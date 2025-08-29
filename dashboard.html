@@ -1,20 +1,130 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Visionary Youth Group</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
-    <script src="script.js" defer></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | VISIONARY YOUTH GROUP 2024</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      height: 100vh;
+      background: #f4f9f9;
+    }
+    /* Sidebar */
+    .sidebar {
+      width: 220px;
+      background: linear-gradient(135deg, #004e92, #000428);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      padding: 1rem;
+    }
+    .sidebar h2 {
+      text-align: center;
+      margin-bottom: 2rem;
+      font-size: 1.3rem;
+    }
+    .sidebar a {
+      color: white;
+      text-decoration: none;
+      padding: 12px;
+      border-radius: 8px;
+      display: block;
+      margin: 5px 0;
+      transition: background 0.3s;
+    }
+    .sidebar a:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+    /* Main Content */
+    .main {
+      flex: 1;
+      padding: 2rem;
+      background: #ffffff;
+      overflow-y: auto;
+    }
+    .main h1 {
+      color: #004e92;
+    }
+    .card {
+      background: #f4f9f9;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1rem 0;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    }
+    button {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #c82333;
+    }
+  </style>
 </head>
-
 <body>
-    <h2>Welcome to Your Dashboard</h2>
-    <p>Here you will see your savings, loans, and contributions (coming soon).</p>
-    <button onclick="logout()">Logout</button>
-</body>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h2>VISIONARY YOUTH</h2>
+    <a href="#">🏦 Contributions</a>
+    <a href="#">💰 Savings</a>
+    <a href="#">📄 Loans</a>
+    <a href="#">👤 Profile</a>
+    <a href="#" onclick="logout()">🚪 Logout</a>
+  </div>
 
+  <!-- Main -->
+  <div class="main">
+    <h1>Welcome, <span id="user-email">Member</span> 👋</h1>
+    <p>Here’s your dashboard where you can view and manage your financial activities.</p>
+
+    <div class="card">
+      <h3>Your Contributions</h3>
+      <p>No records yet.</p>
+    </div>
+
+    <div class="card">
+      <h3>Your Savings</h3>
+      <p>No records yet.</p>
+    </div>
+
+    <div class="card">
+      <h3>Your Loans</h3>
+      <p>No records yet.</p>
+    </div>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="script.js"></script>
+
+  <script>
+    // Show logged in user email
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        document.getElementById("user-email").textContent = user.email;
+      } else {
+        window.location.href = "index.html"; // redirect if logged out
+      }
+    });
+
+    // Logout function
+    function logout() {
+      firebase.auth().signOut().then(() => {
+        alert("Logged out ✅");
+        window.location.href = "index.html";
+      });
+    }
+  </script>
+</body>
 </html>
