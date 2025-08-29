@@ -138,4 +138,126 @@
     <ul>
       <li>Promote financial literacy and savings among members.</li>
       <li>Support entrepreneurship and skill development.</li>
-      <li>Engage in comm
+      <li>Engage in community projects that uplift livelihoods.</li>
+      <li>Foster teamwork, accountability, and leadership among youth.</li>
+    </ul>
+
+    <h3><i class="fas fa-hands-helping"></i> Activities</h3>
+    <ul>
+      <li>Monthly member contributions and savings programs.</li>
+      <li>Business mentorship and training sessions.</li>
+      <li>Community service and outreach programs.</li>
+      <li>Youth empowerment seminars and events.</li>
+    </ul>
+  </section>
+
+  <section id="members" data-aos="fade-right">
+    <h2>Our Members</h2>
+    <p>Join our vibrant community of young people making a positive impact in society.</p>
+  </section>
+
+  <section id="join" data-aos="fade-left">
+    <h2>Become a Member</h2>
+    <p><strong>All fields are required. Registration will fail if any field is left blank.</strong></p>
+    <form id="signupForm">
+      <input type="text" id="name" placeholder="Full Name" required>
+      <input type="email" id="email" placeholder="Email" required>
+      <input type="password" id="password" placeholder="Password" required>
+      <input type="text" id="phone" placeholder="Phone Number" required>
+      <input type="text" id="origin" placeholder="Place of Origin" required>
+      <input type="text" id="idNumber" placeholder="National ID Number" required>
+      <button type="button" onclick="signup()">Sign Up</button>
+    </form>
+
+    <h3>Already a member?</h3>
+    <form id="loginForm">
+      <input type="email" id="loginEmail" placeholder="Email" required>
+      <input type="password" id="loginPassword" placeholder="Password" required>
+      <button type="button" onclick="login()">Login</button>
+    </form>
+  </section>
+
+  <section id="contact" data-aos="fade-up">
+    <h2>Contact Us</h2>
+    <p><i class="fas fa-envelope"></i> visionaryyouthgroup32@gmail.com</p>
+    <p><i class="fas fa-phone"></i> +254 741 453336</p>
+    <p><i class="fas fa-map-marker-alt"></i> Nairobi, Kenya</p>
+    <div class="social-icons">
+      <a href="https://facebook.com/" target="_blank"><i class="fab fa-facebook"></i></a>
+      <a href="https://twitter.com/" target="_blank"><i class="fab fa-twitter"></i></a>
+      <a href="https://instagram.com/" target="_blank"><i class="fab fa-instagram"></i></a>
+    </div>
+  </section>
+
+  <footer>
+    <p>&copy; 2024 VISIONARY YOUTH GROUP. All Rights Reserved.</p>
+  </footer>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+  <!-- AOS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+  <script>AOS.init({ duration: 1000, once: true });</script>
+
+  <script>
+    // Replace with your Firebase config
+    var firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    function signup() {
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const phone = document.getElementById("phone").value;
+      const origin = document.getElementById("origin").value;
+      const idNumber = document.getElementById("idNumber").value;
+
+      if (!name || !email || !password || !phone || !origin || !idNumber) {
+        alert("All fields are required.");
+        return;
+      }
+
+      auth.createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          let user = userCredential.user;
+          return db.collection("members").doc(user.uid).set({
+            name, email, phone, origin, idNumber, createdAt: new Date()
+          });
+        })
+        .then(() => {
+          alert("Signup successful!");
+          document.getElementById("signupForm").reset();
+        })
+        .catch((error) => {
+          alert(error.message);
+        });
+    }
+
+    function login() {
+      const email = document.getElementById("loginEmail").value;
+      const password = document.getElementById("loginPassword").value;
+
+      auth.signInWithEmailAndPassword(email, password)
+        .then(() => {
+          alert("Login successful!");
+          document.getElementById("loginForm").reset();
+        })
+        .catch((error) => {
+          alert(error.message);
+        });
+    }
+  </script>
+</body>
+</html>
