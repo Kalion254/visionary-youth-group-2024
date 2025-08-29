@@ -7,85 +7,43 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
     body {
-      margin: 0;
       font-family: 'Poppins', sans-serif;
+      margin: 0;
       background: linear-gradient(135deg, #004e92, #000428);
       color: white;
       text-align: center;
     }
     header {
       padding: 2rem;
-      background: rgba(0,0,0,0.6);
+      background: rgba(0, 0, 0, 0.6);
     }
     header h1 {
       margin: 0;
-      font-size: 2rem;
-    }
-    header p {
-      margin: 0.5rem 0;
+      font-size: 2.5rem;
+      color: #00ffcc;
     }
     .container {
-      max-width: 500px;
+      max-width: 400px;
       margin: 2rem auto;
-      background: #ffffff;
-      color: #333;
+      background: white;
+      color: black;
       padding: 2rem;
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
     h2 {
-      margin-bottom: 1rem;
       color: #004e92;
+      margin-bottom: 1rem;
+    }
+    label {
+      display: block;
+      text-align: left;
+      margin-top: 10px;
+      font-weight: 600;
     }
     input {
       width: 100%;
       padding: 10px;
-      margin: 0.5rem 0;
+      margin-top: 5px;
       border: 1px solid #ccc;
-      border-radius: 8px;
-    }
-    button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 0.5rem;
-      border: none;
-      border-radius: 8px;
-      background: #004e92;
-      color: white;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    button:hover {
-      background: #00336e;
-    }
-  </style>
-</head>
-<body>
-  <header>
-    <h1>VISIONARY YOUTH GROUP 2024</h1>
-    <p>Email: visionaryyouthgroup32@gmail.com | Phone: +254741453336</p>
-  </header>
-
-  <!-- Login Form -->
-  <div class="container">
-    <h2>Login</h2>
-    <input type="email" id="login-email" placeholder="Enter your email" required>
-    <input type="password" id="login-password" placeholder="Enter your password" required>
-    <button onclick="login()">Login</button>
-  </div>
-
-  <!-- Signup Form -->
-  <div class="container">
-    <h2>Sign Up</h2>
-    <input type="email" id="signup-email" placeholder="Enter your email" required>
-    <input type="password" id="signup-password" placeholder="Create a password" required>
-    <button onclick="signup()">Sign Up</button>
-  </div>
-
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-  <script src="script.js"></script>
-</body>
-</html>
+      border-
