@@ -1,12 +1,17 @@
-// Replace these dummy values with your actual Firebase config
+
 const firebaseConfig = {
-    apiKey: "DUMMY-API-KEY",
-    authDomain: "dummy-project.firebaseapp.com",
-    projectId: "dummy-project",
-    storageBucket: "dummy-project.appspot.com",
-    messagingSenderId: "1234567890",
-    appId: "1:1234567890:web:abcdef123456"
+  apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
+  authDomain: "visionary-youth-grou-2024.firebaseapp.com",
+  projectId: "visionary-youth-grou-2024",
+  storageBucket: "visionary-youth-grou-2024.firebasestorage.app",
+  messagingSenderId: "372978592717",
+  appId: "1:372978592717:web:624596619d41aab84f3284",
+  measurementId: "G-FEHC1GM3B7"
 };
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 
 // Initialize Firebase
 const app = firebase.initializeApp(firebaseConfig);
