@@ -1,0 +1,18 @@
+# VISIONARY YOUTH GROUP 2024
+
+A youth financial group website with Firebase login system.
+
+## 🔹 Features
+- Homepage with group info
+- Signup & Login with Firebase Authentication
+- Member Dashboard (basic)
+- Mobile-friendly design
+
+## 🔹 How to Use
+1. Clone this repo
+2. Replace the dummy Firebase config in `script.js` with your real values from Firebase Console
+3. Enable **Email/Password Authentication** in Firebase
+4. Push changes to GitHub Pages
+
+## 🔹 Live Demo
+[Visit Website](https://<your-username>.github.io/visionary-youth-group-2024/)
