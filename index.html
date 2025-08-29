@@ -11,16 +11,35 @@
       margin: 0;
       background: linear-gradient(135deg, #004e92, #000428);
       color: white;
-      text-align: center;
     }
     header {
-      padding: 2rem;
+      padding: 3rem;
+      text-align: center;
       background: rgba(0, 0, 0, 0.6);
     }
     header h1 {
       margin: 0;
-      font-size: 2.5rem;
+      font-size: 3rem;
       color: #00ffcc;
+    }
+    header p {
+      font-size: 1.2rem;
+      margin-top: 10px;
+    }
+    section {
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+    section h2 {
+      color: #00ffcc;
+      margin-bottom: 1rem;
+    }
+    .about, .contact {
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 2rem;
     }
     .container {
       max-width: 400px;
@@ -46,4 +65,100 @@
       padding: 10px;
       margin-top: 5px;
       border: 1px solid #ccc;
-      border-
+      border-radius: 8px;
+    }
+    button {
+      margin-top: 15px;
+      padding: 12px;
+      width: 100%;
+      background: #004e92;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    button:hover {
+      background: #00ffcc;
+      color: black;
+    }
+    footer {
+      margin-top: 3rem;
+      padding: 1.5rem;
+      text-align: center;
+      background: rgba(0,0,0,0.7);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>VISIONARY YOUTH GROUP 2024</h1>
+    <p>Empowering Youth through Financial Unity and Growth</p>
+  </header>
+
+  <!-- About Section -->
+  <section class="about">
+    <h2>About Us</h2>
+    <p>
+      Visionary Youth Group 2024 is a community of young people committed to building a brighter future 
+      through financial empowerment, collaboration, and innovation. Our mission is to uplift our members 
+      by providing financial support systems, educational programs, and opportunities for growth.
+    </p>
+  </section>
+
+  <!-- Contact Section -->
+  <section class="contact">
+    <h2>Contact Us</h2>
+    <p>Email: <strong>visionaryyouthgroup32@gmail.com</strong></p>
+    <p>Phone: <strong>+254 741 453 336</strong></p>
+  </section>
+
+  <!-- Login Form -->
+  <div class="container">
+    <h2>Login</h2>
+    <label>Email</label>
+    <input type="email" id="login-email" placeholder="Enter your email">
+    <label>Password</label>
+    <input type="password" id="login-password" placeholder="Enter your password">
+    <button onclick="login()">Login</button>
+  </div>
+
+  <!-- Signup Form -->
+  <div class="container">
+    <h2>Sign Up for Membership</h2>
+
+    <label>Full Name</label>
+    <input type="text" id="signup-name" placeholder="Enter your full name" required>
+
+    <label>ID Number</label>
+    <input type="text" id="signup-id" placeholder="Enter your ID number" required>
+
+    <label>Phone Number</label>
+    <input type="text" id="signup-phone" placeholder="Enter your phone number" required>
+
+    <label>Place of Origin</label>
+    <input type="text" id="signup-origin" placeholder="Enter your place of origin" required>
+
+    <label>Email</label>
+    <input type="email" id="signup-email" placeholder="Enter your email" required>
+
+    <label>Password</label>
+    <input type="password" id="signup-password" placeholder="Create a password" required>
+
+    <button onclick="signup()">Sign Up</button>
+  </div>
+
+  <footer>
+    &copy; 2024 Visionary Youth Group | All Rights Reserved
+  </footer>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+  <script>
+    // ==== Replace with YOUR Firebase config ====
+    const firebaseConfig =
