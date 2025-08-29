@@ -49,4 +49,43 @@
       padding: 12px;
       margin-top: 0.5rem;
       border: none;
-      border-
+      border-radius: 8px;
+      background: #004e92;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #00336e;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>VISIONARY YOUTH GROUP 2024</h1>
+    <p>Email: visionaryyouthgroup32@gmail.com | Phone: +254741453336</p>
+  </header>
+
+  <!-- Login Form -->
+  <div class="container">
+    <h2>Login</h2>
+    <input type="email" id="login-email" placeholder="Enter your email" required>
+    <input type="password" id="login-password" placeholder="Enter your password" required>
+    <button onclick="login()">Login</button>
+  </div>
+
+  <!-- Signup Form -->
+  <div class="container">
+    <h2>Sign Up</h2>
+    <input type="email" id="signup-email" placeholder="Enter your email" required>
+    <input type="password" id="signup-password" placeholder="Create a password" required>
+    <button onclick="signup()">Sign Up</button>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
