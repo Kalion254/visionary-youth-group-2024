@@ -140,42 +140,96 @@ footer { text-align:center; padding:15px; background:#333; color:white; margin-t
 </footer>
 
 <!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+import { getFirestore, setDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-<!-- AOS -->
+const firebaseConfig = {
+  apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
+  authDomain: "visionary-youth-grou-2024.firebaseapp.com",
+  projectId: "visionary-youth-grou-2024",
+  storageBucket: "visionary-youth-grou-2024.firebasestorage.app",
+  messagingSenderId: "372978592717",
+  appId: "1:372978592717:web:1c15aec728ee5f854f3284",
+  measurementId: "G-QP1RBT2ZCP"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth();
+const db = getFirestore(app);
+
+window.registerFirebaseUser = async (signupInfo) => {
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, signupInfo.email, signupInfo.password);
+    const user = userCredential.user;
+    await setDoc(doc(db, "members", user.uid), {
+      name: signupInfo.name,
+      phone: signupInfo.phone,
+      idNumber: signupInfo.id,
+      origin: signupInfo.origin,
+      email: signupInfo.email,
+      createdAt: serverTimestamp()
+    });
+    alert(`Welcome ${signupInfo.name}, your account has been created!`);
+  } catch(err) {
+    console.error(err);
+    alert("Firebase signup error: " + err.message);
+  }
+};
+
+window.loginFirebaseUser = async (email, password) => {
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    alert(`Welcome back, ${userCredential.user.email}`);
+  } catch(err) {
+    console.error(err);
+    alert("Login error: " + err.message);
+  }
+};
+</script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
 <script>AOS.init({ duration:1000, once:true });</script>
 
 <script>
 async function triggerMpesaPayment() {
-  const name = document.getElementById('signupName').value;
-  const phone = document.getElementById('signupPhone').value;
-  const id = document.getElementById('signupId').value;
-  const origin = document.getElementById('signupOrigin').value;
-  const email = document.getElementById('signupEmail').value;
-  const password = document.getElementById('signupPassword').value;
-
-  if(!name||!phone||!id||!origin||!email||!password){
-    alert('All fields are required!');
+  const signupInfo = {
+    name: document.getElementById('signupName').value,
+    phone: document.getElementById('signupPhone').value,
+    id: document.getElementById('signupId').value,
+    origin: document.getElementById('signupOrigin').value,
+    email: document.getElementById('signupEmail').value,
+    password: document.getElementById('signupPassword').value
+  };
+  if(!signupInfo.name || !signupInfo.phone || !signupInfo.id || !signupInfo.origin || !signupInfo.email || !signupInfo.password){
+    alert("All fields are required!");
     return;
   }
-
-  try{
-    const response = await fetch('http://localhost:3000/api/mpesa/pay',{
+  try {
+    const response = await fetch('http://localhost:3000/api/mpesa/pay', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ name, phone, id, origin, email, password, amount:100 })
+      body: JSON.stringify({...signupInfo, amount:100})
     });
     const data = await response.json();
-    if(data.success) alert('M-Pesa payment prompt sent! Complete the payment on your phone.');
-    else alert('Payment failed: '+data.message);
+    if(data.success){
+      alert("M-Pesa payment prompt sent! Complete the payment on your phone.");
+      // Call Firebase signup after payment success callback (or sandbox demo)
+      registerFirebaseUser(signupInfo);
+    } else alert("Payment failed: " + data.message);
   } catch(err){
-    alert('Error initiating payment: '+err.message);
+    alert("Error initiating payment: " + err.message);
   }
 }
+
+document.getElementById('loginBtn').addEventListener('click', ()=>{
+  const email = document.getElementById('loginEmail').value;
+  const password = document.getElementById('loginPassword').value;
+  if(!email || !password){ alert("Enter email & password"); return; }
+  loginFirebaseUser(email, password);
+});
 </script>
-<script src="script.js"></script>
+
 </body>
 </html>
