@@ -2,129 +2,130 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <title>Member Dashboard - Visionary Youth Group</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard | VISIONARY YOUTH GROUP 2024</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
   <style>
-    body {
-      margin: 0;
-      font-family: 'Poppins', sans-serif;
-      display: flex;
-      height: 100vh;
-      background: #f4f9f9;
-    }
-    /* Sidebar */
-    .sidebar {
-      width: 220px;
-      background: linear-gradient(135deg, #004e92, #000428);
-      color: white;
-      display: flex;
-      flex-direction: column;
-      padding: 1rem;
-    }
-    .sidebar h2 {
-      text-align: center;
-      margin-bottom: 2rem;
-      font-size: 1.3rem;
-    }
-    .sidebar a {
-      color: white;
-      text-decoration: none;
-      padding: 12px;
-      border-radius: 8px;
-      display: block;
-      margin: 5px 0;
-      transition: background 0.3s;
-    }
-    .sidebar a:hover {
-      background: rgba(255, 255, 255, 0.2);
-    }
-    /* Main Content */
-    .main {
-      flex: 1;
-      padding: 2rem;
-      background: #ffffff;
-      overflow-y: auto;
-    }
-    .main h1 {
-      color: #004e92;
-    }
-    .card {
-      background: #f4f9f9;
-      border-radius: 12px;
-      padding: 1.5rem;
-      margin: 1rem 0;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-    }
-    button {
-      background: #dc3545;
-      color: white;
-      border: none;
-      padding: 10px 18px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: background 0.3s;
-    }
-    button:hover {
-      background: #c82333;
-    }
+    body { margin:0; font-family:'Poppins', sans-serif; background:#f0f2f5; color:#333; }
+    header { background:#007bff; color:white; padding:20px; display:flex; justify-content: space-between; align-items:center; }
+    header h1 { margin:0; font-size:1.8rem; }
+    #logoutBtn { background:#ff6600; border:none; color:white; padding:10px 15px; border-radius:8px; cursor:pointer; font-weight:600; transition:0.3s; }
+    #logoutBtn:hover { background:#ffcc00; color:#333; }
+    nav { background:#0056b3; display:flex; justify-content:center; padding:12px; flex-wrap:wrap; }
+    nav a { color:white; margin:5px 15px; text-decoration:none; font-weight:600; display:flex; align-items:center; }
+    nav a i { margin-right:6px; }
+    nav a:hover { text-decoration:underline; }
+    section { padding:30px; max-width:900px; margin:20px auto; background:white; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.2); }
+    h2 { color:#007bff; margin-bottom:15px; }
+    .card-detail p { margin:5px 0; }
   </style>
 </head>
 <body>
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <h2>VISIONARY YOUTH</h2>
-    <a href="#">🏦 Contributions</a>
-    <a href="#">💰 Savings</a>
-    <a href="#">📄 Loans</a>
-    <a href="#">👤 Profile</a>
-    <a href="#" onclick="logout()">🚪 Logout</a>
-  </div>
 
-  <!-- Main -->
-  <div class="main">
-    <h1>Welcome, <span id="user-email">Member</span> 👋</h1>
-    <p>Here’s your dashboard where you can view and manage your financial activities.</p>
+  <header>
+    <h1>Welcome, <span id="userName">Member</span></h1>
+    <button id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+  </header>
 
-    <div class="card">
-      <h3>Your Contributions</h3>
-      <p>No records yet.</p>
+  <nav>
+    <a href="#account"><i class="fas fa-user"></i> My Account</a>
+    <a href="#savings"><i class="fas fa-piggy-bank"></i> Savings</a>
+    <a href="#loans"><i class="fas fa-hand-holding-usd"></i> Loans</a>
+    <a href="#statements"><i class="fas fa-file-alt"></i> Statements</a>
+    <a href="#events"><i class="fas fa-calendar-alt"></i> Events</a>
+    <a href="#news"><i class="fas fa-newspaper"></i> News</a>
+  </nav>
+
+  <section id="account">
+    <h2>My Account</h2>
+    <div class="card-detail">
+      <p><i class="fas fa-user"></i> Name: <span id="accName"></span></p>
+      <p><i class="fas fa-envelope"></i> Email: <span id="accEmail"></span></p>
+      <p><i class="fas fa-phone"></i> Phone: <span id="accPhone"></span></p>
+      <p><i class="fas fa-id-card"></i> ID Number: <span id="accId"></span></p>
+      <p><i class="fas fa-map-marker-alt"></i> Place of Origin: <span id="accOrigin"></span></p>
     </div>
+  </section>
 
-    <div class="card">
-      <h3>Your Savings</h3>
-      <p>No records yet.</p>
-    </div>
+  <section id="savings">
+    <h2>Savings</h2>
+    <p><i class="fas fa-piggy-bank"></i> Total Savings: <strong>Ksh <span id="savingsBalance">0</span></strong></p>
+  </section>
 
-    <div class="card">
-      <h3>Your Loans</h3>
-      <p>No records yet.</p>
-    </div>
-  </div>
+  <section id="loans">
+    <h2>Loans</h2>
+    <p><i class="fas fa-hand-holding-usd"></i> Outstanding Loan: <strong>Ksh <span id="loanBalance">0</span></strong></p>
+  </section>
 
-  <!-- Firebase SDKs -->
+  <section id="statements">
+    <h2>Statements</h2>
+    <p><i class="fas fa-file-alt"></i> Download or view your transaction history here.</p>
+  </section>
+
+  <section id="events">
+    <h2>Events</h2>
+    <ul>
+      <li><i class="fas fa-calendar-alt"></i> Youth Empowerment Workshop - Sept 15, 2024</li>
+      <li><i class="fas fa-calendar-alt"></i> Annual General Meeting - Dec 20, 2024</li>
+    </ul>
+  </section>
+
+  <section id="news">
+    <h2>News</h2>
+    <p><i class="fas fa-newspaper"></i> Stay updated with latest announcements and opportunities in the group.</p>
+  </section>
+
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-  <script src="script.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
   <script>
-    // Show logged in user email
-    firebase.auth().onAuthStateChanged((user) => {
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Redirect if not logged in
+    auth.onAuthStateChanged(user => {
       if (user) {
-        document.getElementById("user-email").textContent = user.email;
+        db.collection("members").doc(user.uid).get().then(doc => {
+          if (doc.exists) {
+            const data = doc.data();
+            document.getElementById("userName").textContent = data.name;
+            document.getElementById("accName").textContent = data.name;
+            document.getElementById("accEmail").textContent = data.email;
+            document.getElementById("accPhone").textContent = data.phone;
+            document.getElementById("accId").textContent = data.idNumber;
+            document.getElementById("accOrigin").textContent = data.origin;
+          }
+        });
       } else {
-        window.location.href = "index.html"; // redirect if logged out
+        window.location.href = "index.html";
       }
     });
 
-    // Logout function
-    function logout() {
-      firebase.auth().signOut().then(() => {
-        alert("Logged out ✅");
+    // Logout
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      auth.signOut().then(() => {
+        alert("✅ You have been logged out.");
         window.location.href = "index.html";
+      }).catch(error => {
+        alert("❌ Logout failed: " + error.message);
       });
-    }
+    });
   </script>
 </body>
 </html>
