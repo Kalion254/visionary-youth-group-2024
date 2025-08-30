@@ -1,77 +1,57 @@
+<!-- Firebase App (the core Firebase SDK) -->
+<script type="module">
+  // Import the functions you need from the SDKs
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+  import { getFirestore, setDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
+  // Your Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
+    authDomain: "visionary-youth-grou-2024.firebaseapp.com",
+    projectId: "visionary-youth-grou-2024",
+    storageBucket: "visionary-youth-grou-2024.firebasestorage.app",
+    messagingSenderId: "372978592717",
+    appId: "1:372978592717:web:1c15aec728ee5f854f3284",
+    measurementId: "G-QP1RBT2ZCP"
+  };
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
-  authDomain: "visionary-youth-grou-2024.firebaseapp.com",
-  projectId: "visionary-youth-grou-2024",
-  storageBucket: "visionary-youth-grou-2024.firebasestorage.app",
-  messagingSenderId: "372978592717",
-  appId: "1:372978592717:web:624596619d41aab84f3284",
-  measurementId: "G-FEHC1GM3B7"
-};
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth();
+  const db = getFirestore(app);
 
+  // Signup function after successful M-Pesa payment
+  window.registerFirebaseUser = async (signupInfo) => {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, signupInfo.email, signupInfo.password);
+      const user = userCredential.user;
 
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
-
-// ===== SIGN UP =====
-document.getElementById("signupBtn").addEventListener("click", () => {
-  const name = document.getElementById("signupName").value;
-  const phone = document.getElementById("signupPhone").value;
-  const idNumber = document.getElementById("signupId").value;
-  const origin = document.getElementById("signupOrigin").value;
-  const email = document.getElementById("signupEmail").value;
-  const password = document.getElementById("signupPassword").value;
-
-  // Validation (all fields required)
-  if (!name || !phone || !idNumber || !origin || !email || !password) {
-    alert("⚠️ All fields are required!");
-    return;
-  }
-
-  auth.createUserWithEmailAndPassword(email, password)
-    .then(cred => {
-      // Save extra details in Firestore
-      return db.collection("members").doc(cred.user.uid).set({
-        name: name,
-        phone: phone,
-        idNumber: idNumber,
-        origin: origin,
-        email: email,
-        joinedAt: firebase.firestore.FieldValue.serverTimestamp()
+      // Store additional info in Firestore
+      await setDoc(doc(db, "members", user.uid), {
+        name: signupInfo.name,
+        phone: signupInfo.phone,
+        idNumber: signupInfo.id,
+        origin: signupInfo.origin,
+        email: signupInfo.email,
+        createdAt: serverTimestamp()
       });
-    })
-    .then(() => {
-      alert("✅ Signup successful! You can now login.");
-      document.getElementById("signupForm").reset();
-    })
-    .catch(error => {
-      alert("❌ " + error.message);
-    });
-});
 
-// ===== LOGIN =====
-document.getElementById("loginBtn").addEventListener("click", () => {
-  const email = document.getElementById("loginEmail").value;
-  const password = document.getElementById("loginPassword").value;
+      alert(`Welcome ${signupInfo.name}, your account has been created!`);
+    } catch (err) {
+      console.error(err);
+      alert("Firebase signup error: " + err.message);
+    }
+  };
 
-  if (!email || !password) {
-    alert("⚠️ Enter both email and password!");
-    return;
-  }
-
-  auth.signInWithEmailAndPassword(email, password)
-    .then(() => {
-      alert("🎉 Login successful! Welcome back.");
-      document.getElementById("loginForm").reset();
-      // 👉 Redirect to dashboard.html (create this later)
-      window.location.href = "dashboard.html";
-    })
-    .catch(error => {
-      alert("❌ " + error.message);
-    });
-});
+  // Login function
+  window.loginFirebaseUser = async (email, password) => {
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      alert(`Welcome back, ${userCredential.user.email}`);
+    } catch (err) {
+      console.error(err);
+      alert("Login error: " + err.message);
+    }
+  };
+</script>
