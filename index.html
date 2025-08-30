@@ -1,96 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VISIONARY YOUTH GROUP 2024</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VISIONARY YOUTH GROUP 2024</title>
 
-  <!-- Fonts & Icons -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<!-- Fonts & Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-  <!-- AOS Animations -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+<!-- AOS Animations -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
 
-  <style>
-    body { margin:0; font-family:'Poppins',sans-serif; background:#f0f2f5; color:#333; }
-    /* Header & Navigation */
-    header { position: relative; height: 100vh; background: url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1600&q=80') no-repeat center/cover; color: white; text-align: center; display:flex; flex-direction:column; justify-content:center; align-items:center; }
-    header h1 { font-size:3rem; margin:0; color:#ffcc00; text-shadow: 2px 2px 6px #000; }
-    header p { font-size:1.2rem; margin-top:15px; text-shadow: 1px 1px 3px #000; }
-    nav { position: fixed; top:0; width:100%; background: rgba(0,0,0,0.7); display:flex; justify-content:center; padding:12px; z-index:10; }
-    nav a { color:white; margin:0 15px; text-decoration:none; font-weight:600; transition:0.3s; }
-    nav a:hover { color:#ffcc00; }
+<style>
+  body { margin:0; font-family:'Poppins',sans-serif; background:#f0f2f5; color:#333; }
+  /* Navigation */
+  nav { position:fixed; top:0; width:100%; background:rgba(0,0,0,0.7); display:flex; justify-content:center; padding:12px; z-index:10; }
+  nav a { color:white; margin:0 15px; text-decoration:none; font-weight:600; transition:0.3s; }
+  nav a:hover { color:#ffcc00; }
 
-    /* Sections */
-    section { padding:60px 20px; max-width:1000px; margin:auto; background:white; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.1); margin-top:40px; }
-    h2 { color:#007bff; margin-bottom:25px; text-align:center; }
+  /* Hero */
+  header { position:relative; height:100vh; background:url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1600&q=80') no-repeat center/cover; color:white; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; }
+  header h1 { font-size:3rem; margin:0; color:#ffcc00; text-shadow:2px 2px 6px #000; }
+  header p { font-size:1.2rem; margin-top:15px; text-shadow:1px 1px 3px #000; }
+  .hero-btn { background:#ffcc00; color:#333; padding:15px 25px; border:none; border-radius:8px; font-weight:600; font-size:1rem; cursor:pointer; transition:0.3s; margin-top:20px; }
+  .hero-btn:hover { background:#ff6600; color:white; transform:scale(1.05); }
 
-    /* Hero Button */
-    .hero-btn { background:#ffcc00; color:#333; padding:15px 25px; border:none; border-radius:8px; font-weight:600; font-size:1rem; cursor:pointer; transition:0.3s; }
-    .hero-btn:hover { background:#ff6600; color:white; transform:scale(1.05); }
+  /* Sections */
+  section { padding:60px 20px; max-width:1000px; margin:40px auto; background:white; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.1); }
+  h2 { color:#007bff; margin-bottom:25px; text-align:center; }
 
-    /* Benefits Grid */
-    .benefits { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:25px; }
-    .benefit { background:#f9f9f9; padding:25px; border-radius:12px; text-align:center; transition:transform 0.3s; }
-    .benefit:hover { transform:scale(1.05); }
-    .benefit i { font-size:40px; color:#ffcc00; margin-bottom:10px; }
+  /* Benefits */
+  .benefits { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:25px; }
+  .benefit { background:#f9f9f9; padding:25px; border-radius:12px; text-align:center; transition:transform 0.3s; }
+  .benefit:hover { transform:scale(1.05); }
+  .benefit i { font-size:40px; color:#ffcc00; margin-bottom:10px; }
 
-    /* Programs & News */
-    .programs, .news { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:20px; }
-    .card { background:#f9f9f9; padding:20px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.1); }
+  /* Programs & News */
+  .programs, .news { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:20px; }
+  .card { background:#f9f9f9; padding:20px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.1); }
 
-    /* Contact */
-    #contact p i { margin-right:8px; color:#007bff; }
-    .social-icons a { margin:0 10px; font-size:24px; color:#007bff; transition:0.3s; }
-    .social-icons a:hover { color:#ff6600; transform:rotate(15deg) scale(1.2); }
+  /* Contact */
+  #contact p i { margin-right:8px; color:#007bff; }
+  .social-icons a { margin:0 10px; font-size:24px; color:#007bff; transition:0.3s; }
+  .social-icons a:hover { color:#ff6600; transform:rotate(15deg) scale(1.2); }
 
-    /* Forms */
-    form { background:#f9f9f9; padding:25px; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,0.1); margin-top:20px; }
-    input { display:block; width:100%; margin:10px 0; padding:10px; border-radius:8px; border:1px solid #ccc; }
-    button { background:#007bff; color:white; padding:10px 20px; border:none; border-radius:8px; cursor:pointer; transition:0.3s; }
-    button:hover { background:#ff6600; transform:scale(1.05); }
-  </style>
+  /* Forms */
+  form { background:#f9f9f9; padding:25px; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,0.1); margin-top:20px; }
+  input { display:block; width:100%; margin:10px 0; padding:10px; border-radius:8px; border:1px solid #ccc; }
+  button { background:#007bff; color:white; padding:10px 20px; border:none; border-radius:8px; cursor:pointer; transition:0.3s; }
+  button:hover { background:#ff6600; transform:scale(1.05); }
+
+  footer { text-align:center; padding:15px; background:#333; color:white; margin-top:40px; border-radius:12px; }
+</style>
 </head>
 <body>
 
-  <!-- Navigation -->
-  <nav>
-    <a href="#about"><i class="fas fa-info-circle"></i> About</a>
-    <a href="#benefits"><i class="fas fa-gift"></i> Benefits</a>
-    <a href="#programs"><i class="fas fa-tasks"></i> Programs</a>
-    <a href="#news"><i class="fas fa-newspaper"></i> News</a>
-    <a href="#contact"><i class="fas fa-envelope"></i> Contact</a>
-    <a href="#auth"><i class="fas fa-user-plus"></i> Join</a>
-  </nav>
+<!-- Navigation -->
+<nav>
+  <a href="#about"><i class="fas fa-info-circle"></i> About</a>
+  <a href="#benefits"><i class="fas fa-gift"></i> Benefits</a>
+  <a href="#programs"><i class="fas fa-tasks"></i> Programs</a>
+  <a href="#news"><i class="fas fa-newspaper"></i> News</a>
+  <a href="#contact"><i class="fas fa-envelope"></i> Contact</a>
+  <a href="#auth"><i class="fas fa-user-plus"></i> Join</a>
+</nav>
 
-  <!-- Hero Section -->
-  <header data-aos="fade-down">
-    <h1>VISIONARY YOUTH GROUP 2024</h1>
-    <p>Empowering Youth Through Financial Literacy, Entrepreneurship & Community Impact</p>
-    <button class="hero-btn" onclick="document.getElementById('auth').scrollIntoView({behavior:'smooth'})">Join Us Today</button>
-  </header>
+<!-- Hero Section -->
+<header data-aos="fade-down">
+  <h1>VISIONARY YOUTH GROUP 2024</h1>
+  <p>Empowering Youth Through Financial Literacy, Entrepreneurship & Community Impact</p>
+  <button class="hero-btn" onclick="document.getElementById('auth').scrollIntoView({behavior:'smooth'})">Join Us Today</button>
+</header>
 
-  <!-- About -->
-  <section id="about" data-aos="fade-up">
-    <h2>About Us</h2>
-    <p>VISIONARY YOUTH GROUP 2024 is dedicated to empowering young people through financial literacy, entrepreneurship, skill development, and community service. We foster leadership, accountability, and growth among youth to positively impact society.</p>
-  </section>
+<!-- About -->
+<section id="about" data-aos="fade-up">
+  <h2>About Us</h2>
+  <p>VISIONARY YOUTH GROUP 2024 empowers young people through financial literacy, entrepreneurship, and community service. We foster leadership, accountability, and growth among youth to positively impact society.</p>
+</section>
 
-  <!-- Members Benefits -->
-  <section id="benefits" data-aos="fade-up">
-    <h2>Member Benefits</h2>
-    <div class="benefits">
-      <div class="benefit"><i class="fas fa-piggy-bank"></i><h3>Savings</h3><p>Grow your money safely with structured group savings plans.</p></div>
-      <div class="benefit"><i class="fas fa-hand-holding-usd"></i><h3>Loans</h3><p>Access affordable loans to fund personal or business projects.</p></div>
-      <div class="benefit"><i class="fas fa-users"></i><h3>Networking</h3><p>Connect with motivated youth and expand your opportunities.</p></div>
-      <div class="benefit"><i class="fas fa-chalkboard-teacher"></i><h3>Training</h3><p>Attend workshops and seminars to develop skills and knowledge.</p></div>
-    </div>
-  </section>
-
-  <!-- Programs / Activities -->
-  <section id="programs" data-aos="fade-up">
-    <h2>Our Programs</h2>
-    <div class="programs">
-      <div class="card"><i class="fas fa-hand-holding-heart"></i><h3>Community Service</h3><p>Engage in projects that uplift the community and build teamwork.</p></div>
-      <div class="card"><i class=
+<!-- Benefits -->
+<section id="benefits" data-aos="fade-up">
+  <h2>Member Benefits</h2>
+  <div class="benefits">
+    <div class="benefit"><i class="fas fa-piggy-bank"></i><h3>Savings</h3><p>Grow your money safely with structured group savings plans.</p></div>
+    <div class="benefit"><i class="fas fa-hand-holding-usd"></i
