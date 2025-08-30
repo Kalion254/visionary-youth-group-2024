@@ -1,4 +1,7 @@
 
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
   authDomain: "visionary-youth-grou-2024.firebaseapp.com",
@@ -9,52 +12,66 @@ const firebaseConfig = {
   measurementId: "G-FEHC1GM3B7"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
 
 // Initialize Firebase
-const app = firebase.initializeApp(firebaseConfig);
+firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
+const db = firebase.firestore();
 
-// Signup
-const signupForm = document.getElementById("signup-form");
-if (signupForm) {
-    signupForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const email = document.getElementById("signup-email").value;
-        const password = document.getElementById("signup-password").value;
+// ===== SIGN UP =====
+document.getElementById("signupBtn").addEventListener("click", () => {
+  const name = document.getElementById("signupName").value;
+  const phone = document.getElementById("signupPhone").value;
+  const idNumber = document.getElementById("signupId").value;
+  const origin = document.getElementById("signupOrigin").value;
+  const email = document.getElementById("signupEmail").value;
+  const password = document.getElementById("signupPassword").value;
 
-        auth.createUserWithEmailAndPassword(email, password)
-            .then(() => {
-                alert("Account created successfully!");
-                window.location.href = "dashboard.html";
-            })
-            .catch(err => alert(err.message));
+  // Validation (all fields required)
+  if (!name || !phone || !idNumber || !origin || !email || !password) {
+    alert("⚠️ All fields are required!");
+    return;
+  }
+
+  auth.createUserWithEmailAndPassword(email, password)
+    .then(cred => {
+      // Save extra details in Firestore
+      return db.collection("members").doc(cred.user.uid).set({
+        name: name,
+        phone: phone,
+        idNumber: idNumber,
+        origin: origin,
+        email: email,
+        joinedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    })
+    .then(() => {
+      alert("✅ Signup successful! You can now login.");
+      document.getElementById("signupForm").reset();
+    })
+    .catch(error => {
+      alert("❌ " + error.message);
     });
-}
+});
 
-// Login
-const loginForm = document.getElementById("login-form");
-if (loginForm) {
-    loginForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const email = document.getElementById("login-email").value;
-        const password = document.getElementById("login-password").value;
+// ===== LOGIN =====
+document.getElementById("loginBtn").addEventListener("click", () => {
+  const email = document.getElementById("loginEmail").value;
+  const password = document.getElementById("loginPassword").value;
 
-        auth.signInWithEmailAndPassword(email, password)
-            .then(() => {
-                alert("Login successful!");
-                window.location.href = "dashboard.html";
-            })
-            .catch(err => alert(err.message));
+  if (!email || !password) {
+    alert("⚠️ Enter both email and password!");
+    return;
+  }
+
+  auth.signInWithEmailAndPassword(email, password)
+    .then(() => {
+      alert("🎉 Login successful! Welcome back.");
+      document.getElementById("loginForm").reset();
+      // 👉 Redirect to dashboard.html (create this later)
+      window.location.href = "dashboard.html";
+    })
+    .catch(error => {
+      alert("❌ " + error.message);
     });
-}
-
-// Logout
-function logout() {
-    auth.signOut().then(() => {
-        alert("Logged out!");
-        window.location.href = "login.html";
-    });
-}
+});
