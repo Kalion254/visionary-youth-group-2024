@@ -35,8 +35,11 @@ form { background:#f9f9f9; padding:25px; border-radius:12px; box-shadow:0 2px 12
 input { display:block; width:100%; margin:10px 0; padding:10px; border-radius:8px; border:1px solid #ccc; }
 button { background:#007bff; color:white; padding:10px 20px; border:none; border-radius:8px; cursor:pointer; transition:0.3s; }
 button:hover { background:#ff6600; transform:scale(1.05); }
-.forgot-password { color:#007bff; cursor:pointer; text-decoration:underline; margin-top:5px; display:inline-block; }
 footer { text-align:center; padding:15px; background:#333; color:white; margin-top:40px; border-radius:12px; }
+
+/* Dashboard progress bars */
+.progress-container { background:#ddd; border-radius:20px; overflow:hidden; height:20px; width:100%; margin-top:10px; }
+.progress-bar { height:100%; background:#007bff; width:0%; transition: width 1s ease; border-radius:20px; }
 </style>
 </head>
 <body>
@@ -48,8 +51,8 @@ footer { text-align:center; padding:15px; background:#333; color:white; margin-t
   <a href="#news"><i class="fas fa-newspaper"></i> News</a>
   <a href="#contact"><i class="fas fa-envelope"></i> Contact</a>
   <a href="#auth"><i class="fas fa-user-plus"></i> Join</a>
-  <a href="#dashboardPreview"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-  <a href="#admin-dashboard"><i class="fas fa-lock"></i> Admin</a>
+  <a href="#dashboard" id="navDashboard" style="display:none;"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+  <a href="#" id="logoutLink" style="display:none;"><i class="fas fa-sign-out-alt"></i> Logout</a>
 </nav>
 
 <header data-aos="fade-down">
@@ -92,15 +95,22 @@ footer { text-align:center; padding:15px; background:#333; color:white; margin-t
   </div>
 </section>
 
-<section id="dashboardPreview" data-aos="fade-up">
-  <h2>Dashboard Preview</h2>
+<section id="dashboard" data-aos="fade-up" style="display:none;">
+  <h2>Member Dashboard</h2>
   <div class="dashboard-preview">
-    <div class="dash-card"><i class="fas fa-user"></i><h3>My Account</h3><p>View and edit your personal details.</p></div>
-    <div class="dash-card"><i class="fas fa-piggy-bank"></i><h3>Savings</h3><p>Track your savings progress.</p></div>
-    <div class="dash-card"><i class="fas fa-hand-holding-usd"></i><h3>Loans</h3><p>Check your loan status.</p></div>
-    <div class="dash-card"><i class="fas fa-file-alt"></i><h3>Statements</h3><p>View your transaction history.</p></div>
-    <div class="dash-card"><i class="fas fa-calendar-alt"></i><h3>Events</h3><p>See upcoming group events.</p></div>
-    <div class="dash-card"><i class="fas fa-newspaper"></i><h3>News</h3><p>Stay updated with latest announcements.</p></div>
+    <div class="dash-card" id="dashSavings">
+      <i class="fas fa-piggy-bank"></i><h3>Savings</h3>
+      <p>KSh 0 / KSh 100000</p>
+      <div class="progress-container"><div class="progress-bar"></div></div>
+    </div>
+    <div class="dash-card" id="dashLoans">
+      <i class="fas fa-hand-holding-usd"></i><h3>Loans</h3>
+      <p>KSh 0 / KSh 50000</p>
+      <div class="progress-container"><div class="progress-bar"></div></div>
+    </div>
+    <div class="dash-card" id="dashStatements"><i class="fas fa-file-alt"></i><h3>Statements</h3><p>0 transactions</p></div>
+    <div class="dash-card" id="dashEvents"><i class="fas fa-calendar-alt"></i><h3>Events</h3><p>Upcoming events</p></div>
+    <div class="dash-card" id="dashNews"><i class="fas fa-newspaper"></i><h3>News</h3><p>Latest announcements</p></div>
   </div>
 </section>
 
@@ -118,7 +128,6 @@ footer { text-align:center; padding:15px; background:#333; color:white; margin-t
 
 <section id="auth" data-aos="fade-up">
   <h2>Join Our Community</h2>
-  <p><strong>All fields are required. Pay your joining contribution via M-Pesa.</strong></p>
   <form id="signupForm">
     <input type="text" id="signupName" placeholder="Full Name" required>
     <input type="text" id="signupPhone" placeholder="Phone Number" required>
@@ -126,7 +135,7 @@ footer { text-align:center; padding:15px; background:#333; color:white; margin-t
     <input type="text" id="signupOrigin" placeholder="Place of Origin" required>
     <input type="email" id="signupEmail" placeholder="Email" required>
     <input type="password" id="signupPassword" placeholder="Password" required>
-    <button type="button" onclick="registerFirebaseUserFromForm()">Sign Up</button>
+    <button type="button" id="signupBtn">Sign Up</button>
   </form>
 
   <h3>Already a member?</h3>
@@ -134,32 +143,15 @@ footer { text-align:center; padding:15px; background:#333; color:white; margin-t
     <input type="email" id="loginEmail" placeholder="Email" required>
     <input type="password" id="loginPassword" placeholder="Password" required>
     <button type="button" id="loginBtn">Login</button>
-    <span class="forgot-password" onclick="resetPassword()">Forgot Password?</span>
+    <p><a href="#" id="resetPasswordLink">Forgot password?</a></p>
   </form>
 </section>
 
-<section id="admin-dashboard" data-aos="fade-up" style="display:none;">
-  <h2>Admin Dashboard</h2>
-  <div id="dashboard-root">
-    <p>Welcome Admin! Here you can manage loans, statements, and repayments.</p>
-  </div>
-</section>
-
-<footer data-aos="fade-up">
-  <p>© 2024 VISIONARY YOUTH GROUP. All Rights Reserved.</p>
-</footer>
-
+<!-- Firebase -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { 
-  getAuth, 
-  createUserWithEmailAndPassword, 
-  signInWithEmailAndPassword, 
-  sendPasswordResetEmail,
-  onAuthStateChanged, 
-  signOut 
-} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-import { getFirestore, setDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+import { getFirestore, setDoc, doc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
@@ -175,7 +167,11 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth();
 const db = getFirestore(app);
 
-window.registerFirebaseUserFromForm = async () => {
+const savingsGoal = 100000;
+const loanLimit = 50000;
+
+// Signup
+document.getElementById('signupBtn').addEventListener('click', async () => {
   const signupInfo = {
     name: document.getElementById('signupName').value,
     phone: document.getElementById('signupPhone').value,
@@ -184,67 +180,90 @@ window.registerFirebaseUserFromForm = async () => {
     email: document.getElementById('signupEmail').value,
     password: document.getElementById('signupPassword').value
   };
-  if (!signupInfo.name || !signupInfo.phone || !signupInfo.id || !signupInfo.origin || !signupInfo.email || !signupInfo.password) {
-    alert("All fields are required!");
-    return;
-  }
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, signupInfo.email, signupInfo.password);
     const user = userCredential.user;
-    await setDoc(doc(db, "members", user.uid), {
+    await setDoc(doc(db,"members",user.uid), {
       name: signupInfo.name,
       phone: signupInfo.phone,
       idNumber: signupInfo.id,
       origin: signupInfo.origin,
       email: signupInfo.email,
+      savings: 0,
+      loans: 0,
+      transactions: [],
       createdAt: serverTimestamp()
     });
     alert(`Welcome ${signupInfo.name}, your account has been created!`);
-    document.getElementById('signupForm').reset();
-    document.getElementById('dashboardPreview').scrollIntoView({behavior:'smooth'});
-  } catch(err){
-    console.error(err);
-    if(err.code==='auth/email-already-in-use'){
-      alert("This email is already in use. Try logging in or reset your password if forgotten.");
-    } else {
-      alert("Firebase signup error: " + err.message);
-    }
+  } catch(err){ alert(err.message); }
+});
+
+// Login
+document.getElementById('loginBtn').addEventListener('click', async () => {
+  const email = document.getElementById('loginEmail').value;
+  const password = document.getElementById('loginPassword').value;
+  try { await signInWithEmailAndPassword(auth,email,password); } 
+  catch(err){ alert(err.message); }
+});
+
+// Reset password
+document.getElementById('resetPasswordLink').addEventListener('click', async () => {
+  const email = prompt("Enter your registered email:");
+  if(email){
+    try{ await sendPasswordResetEmail(auth,email); alert("Password reset email sent!"); } 
+    catch(err){ alert(err.message); }
   }
-};
-
-document.getElementById('loginBtn').addEventListener('click', async ()=>{
-  const email=document.getElementById('loginEmail').value;
-  const password=document.getElementById('loginPassword').value;
-  if(!email||!password){ alert("Enter email & password"); return; }
-  try{
-    const userCredential = await signInWithEmailAndPassword(auth,email,password);
-    alert(`Welcome back, ${userCredential.user.email}`);
-    document.getElementById('dashboardPreview').scrollIntoView({behavior:'smooth'});
-  } catch(err){ console.error(err); alert("Login error: "+err.message); }
 });
 
-window.resetPassword = async ()=>{
-  const email = prompt("Enter your email to reset password:");
-  if(!email) return;
-  try{
-    await sendPasswordResetEmail(auth,email);
-    alert("Password reset email sent! Check your inbox.");
-  } catch(err){ console.error(err); alert("Error sending reset email: "+err.message); }
-};
-
-onAuthStateChanged(auth,(user)=>{
-  const dashboard=document.getElementById("admin-dashboard");
-  dashboard.style.display=user?"block":"none";
+// Logout
+document.getElementById('logoutLink').addEventListener('click', async () => {
+  await signOut(auth);
+  location.reload();
 });
 
-window.logoutUser = async ()=>{
-  try{ await signOut(auth); alert("Logged out successfully!"); }
-  catch(err){ console.error(err); }
-};
+// Dashboard & animated bars
+onAuthStateChanged(auth, async (user) => {
+  const dashboard = document.getElementById('dashboard');
+  const navDashboard = document.getElementById('navDashboard');
+  const logoutLink = document.getElementById('logoutLink');
+  if(user){
+    dashboard.style.display="block";
+    navDashboard.style.display="inline";
+    logoutLink.style.display="inline";
+
+    const docSnap = await getDoc(doc(db,"members",user.uid));
+    const data = docSnap.exists()?docSnap.data():{};
+
+    const savingsAmount = data.savings||0;
+    const loansAmount = data.loans||0;
+    const savingsPercent = Math.min((savingsAmount/savingsGoal)*100,100);
+    const loansPercent = Math.min((loansAmount/loanLimit)*100,100);
+
+    const savingsBar = document.querySelector('#dashSavings .progress-bar');
+    const loansBar = document.querySelector('#dashLoans .progress-bar');
+    savingsBar.style.width = '0%';
+    loansBar.style.width = '0%';
+    setTimeout(()=>{ savingsBar.style.width = savingsPercent+'%'; },100);
+    setTimeout(()=>{ loansBar.style.width = loansPercent+'%'; },100);
+
+    document.querySelector('#dashSavings p').innerText = `KSh ${savingsAmount} / KSh ${savingsGoal}`;
+    document.querySelector('#dashLoans p').innerText = `KSh ${loansAmount} / KSh ${loanLimit}`;
+    document.querySelector('#dashStatements p').innerText = `${(data.transactions?.length)||0} transactions`;
+    document.querySelector('#dashEvents p').innerText = "Upcoming events here";
+    document.querySelector('#dashNews p').innerText = "Latest announcements here";
+  } else {
+    dashboard.style.display="none";
+    navDashboard.style.display="none";
+    logoutLink.style.display="none";
+  }
+});
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
 <script>AOS.init({ duration:1000, once:true });</script>
 
+<footer data-aos="fade-up">
+  <p>© 2024 VISIONARY YOUTH GROUP. All Rights Reserved.</p>
+</footer>
 </body>
 </html>
