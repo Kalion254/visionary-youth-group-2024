@@ -151,7 +151,8 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 // SIGNUP
-document.getElementById('signupBtn').addEventListener('click', async ()=>{
+document.getElementById('signupBtn').addEventListener('click', async (event)=>{
+  event.preventDefault();
   const signupInfo = {
     name: document.getElementById('signupName').value,
     phone: document.getElementById('signupPhone').value,
@@ -178,19 +179,21 @@ document.getElementById('signupBtn').addEventListener('click', async ()=>{
 });
 
 // LOGIN
-document.getElementById('loginBtn').addEventListener('click', async ()=>{
+document.getElementById('loginBtn').addEventListener('click', async (event)=>{
+  event.preventDefault();
   const email = document.getElementById('loginEmail').value;
   const password = document.getElementById('loginPassword').value;
   try {
     await signInWithEmailAndPassword(auth, email, password);
-    window.location.href = "dashboard.html"; // redirect to dashboard after login
+    window.location.href = "dashboard.html";
   } catch(err){
     alert("Login failed: " + err.message);
   }
 });
 
 // RESET PASSWORD
-document.getElementById('resetPasswordBtn').addEventListener('click', async ()=>{
+document.getElementById('resetPasswordBtn').addEventListener('click', async (event)=>{
+  event.preventDefault();
   const email = document.getElementById('loginEmail').value;
   if(!email){ alert("Enter your email to reset password"); return; }
   try {
@@ -204,5 +207,6 @@ document.getElementById('resetPasswordBtn').addEventListener('click', async ()=>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
 <script>AOS.init({ duration:1000, once:true });</script>
+
 </body>
 </html>
