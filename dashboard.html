@@ -2,145 +2,63 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Member Dashboard</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, signOut, onAuthStateChanged } 
-      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getDatabase, ref, get, set, update, push } 
-      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
-      authDomain: "your-app.firebaseapp.com",
-      databaseURL: "https://your-app.firebaseio.com",
-      projectId: "your-app",
-      storageBucket: "your-app.appspot.com",
-      messagingSenderId: "123456789",
-      appId: "1:123456789:web:xxxx"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getDatabase(app);
-
-    const userName = document.getElementById("userName");
-    const logoutBtn = document.getElementById("logoutBtn");
-
-    // Check if logged in
-    onAuthStateChanged(auth, (user) => {
-      if (!user) {
-        window.location.href = "index.html";
-      } else {
-        get(ref(db, "users/" + user.uid)).then((snapshot) => {
-          if (snapshot.exists()) {
-            userName.innerText = snapshot.val().email;
-          }
-        });
-      }
-    });
-
-    // Logout
-    logoutBtn.addEventListener("click", () => {
-      signOut(auth).then(() => {
-        window.location.href = "index.html";
-      });
-    });
-
-    // Save Profile
-    document.getElementById("profileForm").addEventListener("submit", (e) => {
-      e.preventDefault();
-      const fullName = document.getElementById("fullName").value;
-      const phone = document.getElementById("phone").value;
-      const address = document.getElementById("address").value;
-
-      const user = auth.currentUser;
-      update(ref(db, "users/" + user.uid), {
-        fullName, phone, address
-      }).then(() => {
-        alert("Profile updated successfully!");
-      });
-    });
-
-    // Loan Application
-    document.getElementById("loanForm").addEventListener("submit", (e) => {
-      e.preventDefault();
-      const amount = document.getElementById("loanAmount").value;
-      const purpose = document.getElementById("loanPurpose").value;
-      const guarantor = document.getElementById("loanGuarantor").value;
-
-      const user = auth.currentUser;
-      const loanRef = push(ref(db, "loans/"));
-      set(loanRef, {
-        userId: user.uid,
-        amount, purpose, guarantor,
-        status: "Pending"
-      }).then(() => {
-        alert("Loan application submitted!");
-      });
-    });
-  </script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body class="bg-light">
-  <nav class="navbar navbar-dark bg-primary">
-    <div class="container-fluid">
-      <span class="navbar-brand">Member Dashboard</span>
-      <span class="text-white">Welcome, <b id="userName"></b></span>
-      <button class="btn btn-danger" id="logoutBtn">Logout</button>
-    </div>
+<body class="bg-gray-100">
+
+  <!-- Navbar -->
+  <nav class="bg-blue-700 text-white p-4 flex justify-between">
+    <h1 class="text-xl font-bold">Member Dashboard</h1>
+    <button id="logoutBtn" class="bg-red-500 px-3 py-1 rounded">Logout</button>
   </nav>
 
-  <div class="container mt-4">
-    <div class="row g-4">
-      <!-- Profile -->
-      <div class="col-md-6">
-        <div class="card shadow">
-          <div class="card-header bg-primary text-white">Update Profile</div>
-          <div class="card-body">
-            <form id="profileForm">
-              <input type="text" id="fullName" class="form-control mb-2" placeholder="Full Name">
-              <input type="text" id="phone" class="form-control mb-2" placeholder="Phone">
-              <input type="text" id="address" class="form-control mb-2" placeholder="Address">
-              <button class="btn btn-success w-100">Save Profile</button>
-            </form>
-          </div>
-        </div>
-      </div>
+  <!-- Dashboard Content -->
+  <div class="max-w-6xl mx-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+    
+    <!-- Profile Section -->
+    <div class="bg-white shadow rounded p-4">
+      <h2 class="text-lg font-bold mb-3">Profile Information</h2>
+      <form id="profileForm" class="space-y-2">
+        <input type="text" id="fullName" placeholder="Full Name" class="w-full border p-2 rounded">
+        <input type="email" id="email" placeholder="Email" class="w-full border p-2 rounded">
+        <input type="text" id="phone" placeholder="Phone Number" class="w-full border p-2 rounded">
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Update Profile</button>
+      </form>
+      <p id="profileMsg" class="text-green-600 mt-2 hidden">Profile updated successfully ✅</p>
+    </div>
 
-      <!-- Loan Application -->
-      <div class="col-md-6">
-        <div class="card shadow">
-          <div class="card-header bg-warning">Loan Application</div>
-          <div class="card-body">
-            <form id="loanForm">
-              <input type="number" id="loanAmount" class="form-control mb-2" placeholder="Loan Amount">
-              <input type="text" id="loanPurpose" class="form-control mb-2" placeholder="Purpose">
-              <input type="text" id="loanGuarantor" class="form-control mb-2" placeholder="Guarantor">
-              <button class="btn btn-primary w-100">Apply Loan</button>
-            </form>
-          </div>
-        </div>
-      </div>
+    <!-- Loan Application -->
+    <div class="bg-white shadow rounded p-4">
+      <h2 class="text-lg font-bold mb-3">Loan Application</h2>
+      <form id="loanForm" class="space-y-2">
+        <input type="number" id="loanAmount" placeholder="Loan Amount" class="w-full border p-2 rounded">
+        <input type="text" id="loanPurpose" placeholder="Loan Purpose" class="w-full border p-2 rounded">
+        <input type="text" id="guarantors" placeholder="Guarantors (comma separated)" class="w-full border p-2 rounded">
+        <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded">Apply Loan</button>
+      </form>
+      <p id="loanMsg" class="text-green-600 mt-2 hidden">Loan application submitted ✅</p>
+    </div>
 
-      <!-- Savings & Shares -->
-      <div class="col-md-6">
-        <div class="card shadow">
-          <div class="card-header bg-success text-white">Savings</div>
-          <div class="card-body">
-            <p>Your total savings: <b>Kes. 0</b></p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6">
-        <div class="card shadow">
-          <div class="card-header bg-info text-white">Shares</div>
-          <div class="card-body">
-            <p>Your total shares: <b>0 units</b></p>
-          </div>
-        </div>
-      </div>
+    <!-- Savings & Shares -->
+    <div class="bg-white shadow rounded p-4">
+      <h2 class="text-lg font-bold mb-3">Savings & Shares</h2>
+      <form id="savingsForm" class="space-y-2">
+        <input type="number" id="savings" placeholder="Enter Savings Amount" class="w-full border p-2 rounded">
+        <input type="number" id="shares" placeholder="Enter Shares Amount" class="w-full border p-2 rounded">
+        <button type="submit" class="bg-purple-600 text-white px-4 py-2 rounded">Update</button>
+      </form>
+      <p id="savingsMsg" class="text-green-600 mt-2 hidden">Savings & shares updated ✅</p>
+    </div>
+
+    <!-- Statements -->
+    <div class="bg-white shadow rounded p-4">
+      <h2 class="text-lg font-bold mb-3">Download Statement</h2>
+      <button id="downloadStatement" class="bg-yellow-500 text-white px-4 py-2 rounded">Download PDF</button>
     </div>
   </div>
+
+  <script type="module" src="member.js"></script>
 </body>
 </html>
