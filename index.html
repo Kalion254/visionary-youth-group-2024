@@ -3,207 +3,236 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VISIONARY YOUTH GROUP 2024</title>
+<title>Member Dashboard - Visionary Youth Group</title>
 
-<!-- Fonts & Icons -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<!-- Tailwind CSS & FontAwesome -->
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-<!-- AOS Animations -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
-
 <style>
-body { margin:0; font-family:'Poppins',sans-serif; background:#f0f2f5; color:#333; }
-nav { position:fixed; top:0; width:100%; background:rgba(0,0,0,0.7); display:flex; justify-content:center; padding:12px; z-index:10; }
-nav a { color:white; margin:0 15px; text-decoration:none; font-weight:600; transition:0.3s; }
-nav a:hover { color:#ffcc00; }
-header { position:relative; height:100vh; background:url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1600&q=80') no-repeat center/cover; color:white; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; }
-header h1 { font-size:3rem; margin:0; color:#ffcc00; text-shadow:2px 2px 6px #000; }
-header p { font-size:1.2rem; margin-top:15px; text-shadow:1px 1px 3px #000; }
-.hero-btn { background:#ffcc00; color:#333; padding:15px 25px; border:none; border-radius:8px; font-weight:600; font-size:1rem; cursor:pointer; transition:0.3s; margin-top:20px; }
-.hero-btn:hover { background:#ff6600; color:white; transform:scale(1.05); }
-section { padding:60px 20px; max-width:1000px; margin:40px auto; background:white; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.1); }
-h2 { color:#007bff; margin-bottom:25px; text-align:center; }
-.benefits, .programs, .news { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:25px; }
-.benefit, .card { background:#f9f9f9; padding:25px; border-radius:12px; text-align:center; transition:transform 0.3s; }
-.benefit:hover, .card:hover { transform:scale(1.05); }
-.benefit i, .card i { font-size:40px; color:#ffcc00; margin-bottom:10px; }
-#contact p i { margin-right:8px; color:#007bff; }
-.social-icons a { margin:0 10px; font-size:24px; color:#007bff; transition:0.3s; }
-.social-icons a:hover { color:#ff6600; transform:rotate(15deg) scale(1.2); }
-form { background:#f9f9f9; padding:25px; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,0.1); margin-top:20px; }
-input { display:block; width:100%; margin:10px 0; padding:10px; border-radius:8px; border:1px solid #ccc; }
-button { background:#007bff; color:white; padding:10px 20px; border:none; border-radius:8px; cursor:pointer; transition:0.3s; }
-button:hover { background:#ff6600; transform:scale(1.05); }
-footer { text-align:center; padding:15px; background:#333; color:white; margin-top:40px; border-radius:12px; }
+  body { font-family:'Poppins',sans-serif; background:#f0f2f5; }
+  .card:hover { transform: scale(1.05); transition: 0.3s; }
+  .tab-btn { cursor:pointer; transition:0.3s; }
+  .tab-btn:hover { background:#ffcc00; color:#333; }
 </style>
 </head>
-<body>
+<body class="min-h-screen">
 
-<nav>
-  <a href="#about"><i class="fas fa-info-circle"></i> About</a>
-  <a href="#benefits"><i class="fas fa-gift"></i> Benefits</a>
-  <a href="#programs"><i class="fas fa-tasks"></i> Programs</a>
-  <a href="#news"><i class="fas fa-newspaper"></i> News</a>
-  <a href="#contact"><i class="fas fa-envelope"></i> Contact</a>
-  <a href="#auth"><i class="fas fa-user-plus"></i> Join</a>
-</nav>
-
-<header data-aos="fade-down">
-  <h1>VISIONARY YOUTH GROUP 2024</h1>
-  <p>Empowering Youth Through Financial Literacy, Entrepreneurship & Community Impact</p>
-  <button class="hero-btn" onclick="document.getElementById('auth').scrollIntoView({behavior:'smooth'})">Join Us Today</button>
+<!-- Header -->
+<header class="bg-blue-700 text-white p-4 flex justify-between items-center shadow-lg">
+  <h1 class="text-2xl font-bold">Member Dashboard</h1>
+  <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded flex items-center">
+    <i class="fas fa-sign-out-alt mr-2"></i>Logout
+  </button>
 </header>
 
-<section id="about" data-aos="fade-up">
-  <h2>About Us</h2>
-  <p>VISIONARY YOUTH GROUP 2024 empowers young people through financial literacy, entrepreneurship, and community service. We foster leadership, accountability, and growth among youth to positively impact society.</p>
-</section>
+<main class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-<section id="benefits" data-aos="fade-up">
-  <h2>Member Benefits</h2>
-  <div class="benefits">
-    <div class="benefit"><i class="fas fa-piggy-bank"></i><h3>Savings</h3><p>Grow your money safely with structured group savings plans.</p></div>
-    <div class="benefit"><i class="fas fa-hand-holding-usd"></i><h3>Loans</h3><p>Access affordable loans to fund personal or business projects.</p></div>
-    <div class="benefit"><i class="fas fa-users"></i><h3>Networking</h3><p>Connect with motivated youth and expand your opportunities.</p></div>
-    <div class="benefit"><i class="fas fa-chalkboard-teacher"></i><h3>Training</h3><p>Attend workshops and seminars to develop skills and knowledge.</p></div>
-  </div>
-</section>
+  <!-- Profile Card -->
+  <section class="bg-white shadow-lg rounded-lg p-6 card">
+    <h2 class="text-xl font-bold mb-4 text-blue-600"><i class="fas fa-user"></i> Profile</h2>
+    <input id="name" placeholder="Full Name" class="w-full border p-2 mb-2 rounded">
+    <input id="email" placeholder="Email" class="w-full border p-2 mb-2 rounded">
+    <input id="phone" placeholder="Phone" class="w-full border p-2 mb-2 rounded">
+    <button onclick="updateProfile()" class="w-full bg-green-500 hover:bg-green-600 text-white py-2 rounded mt-2 flex items-center justify-center">
+      <i class="fas fa-edit mr-2"></i> Update Profile
+    </button>
+    <p id="profileMsg" class="mt-2 text-sm text-gray-600"></p>
+  </section>
 
-<section id="programs" data-aos="fade-up">
-  <h2>Our Programs</h2>
-  <div class="programs">
-    <div class="card"><i class="fas fa-hand-holding-heart"></i><h3>Community Service</h3><p>Engage in projects that uplift the community and build teamwork.</p></div>
-    <div class="card"><i class="fas fa-briefcase"></i><h3>Entrepreneurship Support</h3><p>Mentorship, business training, and funding opportunities for young entrepreneurs.</p></div>
-    <div class="card"><i class="fas fa-chart-line"></i><h3>Financial Literacy</h3><p>Learn smart money management, investments, and savings strategies.</p></div>
-    <div class="card"><i class="fas fa-handshake"></i><h3>Networking Events</h3><p>Meet other motivated youth to share ideas, projects, and opportunities.</p></div>
-  </div>
-</section>
+  <!-- Savings Card -->
+  <section class="bg-white shadow-lg rounded-lg p-6 card">
+    <h2 class="text-xl font-bold mb-4 text-purple-600"><i class="fas fa-piggy-bank"></i> Savings</h2>
+    <input id="savingsAmount" placeholder="Amount to Save" class="w-full border p-2 mb-2 rounded">
+    <button onclick="addSavings()" class="w-full bg-purple-500 hover:bg-purple-600 text-white py-2 rounded flex items-center justify-center">
+      <i class="fas fa-plus mr-2"></i> Add Savings
+    </button>
+    <p id="savingsMsg" class="mt-2 text-sm text-gray-600"></p>
+  </section>
 
-<section id="news" data-aos="fade-up">
-  <h2>Latest News</h2>
-  <div class="news">
-    <div class="card"><h3>Youth Workshop 2024</h3><p>Join our next financial literacy workshop on Sept 15, 2024.</p></div>
-    <div class="card"><h3>Annual General Meeting</h3><p>Don't miss our AGM scheduled for Dec 20, 2024.</p></div>
-    <div class="card"><h3>Entrepreneur Grant Program</h3><p>Apply for funding to support your business ideas and projects.</p></div>
-  </div>
-</section>
+  <!-- Shares Card -->
+  <section class="bg-white shadow-lg rounded-lg p-6 card">
+    <h2 class="text-xl font-bold mb-4 text-pink-600"><i class="fas fa-chart-pie"></i> Shares</h2>
+    <input id="sharesAmount" placeholder="Number of Shares" class="w-full border p-2 mb-2 rounded">
+    <button onclick="addShares()" class="w-full bg-pink-500 hover:bg-pink-600 text-white py-2 rounded flex items-center justify-center">
+      <i class="fas fa-plus mr-2"></i> Add Shares
+    </button>
+    <p id="sharesMsg" class="mt-2 text-sm text-gray-600"></p>
+  </section>
 
-<section id="contact" data-aos="fade-up">
-  <h2>Contact Us</h2>
-  <p><i class="fas fa-envelope"></i> visionaryyouthgroup32@gmail.com</p>
-  <p><i class="fas fa-phone"></i> +254 741 453336</p>
-  <p><i class="fas fa-map-marker-alt"></i> Nairobi, Kenya</p>
-  <div class="social-icons">
-    <a href="#"><i class="fab fa-facebook"></i></a>
-    <a href="#"><i class="fab fa-twitter"></i></a>
-    <a href="#"><i class="fab fa-instagram"></i></a>
-  </div>
-</section>
+  <!-- Loan Section with Tabs -->
+  <section class="bg-white shadow-lg rounded-lg p-6 col-span-full card">
+    <h2 class="text-xl font-bold mb-4 text-yellow-600"><i class="fas fa-hand-holding-usd"></i> Loan Management</h2>
+    
+    <!-- Tabs -->
+    <div class="flex mb-4 space-x-2">
+      <button class="tab-btn bg-yellow-500 text-white px-4 py-2 rounded" onclick="showTab('apply')"><i class="fas fa-file-alt mr-1"></i> Apply Loan</button>
+      <button class="tab-btn bg-yellow-500 text-white px-4 py-2 rounded" onclick="showTab('repay')"><i class="fas fa-hand-holding-heart mr-1"></i> Repay Loan</button>
+      <button class="tab-btn bg-yellow-500 text-white px-4 py-2 rounded" onclick="showTab('download')"><i class="fas fa-download mr-1"></i> Download Certificate</button>
+    </div>
 
-<section id="auth" data-aos="fade-up">
-  <h2>Join Our Community</h2>
-  <p><strong>All fields are required. Sign up below.</strong></p>
-  
-  <!-- SIGNUP -->
-  <form id="signupForm" onsubmit="return false;">
-    <input type="text" id="signupName" placeholder="Full Name" required>
-    <input type="text" id="signupPhone" placeholder="Phone Number" required>
-    <input type="text" id="signupId" placeholder="ID Number" required>
-    <input type="text" id="signupOrigin" placeholder="Place of Origin" required>
-    <input type="email" id="signupEmail" placeholder="Email" required>
-    <input type="password" id="signupPassword" placeholder="Password" required>
-    <button type="button" id="signupBtn">Sign Up</button>
-  </form>
+    <!-- Tab Contents -->
+    <div id="loanTabs">
 
-  <h3>Already a member?</h3>
-  <!-- LOGIN -->
-  <form id="loginForm" onsubmit="return false;">
-    <input type="email" id="loginEmail" placeholder="Email" required>
-    <input type="password" id="loginPassword" placeholder="Password" required>
-    <button type="button" id="loginBtn">Login</button>
-    <button type="button" id="resetPasswordBtn">Forgot Password?</button>
-  </form>
-</section>
+      <!-- Apply Loan -->
+      <div id="apply" class="tab-content">
+        <input id="loanAmount" placeholder="Loan Amount" class="w-full border p-2 mb-2 rounded">
+        <textarea id="loanPurpose" placeholder="Loan Purpose" class="w-full border p-2 mb-2 rounded"></textarea>
+        <button onclick="applyLoan()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 rounded flex items-center justify-center">
+          <i class="fas fa-paper-plane mr-2"></i> Submit Application
+        </button>
+        <p id="loanMsg" class="mt-2 text-sm text-gray-600"></p>
+      </div>
 
-<footer data-aos="fade-up">
-  <p>© 2024 VISIONARY YOUTH GROUP. All Rights Reserved.</p>
-</footer>
+      <!-- Repay Loan -->
+      <div id="repay" class="tab-content hidden">
+        <input id="repaymentAmount" placeholder="Repayment Amount" class="w-full border p-2 mb-2 rounded">
+        <button onclick="repayLoan()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 rounded flex items-center justify-center">
+          <i class="fas fa-hand-holding-usd mr-2"></i> Repay Loan
+        </button>
+        <p id="repayMsg" class="mt-2 text-sm text-gray-600"></p>
+      </div>
 
-<!-- Firebase -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-import { getFirestore, setDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+      <!-- Download Loan Certificate -->
+      <div id="download" class="tab-content hidden">
+        <button onclick="downloadLoanCert()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 rounded flex items-center justify-center">
+          <i class="fas fa-file-download mr-2"></i> Download Loan Certificate
+        </button>
+        <p id="downloadMsg" class="mt-2 text-sm text-gray-600"></p>
+      </div>
 
-const firebaseConfig = {
-  apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
-  authDomain: "visionary-youth-grou-2024.firebaseapp.com",
-  projectId: "visionary-youth-grou-2024",
-  storageBucket: "visionary-youth-grou-2024.appspot.com",
-  messagingSenderId: "372978592717",
-  appId: "1:372978592717:web:1c15aec728ee5f854f3284",
-  measurementId: "G-QP1RBT2ZCP"
-};
+      <!-- Loan Status Bar -->
+      <p class="mt-4 font-semibold">Loan Status: <span id="loanStatus">No application yet</span></p>
+      <progress id="loanProgress" value="0" max="100" class="w-full mt-2"></progress>
+    </div>
+  </section>
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+</main>
 
-// SIGNUP
-document.getElementById('signupBtn').addEventListener('click', async ()=>{
-  const signupInfo = {
-    name: document.getElementById('signupName').value,
-    phone: document.getElementById('signupPhone').value,
-    id: document.getElementById('signupId').value,
-    origin: document.getElementById('signupOrigin').value,
-    email: document.getElementById('signupEmail').value,
-    password: document.getElementById('signupPassword').value
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
+    authDomain: "visionary-youth-grou-2024.firebaseapp.com",
+    databaseURL: "https://visionary-youth-grou-2024-default-rtdb.firebaseio.com/",
+    projectId: "visionary-youth-grou-2024",
+    storageBucket: "visionary-youth-grou-2024.firebasestorage.app",
+    messagingSenderId: "372978592717",
+    appId: "1:372978592717:web:624596619d41aab84f3284",
+    measurementId: "G-FEHC1GM3B7"
   };
-  try {
-    const userCredential = await createUserWithEmailAndPassword(auth, signupInfo.email, signupInfo.password);
-    await setDoc(doc(db, "members", userCredential.user.uid), {
-      name: signupInfo.name,
-      phone: signupInfo.phone,
-      id: signupInfo.id,
-      origin: signupInfo.origin,
-      email: signupInfo.email,
-      createdAt: serverTimestamp()
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.database();
+
+  // Logout
+  function logout(){ auth.signOut().then(()=>window.location.href="index.html"); }
+
+  // Tabs
+  function showTab(tab){
+    document.querySelectorAll('.tab-content').forEach(c=>c.classList.add('hidden'));
+    document.getElementById(tab).classList.remove('hidden');
+  }
+
+  // Load user profile
+  auth.onAuthStateChanged(user=>{
+    if(!user) window.location.href="index.html";
+    else {
+      db.ref("members/"+user.uid+"/profile").on("value",snap=>{
+        if(snap.exists()){
+          const data = snap.val();
+          document.getElementById("name").value = data.name || '';
+          document.getElementById("email").value = data.email || '';
+          document.getElementById("phone").value = data.phone || '';
+        }
+      });
+      db.ref("members/"+user.uid+"/loan").on("value",snap=>{
+        if(snap.exists()){
+          const loan = snap.val();
+          document.getElementById("loanStatus").innerText = loan.status || "Pending";
+          document.getElementById("loanProgress").value = loan.progress || 0;
+        }
+      });
+    }
+  });
+
+  // Profile update
+  function updateProfile(){
+    const user = auth.currentUser;
+    if(!user) return;
+    const data = {
+      name: document.getElementById("name").value,
+      email: document.getElementById("email").value,
+      phone: document.getElementById("phone").value
+    };
+    db.ref("members/"+user.uid+"/profile").set(data).then(()=>{
+      document.getElementById("profileMsg").innerText="Profile updated!";
     });
-    alert("Signup successful! Please login.");
-    document.getElementById('signupForm').reset();
-  } catch(err){
-    alert("Signup failed: " + err.message);
   }
-});
 
-// LOGIN
-document.getElementById('loginBtn').addEventListener('click', async ()=>{
-  const email = document.getElementById('loginEmail').value;
-  const password = document.getElementById('loginPassword').value;
-  try {
-    await signInWithEmailAndPassword(auth, email, password);
-    window.location.href = "dashboard.html"; // redirect to dashboard
-  } catch(err){
-    alert("Login failed: " + err.message);
+  // Loan application
+  function applyLoan(){
+    const user = auth.currentUser;
+    if(!user) return;
+    const loanData = {
+      amount: document.getElementById("loanAmount").value,
+      purpose: document.getElementById("loanPurpose").value,
+      status:"Pending",
+      progress:20
+    };
+    db.ref("members/"+user.uid+"/loan").set(loanData).then(()=>{
+      document.getElementById("loanMsg").innerText="Loan applied successfully!";
+      document.getElementById("loanStatus").innerText="Pending";
+      document.getElementById("loanProgress").value=20;
+    });
   }
-});
 
-// RESET PASSWORD
-document.getElementById('resetPasswordBtn').addEventListener('click', async ()=>{
-  const email = document.getElementById('loginEmail').value;
-  if(!email){ alert("Enter your email to reset password"); return; }
-  try {
-    await sendPasswordResetEmail(auth, email);
-    alert("Password reset email sent!");
-  } catch(err){
-    alert("Error: " + err.message);
+  // Loan repayment
+  function repayLoan(){
+    const user = auth.currentUser;
+    if(!user) return;
+    const repayment = document.getElementById("repaymentAmount").value;
+    db.ref("members/"+user.uid+"/repayments").push({ amount:repayment, date:new Date().toLocaleDateString() })
+      .then(()=>{ document.getElementById("repayMsg").innerText="Repayment recorded!"; });
   }
-});
+
+  // Add savings
+  function addSavings(){
+    const user = auth.currentUser;
+    if(!user) return;
+    const amount = document.getElementById("savingsAmount").value;
+    db.ref("members/"+user.uid+"/savings").push({ amount, date:new Date().toLocaleDateString() })
+      .then(()=>{ document.getElementById("savingsMsg").innerText="Savings added!"; });
+  }
+
+  // Add shares
+  function addShares(){
+    const user = auth.currentUser;
+    if(!user) return;
+    const shares = document.getElementById("sharesAmount").value;
+    db.ref("members/"+user.uid+"/shares").push({ amount:shares, date:new Date().toLocaleDateString() })
+      .then(()=>{ document.getElementById("sharesMsg").innerText="Shares recorded!"; });
+  }
+
+  // Download loan certificate
+  function downloadLoanCert(){
+    const user = auth.currentUser;
+    if(!user) return;
+    const loanStatus = document.getElementById("loanStatus").innerText;
+    if(loanStatus !== "Approved") { 
+      document.getElementById("downloadMsg").innerText="Loan not approved yet!";
+      return; 
+    }
+    const blob = new Blob(["Loan Certificate\nMember: "+user.email+"\nStatus: Approved"], {type:"text/plain"});
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "LoanCertificate.txt";
+    link.click();
+    document.getElementById("downloadMsg").innerText="Certificate downloaded!";
+  }
 </script>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
-<script>AOS.init({ duration:1000, once:true });</script>
 
 </body>
 </html>
