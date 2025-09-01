@@ -8,6 +8,7 @@
 <!-- Fonts & Icons -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 <style>
 body { margin:0; font-family:'Poppins',sans-serif; background:#f0f2f5; color:#333; }
 header { background:#007bff; color:white; padding:20px; text-align:center; position:relative; }
@@ -15,15 +16,19 @@ header h1 { margin:0; font-size:2rem; }
 header button { position:absolute; right:20px; top:20px; background:#ff6600; border:none; padding:10px 15px; border-radius:8px; color:white; cursor:pointer; transition:0.3s; }
 header button:hover { background:#ffcc00; color:#333; }
 .container { max-width:1200px; margin:20px auto; padding:0 20px; display:grid; grid-template-columns:1fr 2fr; gap:25px; }
-.card { background:white; padding:20px; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,0.1); }
-h2 { margin-top:0; color:#007bff; text-align:center; }
-.details p { margin:8px 0; }
-.loans table { width:100%; border-collapse:collapse; }
-.loans th, .loans td { border:1px solid #ccc; padding:10px; text-align:center; }
-.progress-bar { background:#f1f1f1; border-radius:8px; overflow:hidden; height:20px; margin-top:5px; }
-.progress { height:100%; background:#007bff; width:0; transition:0.5s; text-align:center; color:white; font-size:0.9rem; line-height:20px; }
-button.download { background:#28a745; border:none; padding:10px 15px; border-radius:8px; color:white; cursor:pointer; transition:0.3s; margin-top:10px; }
-button.download:hover { background:#218838; }
+.card { background:white; padding:20px; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,0.1); transition:0.3s; }
+.card:hover { transform:scale(1.03); }
+h2 { margin-top:0; color:#007bff; text-align:center; margin-bottom:15px; }
+.details p { margin:10px 0; font-size:1rem; }
+.cards-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:20px; }
+.loan-card, .savings-card { border-radius:12px; padding:20px; color:white; position:relative; overflow:hidden; }
+.loan-card { background:linear-gradient(135deg, #ff6600, #ffcc00); }
+.loan-card .progress-bar { background:rgba(255,255,255,0.3); height:15px; border-radius:8px; overflow:hidden; margin-top:10px; }
+.loan-card .progress { height:100%; background:white; width:0; text-align:center; color:#333; font-weight:600; font-size:0.8rem; transition:0.5s; line-height:15px; border-radius:8px; }
+.savings-card { background:linear-gradient(135deg, #28a745, #20c997); text-align:center; }
+.savings-card h3 { font-size:1.5rem; margin:10px 0; }
+button.download { background:#007bff; border:none; padding:10px 15px; border-radius:8px; color:white; cursor:pointer; transition:0.3s; margin-top:10px; width:100%; }
+button.download:hover { background:#0056b3; }
 .logout-msg { text-align:center; margin-top:50px; font-size:1.2rem; color:#ff0000; }
 </style>
 </head>
@@ -46,25 +51,16 @@ button.download:hover { background:#218838; }
   </div>
 
   <!-- Right: Loans & Savings -->
-  <div class="card loans">
-    <h2>Loans Overview</h2>
-    <table id="loansTable">
-      <thead>
-        <tr>
-          <th>Loan Amount</th>
-          <th>Status</th>
-          <th>Application Date</th>
-          <th>Progress</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td colspan="4">Loading loans...</td></tr>
-      </tbody>
-    </table>
-
-    <h2>Savings & Statements</h2>
-    <p><strong>Total Savings:</strong> <span id="totalSavings">Loading...</span></p>
-    <button class="download" id="downloadStmt">Download Statement</button>
+  <div class="card">
+    <h2>Loans & Savings</h2>
+    <div class="cards-grid" id="loansGrid">
+      <p>Loading loans...</p>
+    </div>
+    <div class="savings-card" id="totalSavingsCard">
+      <h3>Total Savings</h3>
+      <p id="totalSavings">Loading...</p>
+      <button class="download" id="downloadStmt">Download Statement</button>
+    </div>
   </div>
 </div>
 
@@ -90,14 +86,14 @@ const auth = getAuth();
 const db = getFirestore(app);
 
 const personalDetails = document.getElementById('personalDetails');
-const loansTable = document.getElementById('loansTable').querySelector('tbody');
+const loansGrid = document.getElementById('loansGrid');
 const totalSavingsEl = document.getElementById('totalSavings');
 const notLogged = document.getElementById('notLogged');
 
-// Logout button
+// Logout
 document.getElementById('logoutBtn').addEventListener('click', async ()=>{
   await signOut(auth);
-  window.location.href = "index.html"; // redirect to landing page
+  window.location.href = "index.html";
 });
 
 // Auth check
@@ -105,9 +101,9 @@ onAuthStateChanged(auth, async (user)=>{
   if(user){
     notLogged.style.display = "none";
     personalDetails.style.display = "block";
-    loansTable.innerHTML = "<tr><td colspan='4'>Loading loans...</td></tr>";
+    loansGrid.innerHTML = "<p>Loading loans...</p>";
 
-    // Load user details
+    // Load personal details
     const userDoc = await getDoc(doc(db, "members", user.uid));
     if(userDoc.exists()){
       const data = userDoc.data();
@@ -120,30 +116,30 @@ onAuthStateChanged(auth, async (user)=>{
 
     // Load loans
     const loansSnap = await getDocs(collection(db, "members", user.uid, "loans"));
-    loansTable.innerHTML = "";
+    loansGrid.innerHTML = "";
     let totalSavings = 0;
     loansSnap.forEach(docSnap=>{
       const loan = docSnap.data();
       totalSavings += loan.savings || 0;
       const progressMap = { "Applied":25, "Verified":50, "Approved":75, "Paid":100 };
       const progWidth = progressMap[loan.status] || 0;
-      loansTable.innerHTML += `
-        <tr>
-          <td>${loan.amount}</td>
-          <td>${loan.status}</td>
-          <td>${loan.date || "N/A"}</td>
-          <td>
-            <div class="progress-bar">
-              <div class="progress" style="width:${progWidth}%">${loan.status}</div>
-            </div>
-          </td>
-        </tr>
+
+      loansGrid.innerHTML += `
+        <div class="loan-card">
+          <h3>Loan Amount: ${loan.amount}</h3>
+          <p>Status: ${loan.status}</p>
+          <p>Application Date: ${loan.date || "N/A"}</p>
+          <div class="progress-bar">
+            <div class="progress" style="width:${progWidth}%">${loan.status}</div>
+          </div>
+        </div>
       `;
     });
+
     totalSavingsEl.textContent = totalSavings;
   } else {
     personalDetails.style.display = "none";
-    loansTable.innerHTML = "";
+    loansGrid.innerHTML = "";
     totalSavingsEl.textContent = "";
     notLogged.style.display = "block";
   }
