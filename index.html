@@ -24,10 +24,10 @@ header p { font-size:1.2rem; margin-top:15px; text-shadow:1px 1px 3px #000; }
 .hero-btn:hover { background:#ff6600; color:white; transform:scale(1.05); }
 section { padding:60px 20px; max-width:1000px; margin:40px auto; background:white; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.1); }
 h2 { color:#007bff; margin-bottom:25px; text-align:center; }
-.benefits, .programs, .news, .dashboard-preview { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:25px; }
-.benefit, .card, .dash-card { background:#f9f9f9; padding:25px; border-radius:12px; text-align:center; transition:transform 0.3s; }
-.benefit:hover, .card:hover, .dash-card:hover { transform:scale(1.05); }
-.benefit i, .card i, .dash-card i { font-size:40px; color:#ffcc00; margin-bottom:10px; }
+.benefits, .programs, .news { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:25px; }
+.benefit, .card { background:#f9f9f9; padding:25px; border-radius:12px; text-align:center; transition:transform 0.3s; }
+.benefit:hover, .card:hover { transform:scale(1.05); }
+.benefit i, .card i { font-size:40px; color:#ffcc00; margin-bottom:10px; }
 #contact p i { margin-right:8px; color:#007bff; }
 .social-icons a { margin:0 10px; font-size:24px; color:#007bff; transition:0.3s; }
 .social-icons a:hover { color:#ff6600; transform:rotate(15deg) scale(1.2); }
@@ -36,9 +36,6 @@ input { display:block; width:100%; margin:10px 0; padding:10px; border-radius:8p
 button { background:#007bff; color:white; padding:10px 20px; border:none; border-radius:8px; cursor:pointer; transition:0.3s; }
 button:hover { background:#ff6600; transform:scale(1.05); }
 footer { text-align:center; padding:15px; background:#333; color:white; margin-top:40px; border-radius:12px; }
-.dashboard-container { display:flex; flex-wrap:wrap; gap:20px; justify-content:center; }
-.dash-card { flex:1 1 250px; background:#f9f9f9; padding:20px; border-radius:12px; text-align:center; box-shadow:0 2px 10px rgba(0,0,0,0.1); }
-.dash-card h3 { margin-top:10px; color:#007bff; }
 </style>
 </head>
 <body>
@@ -133,26 +130,25 @@ footer { text-align:center; padding:15px; background:#333; color:white; margin-t
 <!-- Firebase -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-import { getFirestore, setDoc, doc, serverTimestamp, getDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+import { getFirestore, setDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
   authDomain: "visionary-youth-grou-2024.firebaseapp.com",
   projectId: "visionary-youth-grou-2024",
-  storageBucket: "visionary-youth-grou-2024.firebasestorage.app",
+  storageBucket: "visionary-youth-grou-2024.appspot.com",
   messagingSenderId: "372978592717",
   appId: "1:372978592717:web:1c15aec728ee5f854f3284",
   measurementId: "G-QP1RBT2ZCP"
 };
 
 const app = initializeApp(firebaseConfig);
-const auth = getAuth();
+const auth = getAuth(app);
 const db = getFirestore(app);
 
 // Signup
-document.getElementById('signupBtn').addEventListener('click', async (e)=>{
-  e.preventDefault();
+document.getElementById('signupBtn').addEventListener('click', async ()=>{
   const signupInfo = {
     name: document.getElementById('signupName').value,
     phone: document.getElementById('signupPhone').value,
@@ -163,8 +159,7 @@ document.getElementById('signupBtn').addEventListener('click', async (e)=>{
   };
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, signupInfo.email, signupInfo.password);
-    const user = userCredential.user;
-    await setDoc(doc(db, "members", user.uid), {...signupInfo, createdAt: serverTimestamp()});
+    await setDoc(doc(db, "members", userCredential.user.uid), {...signupInfo, createdAt: serverTimestamp()});
     alert("Signup successful! Please login.");
   } catch(err){
     alert(err.message);
@@ -172,21 +167,19 @@ document.getElementById('signupBtn').addEventListener('click', async (e)=>{
 });
 
 // Login
-document.getElementById('loginBtn').addEventListener('click', async (e)=>{
-  e.preventDefault();
+document.getElementById('loginBtn').addEventListener('click', async ()=>{
   const email = document.getElementById('loginEmail').value;
   const password = document.getElementById('loginPassword').value;
   try {
     await signInWithEmailAndPassword(auth, email, password);
-    window.location.href = "dashboard.html"; // open dashboard page
+    window.location.href = "dashboard.html"; // redirect to dashboard
   } catch(err){
     alert(err.message);
   }
 });
 
 // Reset password
-document.getElementById('resetPasswordBtn').addEventListener('click', async (e)=>{
-  e.preventDefault();
+document.getElementById('resetPasswordBtn').addEventListener('click', async ()=>{
   const email = document.getElementById('loginEmail').value;
   if(!email){ alert("Enter your email to reset password"); return; }
   try {
