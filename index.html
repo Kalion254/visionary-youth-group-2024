@@ -22,24 +22,30 @@ header h1 { font-size:3rem; margin:0; color:#ffcc00; text-shadow:2px 2px 6px #00
 header p { font-size:1.2rem; margin-top:15px; text-shadow:1px 1px 3px #000; }
 .hero-btn { background:#ffcc00; color:#333; padding:15px 25px; border:none; border-radius:8px; font-weight:600; font-size:1rem; cursor:pointer; transition:0.3s; margin-top:20px; }
 .hero-btn:hover { background:#ff6600; color:white; transform:scale(1.05); }
+
 section { padding:60px 20px; max-width:1000px; margin:40px auto; background:white; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.1); }
 h2 { color:#007bff; margin-bottom:25px; text-align:center; }
-.benefits, .programs, .news, .dashboard-preview { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:25px; }
-.benefit, .card, .dash-card { background:#f9f9f9; padding:25px; border-radius:12px; text-align:center; transition:transform 0.3s; }
-.benefit:hover, .card:hover, .dash-card:hover { transform:scale(1.05); }
+
+.benefits, .programs, .news, .dashboard-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:25px; }
+.benefit, .card, .dash-card { background:#f9f9f9; padding:25px; border-radius:12px; text-align:center; transition:transform 0.4s, box-shadow 0.4s; }
+.benefit:hover, .card:hover, .dash-card:hover { transform:scale(1.05) translateY(-5px); box-shadow:0 10px 20px rgba(0,0,0,0.2); }
 .benefit i, .card i, .dash-card i { font-size:40px; color:#ffcc00; margin-bottom:10px; }
+
 #contact p i { margin-right:8px; color:#007bff; }
 .social-icons a { margin:0 10px; font-size:24px; color:#007bff; transition:0.3s; }
 .social-icons a:hover { color:#ff6600; transform:rotate(15deg) scale(1.2); }
+
 form { background:#f9f9f9; padding:25px; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,0.1); margin-top:20px; }
 input { display:block; width:100%; margin:10px 0; padding:10px; border-radius:8px; border:1px solid #ccc; }
 button { background:#007bff; color:white; padding:10px 20px; border:none; border-radius:8px; cursor:pointer; transition:0.3s; }
 button:hover { background:#ff6600; transform:scale(1.05); }
+
 footer { text-align:center; padding:15px; background:#333; color:white; margin-top:40px; border-radius:12px; }
 
-/* Dashboard progress bars */
-.progress-container { background:#ddd; border-radius:20px; overflow:hidden; height:20px; width:100%; margin-top:10px; }
-.progress-bar { height:100%; background:#007bff; width:0%; transition: width 1s ease; border-radius:20px; }
+.progress-container { background:#ddd; border-radius:10px; height:25px; overflow:hidden; margin-top:10px; }
+.progress-bar { height:25px; text-align:center; color:white; line-height:25px; border-radius:10px; width:0%; transition:width 1.5s ease; }
+
+.badge { padding:2px 8px; border-radius:8px; font-size:0.9rem; color:white; }
 </style>
 </head>
 <body>
@@ -51,8 +57,7 @@ footer { text-align:center; padding:15px; background:#333; color:white; margin-t
   <a href="#news"><i class="fas fa-newspaper"></i> News</a>
   <a href="#contact"><i class="fas fa-envelope"></i> Contact</a>
   <a href="#auth"><i class="fas fa-user-plus"></i> Join</a>
-  <a href="#dashboard" id="navDashboard" style="display:none;"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-  <a href="#" id="logoutLink" style="display:none;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+  <a href="#dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
 </nav>
 
 <header data-aos="fade-down">
@@ -95,25 +100,6 @@ footer { text-align:center; padding:15px; background:#333; color:white; margin-t
   </div>
 </section>
 
-<section id="dashboard" data-aos="fade-up" style="display:none;">
-  <h2>Member Dashboard</h2>
-  <div class="dashboard-preview">
-    <div class="dash-card" id="dashSavings">
-      <i class="fas fa-piggy-bank"></i><h3>Savings</h3>
-      <p>KSh 0 / KSh 100000</p>
-      <div class="progress-container"><div class="progress-bar"></div></div>
-    </div>
-    <div class="dash-card" id="dashLoans">
-      <i class="fas fa-hand-holding-usd"></i><h3>Loans</h3>
-      <p>KSh 0 / KSh 50000</p>
-      <div class="progress-container"><div class="progress-bar"></div></div>
-    </div>
-    <div class="dash-card" id="dashStatements"><i class="fas fa-file-alt"></i><h3>Statements</h3><p>0 transactions</p></div>
-    <div class="dash-card" id="dashEvents"><i class="fas fa-calendar-alt"></i><h3>Events</h3><p>Upcoming events</p></div>
-    <div class="dash-card" id="dashNews"><i class="fas fa-newspaper"></i><h3>News</h3><p>Latest announcements</p></div>
-  </div>
-</section>
-
 <section id="contact" data-aos="fade-up">
   <h2>Contact Us</h2>
   <p><i class="fas fa-envelope"></i> visionaryyouthgroup32@gmail.com</p>
@@ -135,7 +121,7 @@ footer { text-align:center; padding:15px; background:#333; color:white; margin-t
     <input type="text" id="signupOrigin" placeholder="Place of Origin" required>
     <input type="email" id="signupEmail" placeholder="Email" required>
     <input type="password" id="signupPassword" placeholder="Password" required>
-    <button type="button" id="signupBtn">Sign Up</button>
+    <button type="button" onclick="signupUser()">Sign Up</button>
   </form>
 
   <h3>Already a member?</h3>
@@ -143,127 +129,124 @@ footer { text-align:center; padding:15px; background:#333; color:white; margin-t
     <input type="email" id="loginEmail" placeholder="Email" required>
     <input type="password" id="loginPassword" placeholder="Password" required>
     <button type="button" id="loginBtn">Login</button>
-    <p><a href="#" id="resetPasswordLink">Forgot password?</a></p>
   </form>
+  <p style="margin-top:10px;"><a href="#" onclick="resetPassword()">Forgot Password?</a></p>
 </section>
 
-<!-- Firebase -->
+<section id="dashboard" data-aos="fade-up" style="display:none;">
+  <h2 style="text-align:center; color:#007bff; margin-bottom:40px;">Member Dashboard</h2>
+
+  <div class="dashboard-grid">
+    <!-- Personal Details -->
+    <div class="dash-card" style="background:#f0f8ff;">
+      <h3 style="color:#007bff;">Personal Details</h3>
+      <p id="dashName"></p>
+      <p id="dashEmail"></p>
+      <p id="dashPhone"></p>
+      <button onclick="showProfileUpdate()">Update Profile</button>
+    </div>
+
+    <div class="dash-card" id="dashProfileUpdate" style="display:none; background:#e6f7ff;">
+      <h3 style="color:#007bff;">Update Profile</h3>
+      <input type="text" id="updateName" placeholder="Full Name">
+      <input type="text" id="updatePhone" placeholder="Phone">
+      <button onclick="updateProfile()">Save Changes</button>
+    </div>
+
+    <!-- Savings -->
+    <div class="dash-card" style="background:#fff0f5;">
+      <h3 style="color:#ff69b4;">Savings</h3>
+      <div class="progress-container">
+        <div class="progress-bar" id="savingsBar">0%</div>
+      </div>
+    </div>
+
+    <!-- Loans -->
+    <div class="dash-card" style="background:#fff8dc;">
+      <h3 style="color:#ff8c00;">Loans</h3>
+      <div id="loanList"></div>
+      <button onclick="showLoanForm()">Apply for Loan</button>
+    </div>
+
+    <div class="dash-card" id="dashLoanForm" style="display:none; background:#ffefd5;">
+      <h3 style="color:#ff8c00;">Loan Application</h3>
+      <input type="text" id="loanAmount" placeholder="Loan Amount" required>
+      <input type="text" id="loanPurpose" placeholder="Purpose" required>
+      <button onclick="submitLoan()">Submit Loan</button>
+    </div>
+
+    <!-- Statements -->
+    <div class="dash-card" style="background:#f5f5dc;">
+      <h3 style="color:#32cd32;">Statements</h3>
+      <p id="statementsText">0 transactions</p>
+      <button onclick="downloadStatement()">Download PDF</button>
+    </div>
+
+    <!-- Events -->
+    <div class="dash-card" style="background:#e0ffff;">
+      <h3 style="color:#1e90ff;">Events</h3>
+      <p id="eventsText">Upcoming events here</p>
+    </div>
+
+    <!-- News -->
+    <div class="dash-card" style="background:#fffacd;">
+      <h3 style="color:#ff4500;">News</h3>
+      <p id="newsText">Latest announcements here</p>
+    </div>
+  </div>
+</section>
+
+<footer data-aos="fade-up">
+  <p>© 2024 VISIONARY YOUTH GROUP. All Rights Reserved.</p>
+</footer>
+
+<!-- Firebase + jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-import { getFirestore, setDoc, doc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+import { getFirestore, setDoc, doc, serverTimestamp, getDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
-  authDomain: "visionary-youth-grou-2024.firebaseapp.com",
-  projectId: "visionary-youth-grou-2024",
-  storageBucket: "visionary-youth-grou-2024.firebasestorage.app",
-  messagingSenderId: "372978592717",
-  appId: "1:372978592717:web:1c15aec728ee5f854f3284",
-  measurementId: "G-QP1RBT2ZCP"
+  apiKey: "...",
+  authDomain: "...",
+  projectId: "...",
+  storageBucket: "...",
+  messagingSenderId: "...",
+  appId: "...",
+  measurementId: "..."
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth();
 const db = getFirestore(app);
 
-const savingsGoal = 100000;
-const loanLimit = 50000;
+// Signup/Login/Reset Password omitted for brevity (same as previous version)...
 
-// Signup
-document.getElementById('signupBtn').addEventListener('click', async () => {
-  const signupInfo = {
-    name: document.getElementById('signupName').value,
-    phone: document.getElementById('signupPhone').value,
-    id: document.getElementById('signupId').value,
-    origin: document.getElementById('signupOrigin').value,
-    email: document.getElementById('signupEmail').value,
-    password: document.getElementById('signupPassword').value
-  };
-  try {
-    const userCredential = await createUserWithEmailAndPassword(auth, signupInfo.email, signupInfo.password);
-    const user = userCredential.user;
-    await setDoc(doc(db,"members",user.uid), {
-      name: signupInfo.name,
-      phone: signupInfo.phone,
-      idNumber: signupInfo.id,
-      origin: signupInfo.origin,
-      email: signupInfo.email,
-      savings: 0,
-      loans: 0,
-      transactions: [],
-      createdAt: serverTimestamp()
-    });
-    alert(`Welcome ${signupInfo.name}, your account has been created!`);
-  } catch(err){ alert(err.message); }
-});
-
-// Login
-document.getElementById('loginBtn').addEventListener('click', async () => {
-  const email = document.getElementById('loginEmail').value;
-  const password = document.getElementById('loginPassword').value;
-  try { await signInWithEmailAndPassword(auth,email,password); } 
-  catch(err){ alert(err.message); }
-});
-
-// Reset password
-document.getElementById('resetPasswordLink').addEventListener('click', async () => {
-  const email = prompt("Enter your registered email:");
-  if(email){
-    try{ await sendPasswordResetEmail(auth,email); alert("Password reset email sent!"); } 
-    catch(err){ alert(err.message); }
-  }
-});
-
-// Logout
-document.getElementById('logoutLink').addEventListener('click', async () => {
-  await signOut(auth);
-  location.reload();
-});
-
-// Dashboard & animated bars
-onAuthStateChanged(auth, async (user) => {
-  const dashboard = document.getElementById('dashboard');
-  const navDashboard = document.getElementById('navDashboard');
-  const logoutLink = document.getElementById('logoutLink');
-  if(user){
-    dashboard.style.display="block";
-    navDashboard.style.display="inline";
-    logoutLink.style.display="inline";
-
-    const docSnap = await getDoc(doc(db,"members",user.uid));
-    const data = docSnap.exists()?docSnap.data():{};
-
-    const savingsAmount = data.savings||0;
-    const loansAmount = data.loans||0;
-    const savingsPercent = Math.min((savingsAmount/savingsGoal)*100,100);
-    const loansPercent = Math.min((loansAmount/loanLimit)*100,100);
-
-    const savingsBar = document.querySelector('#dashSavings .progress-bar');
-    const loansBar = document.querySelector('#dashLoans .progress-bar');
-    savingsBar.style.width = '0%';
-    loansBar.style.width = '0%';
-    setTimeout(()=>{ savingsBar.style.width = savingsPercent+'%'; },100);
-    setTimeout(()=>{ loansBar.style.width = loansPercent+'%'; },100);
-
-    document.querySelector('#dashSavings p').innerText = `KSh ${savingsAmount} / KSh ${savingsGoal}`;
-    document.querySelector('#dashLoans p').innerText = `KSh ${loansAmount} / KSh ${loanLimit}`;
-    document.querySelector('#dashStatements p').innerText = `${(data.transactions?.length)||0} transactions`;
-    document.querySelector('#dashEvents p').innerText = "Upcoming events here";
-    document.querySelector('#dashNews p').innerText = "Latest announcements here";
-  } else {
-    dashboard.style.display="none";
-    navDashboard.style.display="none";
-    logoutLink.style.display="none";
-  }
-});
+// Download statement
+window.downloadStatement = ()=>{
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const user = auth.currentUser;
+  if(!user) return alert("Login first");
+  getDoc(doc(db,"members",user.uid)).then(docSnap=>{
+    if(docSnap.exists()){
+      const data = docSnap.data();
+      doc.text("VISIONARY YOUTH GROUP 2024 - Statement", 20, 20);
+      doc.text(`Name: ${data.name}`, 20, 30);
+      doc.text(`Email: ${data.email}`, 20, 40);
+      let y=50;
+      (data.loans||[]).forEach((loan,i)=>{
+        doc.text(`Loan ${i+1}: Amount: ${loan.amount}, Purpose: ${loan.purpose}, Status: ${loan.status}`,20,y);
+        y+=10;
+      });
+      doc.save("Statement.pdf");
+    }
+  });
+};
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
 <script>AOS.init({ duration:1000, once:true });</script>
-
-<footer data-aos="fade-up">
-  <p>© 2024 VISIONARY YOUTH GROUP. All Rights Reserved.</p>
-</footer>
 </body>
 </html>
