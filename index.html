@@ -24,10 +24,10 @@ header p { font-size:1.2rem; margin-top:15px; text-shadow:1px 1px 3px #000; }
 .hero-btn:hover { background:#ff6600; color:white; transform:scale(1.05); }
 section { padding:60px 20px; max-width:1000px; margin:40px auto; background:white; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.1); }
 h2 { color:#007bff; margin-bottom:25px; text-align:center; }
-.benefits, .programs, .news { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:25px; }
-.benefit, .card { background:#f9f9f9; padding:25px; border-radius:12px; text-align:center; transition:transform 0.3s; }
-.benefit:hover, .card:hover { transform:scale(1.05); }
-.benefit i, .card i { font-size:40px; color:#ffcc00; margin-bottom:10px; }
+.benefits, .programs, .news, .dashboard-preview { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:25px; }
+.benefit, .card, .dash-card { background:#f9f9f9; padding:25px; border-radius:12px; text-align:center; transition:transform 0.3s; }
+.benefit:hover, .card:hover, .dash-card:hover { transform:scale(1.05); }
+.benefit i, .card i, .dash-card i { font-size:40px; color:#ffcc00; margin-bottom:10px; }
 #contact p i { margin-right:8px; color:#007bff; }
 .social-icons a { margin:0 10px; font-size:24px; color:#007bff; transition:0.3s; }
 .social-icons a:hover { color:#ff6600; transform:rotate(15deg) scale(1.2); }
@@ -37,23 +37,19 @@ button { background:#007bff; color:white; padding:10px 20px; border:none; border
 button:hover { background:#ff6600; transform:scale(1.05); }
 footer { text-align:center; padding:15px; background:#333; color:white; margin-top:40px; border-radius:12px; }
 
-/* Dashboard Styles */
+/* Dashboard */
 #memberDashboard { display:none; }
-.dashboard-header { background:#007bff; color:white; padding:20px; text-align:center; position:relative; }
-.dashboard-header h1 { margin:0; font-size:2rem; }
-.dashboard-header button { position:absolute; right:20px; top:20px; background:#ff6600; border:none; padding:10px 15px; border-radius:8px; color:white; cursor:pointer; }
-.container { max-width:1200px; margin:20px auto; padding:0 20px; display:grid; grid-template-columns:1fr 2fr; gap:25px; }
-.details p { margin:10px 0; font-size:1rem; }
-.cards-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:20px; }
-.loan-card, .savings-card { border-radius:12px; padding:20px; color:white; position:relative; overflow:hidden; }
-.loan-card { background:linear-gradient(135deg, #ff6600, #ffcc00); }
-.loan-card .progress-bar { background:rgba(255,255,255,0.3); height:15px; border-radius:8px; overflow:hidden; margin-top:10px; }
-.loan-card .progress { height:100%; background:white; width:0; text-align:center; color:#333; font-weight:600; font-size:0.8rem; transition:0.5s; line-height:15px; border-radius:8px; }
-.savings-card { background:linear-gradient(135deg, #28a745, #20c997); text-align:center; }
-.savings-card h3 { font-size:1.5rem; margin:10px 0; }
-button.download { background:#007bff; border:none; padding:10px 15px; border-radius:8px; color:white; cursor:pointer; transition:0.3s; margin-top:10px; width:100%; }
-button.download:hover { background:#0056b3; }
-.logout-msg { text-align:center; margin-top:50px; font-size:1.2rem; color:#ff0000; }
+.dashboard-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+.dashboard-header h1 { color:#007bff; }
+.dashboard-header button { background:#ff6600; color:white; }
+.card.details p { margin:8px 0; }
+.cards-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:20px; }
+.loan-card { background:#e9f7ff; padding:15px; border-radius:8px; }
+.progress-bar { background:#ccc; border-radius:5px; height:15px; margin-top:5px; }
+.progress { background:#007bff; height:100%; border-radius:5px; text-align:center; color:white; font-size:12px; }
+.savings-card { background:#fff3e6; padding:15px; border-radius:8px; text-align:center; }
+.download { margin-top:10px; background:#007bff; color:white; }
+.download:hover { background:#ff6600; }
 </style>
 </head>
 <body>
@@ -75,7 +71,7 @@ button.download:hover { background:#0056b3; }
 
 <section id="about" data-aos="fade-up">
   <h2>About Us</h2>
-  <p>VISIONARY YOUTH GROUP 2024 empowers young people through financial literacy, entrepreneurship, and community service. We foster leadership, accountability, and growth among youth to positively impact society.</p>
+  <p>VISIONARY YOUTH GROUP 2024 empowers young people through financial literacy, entrepreneurship, and community service.</p>
 </section>
 
 <section id="benefits" data-aos="fade-up">
@@ -121,7 +117,6 @@ button.download:hover { background:#0056b3; }
 
 <section id="auth" data-aos="fade-up">
   <h2>Join Our Community</h2>
-  <p><strong>All fields are required. Enter your details below.</strong></p>
   <form id="signupForm">
     <input type="text" id="signupName" placeholder="Full Name" required>
     <input type="text" id="signupPhone" placeholder="Phone Number" required>
@@ -137,14 +132,11 @@ button.download:hover { background:#0056b3; }
     <input type="email" id="loginEmail" placeholder="Email" required>
     <input type="password" id="loginPassword" placeholder="Password" required>
     <button type="button" id="loginBtn">Login</button>
+    <button type="button" id="resetPasswordBtn">Forgot Password?</button>
   </form>
-
-  <h3>Forgot Password?</h3>
-  <input type="email" id="resetEmail" placeholder="Enter your email">
-  <button type="button" id="resetBtn">Reset Password</button>
 </section>
 
-<!-- Member Dashboard Section -->
+<!-- Member Dashboard -->
 <section id="memberDashboard" data-aos="fade-up">
   <div class="dashboard-header">
     <h1>Member Dashboard</h1>
@@ -152,28 +144,38 @@ button.download:hover { background:#0056b3; }
   </div>
 
   <div class="container">
+    <!-- Personal Details -->
     <div class="card details" id="personalDetails">
       <h2>Personal Details</h2>
-      <p><strong>Name:</strong> <span id="userName">Loading...</span></p>
-      <p><strong>Email:</strong> <span id="userEmail">Loading...</span></p>
-      <p><strong>Phone:</strong> <span id="userPhone">Loading...</span></p>
-      <p><strong>ID Number:</strong> <span id="userID">Loading...</span></p>
-      <p><strong>Place of Origin:</strong> <span id="userOrigin">Loading...</span></p>
+      <p><strong>Name:</strong> <span id="userName"></span></p>
+      <p><strong>Email:</strong> <span id="userEmail"></span></p>
+      <p><strong>Phone:</strong> <span id="userPhone"></span></p>
+      <p><strong>ID Number:</strong> <span id="userID"></span></p>
+      <p><strong>Place of Origin:</strong> <span id="userOrigin"></span></p>
     </div>
 
+    <!-- Loans & Savings -->
     <div class="card">
       <h2>Loans & Savings</h2>
-      <div class="cards-grid" id="loansGrid">
-        <p>Loading loans...</p>
-      </div>
-      <div class="savings-card" id="totalSavingsCard">
+      <div class="cards-grid" id="loansGrid"></div>
+      <div class="savings-card">
         <h3>Total Savings</h3>
-        <p id="totalSavings">Loading...</p>
+        <p id="totalSavings"></p>
         <button class="download" id="downloadStmt">Download Statement</button>
       </div>
     </div>
+
+    <!-- Loan Application Form -->
+    <div class="card" id="loanApplication">
+      <h2>Apply for a Loan</h2>
+      <form id="loanForm">
+        <input type="number" id="loanAmount" placeholder="Loan Amount" required>
+        <input type="text" id="loanPurpose" placeholder="Purpose of Loan" required>
+        <input type="text" id="loanPeriod" placeholder="Repayment Period (months)" required>
+        <button type="button" id="applyLoanBtn">Submit Loan Application</button>
+      </form>
+    </div>
   </div>
-  <p class="logout-msg" id="notLogged" style="display:none;">You must log in to view this page.</p>
 </section>
 
 <footer data-aos="fade-up">
@@ -183,48 +185,40 @@ button.download:hover { background:#0056b3; }
 <!-- Firebase -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-import { getFirestore, setDoc, doc, serverTimestamp, collection, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
   authDomain: "visionary-youth-grou-2024.firebaseapp.com",
   projectId: "visionary-youth-grou-2024",
-  storageBucket: "visionary-youth-grou-2024.firebasestorage.app",
+  storageBucket: "visionary-youth-grou-2024.appspot.com",
   messagingSenderId: "372978592717",
-  appId: "1:372978592717:web:1c15aec728ee5f854f3284"
+  appId: "1:372978592717:web:1c15aec728ee5f854f3284",
+  measurementId: "G-QP1RBT2ZCP"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth();
 const db = getFirestore(app);
 
-// Register
+// Signup
 document.getElementById('signupBtn').addEventListener('click', async ()=>{
-  const signupInfo = {
-    name: document.getElementById('signupName').value,
-    phone: document.getElementById('signupPhone').value,
-    id: document.getElementById('signupId').value,
-    origin: document.getElementById('signupOrigin').value,
-    email: document.getElementById('signupEmail').value,
-    password: document.getElementById('signupPassword').value
-  };
-  if(!signupInfo.name || !signupInfo.phone || !signupInfo.id || !signupInfo.origin || !signupInfo.email || !signupInfo.password){
-    return alert("All fields are required!");
-  }
+  const name = document.getElementById('signupName').value;
+  const phone = document.getElementById('signupPhone').value;
+  const id = document.getElementById('signupId').value;
+  const origin = document.getElementById('signupOrigin').value;
+  const email = document.getElementById('signupEmail').value;
+  const password = document.getElementById('signupPassword').value;
+
+  if(!name || !phone || !id || !origin || !email || !password) return alert("All fields are required");
+
   try{
-    const userCredential = await createUserWithEmailAndPassword(auth, signupInfo.email, signupInfo.password);
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
-    await setDoc(doc(db, "members", user.uid), {
-      name: signupInfo.name,
-      phone: signupInfo.phone,
-      idNumber: signupInfo.id,
-      origin: signupInfo.origin,
-      email: signupInfo.email,
-      createdAt: serverTimestamp()
-    });
-    alert(`Welcome ${signupInfo.name}, your account has been created!`);
-  } catch(err){ alert(err.message); }
+    await setDoc(doc(db,"members",user.uid),{name, phone, idNumber:id, origin, email});
+    alert("Signup successful!");
+  }catch(err){ alert(err.message); }
 });
 
 // Login
@@ -232,19 +226,18 @@ document.getElementById('loginBtn').addEventListener('click', async ()=>{
   const email = document.getElementById('loginEmail').value;
   const password = document.getElementById('loginPassword').value;
   if(!email || !password) return alert("Enter email & password");
+
   try{
-    await signInWithEmailAndPassword(auth, email, password);
-    document.getElementById('memberDashboard').style.display = "block";
-    window.scrollTo({ top:0, behavior:'smooth' });
+    await signInWithEmailAndPassword(auth,email,password);
   }catch(err){ alert(err.message); }
 });
 
-// Password Reset
-document.getElementById('resetBtn').addEventListener('click', async ()=>{
-  const email = document.getElementById('resetEmail').value;
-  if(!email) return alert("Enter your email");
+// Reset Password
+document.getElementById('resetPasswordBtn').addEventListener('click', async ()=>{
+  const email = document.getElementById('loginEmail').value;
+  if(!email) return alert("Enter your email to reset password");
   try{
-    await sendPasswordResetEmail(auth, email);
+    await sendPasswordResetEmail(auth,email);
     alert("Password reset email sent!");
   }catch(err){ alert(err.message); }
 });
@@ -252,24 +245,15 @@ document.getElementById('resetBtn').addEventListener('click', async ()=>{
 // Logout
 document.getElementById('logoutDashboardBtn').addEventListener('click', async ()=>{
   await signOut(auth);
-  alert("Logged out successfully!");
-  location.reload();
 });
 
-// Load dashboard details on auth state
-onAuthStateChanged(auth, async (user)=>{
-  const dashboard = document.getElementById('memberDashboard');
-  const personalDetails = document.getElementById('personalDetails');
-  const loansGrid = document.getElementById('loansGrid');
-  const totalSavingsEl = document.getElementById('totalSavings');
-  const notLogged = document.getElementById('notLogged');
-
+// Show dashboard only if logged in
+onAuthStateChanged(auth, async user=>{
   if(user){
-    dashboard.style.display = "block";
-    notLogged.style.display = "none";
+    document.getElementById('memberDashboard').style.display = 'block';
+    document.getElementById('auth').style.display = 'none';
 
-    // Load personal details
-    const userDoc = await getDoc(doc(db, "members", user.uid));
+    const userDoc = await getDoc(doc(db,"members",user.uid));
     if(userDoc.exists()){
       const data = userDoc.data();
       document.getElementById('userName').textContent = data.name;
@@ -279,54 +263,79 @@ onAuthStateChanged(auth, async (user)=>{
       document.getElementById('userOrigin').textContent = data.origin;
     }
 
-    // Load loans
-    const loansSnap = await getDocs(collection(db, "members", user.uid, "loans"));
-    loansGrid.innerHTML = "";
-    let totalSavings = 0;
-    loansSnap.forEach(docSnap=>{
-      const loan = docSnap.data();
-      totalSavings += loan.savings || 0;
-      const progressMap = { "Applied":25, "Verified":50, "Approved":75, "Paid":100 };
-      const progWidth = progressMap[loan.status] || 0;
+    loadMemberLoans(user.uid);
 
-      loansGrid.innerHTML += `
-        <div class="loan-card">
-          <h3>Loan Amount: ${loan.amount}</h3>
-          <p>Status: ${loan.status}</p>
-          <p>Application Date: ${loan.date || "N/A"}</p>
-          <div class="progress-bar">
-            <div class="progress" style="width:${progWidth}%">${loan.status}</div>
-          </div>
-        </div>
-      `;
-    });
-    totalSavingsEl.textContent = totalSavings;
-
-  } else {
-    dashboard.style.display = "none";
-    loansGrid.innerHTML = "";
-    totalSavingsEl.textContent = "";
-    notLogged.style.display = "block";
+  }else{
+    document.getElementById('memberDashboard').style.display = 'none';
+    document.getElementById('auth').style.display = 'block';
   }
 });
 
-// Download statement
-document.getElementById('downloadStmt').addEventListener('click', async ()=>{
+// Loan application
+document.getElementById('applyLoanBtn').addEventListener('click', async ()=>{
   const user = auth.currentUser;
-  if(!user) return alert("Not logged in");
-  const loansSnap = await getDocs(collection(db, "members", user.uid, "loans"));
-  let csv = "Loan Amount,Status,Date\n";
+  if(!user) return alert("You must be logged in");
+
+  const amount = document.getElementById('loanAmount').value;
+  const purpose = document.getElementById('loanPurpose').value;
+  const period = document.getElementById('loanPeriod').value;
+
+  if(!amount || !purpose || !period) return alert("Fill all loan fields");
+
+  try{
+    const loanRef = doc(collection(db, "members", user.uid, "loans"));
+    await setDoc(loanRef, {
+      amount: parseFloat(amount),
+      purpose: purpose,
+      period: period,
+      status: "Applied",
+      date: new Date().toLocaleDateString(),
+      savings: 0
+    });
+    alert("Loan application submitted!");
+    document.getElementById('loanForm').reset();
+    loadMemberLoans(user.uid);
+  }catch(err){ alert(err.message); }
+});
+
+// Load loans
+async function loadMemberLoans(uid){
+  const loansSnap = await getDocs(collection(db,"members",uid,"loans"));
+  const loansGrid = document.getElementById('loansGrid');
+  loansGrid.innerHTML = "";
+  let totalSavings = 0;
+
   loansSnap.forEach(docSnap=>{
     const loan = docSnap.data();
-    csv += `${loan.amount},${loan.status},${loan.date || "N/A"}\n`;
+    totalSavings += loan.savings || 0;
+    const progressMap = { "Applied":25, "Verified":50, "Approved":75, "Paid":100 };
+    const progWidth = progressMap[loan.status] || 0;
+
+    loansGrid.innerHTML += `
+      <div class="loan-card">
+        <h3>Loan Amount: ${loan.amount}</h3>
+        <p>Status: ${loan.status}</p>
+        <p>Purpose: ${loan.purpose}</p>
+        <p>Repayment Period: ${loan.period} months</p>
+        <p>Application Date: ${loan.date || "N/A"}</p>
+        <div class="progress-bar">
+          <div class="progress" style="width:${progWidth}%">${loan.status}</div>
+        </div>
+      </div>
+    `;
   });
-  const blob = new Blob([csv], {type:"text/csv"});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = "statement.csv";
-  a.click();
-  URL.revokeObjectURL(url);
+  document.getElementById('totalSavings').textContent = totalSavings;
+}
+
+// Download Statement
+document.getElementById('downloadStmt').addEventListener('click', ()=>{
+  const userName = document.getElementById('userName').textContent;
+  const loansHTML = document.getElementById('loansGrid').innerHTML;
+  const blob = new Blob([`Member: ${userName}\n\nLoans:\n${loansHTML.replace(/<[^>]*>?/gm, '')}`],{type:'text/plain'});
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = `${userName}_statement.txt`;
+  link.click();
 });
 </script>
 
