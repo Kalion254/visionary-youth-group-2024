@@ -35,6 +35,7 @@ form { background:#f9f9f9; padding:25px; border-radius:12px; box-shadow:0 2px 12
 input { display:block; width:100%; margin:10px 0; padding:10px; border-radius:8px; border:1px solid #ccc; }
 button { background:#007bff; color:white; padding:10px 20px; border:none; border-radius:8px; cursor:pointer; transition:0.3s; }
 button:hover { background:#ff6600; transform:scale(1.05); }
+.forgot-password { color:#007bff; cursor:pointer; text-decoration:underline; margin-top:5px; display:inline-block; }
 footer { text-align:center; padding:15px; background:#333; color:white; margin-top:40px; border-radius:12px; }
 </style>
 </head>
@@ -125,7 +126,7 @@ footer { text-align:center; padding:15px; background:#333; color:white; margin-t
     <input type="text" id="signupOrigin" placeholder="Place of Origin" required>
     <input type="email" id="signupEmail" placeholder="Email" required>
     <input type="password" id="signupPassword" placeholder="Password" required>
-    <button type="button" onclick="triggerMpesaPayment()">Sign Up & Pay</button>
+    <button type="button" onclick="registerFirebaseUserFromForm()">Sign Up</button>
   </form>
 
   <h3>Already a member?</h3>
@@ -133,6 +134,7 @@ footer { text-align:center; padding:15px; background:#333; color:white; margin-t
     <input type="email" id="loginEmail" placeholder="Email" required>
     <input type="password" id="loginPassword" placeholder="Password" required>
     <button type="button" id="loginBtn">Login</button>
+    <span class="forgot-password" onclick="resetPassword()">Forgot Password?</span>
   </form>
 </section>
 
@@ -147,10 +149,16 @@ footer { text-align:center; padding:15px; background:#333; color:white; margin-t
   <p>© 2024 VISIONARY YOUTH GROUP. All Rights Reserved.</p>
 </footer>
 
-<!-- Firebase -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+import { 
+  getAuth, 
+  createUserWithEmailAndPassword, 
+  signInWithEmailAndPassword, 
+  sendPasswordResetEmail,
+  onAuthStateChanged, 
+  signOut 
+} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 import { getFirestore, setDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -167,7 +175,19 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth();
 const db = getFirestore(app);
 
-window.registerFirebaseUser = async (signupInfo) => {
+window.registerFirebaseUserFromForm = async () => {
+  const signupInfo = {
+    name: document.getElementById('signupName').value,
+    phone: document.getElementById('signupPhone').value,
+    id: document.getElementById('signupId').value,
+    origin: document.getElementById('signupOrigin').value,
+    email: document.getElementById('signupEmail').value,
+    password: document.getElementById('signupPassword').value
+  };
+  if (!signupInfo.name || !signupInfo.phone || !signupInfo.id || !signupInfo.origin || !signupInfo.email || !signupInfo.password) {
+    alert("All fields are required!");
+    return;
+  }
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, signupInfo.email, signupInfo.password);
     const user = userCredential.user;
@@ -180,83 +200,51 @@ window.registerFirebaseUser = async (signupInfo) => {
       createdAt: serverTimestamp()
     });
     alert(`Welcome ${signupInfo.name}, your account has been created!`);
-  } catch(err) {
+    document.getElementById('signupForm').reset();
+    document.getElementById('dashboardPreview').scrollIntoView({behavior:'smooth'});
+  } catch(err){
     console.error(err);
-    if (err.code === 'auth/email-already-in-use') {
-      alert("This email is already registered. Try logging in instead.");
-    } else if (err.code === 'auth/invalid-email') {
-      alert("Invalid email format. Please enter a valid email.");
-    } else if (err.code === 'auth/weak-password') {
-      alert("Password is too weak. Use at least 6 characters.");
+    if(err.code==='auth/email-already-in-use'){
+      alert("This email is already in use. Try logging in or reset your password if forgotten.");
     } else {
-      alert("Signup error: " + err.message);
+      alert("Firebase signup error: " + err.message);
     }
   }
 };
 
-window.loginFirebaseUser = async (email, password) => {
-  try {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+document.getElementById('loginBtn').addEventListener('click', async ()=>{
+  const email=document.getElementById('loginEmail').value;
+  const password=document.getElementById('loginPassword').value;
+  if(!email||!password){ alert("Enter email & password"); return; }
+  try{
+    const userCredential = await signInWithEmailAndPassword(auth,email,password);
     alert(`Welcome back, ${userCredential.user.email}`);
-  } catch(err) {
-    console.error(err);
-    alert("Login error: " + err.message);
-  }
-};
-
-// Show/hide Admin Dashboard
-onAuthStateChanged(auth, (user) => {
-  const dashboard = document.getElementById("admin-dashboard");
-  if (user) dashboard.style.display = "block";
-  else dashboard.style.display = "none";
+    document.getElementById('dashboardPreview').scrollIntoView({behavior:'smooth'});
+  } catch(err){ console.error(err); alert("Login error: "+err.message); }
 });
 
-window.logoutUser = async () => {
-  try { await signOut(auth); alert("Logged out successfully!"); }
+window.resetPassword = async ()=>{
+  const email = prompt("Enter your email to reset password:");
+  if(!email) return;
+  try{
+    await sendPasswordResetEmail(auth,email);
+    alert("Password reset email sent! Check your inbox.");
+  } catch(err){ console.error(err); alert("Error sending reset email: "+err.message); }
+};
+
+onAuthStateChanged(auth,(user)=>{
+  const dashboard=document.getElementById("admin-dashboard");
+  dashboard.style.display=user?"block":"none";
+});
+
+window.logoutUser = async ()=>{
+  try{ await signOut(auth); alert("Logged out successfully!"); }
   catch(err){ console.error(err); }
 };
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
 <script>AOS.init({ duration:1000, once:true });</script>
-
-<script>
-async function triggerMpesaPayment() {
-  const signupInfo = {
-    name: document.getElementById('signupName').value,
-    phone: document.getElementById('signupPhone').value,
-    id: document.getElementById('signupId').value,
-    origin: document.getElementById('signupOrigin').value,
-    email: document.getElementById('signupEmail').value,
-    password: document.getElementById('signupPassword').value
-  };
-  if(!signupInfo.name || !signupInfo.phone || !signupInfo.id || !signupInfo.origin || !signupInfo.email || !signupInfo.password){
-    alert("All fields are required!");
-    return;
-  }
-  try {
-    const response = await fetch('http://localhost:3000/api/mpesa/pay', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({...signupInfo, amount:100})
-    });
-    const data = await response.json();
-    if(data.success){
-      alert("M-Pesa payment prompt sent! Complete the payment on your phone.");
-      registerFirebaseUser(signupInfo);
-    } else alert("Payment failed: " + data.message);
-  } catch(err){
-    alert("Error initiating payment: " + err.message);
-  }
-}
-
-document.getElementById('loginBtn').addEventListener('click', ()=>{
-  const email = document.getElementById('loginEmail').value;
-  const password = document.getElementById('loginPassword').value;
-  if(!email || !password){ alert("Enter email & password"); return; }
-  loginFirebaseUser(email, password);
-});
-</script>
 
 </body>
 </html>
