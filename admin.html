@@ -2,15 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <script type="module">
-    // Firebase SDK imports
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getAuth, signOut, onAuthStateChanged } 
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getDatabase, ref, get, update } 
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-    // Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
       authDomain: "your-app.firebaseapp.com",
@@ -18,119 +18,90 @@
       projectId: "your-app",
       storageBucket: "your-app.appspot.com",
       messagingSenderId: "123456789",
-      appId: "1:123456789:web:abcdef"
+      appId: "1:123456789:web:xxxx"
     };
 
-    // Initialize
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getDatabase(app);
 
-    // Only admin should access
-    const ADMIN_EMAIL = "admin@example.com"; // 🔹 change to your real admin email
+    const logoutBtn = document.getElementById("logoutBtn");
+    const loanList = document.getElementById("loanList");
 
+    // Check login
     onAuthStateChanged(auth, (user) => {
-      if (user) {
-        if (user.email !== ADMIN_EMAIL) {
-          alert("Access denied. Admins only!");
-          window.location.href = "index.html";
-        } else {
-          document.getElementById("adminEmail").textContent = user.email;
-          loadAllMembers();
-        }
-      } else {
+      if (!user) {
         window.location.href = "index.html";
       }
     });
 
-    // Load all members
-    function loadAllMembers() {
-      get(ref(db, "members")).then((snapshot) => {
-        const container = document.getElementById("membersList");
-        container.innerHTML = "";
-        if (snapshot.exists()) {
-          snapshot.forEach((memberSnap) => {
-            const uid = memberSnap.key;
-            const member = memberSnap.val();
-            const profile = member.profile || {};
-            const loans = member.loans || {};
-            const shares = member.shares || {};
-
-            const card = document.createElement("div");
-            card.className = "card";
-
-            card.innerHTML = `
-              <h3>${profile.name || "Unnamed"} (${profile.phone || "N/A"})</h3>
-              <p><b>ID:</b> ${profile.idNumber || "N/A"}</p>
-              <h4>Shares</h4>
-              <ul>${Object.values(shares).map(s => `<li>${s.units} Units - ${s.date}</li>`).join("") || "<li>No shares</li>"}</ul>
-              <h4>Loans</h4>
-              <ul>
-                ${Object.entries(loans).map(([loanId, loan]) => `
-                  <li>
-                    Amount: ${loan.amount}, Purpose: ${loan.purpose}, Status: ${loan.status}
-                    <br>
-                    <button onclick="approveLoan('${uid}', '${loanId}')">Approve</button>
-                    <button onclick="rejectLoan('${uid}', '${loanId}')">Reject</button>
-                  </li>
-                `).join("") || "<li>No loans</li>"}
-              </ul>
-            `;
-            container.appendChild(card);
-          });
-        } else {
-          container.innerHTML = "<p>No members found.</p>";
-        }
-      });
-    }
-
-    // Approve Loan
-    window.approveLoan = function(uid, loanId) {
-      update(ref(db, "members/" + uid + "/loans/" + loanId), { status: "Approved" }).then(() => {
-        alert("Loan Approved");
-        loadAllMembers();
-      });
-    };
-
-    // Reject Loan
-    window.rejectLoan = function(uid, loanId) {
-      update(ref(db, "members/" + uid + "/loans/" + loanId), { status: "Rejected" }).then(() => {
-        alert("Loan Rejected");
-        loadAllMembers();
-      });
-    };
-
     // Logout
-    document.getElementById("logout").addEventListener("click", () => {
+    logoutBtn.addEventListener("click", () => {
       signOut(auth).then(() => {
         window.location.href = "index.html";
       });
     });
+
+    // Load Loans
+    get(ref(db, "loans")).then((snapshot) => {
+      if (snapshot.exists()) {
+        loanList.innerHTML = "";
+        snapshot.forEach((child) => {
+          const loan = child.val();
+          const row = `
+            <tr>
+              <td>${loan.userId}</td>
+              <td>${loan.amount}</td>
+              <td>${loan.purpose}</td>
+              <td>${loan.guarantor}</td>
+              <td>${loan.status}</td>
+              <td>
+                <button class="btn btn-success btn-sm" onclick="approveLoan('${child.key}')">Approve</button>
+                <button class="btn btn-danger btn-sm" onclick="rejectLoan('${child.key}')">Reject</button>
+              </td>
+            </tr>
+          `;
+          loanList.innerHTML += row;
+        });
+      }
+    });
+
+    // Approve & Reject
+    window.approveLoan = (key) => {
+      update(ref(db, "loans/" + key), { status: "Approved" });
+      alert("Loan approved!");
+      location.reload();
+    };
+    window.rejectLoan = (key) => {
+      update(ref(db, "loans/" + key), { status: "Rejected" });
+      alert("Loan rejected!");
+      location.reload();
+    };
   </script>
-
-  <style>
-    body { font-family: Arial, sans-serif; background: #f4f7fb; margin: 0; }
-    header { background: #1e3c72; color: white; padding: 20px; text-align: center; }
-    .container { padding: 20px; max-width: 1000px; margin: auto; }
-    .card { background: white; border-radius: 10px; padding: 15px; margin-bottom: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
-    h3 { color: #1e3c72; }
-    button { margin: 5px; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer; }
-    button:hover { opacity: 0.8; }
-    button:nth-child(1) { background: #28a745; color: white; } /* Approve */
-    button:nth-child(2) { background: #dc3545; color: white; } /* Reject */
-  </style>
 </head>
-<body>
-  <header>
-    <h1>Admin Dashboard</h1>
-    <p id="adminEmail"></p>
-    <button id="logout">Logout</button>
-  </header>
+<body class="bg-light">
+  <nav class="navbar navbar-dark bg-dark">
+    <div class="container-fluid">
+      <span class="navbar-brand">Admin Dashboard</span>
+      <button class="btn btn-danger" id="logoutBtn">Logout</button>
+    </div>
+  </nav>
 
-  <div class="container">
-    <h2>All Members</h2>
-    <div id="membersList"></div>
+  <div class="container mt-4">
+    <h3>Loan Applications</h3>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>User ID</th>
+          <th>Amount</th>
+          <th>Purpose</th>
+          <th>Guarantor</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="loanList"></tbody>
+    </table>
   </div>
 </body>
 </html>
-a
