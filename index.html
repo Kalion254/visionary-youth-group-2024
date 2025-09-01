@@ -24,10 +24,10 @@ header p { font-size:1.2rem; margin-top:15px; text-shadow:1px 1px 3px #000; }
 .hero-btn:hover { background:#ff6600; color:white; transform:scale(1.05); }
 section { padding:60px 20px; max-width:1000px; margin:40px auto; background:white; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.1); }
 h2 { color:#007bff; margin-bottom:25px; text-align:center; }
-.benefits, .programs, .news, .dashboard-preview { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:25px; }
-.benefit, .card, .dash-card { background:#f9f9f9; padding:25px; border-radius:12px; text-align:center; transition:transform 0.3s; }
-.benefit:hover, .card:hover, .dash-card:hover { transform:scale(1.05); }
-.benefit i, .card i, .dash-card i { font-size:40px; color:#ffcc00; margin-bottom:10px; }
+.benefits, .programs, .news { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:25px; }
+.benefit, .card { background:#f9f9f9; padding:25px; border-radius:12px; text-align:center; transition:transform 0.3s; }
+.benefit:hover, .card:hover { transform:scale(1.05); }
+.benefit i, .card i { font-size:40px; color:#ffcc00; margin-bottom:10px; }
 #contact p i { margin-right:8px; color:#007bff; }
 .social-icons a { margin:0 10px; font-size:24px; color:#007bff; transition:0.3s; }
 .social-icons a:hover { color:#ff6600; transform:rotate(15deg) scale(1.2); }
@@ -36,7 +36,24 @@ input { display:block; width:100%; margin:10px 0; padding:10px; border-radius:8p
 button { background:#007bff; color:white; padding:10px 20px; border:none; border-radius:8px; cursor:pointer; transition:0.3s; }
 button:hover { background:#ff6600; transform:scale(1.05); }
 footer { text-align:center; padding:15px; background:#333; color:white; margin-top:40px; border-radius:12px; }
-#dashboard, #profile, #loanApplication { display:none; }
+
+/* Dashboard Styles */
+#memberDashboard { display:none; }
+.dashboard-header { background:#007bff; color:white; padding:20px; text-align:center; position:relative; }
+.dashboard-header h1 { margin:0; font-size:2rem; }
+.dashboard-header button { position:absolute; right:20px; top:20px; background:#ff6600; border:none; padding:10px 15px; border-radius:8px; color:white; cursor:pointer; }
+.container { max-width:1200px; margin:20px auto; padding:0 20px; display:grid; grid-template-columns:1fr 2fr; gap:25px; }
+.details p { margin:10px 0; font-size:1rem; }
+.cards-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:20px; }
+.loan-card, .savings-card { border-radius:12px; padding:20px; color:white; position:relative; overflow:hidden; }
+.loan-card { background:linear-gradient(135deg, #ff6600, #ffcc00); }
+.loan-card .progress-bar { background:rgba(255,255,255,0.3); height:15px; border-radius:8px; overflow:hidden; margin-top:10px; }
+.loan-card .progress { height:100%; background:white; width:0; text-align:center; color:#333; font-weight:600; font-size:0.8rem; transition:0.5s; line-height:15px; border-radius:8px; }
+.savings-card { background:linear-gradient(135deg, #28a745, #20c997); text-align:center; }
+.savings-card h3 { font-size:1.5rem; margin:10px 0; }
+button.download { background:#007bff; border:none; padding:10px 15px; border-radius:8px; color:white; cursor:pointer; transition:0.3s; margin-top:10px; width:100%; }
+button.download:hover { background:#0056b3; }
+.logout-msg { text-align:center; margin-top:50px; font-size:1.2rem; color:#ff0000; }
 </style>
 </head>
 <body>
@@ -48,7 +65,6 @@ footer { text-align:center; padding:15px; background:#333; color:white; margin-t
   <a href="#news"><i class="fas fa-newspaper"></i> News</a>
   <a href="#contact"><i class="fas fa-envelope"></i> Contact</a>
   <a href="#auth"><i class="fas fa-user-plus"></i> Join</a>
-  <a href="#" id="dashboardLink"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
 </nav>
 
 <header data-aos="fade-down">
@@ -104,7 +120,8 @@ footer { text-align:center; padding:15px; background:#333; color:white; margin-t
 </section>
 
 <section id="auth" data-aos="fade-up">
-  <h2>Join / Login</h2>
+  <h2>Join Our Community</h2>
+  <p><strong>All fields are required. Enter your details below.</strong></p>
   <form id="signupForm">
     <input type="text" id="signupName" placeholder="Full Name" required>
     <input type="text" id="signupPhone" placeholder="Phone Number" required>
@@ -123,27 +140,40 @@ footer { text-align:center; padding:15px; background:#333; color:white; margin-t
   </form>
 
   <h3>Forgot Password?</h3>
-  <form id="resetForm">
-    <input type="email" id="resetEmail" placeholder="Enter your email" required>
-    <button type="button" id="resetBtn">Reset Password</button>
-  </form>
+  <input type="email" id="resetEmail" placeholder="Enter your email">
+  <button type="button" id="resetBtn">Reset Password</button>
 </section>
 
-<section id="dashboard" data-aos="fade-up">
-  <h2>Member Dashboard</h2>
-  <button onclick="logoutUser()">Logout</button>
-  <div id="profile">
-    <h3>Personal Details</h3>
-    <p id="personalDetails"></p>
-    <h3>Loan Status</h3>
-    <p id="loanDetails"></p>
-    <button onclick="downloadStatement()">Download Statement</button>
+<!-- Member Dashboard Section -->
+<section id="memberDashboard" data-aos="fade-up">
+  <div class="dashboard-header">
+    <h1>Member Dashboard</h1>
+    <button id="logoutDashboardBtn">Logout</button>
   </div>
-  <div id="loanApplication">
-    <h3>Apply for Loan</h3>
-    <input type="text" id="loanAmount" placeholder="Loan Amount">
-    <button onclick="applyLoan()">Submit Application</button>
+
+  <div class="container">
+    <div class="card details" id="personalDetails">
+      <h2>Personal Details</h2>
+      <p><strong>Name:</strong> <span id="userName">Loading...</span></p>
+      <p><strong>Email:</strong> <span id="userEmail">Loading...</span></p>
+      <p><strong>Phone:</strong> <span id="userPhone">Loading...</span></p>
+      <p><strong>ID Number:</strong> <span id="userID">Loading...</span></p>
+      <p><strong>Place of Origin:</strong> <span id="userOrigin">Loading...</span></p>
+    </div>
+
+    <div class="card">
+      <h2>Loans & Savings</h2>
+      <div class="cards-grid" id="loansGrid">
+        <p>Loading loans...</p>
+      </div>
+      <div class="savings-card" id="totalSavingsCard">
+        <h3>Total Savings</h3>
+        <p id="totalSavings">Loading...</p>
+        <button class="download" id="downloadStmt">Download Statement</button>
+      </div>
+    </div>
   </div>
+  <p class="logout-msg" id="notLogged" style="display:none;">You must log in to view this page.</p>
 </section>
 
 <footer data-aos="fade-up">
@@ -153,14 +183,14 @@ footer { text-align:center; padding:15px; background:#333; color:white; margin-t
 <!-- Firebase -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-import { getFirestore, setDoc, doc, serverTimestamp, getDoc, updateDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+import { getFirestore, setDoc, doc, serverTimestamp, collection, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
   authDomain: "visionary-youth-grou-2024.firebaseapp.com",
   projectId: "visionary-youth-grou-2024",
-  storageBucket: "visionary-youth-grou-2024.appspot.com",
+  storageBucket: "visionary-youth-grou-2024.firebasestorage.app",
   messagingSenderId: "372978592717",
   appId: "1:372978592717:web:1c15aec728ee5f854f3284"
 };
@@ -169,7 +199,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth();
 const db = getFirestore(app);
 
-// Sign Up
+// Register
 document.getElementById('signupBtn').addEventListener('click', async ()=>{
   const signupInfo = {
     name: document.getElementById('signupName').value,
@@ -179,89 +209,125 @@ document.getElementById('signupBtn').addEventListener('click', async ()=>{
     email: document.getElementById('signupEmail').value,
     password: document.getElementById('signupPassword').value
   };
-  try {
+  if(!signupInfo.name || !signupInfo.phone || !signupInfo.id || !signupInfo.origin || !signupInfo.email || !signupInfo.password){
+    return alert("All fields are required!");
+  }
+  try{
     const userCredential = await createUserWithEmailAndPassword(auth, signupInfo.email, signupInfo.password);
     const user = userCredential.user;
     await setDoc(doc(db, "members", user.uid), {
-      ...signupInfo,
+      name: signupInfo.name,
+      phone: signupInfo.phone,
+      idNumber: signupInfo.id,
+      origin: signupInfo.origin,
+      email: signupInfo.email,
       createdAt: serverTimestamp()
     });
-    alert("Signup successful!");
-  } catch(err){
-    alert(err.message);
-  }
+    alert(`Welcome ${signupInfo.name}, your account has been created!`);
+  } catch(err){ alert(err.message); }
 });
 
 // Login
 document.getElementById('loginBtn').addEventListener('click', async ()=>{
   const email = document.getElementById('loginEmail').value;
   const password = document.getElementById('loginPassword').value;
-  try {
+  if(!email || !password) return alert("Enter email & password");
+  try{
     await signInWithEmailAndPassword(auth, email, password);
-  } catch(err){
-    alert(err.message);
-  }
+    document.getElementById('memberDashboard').style.display = "block";
+    window.scrollTo({ top:0, behavior:'smooth' });
+  }catch(err){ alert(err.message); }
 });
 
-// Reset Password
+// Password Reset
 document.getElementById('resetBtn').addEventListener('click', async ()=>{
   const email = document.getElementById('resetEmail').value;
+  if(!email) return alert("Enter your email");
   try{
     await sendPasswordResetEmail(auth, email);
     alert("Password reset email sent!");
-  } catch(err){
-    alert(err.message);
-  }
-});
-
-// Show Dashboard after login
-onAuthStateChanged(auth, async (user)=>{
-  if(user){
-    document.getElementById('dashboard').style.display="block";
-    document.getElementById('auth').style.display="none";
-    document.getElementById('dashboardLink').style.display="inline";
-
-    const docSnap = await getDoc(doc(db, "members", user.uid));
-    if(docSnap.exists()){
-      const data = docSnap.data();
-      document.getElementById('personalDetails').innerText = 
-        `Name: ${data.name}\nPhone: ${data.phone}\nID: ${data.id}\nOrigin: ${data.origin}\nEmail: ${data.email}`;
-      // Load loan details if any
-      document.getElementById('loanDetails').innerText = data.loan ? JSON.stringify(data.loan) : "No active loans";
-    }
-  } else {
-    document.getElementById('dashboard').style.display="none";
-    document.getElementById('auth').style.display="block";
-  }
+  }catch(err){ alert(err.message); }
 });
 
 // Logout
-window.logoutUser = async ()=>{
+document.getElementById('logoutDashboardBtn').addEventListener('click', async ()=>{
   await signOut(auth);
-  alert("Logged out!");
-};
+  alert("Logged out successfully!");
+  location.reload();
+});
 
-// Apply Loan
-window.applyLoan = async ()=>{
+// Load dashboard details on auth state
+onAuthStateChanged(auth, async (user)=>{
+  const dashboard = document.getElementById('memberDashboard');
+  const personalDetails = document.getElementById('personalDetails');
+  const loansGrid = document.getElementById('loansGrid');
+  const totalSavingsEl = document.getElementById('totalSavings');
+  const notLogged = document.getElementById('notLogged');
+
+  if(user){
+    dashboard.style.display = "block";
+    notLogged.style.display = "none";
+
+    // Load personal details
+    const userDoc = await getDoc(doc(db, "members", user.uid));
+    if(userDoc.exists()){
+      const data = userDoc.data();
+      document.getElementById('userName').textContent = data.name;
+      document.getElementById('userEmail').textContent = data.email;
+      document.getElementById('userPhone').textContent = data.phone;
+      document.getElementById('userID').textContent = data.idNumber;
+      document.getElementById('userOrigin').textContent = data.origin;
+    }
+
+    // Load loans
+    const loansSnap = await getDocs(collection(db, "members", user.uid, "loans"));
+    loansGrid.innerHTML = "";
+    let totalSavings = 0;
+    loansSnap.forEach(docSnap=>{
+      const loan = docSnap.data();
+      totalSavings += loan.savings || 0;
+      const progressMap = { "Applied":25, "Verified":50, "Approved":75, "Paid":100 };
+      const progWidth = progressMap[loan.status] || 0;
+
+      loansGrid.innerHTML += `
+        <div class="loan-card">
+          <h3>Loan Amount: ${loan.amount}</h3>
+          <p>Status: ${loan.status}</p>
+          <p>Application Date: ${loan.date || "N/A"}</p>
+          <div class="progress-bar">
+            <div class="progress" style="width:${progWidth}%">${loan.status}</div>
+          </div>
+        </div>
+      `;
+    });
+    totalSavingsEl.textContent = totalSavings;
+
+  } else {
+    dashboard.style.display = "none";
+    loansGrid.innerHTML = "";
+    totalSavingsEl.textContent = "";
+    notLogged.style.display = "block";
+  }
+});
+
+// Download statement
+document.getElementById('downloadStmt').addEventListener('click', async ()=>{
   const user = auth.currentUser;
-  if(!user){ alert("Login required"); return; }
-  const amount = document.getElementById('loanAmount').value;
-  if(!amount){ alert("Enter loan amount"); return; }
-  const memberRef = doc(db, "members", user.uid);
-  await updateDoc(memberRef, { loan: { amount: amount, stage: "Applied", appliedAt: new Date().toISOString() }});
-  alert("Loan applied successfully!");
-  document.getElementById('loanDetails').innerText = `Amount: ${amount}\nStage: Applied`;
-};
-
-// Download Statement
-window.downloadStatement = ()=>{
-  const text = document.getElementById('personalDetails').innerText + "\n" + document.getElementById('loanDetails').innerText;
-  const blob = new Blob([text], { type: "text/plain" });
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = "statement.txt";
-  link.click();
-};
+  if(!user) return alert("Not logged in");
+  const loansSnap = await getDocs(collection(db, "members", user.uid, "loans"));
+  let csv = "Loan Amount,Status,Date\n";
+  loansSnap.forEach(docSnap=>{
+    const loan = docSnap.data();
+    csv += `${loan.amount},${loan.status},${loan.date || "N/A"}\n`;
+  });
+  const blob = new Blob([csv], {type:"text/csv"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = "statement.csv";
+  a.click();
+  URL.revokeObjectURL(url);
+});
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
