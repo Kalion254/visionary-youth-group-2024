@@ -10,11 +10,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 
 <style>
-  :root{
-    --primary:#007bff;
-    --accent:#ff6600;
-    --muted:#f1f3f5;
-  }
+  :root{ --primary:#007bff; --accent:#ff6600; --muted:#f1f3f5; }
   *{box-sizing:border-box}
   body{font-family:'Poppins',sans-serif;margin:0;background:#f6f8fb;color:#222}
   header{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;background:linear-gradient(90deg,var(--primary),#0062d6);color:#fff}
@@ -34,8 +30,7 @@
   .loan-card{display:flex;flex-direction:column;gap:8px}
   .loan-meta{display:flex;justify-content:space-between;align-items:center}
   .status-badge{padding:6px 10px;border-radius:8px;color:#fff;font-weight:600}
-  .status-Pending{background:#ffcc00;color:#222}
-  .status-Registered{background:#ffcc00;color:#222}
+  .status-Pending,.status-Registered{background:#ffcc00;color:#222}
   .status-Verified{background:#28a745}
   .status-Approved{background:#1e7be7}
   .status-Rejected{background:#dc3545}
@@ -50,462 +45,179 @@
   @media (max-width:700px){ header{flex-direction:column;gap:8px;align-items:flex-start} .profile-row{flex-direction:column} }
 </style>
 
-<!-- Chart.js (CDN) -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<!-- jsPDF (CDN) for PDF creation -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
 </head>
 <body>
 
 <header>
   <h1>VISIONARY YOUTH GROUP — Member Dashboard</h1>
   <div class="actions">
-    <button id="refreshBtn" title="Refresh data"><i class="fa-solid fa-arrows-rotate"></i> Refresh</button>
+    <button id="refreshBtn"><i class="fa-solid fa-arrows-rotate"></i> Refresh</button>
     <button id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
   </div>
 </header>
 
 <main class="container">
-  <!-- Personal summary -->
-  <section class="grid cols-3" style="margin-bottom:18px">
+  <!-- Top summary -->
+  <section class="grid cols-3">
     <div class="card">
       <h3>Welcome, <span id="nameTop">Member</span></h3>
-      <p class="small muted" id="emailTop">Loading email...</p>
-      <p class="small" id="memberSummary">Member summary: savings, loans and activities.</p>
-      <div style="margin-top:10px">
-        <a href="#" id="downloadPdf" class="download"><i class="fa-solid fa-file-arrow-down"></i> Download PDF Statement</a>
-      </div>
+      <p class="small muted" id="emailTop">Loading...</p>
+      <p class="small" id="memberSummary">Loading...</p>
+      <a href="#" id="downloadPdf" class="download"><i class="fa-solid fa-file-arrow-down"></i> PDF Statement</a>
     </div>
 
     <div class="card">
       <h3>Savings Progress</h3>
-      <p class="small muted">Your current savings progress toward target</p>
-      <div style="margin-top:10px">
-        <div class="progress-track"><div id="savingsFill" class="progress-fill">0%</div></div>
-        <p style="margin-top:8px"><strong id="savingsAmount">KES 0</strong> saved</p>
-      </div>
+      <div class="progress-track"><div id="savingsFill" class="progress-fill">0%</div></div>
+      <p><strong id="savingsAmount">KES 0</strong> saved</p>
     </div>
 
     <div class="card">
       <h3>Quick Actions</h3>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
-        <button id="applyLoanBtn" class="btn"><i class="fa-solid fa-hand-holding-dollar"></i> Apply Loan</button>
-        <button id="openProfileEdit" class="btn alt">Edit Profile</button>
-      </div>
-      <p class="small muted" style="margin-top:8px">You can update your profile and apply for loans here.</p>
+      <button id="applyLoanBtn" class="btn">Apply Loan</button>
+      <button id="openProfileEdit" class="btn alt">Edit Profile</button>
     </div>
   </section>
 
   <!-- Charts -->
-  <section style="margin-bottom:18px">
-    <div class="chart-wrap card">
-      <h3>Savings vs Loans (Summary)</h3>
-      <canvas id="summaryChart" height="120"></canvas>
-    </div>
+  <section class="card" style="margin-top:18px">
+    <h3>Savings vs Loans</h3>
+    <canvas id="summaryChart" height="120"></canvas>
   </section>
 
-  <!-- Profile edit & loan apply -->
-  <section class="grid cols-3" style="margin-bottom:18px">
+  <!-- Forms -->
+  <section class="grid cols-3" style="margin-top:18px">
     <div class="card">
       <h3>Edit Profile</h3>
       <form id="profileForm">
-        <div class="profile-row">
-          <div class="profile-item">
-            <label class="small muted">Full name</label>
-            <input id="inputName" required />
-          </div>
-          <div class="profile-item">
-            <label class="small muted">Phone</label>
-            <input id="inputPhone" required />
-          </div>
-          <div class="profile-item">
-            <label class="small muted">Place of origin</label>
-            <input id="inputOrigin" />
-          </div>
-        </div>
-        <div style="margin-top:8px">
-          <button type="submit" class="btn">Save Profile</button>
-        </div>
+        <input id="inputName" placeholder="Full name" required />
+        <input id="inputPhone" placeholder="Phone" required />
+        <input id="inputOrigin" placeholder="Place of origin" />
+        <button type="submit" class="btn">Save Profile</button>
       </form>
     </div>
 
     <div class="card">
-      <h3>Apply for a Loan</h3>
+      <h3>Loan Application</h3>
       <form id="loanApplyForm">
-        <label class="small muted">Title</label>
-        <input id="loanTitle" placeholder="e.g., Business Seed Loan" required />
-        <label class="small muted">Amount (KES)</label>
-        <input id="loanAmount" type="number" min="1" required />
-        <label class="small muted">Purpose</label>
+        <input id="loanTitle" placeholder="Loan Title" required />
+        <input id="loanAmount" type="number" min="1" placeholder="Amount" required />
         <select id="loanPurpose" required>
-          <option value="">Select</option>
+          <option value="">Select Purpose</option>
           <option value="Business">Business</option>
           <option value="Education">Education</option>
           <option value="Personal">Personal</option>
         </select>
-        <div style="margin-top:8px">
-          <button type="submit" class="btn">Submit Application</button>
-        </div>
+        <button type="submit" class="btn">Apply</button>
       </form>
     </div>
 
     <div class="card">
       <h3>Account Details</h3>
-      <p class="small"><strong>Email:</strong> <span id="accountEmail">—</span></p>
-      <p class="small"><strong>Member ID:</strong> <span id="accountId">—</span></p>
-      <p class="small"><strong>Joined:</strong> <span id="accountJoined">—</span></p>
-      <div style="margin-top:8px">
-        <button id="downloadCsv" class="btn alt">Download CSV Statement</button>
-      </div>
+      <p><strong>Email:</strong> <span id="accountEmail">—</span></p>
+      <p><strong>ID:</strong> <span id="accountId">—</span></p>
+      <p><strong>Joined:</strong> <span id="accountJoined">—</span></p>
+      <button id="downloadCsv" class="btn alt">CSV Statement</button>
     </div>
   </section>
 
-  <!-- Loan list -->
-  <section>
-    <h2 style="text-align:left;color:var(--primary);margin-bottom:12px">Your Loans</h2>
+  <!-- Loans -->
+  <section style="margin-top:18px">
+    <h2>Your Loans</h2>
     <div id="loanGrid" class="loan-grid"></div>
-    <p id="noLoansMsg" class="muted" style="margin-top:12px;display:none">No loans yet — apply above.</p>
+    <p id="noLoansMsg" class="muted" style="display:none">No loans yet</p>
   </section>
 </main>
 
-<!-- Firebase + logic (module) -->
 <script type="module">
-  // Firebase modular imports
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-  import {
-    getFirestore, doc, getDoc, setDoc, updateDoc,
-    collection, addDoc, getDocs, query, where, serverTimestamp, orderBy
-  } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+// Firebase imports
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, getDocs, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-  // Replace with your config if different
-  const firebaseConfig = {
-    apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
-    authDomain: "visionary-youth-grou-2024.firebaseapp.com",
-    projectId: "visionary-youth-grou-2024",
-    storageBucket: "visionary-youth-grou-2024.firebasestorage.app",
-    messagingSenderId: "372978592717",
-    appId: "1:372978592717:web:1c15aec728ee5f854f3284",
-    measurementId: "G-QP1RBT2ZCP"
-  };
+// Config
+const firebaseConfig = {
+  apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
+  authDomain: "visionary-youth-grou-2024.firebaseapp.com",
+  projectId: "visionary-youth-grou-2024",
+  storageBucket: "visionary-youth-grou-2024.appspot.com",
+  messagingSenderId: "372978592717",
+  appId: "1:372978592717:web:1c15aec728ee5f854f3284"
+};
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth();
-  const db = getFirestore();
+const app = initializeApp(firebaseConfig);
+const auth = getAuth();
+const db = getFirestore();
 
-  // UI refs
-  const nameTop = document.getElementById('nameTop');
-  const emailTop = document.getElementById('emailTop');
-  const memberSummary = document.getElementById('memberSummary');
-  const savingsAmount = document.getElementById('savingsAmount');
-  const savingsFill = document.getElementById('savingsFill');
-  const summaryChartCanvas = document.getElementById('summaryChart');
-  const loanGrid = document.getElementById('loanGrid');
-  const noLoansMsg = document.getElementById('noLoansMsg');
+const statusProgress = { Registered:25, RequestedVerification:40, Verified:70, Approved:100, Rejected:100 };
 
-  const inputName = document.getElementById('inputName');
-  const inputPhone = document.getElementById('inputPhone');
-  const inputOrigin = document.getElementById('inputOrigin');
-  const profileForm = document.getElementById('profileForm');
+// Refs
+const nameTop=document.getElementById("nameTop"),emailTop=document.getElementById("emailTop"),savingsFill=document.getElementById("savingsFill"),savingsAmount=document.getElementById("savingsAmount"),loanGrid=document.getElementById("loanGrid"),noLoansMsg=document.getElementById("noLoansMsg"),profileForm=document.getElementById("profileForm"),loanApplyForm=document.getElementById("loanApplyForm");
 
-  const loanApplyForm = document.getElementById('loanApplyForm');
-  const loanTitle = document.getElementById('loanTitle');
-  const loanAmount = document.getElementById('loanAmount');
-  const loanPurpose = document.getElementById('loanPurpose');
+// Auth guard
+let currentUser=null,memberDocRef=null;
+onAuthStateChanged(auth,async user=>{
+  if(!user){ window.location.href="index.html"; return; }
+  currentUser=user;
+  memberDocRef=doc(db,"members",user.uid);
+  await refreshAll();
+});
 
-  const accountEmail = document.getElementById('accountEmail');
-  const accountIdEl = document.getElementById('accountId');
-  const accountJoined = document.getElementById('accountJoined');
+async function refreshAll(){
+  try{
+    let snap=await getDoc(memberDocRef);
+    if(!snap.exists()) await setDoc(memberDocRef,{email:currentUser.email,createdAt:serverTimestamp(),savings:0});
+    snap=await getDoc(memberDocRef);
+    const data=snap.data();
+    nameTop.textContent=data.name||"Member";
+    emailTop.textContent=data.email||currentUser.email;
+    savingsAmount.textContent=`KES ${data.savings||0}`;
+    const percent=Math.min(100,Math.floor((data.savings||0)/1000)); // Example goal: 1000
+    savingsFill.style.width=percent+"%"; savingsFill.textContent=percent+"%";
+    await loadLoans();
+  }catch(e){console.error("refresh error",e);}
+}
 
-  const downloadPdfBtn = document.getElementById('downloadPdf');
-  const downloadCsvBtn = document.getElementById('downloadCsv');
-  const refreshBtn = document.getElementById('refreshBtn');
-  const logoutBtn = document.getElementById('logoutBtn');
-
-  let currentUser = null;
-  let memberDocRef = null;
-  let chartInstance = null;
-
-  // Map statuses to progress %
-  const statusProgress = {
-    "Registered": 25,
-    "Pending": 25,
-    "RequestedVerification": 40,
-    "Verified": 70,
-    "Approved": 100,
-    "Rejected": 100
-  };
-
-  // Utility: format currency
-  function formatKES(n){ return `KES ${Number(n || 0).toLocaleString()}`; }
-
-  // Protected: redirect if not logged in
-  onAuthStateChanged(auth, async user => {
-    if(!user) {
-      window.location.href = "index.html";
-      return;
-    }
-    currentUser = user;
-    memberDocRef = doc(db, "members", user.uid);
-    await refreshAll();
-  });
-
-  // Refresh all data
-  async function refreshAll(){
-    try {
-      const docSnap = await getDoc(memberDocRef);
-      if(!docSnap.exists()){
-        console.warn("Member doc not found — creating minimal record");
-        await setDoc(memberDocRef, { email: currentUser.email, createdAt: serverTimestamp(), savings:0 });
-      }
-      const data = (await getDoc(memberDocRef)).data();
-      nameTop.innerText = data.name || "Member";
-      emailTop.innerText = data.email || currentUser.email || "—";
-      memberSummary.innerText = `Welcome back! You have ${formatKES(data.savings || 0)} in savings.`;
-      savingsAmount.innerText = formatKES(data.savings || 0);
-      const savingsPercent = Math.min(100, Number(data.savings || 0));
-      savingsFill.style.width = `${savingsPercent}%`;
-      savingsFill.innerText = `${savingsPercent}%`;
-
-      inputName.value = data.name || "";
-      inputPhone.value = data.phone || "";
-      inputOrigin.value = data.origin || "";
-
-      accountEmail.innerText = data.email || currentUser.email;
-      accountIdEl.innerText = currentUser.uid.slice(0,10) + '...';
-      accountJoined.innerText = data.createdAt ? new Date(data.createdAt.seconds*1000).toLocaleDateString() : '—';
-
-      await loadLoansAndRender();
-      renderSummaryChart();
-    } catch (err){
-      console.error("Refresh error:", err);
-      alert("Error loading dashboard. Check console.");
-    }
-  }
-
-  // Load loans
-  async function loadLoansAndRender(){
-    loanGrid.innerHTML = "";
-    const loansColl = collection(db, "members", currentUser.uid, "loans");
-    const loansSnapshot = await getDocs(query(loansColl, orderBy("createdAt","desc")));
-    if(loansSnapshot.empty){
-      noLoansMsg.style.display = 'block';
-      return;
-    } else noLoansMsg.style.display = 'none';
-
-    const loans = [];
-    loansSnapshot.forEach(docSnap=>{
-      const l = docSnap.data();
-      l._id = docSnap.id;
-      loans.push(l);
-    });
-
-    // Render loan cards
-    for(const l of loans){
-      const statusClass = `status-${(l.status||"Registered")}`;
-      const prog = statusProgress[l.status] || 0;
-      const loanCard = document.createElement('div');
-      loanCard.className = 'card loan-card';
-      loanCard.innerHTML = `
+async function loadLoans(){
+  loanGrid.innerHTML="";
+  const q=query(collection(db,"members",currentUser.uid,"loans"),orderBy("createdAt","desc"));
+  const snap=await getDocs(q);
+  if(snap.empty){ noLoansMsg.style.display="block"; return; }
+  noLoansMsg.style.display="none";
+  snap.forEach(d=>{
+    const l=d.data(),status=l.status||"Registered";
+    const prog=statusProgress[status]||0;
+    loanGrid.innerHTML+=`
+      <div class="card loan-card">
         <div class="loan-meta">
-          <div>
-            <h4 style="margin:0">${l.title || 'Loan'}</h4>
-            <div class="small muted">${l.purpose || ''} • ${l.date || ''}</div>
-          </div>
-          <div style="text-align:right">
-            <div class="status-badge ${'status-' + (l.status || 'Registered') }">${l.status || 'Registered'}</div>
-            <div class="small muted" style="margin-top:6px">Amount</div>
-            <div style="font-weight:700">${formatKES(l.amount)}</div>
-          </div>
+          <div><h4>${l.title}</h4><div class="small muted">${l.purpose}</div></div>
+          <div><div class="status-badge status-${status}">${status}</div><div>${l.amount} KES</div></div>
         </div>
-
-        <div style="margin-top:10px">
-          <div class="progress-track"><div class="progress-fill" style="width:${prog}%">${prog}%</div></div>
-        </div>
-
-        <div style="display:flex;gap:8px;margin-top:12px">
-          <button class="btn request-verify-btn" data-loanid="${l._id}">Request Verification</button>
-          <button class="btn alt download-loan" data-loanid="${l._id}">Download</button>
-        </div>
-      `;
-      loanGrid.appendChild(loanCard);
-    }
-
-    // Wire up buttons
-    document.querySelectorAll('.request-verify-btn').forEach(btn=>{
-      btn.addEventListener('click', async (e)=>{
-        const loanId = btn.dataset.loanid;
-        try{
-          const loanRef = doc(db, "members", currentUser.uid, "loans", loanId);
-          await updateDoc(loanRef, { status: "RequestedVerification", requestedVerification: true });
-          alert("Verification requested. Admin will review.");
-          await loadLoansAndRender();
-          renderSummaryChart();
-        }catch(err){ console.error(err); alert("Error requesting verification"); }
-      });
-    });
-
-    document.querySelectorAll('.download-loan').forEach(btn=>{
-      btn.addEventListener('click', async ()=>{
-        const loanId = btn.dataset.loanid;
-        const loanRef = doc(db, "members", currentUser.uid, "loans", loanId);
-        const snap = await getDoc(loanRef);
-        if(!snap.exists()) return alert("Loan not found");
-        const loan = snap.data();
-        generateLoanPdf(loan);
-      });
-    });
-  }
-
-  // Profile update
-  profileForm.addEventListener('submit', async (e)=>{
-    e.preventDefault();
-    try{
-      await updateDoc(memberDocRef, {
-        name: inputName.value,
-        phone: inputPhone.value,
-        origin: inputOrigin.value
-      });
-      alert("Profile updated");
-      await refreshAll();
-    }catch(err){ console.error(err); alert("Error updating profile"); }
+        <div class="progress-track"><div class="progress-fill" style="width:${prog}%">${prog}%</div></div>
+      </div>`;
   });
+}
 
-  // Loan apply
-  loanApplyForm.addEventListener('submit', async (e)=>{
-    e.preventDefault();
-    const title = loanTitle.value.trim();
-    const amount = Number(loanAmount.value);
-    const purpose = loanPurpose.value;
-    if(!title || !amount || !purpose) return alert("Fill all loan fields");
-    try {
-      await addDoc(collection(db, "members", currentUser.uid, "loans"), {
-        title, amount, purpose,
-        status: "Registered",
-        date: new Date().toLocaleDateString(),
-        createdAt: serverTimestamp()
-      });
-      loanApplyForm.reset();
-      alert("Loan application submitted");
-      await loadLoansAndRender();
-      renderSummaryChart();
-    } catch(err){ console.error(err); alert("Error submitting loan"); }
-  });
+// Profile save
+profileForm.addEventListener("submit",async e=>{
+  e.preventDefault();
+  const n=document.getElementById("inputName").value,p=document.getElementById("inputPhone").value,o=document.getElementById("inputOrigin").value;
+  await updateDoc(memberDocRef,{name:n,phone:p,origin:o});
+  alert("Profile updated"); refreshAll();
+});
 
-  // Charts: Savings vs total loans
-  function renderSummaryChart(){
-    (async ()=>{
-      try {
-        const docSnap = await getDoc(memberDocRef);
-        const data = docSnap.data();
-        const saved = Number(data.savings || 0);
+// Loan apply
+loanApplyForm.addEventListener("submit",async e=>{
+  e.preventDefault();
+  const t=document.getElementById("loanTitle").value,a=Number(document.getElementById("loanAmount").value),p=document.getElementById("loanPurpose").value;
+  await addDoc(collection(db,"members",currentUser.uid,"loans"),{title:t,amount:a,purpose:p,status:"Registered",createdAt:serverTimestamp()});
+  alert("Loan submitted"); refreshAll();
+});
 
-        // compute total loans
-        const loansColl = collection(db, "members", currentUser.uid, "loans");
-        const loansSnap = await getDocs(loansColl);
-        let totalLoans = 0;
-        loansSnap.forEach(s => totalLoans += Number(s.data().amount || 0));
-
-        const ctx = summaryChartCanvas.getContext('2d');
-        if(chartInstance) chartInstance.destroy();
-        chartInstance = new Chart(ctx, {
-          type: 'doughnut',
-          data: {
-            labels: ['Savings','Total Loans'],
-            datasets: [{ data: [saved, totalLoans], backgroundColor: ['#28a745','#ff6600'] }]
-          },
-          options: { plugins:{legend:{position:'bottom'}} }
-        });
-
-      } catch(err){ console.error("chart render error", err); }
-    })();
-  }
-
-  // PDF generation using jsPDF (summary + loans)
-  async function generateFullPdf(){
-    // gather data
-    const docSnap = await getDoc(memberDocRef);
-    const member = docSnap.data() || {};
-    const loansRef = collection(db, "members", currentUser.uid, "loans");
-    const loansSnap = await getDocs(loansRef);
-
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF();
-    pdf.setFontSize(16);
-    pdf.text("VISIONARY YOUTH GROUP - Member Statement", 14, 20);
-    pdf.setFontSize(11);
-    pdf.text(`Name: ${member.name || ''}`, 14, 32);
-    pdf.text(`Email: ${member.email || ''}`, 14, 40);
-    pdf.text(`Phone: ${member.phone || ''}`, 14, 48);
-    pdf.text(`Savings: ${formatKES(member.savings || 0)}`, 14, 56);
-
-    pdf.setFontSize(13);
-    pdf.text("Loans:", 14, 72);
-    let y = 80;
-    loansSnap.forEach(l => {
-      const loan = l.data();
-      pdf.setFontSize(11);
-      pdf.text(`- ${loan.title || 'Loan'} | ${formatKES(loan.amount)} | ${loan.status} | ${loan.date || ''}`, 14, y);
-      y += 7;
-      if(y > 270){ pdf.addPage(); y = 20; }
-    });
-
-    pdf.save(`statement_${(member.name||'member').replace(/\s+/g,'_')}.pdf`);
-  }
-
-  // Generate single loan PDF (small)
-  async function generateLoanPdf(loan){
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF();
-    pdf.setFontSize(14);
-    pdf.text("Loan Summary", 14, 18);
-    pdf.setFontSize(11);
-    pdf.text(`Title: ${loan.title || ''}`, 14, 30);
-    pdf.text(`Amount: ${formatKES(loan.amount)}`, 14, 38);
-    pdf.text(`Purpose: ${loan.purpose || ''}`, 14, 46);
-    pdf.text(`Date: ${loan.date || ''}`, 14, 54);
-    pdf.text(`Status: ${loan.status || ''}`, 14, 62);
-    pdf.save(`loan_${(loan.title||'loan').replace(/\s+/g,'_')}.pdf`);
-  }
-
-  // CSV download of loans & savings
-  async function downloadCsv(){
-    const docSnap = await getDoc(memberDocRef);
-    const member = docSnap.data() || {};
-    const loansRef = collection(db, "members", currentUser.uid, "loans");
-    const loansSnap = await getDocs(loansRef);
-
-    let csv = `Member,${member.name || ''}\nEmail,${member.email || ''}\nSavings,${member.savings || 0}\n\nLoan Title,Amount,Status,Date\n`;
-    loansSnap.forEach(l => {
-      const loan = l.data();
-      csv += `"${loan.title || ''}",${loan.amount || 0},"${loan.status || ''}","${loan.date || ''}"\n`;
-    });
-
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `statement_${(member.name||'member').replace(/\s+/g,'_')}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-  }
-
-  // Wire up buttons
-  downloadPdfBtn.addEventListener('click', async (e)=>{
-    e.preventDefault();
-    await generateFullPdf();
-  });
-  downloadCsvBtn.addEventListener('click', downloadCsv);
-  refreshBtn.addEventListener('click', refreshAll);
-  logoutBtn.addEventListener('click', async ()=>{ await signOut(auth); window.location.href = 'index.html'; });
-
-  // initializations handled by onAuthStateChanged
+// Logout
+document.getElementById("logoutBtn").onclick=()=>signOut(auth);
 </script>
-
-<!-- AOS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
-<script> AOS.init({ duration:700, once:true }); </script>
-
 </body>
 </html>
