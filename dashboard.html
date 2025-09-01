@@ -9,24 +9,29 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background: #f8f9fa; }
+    .card { border-radius: 12px; box-shadow: 0px 2px 6px rgba(0,0,0,0.1); }
+    .success-msg { color: green; font-size: 14px; margin-top: 5px; display:none; }
+  </style>
 </head>
-<body class="bg-light">
+<body>
 
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container">
-      <a class="navbar-brand fw-bold" href="#">Sacco Dashboard</a>
+      <a class="navbar-brand fw-bold" href="#">🌍 Sacco Dashboard</a>
       <button class="btn btn-danger" id="logoutBtn">Logout</button>
     </div>
   </nav>
 
-  <!-- Dashboard Content -->
+  <!-- Dashboard -->
   <div class="container my-4">
     <h2 class="text-center mb-4">Welcome, <span id="userName">Member</span></h2>
 
-    <!-- Profile Section -->
+    <!-- Profile -->
     <div class="card mb-3">
-      <div class="card-header bg-info text-white">Profile Details</div>
+      <div class="card-header bg-info text-white">👤 Profile Details</div>
       <div class="card-body">
         <form id="profileForm">
           <div class="row g-2">
@@ -37,14 +42,15 @@
             <div class="col-md-6"><input type="text" id="occupation" class="form-control" placeholder="Occupation"></div>
             <div class="col-md-6"><input type="text" id="guarantor" class="form-control" placeholder="Guarantor"></div>
           </div>
-          <button type="submit" class="btn btn-success mt-3">Update Profile</button>
+          <button type="submit" class="btn btn-success mt-3">💾 Update Profile</button>
+          <p id="profileSuccess" class="success-msg">✅ Profile updated successfully</p>
         </form>
       </div>
     </div>
 
     <!-- Loan Application -->
     <div class="card mb-3">
-      <div class="card-header bg-warning">Loan Application</div>
+      <div class="card-header bg-warning">💰 Loan Application</div>
       <div class="card-body">
         <form id="loanForm">
           <div class="row g-2">
@@ -52,37 +58,46 @@
             <div class="col-md-6"><input type="number" id="loanPeriod" class="form-control" placeholder="Repayment Period (Months)" required></div>
           </div>
           <textarea id="loanReason" class="form-control my-2" placeholder="Loan Purpose" required></textarea>
-          <button type="submit" class="btn btn-primary">Apply for Loan</button>
+          <button type="submit" class="btn btn-primary">📤 Apply for Loan</button>
         </form>
-        <div class="mt-3">
-          <h6>My Loan Applications</h6>
-          <ul id="loanList" class="list-group"></ul>
-        </div>
+        <h6 class="mt-3">My Loan Applications</h6>
+        <ul id="loanList" class="list-group"></ul>
       </div>
     </div>
 
     <!-- Savings -->
     <div class="card mb-3">
-      <div class="card-header bg-success text-white">Savings</div>
+      <div class="card-header bg-success text-white">💵 Savings</div>
       <div class="card-body">
-        <p>Total Savings: <span id="savingsTotal">0</span> KES</p>
-        <button class="btn btn-outline-success" id="addSavingsBtn">Add Savings</button>
+        <p>Total Savings: <b><span id="savingsTotal">0</span> KES</b></p>
+        <button class="btn btn-outline-success" id="addSavingsBtn">➕ Add Savings</button>
         <h6 class="mt-3">Savings History</h6>
         <ul id="savingsHistory" class="list-group"></ul>
       </div>
     </div>
 
+    <!-- Shares -->
+    <div class="card mb-3">
+      <div class="card-header bg-dark text-white">📈 Shares</div>
+      <div class="card-body">
+        <p>Total Shares: <b><span id="sharesTotal">0</span></b></p>
+        <button class="btn btn-outline-dark" id="buySharesBtn">➕ Buy Shares</button>
+        <h6 class="mt-3">Shares History</h6>
+        <ul id="sharesHistory" class="list-group"></ul>
+      </div>
+    </div>
+
     <!-- Statement -->
     <div class="card mb-3">
-      <div class="card-header bg-secondary text-white">Account Statement</div>
+      <div class="card-header bg-secondary text-white">📑 Account Statement</div>
       <div class="card-body">
-        <button class="btn btn-dark" id="downloadStatement">Download PDF</button>
+        <button class="btn btn-dark" id="downloadStatement">⬇️ Download PDF</button>
       </div>
     </div>
 
     <!-- Admin Section -->
     <div class="card mb-3 d-none" id="adminSection">
-      <div class="card-header bg-danger text-white">Admin Panel (Loan Approvals)</div>
+      <div class="card-header bg-danger text-white">🛠 Admin Panel (Loan Approvals)</div>
       <div class="card-body">
         <ul id="pendingLoans" class="list-group"></ul>
       </div>
@@ -104,7 +119,7 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // Protect Dashboard
+    // Auth Protection
     auth.onAuthStateChanged(user => {
       if (!user) {
         window.location.href = "index.html";
@@ -113,8 +128,9 @@
         loadProfile(user.uid);
         loadLoans(user.uid);
         loadSavings(user.uid);
+        loadShares(user.uid);
 
-        // Check admin role
+        // Check Admin
         db.collection("users").doc(user.uid).get().then(doc => {
           if (doc.exists && doc.data().role === "admin") {
             document.getElementById("adminSection").classList.remove("d-none");
@@ -134,19 +150,20 @@
       db.collection("users").doc(uid).get().then(doc => {
         if (doc.exists) {
           let d = doc.data();
-          document.getElementById("fullName").value = d.fullName || "";
-          document.getElementById("idNumber").value = d.idNumber || "";
-          document.getElementById("phone").value = d.phone || "";
-          document.getElementById("address").value = d.address || "";
-          document.getElementById("occupation").value = d.occupation || "";
-          document.getElementById("guarantor").value = d.guarantor || "";
-          document.getElementById("savingsTotal").innerText = d.savings || 0;
+          fullName.value = d.fullName || "";
+          idNumber.value = d.idNumber || "";
+          phone.value = d.phone || "";
+          address.value = d.address || "";
+          occupation.value = d.occupation || "";
+          guarantor.value = d.guarantor || "";
+          savingsTotal.innerText = d.savings || 0;
+          sharesTotal.innerText = d.shares || 0;
         }
       });
     }
 
     // Update Profile
-    document.getElementById("profileForm").addEventListener("submit", e => {
+    profileForm.addEventListener("submit", e => {
       e.preventDefault();
       const user = auth.currentUser;
       db.collection("users").doc(user.uid).set({
@@ -157,12 +174,14 @@
         occupation: occupation.value,
         guarantor: guarantor.value,
         email: user.email
-      }, { merge: true });
-      alert("Profile updated!");
+      }, { merge: true }).then(() => {
+        profileSuccess.style.display = "block";
+        setTimeout(()=> profileSuccess.style.display = "none", 3000);
+      });
     });
 
     // Loan Application
-    document.getElementById("loanForm").addEventListener("submit", e => {
+    loanForm.addEventListener("submit", e => {
       e.preventDefault();
       const user = auth.currentUser;
       db.collection("loans").add({
@@ -172,14 +191,12 @@
         reason: loanReason.value,
         status: "Pending",
         createdAt: new Date()
-      });
+      }).then(()=> loadLoans(user.uid));
       loanAmount.value = loanPeriod.value = loanReason.value = "";
-      loadLoans(user.uid);
     });
 
     function loadLoans(uid) {
       db.collection("loans").where("uid", "==", uid).get().then(snapshot => {
-        let loanList = document.getElementById("loanList");
         loanList.innerHTML = "";
         snapshot.forEach(doc => {
           let loan = doc.data();
@@ -191,24 +208,23 @@
     // Admin Panel
     function loadPendingLoans() {
       db.collection("loans").where("status", "==", "Pending").get().then(snapshot => {
-        let list = document.getElementById("pendingLoans");
-        list.innerHTML = "";
+        pendingLoans.innerHTML = "";
         snapshot.forEach(doc => {
           let loan = doc.data();
-          list.innerHTML += `
+          pendingLoans.innerHTML += `
             <li class="list-group-item">
-              ${loan.amount} KES by ${loan.uid} - ${loan.reason}
+              ${loan.amount} KES - ${loan.reason}
               <button class="btn btn-sm btn-success ms-2" onclick="approveLoan('${doc.id}')">Approve</button>
               <button class="btn btn-sm btn-danger ms-2" onclick="rejectLoan('${doc.id}')">Reject</button>
             </li>`;
         });
       });
     }
-    function approveLoan(id) { db.collection("loans").doc(id).update({status:"Approved"}); loadPendingLoans(); }
-    function rejectLoan(id) { db.collection("loans").doc(id).update({status:"Rejected"}); loadPendingLoans(); }
+    function approveLoan(id){ db.collection("loans").doc(id).update({status:"Approved"}).then(loadPendingLoans); }
+    function rejectLoan(id){ db.collection("loans").doc(id).update({status:"Rejected"}).then(loadPendingLoans); }
 
     // Savings
-    document.getElementById("addSavingsBtn").addEventListener("click", () => {
+    addSavingsBtn.addEventListener("click", () => {
       const user = auth.currentUser;
       let amount = parseInt(prompt("Enter savings amount:"));
       if (!isNaN(amount)) {
@@ -224,25 +240,53 @@
 
     function loadSavings(uid) {
       db.collection("savings").where("uid","==",uid).orderBy("date","desc").get().then(snapshot=>{
-        let history=document.getElementById("savingsHistory");
-        history.innerHTML="";
+        savingsHistory.innerHTML="";
         let total=0;
         snapshot.forEach(doc=>{
           let s=doc.data();
-          history.innerHTML+=`<li class="list-group-item">KES ${s.amount} on ${s.date.toDate().toLocaleDateString()}</li>`;
+          savingsHistory.innerHTML+=`<li class="list-group-item">KES ${s.amount} on ${s.date.toDate().toLocaleDateString()}</li>`;
           total+=s.amount;
         });
-        document.getElementById("savingsTotal").innerText=total;
+        savingsTotal.innerText=total;
+      });
+    }
+
+    // Shares
+    buySharesBtn.addEventListener("click", () => {
+      const user = auth.currentUser;
+      let shares = parseInt(prompt("Enter number of shares to buy:"));
+      if (!isNaN(shares)) {
+        const userRef = db.collection("users").doc(user.uid);
+        userRef.get().then(doc => {
+          let current = doc.exists && doc.data().shares ? doc.data().shares : 0;
+          userRef.update({ shares: current + shares });
+          db.collection("shares").add({ uid: user.uid, shares, date: new Date() });
+          loadShares(user.uid);
+        });
+      }
+    });
+
+    function loadShares(uid) {
+      db.collection("shares").where("uid","==",uid).orderBy("date","desc").get().then(snapshot=>{
+        sharesHistory.innerHTML="";
+        let total=0;
+        snapshot.forEach(doc=>{
+          let sh=doc.data();
+          sharesHistory.innerHTML+=`<li class="list-group-item">${sh.shares} shares on ${sh.date.toDate().toLocaleDateString()}</li>`;
+          total+=sh.shares;
+        });
+        sharesTotal.innerText=total;
       });
     }
 
     // Statement PDF
-    document.getElementById("downloadStatement").addEventListener("click", () => {
+    downloadStatement.addEventListener("click", () => {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
       doc.text("Member Account Statement", 20, 20);
-      doc.text("Name: " + document.getElementById("fullName").value, 20, 30);
-      doc.text("Total Savings: " + document.getElementById("savingsTotal").innerText + " KES", 20, 40);
+      doc.text("Name: " + fullName.value, 20, 30);
+      doc.text("Total Savings: " + savingsTotal.innerText + " KES", 20, 40);
+      doc.text("Total Shares: " + sharesTotal.innerText, 20, 50);
       doc.save("statement.pdf");
     });
   </script>
