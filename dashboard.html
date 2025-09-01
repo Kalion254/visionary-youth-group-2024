@@ -1,546 +1,130 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>VISIONARY YOUTH GROUP — Member Dashboard (RTDB)</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
-
-<style>
-  :root{
-    --primary:#007bff; --accent:#ff6600; --muted:#f1f3f5; --ok:#28a745; --warn:#ffcc00; --err:#dc3545;
-  }
-  *{box-sizing:border-box}
-  body{font-family:'Poppins',sans-serif;margin:0;background:#f6f8fb;color:#222}
-  header{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;padding:16px 24px;background:linear-gradient(90deg,var(--primary),#0062d6);color:#fff;box-shadow:0 6px 18px rgba(2,6,23,0.18)}
-  header h1{margin:0;font-size:1.1rem}
-  header .actions{display:flex;gap:10px;align-items:center}
-  header button, .btn{background:var(--primary);border:none;color:#fff;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:600}
-  .btn.alt{background:#fff;color:var(--primary);border:1px solid #dfe6ef}
-  .btn.ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.4)}
-  .btn.success{background:var(--ok)}
-  .btn.warn{background:var(--accent)}
-  .container{max-width:1200px;margin:28px auto;padding:0 18px}
-  .grid{display:grid;gap:18px}
-  .cols-3{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
-  .card{background:#fff;padding:16px;border-radius:16px;box-shadow:0 10px 30px rgba(2,6,23,0.08)}
-  .card h3{margin:0 0 8px;color:var(--primary)}
-  .muted{color:#6b7280}
-  .small{font-size:.92rem}
-  .row{display:flex;gap:12px;flex-wrap:wrap}
-  .field{flex:1 1 180px}
-  label{display:block;font-size:.85rem;color:#6b7280;margin-bottom:6px}
-  input,select,textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #e5eaf2;background:#fff}
-  .pill{display:inline-flex;gap:6px;align-items:center;padding:8px 12px;border-radius:999px;background:#eef4ff;color:#1b4fd6;font-weight:600}
-  .progress-track{height:12px;background:#eef3f9;border-radius:999px;overflow:hidden}
-  .progress-fill{height:12px;background:linear-gradient(90deg,#28a745,#1e7be7);width:0%;color:#fff;text-align:center;font-size:10px;font-weight:700}
-  .loan-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
-  .loan-card{display:flex;flex-direction:column;gap:10px}
-  .status{padding:6px 10px;border-radius:999px;font-weight:700;width:max-content}
-  .st-Registered,.st-Pending{background:var(--warn);color:#222}
-  .st-RequestedVerification{background:#ffd37a;color:#222}
-  .st-Verified{background:#6ddf8e}
-  .st-Approved{background:#1e7be7;color:#fff}
-  .st-Rejected{background:#ffc5cc;color:#8b0000}
-  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
-  .tab{background:#fff;border:1px solid #e5eaf2;border-radius:999px;padding:8px 14px;cursor:pointer}
-  .tab.active{background:#1b4fd6;color:#fff;border-color:#1b4fd6}
-  .toast{position:fixed;right:18px;bottom:18px;background:#111;color:#fff;padding:12px 16px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.2);opacity:0;transform:translateY(12px);transition:all .25s;z-index:999}
-  .toast.show{opacity:1;transform:translateY(0)}
-  .chip{display:inline-flex;align-items:center;gap:6px;background:#f1f4f9;color:#3b4453;border-radius:999px;padding:6px 10px;font-weight:600}
-  .link{color:var(--primary);text-decoration:none;font-weight:600}
-  @media (max-width:720px){ header{flex-direction:column;gap:8px;align-items:flex-start} }
-</style>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <script type="module" src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
+<body class="bg-gray-100 font-sans">
 
-<header>
-  <h1>VISIONARY YOUTH GROUP — Member Dashboard</h1>
-  <div class="actions">
-    <button id="btnAdmin" class="btn ghost" style="display:none"><i class="fa-solid fa-shield-halved"></i> Admin</button>
-    <button id="btnRefresh" title="Refresh"><i class="fa-solid fa-rotate"></i> Refresh</button>
-    <button id="btnLogout" class="btn warn"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
-  </div>
-</header>
+  <!-- NAVBAR -->
+  <nav class="bg-blue-800 p-4 text-white flex justify-between items-center shadow-md">
+    <h1 class="text-xl font-bold">Admin Dashboard</h1>
+    <button id="logoutBtn" class="bg-red-600 px-4 py-2 rounded hover:bg-red-700">Logout</button>
+  </nav>
 
-<main class="container">
-
-  <!-- Welcome + quick -->
-  <section class="grid cols-3" style="margin-bottom:18px">
-    <div class="card">
-      <h3>Welcome, <span id="nameTop">Member</span></h3>
-      <p class="small muted" id="emailTop">Loading…</p>
-      <div class="row" style="margin-top:8px">
-        <span class="pill"><i class="fa-solid fa-piggy-bank"></i> Savings: <span id="pillSavings">KES 0</span></span>
-        <span class="pill" style="background:#fff1e8;color:#b24d00"><i class="fa-solid fa-coins"></i> Shares: <span id="pillShares">0</span></span>
-      </div>
-      <div style="margin-top:12px">
-        <a href="#" id="btnDownloadPdf" class="link"><i class="fa-solid fa-file-arrow-down"></i> Download PDF Statement</a>
-        &nbsp;•&nbsp;
-        <a href="#" id="btnDownloadCsv" class="link">CSV</a>
-      </div>
+  <div class="container mx-auto p-6">
+    <!-- LOANS -->
+    <div class="bg-white p-6 rounded-xl shadow-lg">
+      <h2 class="text-lg font-bold mb-4">Loan Applications</h2>
+      <table class="w-full border-collapse border">
+        <thead>
+          <tr class="bg-gray-200">
+            <th class="border p-2">Member</th>
+            <th class="border p-2">Amount</th>
+            <th class="border p-2">Purpose</th>
+            <th class="border p-2">Guarantors</th>
+            <th class="border p-2">Status</th>
+            <th class="border p-2">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="adminLoanTable">
+          <tr><td colspan="6" class="p-2 text-center">Loading loans...</td></tr>
+        </tbody>
+      </table>
     </div>
-
-    <div class="card">
-      <h3>Savings Progress</h3>
-      <p class="small muted">Target progress</p>
-      <div class="progress-track"><div id="savingsFill" class="progress-fill">0%</div></div>
-      <p style="margin-top:8px"><strong id="savingsText">KES 0</strong> saved</p>
-      <form id="formAddSavings" class="row">
-        <div class="field">
-          <label>Top-up (KES)</label>
-          <input id="inSavingsAdd" type="number" min="1" placeholder="e.g., 500"/>
-        </div>
-        <div class="field" style="align-self:flex-end">
-          <button class="btn" type="submit"><i class="fa-solid fa-plus"></i> Add</button>
-        </div>
-      </form>
-    </div>
-
-    <div class="card">
-      <h3>Quick Actions</h3>
-      <div class="row" style="margin-top:6px">
-        <button id="btnOpenLoan" class="btn"><i class="fa-solid fa-hand-holding-dollar"></i> Apply Loan</button>
-        <button id="btnOpenProfile" class="btn alt">Edit Profile</button>
-      </div>
-      <form id="formAddShares" class="row" style="margin-top:10px">
-        <div class="field">
-          <label>Buy Shares (units)</label>
-          <input id="inSharesAdd" type="number" min="1" placeholder="e.g., 10"/>
-        </div>
-        <div class="field" style="align-self:flex-end">
-          <button class="btn" type="submit"><i class="fa-solid fa-plus"></i> Buy</button>
-        </div>
-      </form>
-    </div>
-  </section>
-
-  <!-- Tabs -->
-  <div class="tabs">
-    <button class="tab active" data-tab="profileTab"><i class="fa-solid fa-user"></i> Profile</button>
-    <button class="tab" data-tab="loanTab"><i class="fa-solid fa-sack-dollar"></i> Loans</button>
-    <button class="tab" data-tab="guarantorTab"><i class="fa-solid fa-people-group"></i> Guarantors</button>
-    <button class="tab" data-tab="statsTab"><i class="fa-solid fa-chart-pie"></i> Insights</button>
   </div>
 
-  <!-- Profile -->
-  <section id="profileTab" class="card">
-    <h3>Edit Profile</h3>
-    <form id="formProfile">
-      <div class="row">
-        <div class="field"><label>Full name</label><input id="inName" required/></div>
-        <div class="field"><label>Phone</label><input id="inPhone" required/></div>
-        <div class="field"><label>Place of origin</label><input id="inOrigin"/></div>
-      </div>
-      <p class="small"><strong>Email:</strong> <span id="accountEmail">—</span> &nbsp;•&nbsp; <strong>Member ID:</strong> <span id="accountId">—</span> &nbsp;•&nbsp; <strong>Joined:</strong> <span id="accountJoined">—</span></p>
-      <div class="row" style="margin-top:8px">
-        <button class="btn" type="submit"><i class="fa-solid fa-floppy-disk"></i> Save Profile</button>
-        <button id="btnResetPass" class="btn alt" type="button"><i class="fa-solid fa-key"></i> Reset Password Email</button>
-      </div>
-    </form>
-  </section>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getDatabase, ref, get, child, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-  <!-- Loans -->
-  <section id="loanTab" class="card" style="display:none">
-    <h3>Apply for a Loan</h3>
-    <form id="formLoan">
-      <div class="row">
-        <div class="field"><label>Title</label><input id="loanTitle" placeholder="e.g., Business Seed Loan" required/></div>
-        <div class="field"><label>Amount (KES)</label><input id="loanAmount" type="number" min="1" required/></div>
-        <div class="field"><label>Purpose</label>
-          <select id="loanPurpose" required>
-            <option value="">Select</option>
-            <option>Business</option><option>Education</option><option>Personal</option>
-          </select>
-        </div>
-      </div>
-      <div class="row">
-        <div class="field"><label>Repayment Months</label><input id="loanMonths" type="number" min="1" placeholder="e.g., 12"/></div>
-        <div class="field"><label>Notes (optional)</label><input id="loanNotes" placeholder="Short description"/></div>
-      </div>
-      <button class="btn" type="submit"><i class="fa-solid fa-paper-plane"></i> Submit Application</button>
-    </form>
+    const firebaseConfig = {
+      apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
+      authDomain: "your-app.firebaseapp.com",
+      databaseURL: "https://your-app.firebaseio.com",
+      projectId: "your-app",
+      storageBucket: "your-app.appspot.com",
+      messagingSenderId: "xxxx",
+      appId: "xxxx"
+    };
 
-    <h3 style="margin-top:16px">Your Loans</h3>
-    <div id="loanGrid" class="loan-grid"></div>
-    <p id="noLoans" class="muted" style="display:none">No loans yet — apply above.</p>
-  </section>
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
 
-  <!-- Guarantors -->
-  <section id="guarantorTab" class="card" style="display:none">
-    <h3>Guarantors</h3>
-    <form id="formGuarantor" class="row">
-      <div class="field"><label>Name</label><input id="gName" required/></div>
-      <div class="field"><label>Phone</label><input id="gPhone" required/></div>
-      <div class="field"><label>Relationship</label><input id="gRelation" placeholder="e.g., Brother"/></div>
-      <div class="field" style="align-self:flex-end"><button class="btn" type="submit"><i class="fa-solid fa-user-plus"></i> Add</button></div>
-    </form>
-    <div id="guarantorList" class="row" style="margin-top:10px"></div>
-  </section>
+    const logoutBtn = document.getElementById("logoutBtn");
+    const adminLoanTable = document.getElementById("adminLoanTable");
 
-  <!-- Insights -->
-  <section id="statsTab" class="card" style="display:none">
-    <h3>Savings vs Loans</h3>
-    <canvas id="summaryChart" height="120"></canvas>
-  </section>
-</main>
-
-<div id="toast" class="toast">Saved!</div>
-
-<script type="module">
-  /* ---------------- Firebase (Auth + RTDB) ---------------- */
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-  import { getAuth, onAuthStateChanged, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-  import {
-    getDatabase, ref, get, set, update, push, onValue, serverTimestamp
-  } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
-    authDomain: "visionary-youth-grou-2024.firebaseapp.com",
-    projectId: "visionary-youth-grou-2024",
-    databaseURL: "https://visionary-youth-grou-2024-default-rtdb.firebaseio.com",
-    storageBucket: "visionary-youth-grou-2024.firebasestorage.app",
-    messagingSenderId: "372978592717",
-    appId: "1:372978592717:web:1c15aec728ee5f854f3284",
-    measurementId: "G-QP1RBT2ZCP"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth();
-  const db = getDatabase();
-
-  /* ---------------- UI Helpers ---------------- */
-  const $ = sel => document.querySelector(sel);
-  const $$ = sel => [...document.querySelectorAll(sel)];
-  const toast = $("#toast");
-  function showToast(msg, type="ok"){
-    toast.textContent = msg;
-    toast.style.background = type==="ok" ? "#111" : (type==="err" ? "var(--err)" : "var(--accent)");
-    toast.classList.add("show");
-    setTimeout(()=>toast.classList.remove("show"), 2200);
-  }
-  function fmtKES(n){ return "KES " + Number(n||0).toLocaleString(); }
-
-  /* ---------------- Refs ---------------- */
-  const nameTop=$("#nameTop"), emailTop=$("#emailTop"), pillSavings=$("#pillSavings"), pillShares=$("#pillShares");
-  const savingsFill=$("#savingsFill"), savingsText=$("#savingsText");
-  const btnDownloadPdf=$("#btnDownloadPdf"), btnDownloadCsv=$("#btnDownloadCsv");
-  const btnRefresh=$("#btnRefresh"), btnLogout=$("#btnLogout"), btnAdmin=$("#btnAdmin");
-  const btnOpenLoan=$("#btnOpenLoan"), btnOpenProfile=$("#btnOpenProfile");
-  const accountEmail=$("#accountEmail"), accountId=$("#accountId"), accountJoined=$("#accountJoined");
-  const inName=$("#inName"), inPhone=$("#inPhone"), inOrigin=$("#inOrigin");
-  const formProfile=$("#formProfile"), formLoan=$("#formLoan"), formGuarantor=$("#formGuarantor");
-  const loanTitle=$("#loanTitle"), loanAmount=$("#loanAmount"), loanPurpose=$("#loanPurpose"), loanMonths=$("#loanMonths"), loanNotes=$("#loanNotes");
-  const guarantorList=$("#guarantorList");
-  const formAddSavings=$("#formAddSavings"), inSavingsAdd=$("#inSavingsAdd");
-  const formAddShares=$("#formAddShares"), inSharesAdd=$("#inSharesAdd");
-  const loanGrid=$("#loanGrid"), noLoans=$("#noLoans");
-  const btnResetPass=$("#btnResetPass");
-  const chartCanvas=$("#summaryChart");
-  let chartInstance=null;
-
-  let user=null;
-  let uid=null;
-
-  /* ---------------- Tabs ---------------- */
-  $$(".tab").forEach(t=>{
-    t.addEventListener("click", ()=>{
-      $$(".tab").forEach(x=>x.classList.remove("active"));
-      t.classList.add("active");
-      ["profileTab","loanTab","guarantorTab","statsTab"].forEach(id=>$("#"+id).style.display="none");
-      $("#"+t.dataset.tab).style.display="block";
-    });
-  });
-  btnOpenLoan.addEventListener("click", ()=>{ document.querySelector('.tab[data-tab="loanTab"]').click(); });
-  btnOpenProfile.addEventListener("click", ()=>{ document.querySelector('.tab[data-tab="profileTab"]').click(); });
-
-  /* ---------------- Auth gate ---------------- */
-  onAuthStateChanged(auth, async (_user)=>{
-    if(!_user){ window.location.href="index.html"; return; }
-    user=_user; uid=user.uid;
-    accountEmail.textContent = user.email || "—";
-    accountId.textContent = uid.slice(0,10)+"...";
-    emailTop.textContent = user.email || "—";
-    await ensureMemberRecord();
-    wireLiveBindings();
-    await refreshAll();
-  });
-
-  async function ensureMemberRecord(){
-    const mRef = ref(db, `members/${uid}`);
-    const snap = await get(mRef);
-    if(!snap.exists()){
-      await set(mRef, {
-        email: user.email || "",
-        name: user.displayName || "",
-        phone: "",
-        origin: "",
-        savings: 0,
-        shares: 0,
-        role: "member",
-        createdAt: Date.now()
-      });
-    }
-  }
-
-  /* ---------------- Live bindings (keep display updated) ---------------- */
-  function wireLiveBindings(){
-    onValue(ref(db, `members/${uid}`), (s)=>{
-      const m=s.val()||{};
-      nameTop.textContent = m.name || "Member";
-      inName.value = m.name || "";
-      inPhone.value = m.phone || "";
-      inOrigin.value = m.origin || "";
-      pillSavings.textContent = fmtKES(m.savings||0);
-      savingsText.textContent = fmtKES(m.savings||0);
-      const perc = Math.max(0, Math.min(100, Number(m.savings || 0))); // treat value as %
-      savingsFill.style.width = perc + "%";
-      savingsFill.textContent = perc + "%";
-      pillShares.textContent = Number(m.shares||0);
-      accountJoined.textContent = m.createdAt ? new Date(m.createdAt).toLocaleDateString() : "—";
-      if((m.role||"member")==="admin"){ btnAdmin.style.display="inline-block"; }
+    // Logout
+    logoutBtn.addEventListener("click", async () => {
+      await signOut(auth);
+      window.location.href = "index.html";
     });
 
-    onValue(ref(db, `guarantors/${uid}`), (s)=>{
-      guarantorList.innerHTML="";
-      const data=s.val()||{};
-      const entries=Object.entries(data);
-      if(entries.length===0){
-        guarantorList.innerHTML = `<span class="chip"><i class="fa-regular fa-circle"></i> No guarantors yet</span>`;
-      }else{
-        entries.forEach(([gid, g])=>{
-          const el=document.createElement('span');
-          el.className="chip";
-          el.innerHTML=`<i class="fa-solid fa-user-shield"></i> ${g.name} — ${g.phone} (${g.relation||'—'})`;
-          guarantorList.appendChild(el);
-        });
+    // Auth check (restrict admin)
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = "index.html";
+      } else {
+        // Check if admin (e.g., hardcoded email for now)
+        if (user.email !== "admin@sacco.com") {
+          alert("Access denied. Admins only.");
+          window.location.href = "dashboard.html";
+        } else {
+          loadAllLoans();
+        }
       }
     });
 
-    onValue(ref(db, `loans/${uid}`), (s)=>{
-      loanGrid.innerHTML="";
-      const data=s.val()||{};
-      const list=Object.entries(data).sort((a,b)=> (b[1].createdAt||0)-(a[1].createdAt||0));
-      if(list.length===0){ noLoans.style.display="block"; return; }
-      noLoans.style.display="none";
-      list.forEach(([lid, L])=>{
-        const prog = statusToProgress(L.status);
-        const card=document.createElement('div');
-        card.className="card loan-card";
-        card.innerHTML=`
-          <div class="row" style="justify-content:space-between">
-            <div>
-              <h4 style="margin:0">${L.title||"Loan"}</h4>
-              <div class="small muted">${L.purpose||''} • ${L.date||''}</div>
-            </div>
-            <div style="text-align:right">
-              <span class="status st-${L.status||'Registered'}">${L.status||'Registered'}</span>
-              <div class="small muted" style="margin-top:6px">Amount</div>
-              <div style="font-weight:700">${fmtKES(L.amount||0)}</div>
-            </div>
-          </div>
-          <div class="progress-track"><div class="progress-fill" style="width:${prog}%">${prog}%</div></div>
-          <div class="row" style="margin-top:8px">
-            <button class="btn btnVerify" data-id="${lid}"><i class="fa-solid fa-shield"></i> Request Verification</button>
-            <button class="btn alt btnLoanPdf" data-id="${lid}"><i class="fa-solid fa-file"></i> Download</button>
-          </div>
-        `;
-        loanGrid.appendChild(card);
-      });
+    // Load all loans
+    async function loadAllLoans() {
+      const snapshot = await get(child(ref(db), "users"));
+      adminLoanTable.innerHTML = "";
+      if (snapshot.exists()) {
+        snapshot.forEach((userSnap) => {
+          const uid = userSnap.key;
+          const userData = userSnap.val();
+          const profile = userData.profile || { fullName: "Unknown" };
+          if (userData.loans) {
+            Object.entries(userData.loans).forEach(([loanId, loan]) => {
+              adminLoanTable.innerHTML += `
+                <tr>
+                  <td class="border p-2">${profile.fullName}</td>
+                  <td class="border p-2">${loan.amount}</td>
+                  <td class="border p-2">${loan.purpose}</td>
+                  <td class="border p-2">${loan.guarantors}</td>
+                  <td class="border p-2">${loan.status}</td>
+                  <td class="border p-2">
+                    <button class="bg-green-600 text-white px-2 py-1 rounded mr-2" onclick="approveLoan('${uid}','${loanId}')">Approve</button>
+                    <button class="bg-red-600 text-white px-2 py-1 rounded" onclick="rejectLoan('${uid}','${loanId}')">Reject</button>
+                  </td>
+                </tr>
+              `;
+            });
+          }
+        });
+      } else {
+        adminLoanTable.innerHTML = `<tr><td colspan="6" class="p-2 text-center">No loans found</td></tr>`;
+      }
+    }
 
-      // wire buttons
-      $$(".btnVerify").forEach(b=>b.addEventListener("click", async()=>{
-        const lid=b.getAttribute("data-id");
-        await update(ref(db, `loans/${uid}/${lid}`), { status:"RequestedVerification", requestedVerification:true });
-        showToast("Verification requested");
-      }));
-      $$(".btnLoanPdf").forEach(b=>b.addEventListener("click", async()=>{
-        const lid=b.getAttribute("data-id");
-        const snap=await get(ref(db, `loans/${uid}/${lid}`));
-        if(!snap.exists()) return;
-        generateLoanPdf(snap.val());
-      }));
-
-      // refresh chart on loans change
-      renderChart();
-    });
-  }
-
-  /* ---------------- Actions ---------------- */
-  btnRefresh.addEventListener("click", refreshAll);
-  btnLogout.addEventListener("click", async()=>{ await signOut(auth); window.location.href="index.html"; });
-  btnAdmin.addEventListener("click", ()=>{ window.location.href="admin.html"; });
-
-  formProfile.addEventListener("submit", async(e)=>{
-    e.preventDefault();
-    await update(ref(db, `members/${uid}`), {
-      name: inName.value.trim(),
-      phone: inPhone.value.trim(),
-      origin: inOrigin.value.trim()
-    });
-    showToast("Profile updated");
-  });
-
-  btnResetPass.addEventListener("click", async()=>{
-    try{
-      await sendPasswordResetEmail(auth, user.email);
-      showToast("Password reset email sent","ok");
-    }catch(err){ console.error(err); showToast(err.message,"err"); }
-  });
-
-  formLoan.addEventListener("submit", async(e)=>{
-    e.preventDefault();
-    const title=loanTitle.value.trim();
-    const amount=Number(loanAmount.value);
-    const purpose=loanPurpose.value;
-    const months=Number(loanMonths.value||0);
-    if(!title || !amount || !purpose){ showToast("Fill all loan fields","warn"); return; }
-
-    const loanData={
-      title, amount, purpose, months: months||null,
-      notes: loanNotes.value.trim()||null,
-      status:"Registered",
-      date: new Date().toLocaleDateString(),
-      createdAt: Date.now()
+    // Approve loan
+    window.approveLoan = async (uid, loanId) => {
+      await update(ref(db, `users/${uid}/loans/${loanId}`), { status: "Approved ✅" });
+      loadAllLoans();
     };
-    const newRef = push(ref(db, `loans/${uid}`));
-    await set(newRef, loanData);
 
-    // Queue for admin review
-    const adminRef = push(ref(db, `admin/pendingLoans`));
-    await set(adminRef, { userId: uid, loanId: newRef.key, ...loanData });
-
-    formLoan.reset();
-    showToast("Loan application submitted");
-  });
-
-  formGuarantor.addEventListener("submit", async(e)=>{
-    e.preventDefault();
-    const name=$("#gName").value.trim();
-    const phone=$("#gPhone").value.trim();
-    const relation=$("#gRelation").value.trim();
-    if(!name || !phone){ showToast("Enter name & phone","warn"); return; }
-    const newRef=push(ref(db, `guarantors/${uid}`));
-    await set(newRef, { name, phone, relation: relation||null, createdAt: Date.now() });
-    formGuarantor.reset();
-    showToast("Guarantor added");
-  });
-
-  formAddSavings.addEventListener("submit", async(e)=>{
-    e.preventDefault();
-    const add = Number(inSavingsAdd.value||0);
-    if(add<=0){ showToast("Enter amount","warn"); return; }
-    const mRef=ref(db, `members/${uid}`);
-    const snap=await get(mRef);
-    const cur = (snap.val()&&snap.val().savings) || 0;
-    await update(mRef, { savings: cur + add });
-    inSavingsAdd.value="";
-    showToast("Savings updated");
-  });
-
-  formAddShares.addEventListener("submit", async(e)=>{
-    e.preventDefault();
-    const add = Number(inSharesAdd.value||0);
-    if(add<=0){ showToast("Enter share units","warn"); return; }
-    const mRef=ref(db, `members/${uid}`);
-    const snap=await get(mRef);
-    const cur = (snap.val()&&snap.val().shares) || 0;
-    await update(mRef, { shares: cur + add });
-    inSharesAdd.value="";
-    showToast("Shares updated");
-  });
-
-  btnDownloadPdf.addEventListener("click", async(e)=>{ e.preventDefault(); await downloadFullPdf(); });
-  btnDownloadCsv.addEventListener("click", async(e)=>{ e.preventDefault(); await downloadCsv(); });
-
-  /* ---------------- Load all ---------------- */
-  async function refreshAll(){
-    await get(ref(db, `members/${uid}`)); // triggers onValue anyway
-    await get(ref(db, `guarantors/${uid}`));
-    await get(ref(db, `loans/${uid}`));
-    renderChart();
-    showToast("Refreshed");
-  }
-
-  /* ---------------- Chart ---------------- */
-  async function renderChart(){
-    const mSnap=await get(ref(db, `members/${uid}`));
-    const member=mSnap.val()||{};
-    const loansSnap=await get(ref(db, `loans/${uid}`));
-    let totalLoans=0;
-    if(loansSnap.exists()){
-      Object.values(loansSnap.val()).forEach(l=> totalLoans += Number(l.amount||0));
-    }
-    const ctx=chartCanvas.getContext('2d');
-    if(chartInstance) chartInstance.destroy();
-    chartInstance=new Chart(ctx,{
-      type:'doughnut',
-      data:{ labels:['Savings','Total Loans'], datasets:[{ data:[Number(member.savings||0), totalLoans] }]},
-      options:{ plugins:{legend:{position:'bottom'}} }
-    });
-  }
-
-  function statusToProgress(st){
-    return { Registered:25, Pending:25, RequestedVerification:40, Verified:70, Approved:100, Rejected:100 }[st||"Registered"]||0;
-  }
-
-  /* ---------------- Statements ---------------- */
-  async function downloadCsv(){
-    const m=(await get(ref(db, `members/${uid}`))).val()||{};
-    const loansSnap=await get(ref(db, `loans/${uid}`));
-    let csv=`Member,${m.name||''}\nEmail,${m.email||user.email||''}\nSavings,${m.savings||0}\nShares,${m.shares||0}\n\nLoan Title,Amount,Status,Date\n`;
-    if(loansSnap.exists()){
-      Object.values(loansSnap.val()).forEach(l=>{
-        csv+=`"${l.title||''}",${l.amount||0},"${l.status||''}","${l.date||''}"\n`;
-      });
-    }
-    const blob=new Blob([csv],{type:'text/csv'});
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement('a'); a.href=url; a.download=`statement_${(m.name||'member').replace(/\s+/g,'_')}.csv`; a.click();
-    URL.revokeObjectURL(url);
-  }
-
-  async function downloadFullPdf(){
-    const m=(await get(ref(db, `members/${uid}`))).val()||{};
-    const loansSnap=await get(ref(db, `loans/${uid}`));
-    const loans = loansSnap.exists()? Object.values(loansSnap.val()) : [];
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF();
-    pdf.setFontSize(16); pdf.text("VISIONARY YOUTH GROUP - Member Statement", 14, 18);
-    pdf.setFontSize(11);
-    pdf.text(`Name: ${m.name||''}`,14,28);
-    pdf.text(`Email: ${m.email||user.email||''}`,14,36);
-    pdf.text(`Phone: ${m.phone||''}`,14,44);
-    pdf.text(`Savings: ${fmtKES(m.savings||0)}`,14,52);
-    pdf.text(`Shares: ${m.shares||0}`,14,60);
-    pdf.setFontSize(13); pdf.text("Loans:",14,74);
-    let y=82; pdf.setFontSize(11);
-    loans.forEach(l=>{
-      pdf.text(`- ${l.title||'Loan'} | ${fmtKES(l.amount||0)} | ${l.status||''} | ${l.date||''}`,14,y);
-      y+=7; if(y>270){ pdf.addPage(); y=20; }
-    });
-    pdf.save(`statement_${(m.name||'member').replace(/\s+/g,'_')}.pdf`);
-  }
-
-  function generateLoanPdf(l){
-    const { jsPDF } = window.jspdf;
-    const pdf=new jsPDF();
-    pdf.setFontSize(14); pdf.text("Loan Summary",14,18);
-    pdf.setFontSize(11);
-    pdf.text(`Title: ${l.title||''}`,14,30);
-    pdf.text(`Amount: ${fmtKES(l.amount||0)}`,14,38);
-    pdf.text(`Purpose: ${l.purpose||''}`,14,46);
-    pdf.text(`Months: ${l.months||'-'}`,14,54);
-    pdf.text(`Date: ${l.date||''}`,14,62);
-    pdf.text(`Status: ${l.status||''}`,14,70);
-    pdf.save(`loan_${(l.title||'loan').replace(/\s+/g,'_')}.pdf`);
-  }
-</script>
+    // Reject loan
+    window.rejectLoan = async (uid, loanId) => {
+      await update(ref(db, `users/${uid}/loans/${loanId}`), { status: "Rejected ❌" });
+      loadAllLoans();
+    };
+  </script>
 </body>
 </html>
