@@ -1,195 +1,138 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Member Dashboard</title>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/@heroicons/react/outline"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Member Dashboard - Visionary Youth Group</title>
+
+<!-- Tailwind CSS & FontAwesome -->
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+body { font-family:'Poppins',sans-serif; background: linear-gradient(to right, #f0f2f5, #e0f7fa); }
+.card { background:white; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.1); padding:20px; transition:0.3s; }
+.card:hover { transform: scale(1.03); }
+.balance { font-size:1.5rem; font-weight:700; color:#1f2937; }
+.progress-bar { height:20px; border-radius:10px; background:#e2e8f0; overflow:hidden; }
+.progress-bar-inner { height:100%; background:#f59e0b; width:0%; text-align:center; color:white; font-weight:600; line-height:20px; transition:width 0.5s; }
+</style>
 </head>
-<body class="bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100 min-h-screen">
+<body>
 
-  <!-- Header -->
-  <header class="bg-gradient-to-r from-blue-700 to-purple-700 text-white p-4 flex justify-between items-center shadow-lg">
-    <h1 class="text-2xl font-bold flex items-center gap-2">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-yellow-300" viewBox="0 0 20 20" fill="currentColor">
-        <path d="M10 15l-5.878 3.09 1.122-6.545L.488 6.91l6.561-.955L10 0l2.951 5.955 6.561.955-4.756 4.635 1.122 6.545z"/>
-      </svg>
-      Member Dashboard
-    </h1>
-    <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg shadow-md flex items-center gap-2">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1m0-10V5m0 0h4m-4 0H9" />
-      </svg>
-      Logout
-    </button>
-  </header>
+<header class="bg-blue-700 text-white p-4 flex justify-between items-center shadow-lg">
+  <h1 class="text-2xl font-bold">Member Dashboard</h1>
+  <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded flex items-center">
+    <i class="fas fa-sign-out-alt mr-2"></i>Logout
+  </button>
+</header>
 
-  <!-- Main Content -->
-  <main class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<main class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
 
-    <!-- Profile -->
-    <section class="bg-white shadow-lg rounded-xl p-6 hover:shadow-2xl transition">
-      <h2 class="text-xl font-bold mb-4 text-blue-700 flex items-center gap-2">
-        👤 Profile
-      </h2>
-      <input id="name" placeholder="Full Name" class="w-full border p-2 mb-2 rounded">
-      <input id="email" placeholder="Email" class="w-full border p-2 mb-2 rounded">
-      <input id="phone" placeholder="Phone" class="w-full border p-2 mb-2 rounded">
-      <button onclick="updateProfile()" class="w-full bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg">Update Profile</button>
-      <p id="profileMsg" class="mt-2 text-sm text-green-600 font-semibold"></p>
-    </section>
+  <!-- Savings Card -->
+  <div class="card flex flex-col items-center">
+    <i class="fas fa-piggy-bank text-yellow-500 text-4xl mb-2"></i>
+    <h2 class="text-xl font-semibold text-gray-700">Savings</h2>
+    <p class="balance" id="savingsBalance">Ksh 0</p>
+  </div>
 
-    <!-- Loan Application -->
-    <section class="bg-white shadow-lg rounded-xl p-6 hover:shadow-2xl transition">
-      <h2 class="text-xl font-bold mb-4 text-yellow-600">💳 Loan Application</h2>
-      <input id="loanAmount" placeholder="Loan Amount" class="w-full border p-2 mb-2 rounded">
-      <textarea id="loanPurpose" placeholder="Loan Purpose" class="w-full border p-2 mb-2 rounded"></textarea>
-      <button onclick="applyLoan()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 rounded-lg">Apply Loan</button>
-      <p id="loanMsg" class="mt-2 text-sm text-yellow-600 font-semibold"></p>
-    </section>
+  <!-- Shares Card -->
+  <div class="card flex flex-col items-center">
+    <i class="fas fa-chart-pie text-pink-500 text-4xl mb-2"></i>
+    <h2 class="text-xl font-semibold text-gray-700">Shares</h2>
+    <p class="balance" id="sharesBalance">Ksh 0</p>
+  </div>
 
-    <!-- Loan Status -->
-    <section class="bg-white shadow-lg rounded-xl p-6 hover:shadow-2xl transition">
-      <h2 class="text-xl font-bold mb-4 text-purple-600">📊 Loan Status</h2>
-      <p id="loanStatus" class="text-gray-700 font-semibold">No application yet.</p>
-      <progress id="loanProgress" value="0" max="100" class="w-full mt-2"></progress>
-    </section>
+  <!-- Loan Card -->
+  <div class="card flex flex-col items-center">
+    <i class="fas fa-hand-holding-usd text-green-500 text-4xl mb-2"></i>
+    <h2 class="text-xl font-semibold text-gray-700">Loan Balance</h2>
+    <p class="balance" id="loanBalance">Ksh 0</p>
+    <div class="progress-bar w-full mt-3">
+      <div id="loanProgress" class="progress-bar-inner">0%</div>
+    </div>
+    <p class="mt-2 font-medium text-gray-600" id="loanStatus">No active loan</p>
+  </div>
 
-    <!-- Savings -->
-    <section class="bg-white shadow-lg rounded-xl p-6 hover:shadow-2xl transition">
-      <h2 class="text-xl font-bold mb-4 text-green-600">💰 Savings</h2>
-      <input id="savingsAmount" placeholder="Amount to Save" class="w-full border p-2 mb-2 rounded">
-      <button onclick="addSavings()" class="w-full bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg">Add Savings</button>
-      <p id="savingsMsg" class="mt-2 text-sm text-green-600 font-semibold"></p>
-    </section>
+  <!-- Recent Activity -->
+  <div class="card col-span-full">
+    <h2 class="text-xl font-semibold mb-4 text-gray-700 flex items-center"><i class="fas fa-history mr-2"></i> Recent Activity</h2>
+    <ul id="recentActivity" class="space-y-2 text-gray-600"></ul>
+  </div>
 
-    <!-- Shares -->
-    <section class="bg-white shadow-lg rounded-xl p-6 hover:shadow-2xl transition">
-      <h2 class="text-xl font-bold mb-4 text-pink-600">📈 Shares</h2>
-      <input id="sharesAmount" placeholder="Number of Shares" class="w-full border p-2 mb-2 rounded">
-      <button onclick="addShares()" class="w-full bg-pink-500 hover:bg-pink-600 text-white py-2 rounded-lg">Add Shares</button>
-      <p id="sharesMsg" class="mt-2 text-sm text-pink-600 font-semibold"></p>
-    </section>
+</main>
 
-    <!-- Loan Repayment -->
-    <section class="bg-white shadow-lg rounded-xl p-6 hover:shadow-2xl transition">
-      <h2 class="text-xl font-bold mb-4 text-indigo-600">💵 Loan Repayment</h2>
-      <input id="repaymentAmount" placeholder="Repayment Amount" class="w-full border p-2 mb-2 rounded">
-      <button onclick="repayLoan()" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white py-2 rounded-lg">Repay Loan</button>
-      <p id="repayMsg" class="mt-2 text-sm text-indigo-600 font-semibold"></p>
-    </section>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-  </main>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
+  authDomain: "visionary-youth-grou-2024.firebaseapp.com",
+  databaseURL: "https://visionary-youth-grou-2024-default-rtdb.firebaseio.com/",
+  projectId: "visionary-youth-grou-2024",
+  storageBucket: "visionary-youth-grou-2024.firebasestorage.app",
+  messagingSenderId: "372978592717",
+  appId: "1:372978592717:web:624596619d41aab84f3284",
+  measurementId: "G-FEHC1GM3B7"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
 
-  <script>
-    // Firebase Config
-    const firebaseConfig = {
-      apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
-      authDomain: "your-app.firebaseapp.com",
-      databaseURL: "https://your-app.firebaseio.com",
-      projectId: "your-app",
-      storageBucket: "your-app.appspot.com",
-      messagingSenderId: "1234567890",
-      appId: "1:1234567890:web:abcdef"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.database();
+// Logout
+function logout(){ auth.signOut().then(()=>window.location.href="index.html"); }
 
-    // Logout
-    function logout() {
-      auth.signOut().then(() => window.location.href = "index.html");
+// Load balances & loan status
+auth.onAuthStateChanged(user=>{
+  if(!user){ window.location.href="index.html"; return; }
+
+  // Savings
+  db.ref("members/"+user.uid+"/savings").on("value", snap=>{
+    let total=0;
+    snap.forEach(child=>total+=Number(child.val().amount));
+    document.getElementById("savingsBalance").innerText="Ksh "+total.toLocaleString();
+  });
+
+  // Shares
+  db.ref("members/"+user.uid+"/shares").on("value", snap=>{
+    let total=0;
+    snap.forEach(child=>total+=Number(child.val().amount));
+    document.getElementById("sharesBalance").innerText="Ksh "+total.toLocaleString();
+  });
+
+  // Loan
+  db.ref("members/"+user.uid+"/loan").on("value", snap=>{
+    if(snap.exists()){
+      const loan = snap.val();
+      const progress = loan.progress || 0;
+      document.getElementById("loanProgress").style.width=progress+"%";
+      document.getElementById("loanProgress").innerText=progress+"%";
+      document.getElementById("loanBalance").innerText="Ksh "+Number(loan.amount||0).toLocaleString();
+      document.getElementById("loanStatus").innerText=loan.status || "Pending";
     }
+  });
 
-    // Profile Update
-    function updateProfile() {
-      const user = auth.currentUser;
-      if (!user) return;
-      const profileData = {
-        name: document.getElementById("name").value,
-        email: document.getElementById("email").value,
-        phone: document.getElementById("phone").value
-      };
-      db.ref("members/" + user.uid + "/profile").set(profileData).then(() => {
-        document.getElementById("profileMsg").innerText = "✅ Profile updated successfully!";
+  // Recent Activity
+  const activityList = document.getElementById("recentActivity");
+  const activityPaths = ["savings","shares","repayments"];
+  activityPaths.forEach(path=>{
+    db.ref("members/"+user.uid+"/"+path).on("value", snap=>{
+      let items=[];
+      snap.forEach(child=>{
+        const val=child.val();
+        if(path==="repayments") items.push(`Repayment: Ksh ${val.amount} on ${val.date}`);
+        else if(path==="savings") items.push(`Saved: Ksh ${val.amount} on ${val.date}`);
+        else if(path==="shares") items.push(`Shares: Ksh ${val.amount} on ${val.date}`);
       });
-    }
-
-    // Loan Application
-    function applyLoan() {
-      const user = auth.currentUser;
-      if (!user) return;
-      const loanData = {
-        amount: document.getElementById("loanAmount").value,
-        purpose: document.getElementById("loanPurpose").value,
-        status: "Pending",
-        progress: 20
-      };
-      db.ref("members/" + user.uid + "/loan").set(loanData).then(() => {
-        document.getElementById("loanMsg").innerText = "✅ Loan application submitted!";
-        document.getElementById("loanStatus").innerText = "Pending Approval";
-        document.getElementById("loanProgress").value = 20;
-      });
-    }
-
-    // Loan Repayment
-    function repayLoan() {
-      const user = auth.currentUser;
-      if (!user) return;
-      const repayment = document.getElementById("repaymentAmount").value;
-      db.ref("members/" + user.uid + "/repayments").push({
-        amount: repayment,
-        date: new Date().toLocaleDateString()
-      }).then(() => {
-        document.getElementById("repayMsg").innerText = "✅ Repayment recorded!";
-      });
-    }
-
-    // Savings
-    function addSavings() {
-      const user = auth.currentUser;
-      if (!user) return;
-      const savings = document.getElementById("savingsAmount").value;
-      db.ref("members/" + user.uid + "/savings").push({
-        amount: savings,
-        date: new Date().toLocaleDateString()
-      }).then(() => {
-        document.getElementById("savingsMsg").innerText = "✅ Savings added successfully!";
-      });
-    }
-
-    // Shares
-    function addShares() {
-      const user = auth.currentUser;
-      if (!user) return;
-      const shares = document.getElementById("sharesAmount").value;
-      db.ref("members/" + user.uid + "/shares").push({
-        amount: shares,
-        date: new Date().toLocaleDateString()
-      }).then(() => {
-        document.getElementById("sharesMsg").innerText = "✅ Shares recorded!";
-      });
-    }
-
-    // Auto-load data
-    auth.onAuthStateChanged(user => {
-      if (!user) {
-        window.location.href = "index.html";
-      } else {
-        db.ref("members/" + user.uid + "/loan").on("value", snapshot => {
-          if (snapshot.exists()) {
-            const loan = snapshot.val();
-            document.getElementById("loanStatus").innerText = loan.status;
-            document.getElementById("loanProgress").value = loan.progress || 0;
-          }
-        });
-      }
+      items.reverse(); // most recent first
+      activityList.innerHTML=items.map(i=>`<li>${i}</li>`).join('');
     });
-  </script>
+  });
+
+});
+</script>
 
 </body>
 </html>
