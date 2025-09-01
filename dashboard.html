@@ -2,47 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard</title>
-  <script type="module" src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-  <script type="module" src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
-  <script type="module" src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js"></script>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-</head>
-<body class="bg-gray-100 font-sans">
-
-  <!-- NAVBAR -->
-  <nav class="bg-blue-800 p-4 text-white flex justify-between items-center shadow-md">
-    <h1 class="text-xl font-bold">Admin Dashboard</h1>
-    <button id="logoutBtn" class="bg-red-600 px-4 py-2 rounded hover:bg-red-700">Logout</button>
-  </nav>
-
-  <div class="container mx-auto p-6">
-    <!-- LOANS -->
-    <div class="bg-white p-6 rounded-xl shadow-lg">
-      <h2 class="text-lg font-bold mb-4">Loan Applications</h2>
-      <table class="w-full border-collapse border">
-        <thead>
-          <tr class="bg-gray-200">
-            <th class="border p-2">Member</th>
-            <th class="border p-2">Amount</th>
-            <th class="border p-2">Purpose</th>
-            <th class="border p-2">Guarantors</th>
-            <th class="border p-2">Status</th>
-            <th class="border p-2">Actions</th>
-          </tr>
-        </thead>
-        <tbody id="adminLoanTable">
-          <tr><td colspan="6" class="p-2 text-center">Loading loans...</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
+  <title>Member Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getDatabase, ref, get, child, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getAuth, signOut, onAuthStateChanged } 
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getDatabase, ref, get, set, update, push } 
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
@@ -50,81 +17,130 @@
       databaseURL: "https://your-app.firebaseio.com",
       projectId: "your-app",
       storageBucket: "your-app.appspot.com",
-      messagingSenderId: "xxxx",
-      appId: "xxxx"
+      messagingSenderId: "123456789",
+      appId: "1:123456789:web:xxxx"
     };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getDatabase(app);
 
+    const userName = document.getElementById("userName");
     const logoutBtn = document.getElementById("logoutBtn");
-    const adminLoanTable = document.getElementById("adminLoanTable");
 
-    // Logout
-    logoutBtn.addEventListener("click", async () => {
-      await signOut(auth);
-      window.location.href = "index.html";
-    });
-
-    // Auth check (restrict admin)
+    // Check if logged in
     onAuthStateChanged(auth, (user) => {
       if (!user) {
         window.location.href = "index.html";
       } else {
-        // Check if admin (e.g., hardcoded email for now)
-        if (user.email !== "admin@sacco.com") {
-          alert("Access denied. Admins only.");
-          window.location.href = "dashboard.html";
-        } else {
-          loadAllLoans();
-        }
+        get(ref(db, "users/" + user.uid)).then((snapshot) => {
+          if (snapshot.exists()) {
+            userName.innerText = snapshot.val().email;
+          }
+        });
       }
     });
 
-    // Load all loans
-    async function loadAllLoans() {
-      const snapshot = await get(child(ref(db), "users"));
-      adminLoanTable.innerHTML = "";
-      if (snapshot.exists()) {
-        snapshot.forEach((userSnap) => {
-          const uid = userSnap.key;
-          const userData = userSnap.val();
-          const profile = userData.profile || { fullName: "Unknown" };
-          if (userData.loans) {
-            Object.entries(userData.loans).forEach(([loanId, loan]) => {
-              adminLoanTable.innerHTML += `
-                <tr>
-                  <td class="border p-2">${profile.fullName}</td>
-                  <td class="border p-2">${loan.amount}</td>
-                  <td class="border p-2">${loan.purpose}</td>
-                  <td class="border p-2">${loan.guarantors}</td>
-                  <td class="border p-2">${loan.status}</td>
-                  <td class="border p-2">
-                    <button class="bg-green-600 text-white px-2 py-1 rounded mr-2" onclick="approveLoan('${uid}','${loanId}')">Approve</button>
-                    <button class="bg-red-600 text-white px-2 py-1 rounded" onclick="rejectLoan('${uid}','${loanId}')">Reject</button>
-                  </td>
-                </tr>
-              `;
-            });
-          }
-        });
-      } else {
-        adminLoanTable.innerHTML = `<tr><td colspan="6" class="p-2 text-center">No loans found</td></tr>`;
-      }
-    }
+    // Logout
+    logoutBtn.addEventListener("click", () => {
+      signOut(auth).then(() => {
+        window.location.href = "index.html";
+      });
+    });
 
-    // Approve loan
-    window.approveLoan = async (uid, loanId) => {
-      await update(ref(db, `users/${uid}/loans/${loanId}`), { status: "Approved ✅" });
-      loadAllLoans();
-    };
+    // Save Profile
+    document.getElementById("profileForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const fullName = document.getElementById("fullName").value;
+      const phone = document.getElementById("phone").value;
+      const address = document.getElementById("address").value;
 
-    // Reject loan
-    window.rejectLoan = async (uid, loanId) => {
-      await update(ref(db, `users/${uid}/loans/${loanId}`), { status: "Rejected ❌" });
-      loadAllLoans();
-    };
+      const user = auth.currentUser;
+      update(ref(db, "users/" + user.uid), {
+        fullName, phone, address
+      }).then(() => {
+        alert("Profile updated successfully!");
+      });
+    });
+
+    // Loan Application
+    document.getElementById("loanForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const amount = document.getElementById("loanAmount").value;
+      const purpose = document.getElementById("loanPurpose").value;
+      const guarantor = document.getElementById("loanGuarantor").value;
+
+      const user = auth.currentUser;
+      const loanRef = push(ref(db, "loans/"));
+      set(loanRef, {
+        userId: user.uid,
+        amount, purpose, guarantor,
+        status: "Pending"
+      }).then(() => {
+        alert("Loan application submitted!");
+      });
+    });
   </script>
+</head>
+<body class="bg-light">
+  <nav class="navbar navbar-dark bg-primary">
+    <div class="container-fluid">
+      <span class="navbar-brand">Member Dashboard</span>
+      <span class="text-white">Welcome, <b id="userName"></b></span>
+      <button class="btn btn-danger" id="logoutBtn">Logout</button>
+    </div>
+  </nav>
+
+  <div class="container mt-4">
+    <div class="row g-4">
+      <!-- Profile -->
+      <div class="col-md-6">
+        <div class="card shadow">
+          <div class="card-header bg-primary text-white">Update Profile</div>
+          <div class="card-body">
+            <form id="profileForm">
+              <input type="text" id="fullName" class="form-control mb-2" placeholder="Full Name">
+              <input type="text" id="phone" class="form-control mb-2" placeholder="Phone">
+              <input type="text" id="address" class="form-control mb-2" placeholder="Address">
+              <button class="btn btn-success w-100">Save Profile</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loan Application -->
+      <div class="col-md-6">
+        <div class="card shadow">
+          <div class="card-header bg-warning">Loan Application</div>
+          <div class="card-body">
+            <form id="loanForm">
+              <input type="number" id="loanAmount" class="form-control mb-2" placeholder="Loan Amount">
+              <input type="text" id="loanPurpose" class="form-control mb-2" placeholder="Purpose">
+              <input type="text" id="loanGuarantor" class="form-control mb-2" placeholder="Guarantor">
+              <button class="btn btn-primary w-100">Apply Loan</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Savings & Shares -->
+      <div class="col-md-6">
+        <div class="card shadow">
+          <div class="card-header bg-success text-white">Savings</div>
+          <div class="card-body">
+            <p>Your total savings: <b>Kes. 0</b></p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card shadow">
+          <div class="card-header bg-info text-white">Shares</div>
+          <div class="card-body">
+            <p>Your total shares: <b>0 units</b></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
