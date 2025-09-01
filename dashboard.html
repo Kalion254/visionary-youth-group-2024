@@ -1,254 +1,182 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Member Dashboard</title>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- Firebase -->
-  <script type="module">
-    // Import Firebase
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
-    import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
-    import { getDatabase, ref, set, get, update } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-database.js";
+</head>
+<body class="bg-gray-100">
 
-    // TODO: Replace with your Firebase config
+  <!-- Header -->
+  <header class="bg-blue-700 text-white p-4 flex justify-between items-center shadow-lg">
+    <h1 class="text-2xl font-bold">Member Dashboard</h1>
+    <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded">Logout</button>
+  </header>
+
+  <!-- Main Content -->
+  <main class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+    <!-- Profile -->
+    <section class="bg-white shadow-lg rounded-lg p-6">
+      <h2 class="text-xl font-bold mb-4 text-blue-600">Profile</h2>
+      <input id="name" placeholder="Full Name" class="w-full border p-2 mb-2 rounded">
+      <input id="email" placeholder="Email" class="w-full border p-2 mb-2 rounded">
+      <input id="phone" placeholder="Phone" class="w-full border p-2 mb-2 rounded">
+      <button onclick="updateProfile()" class="w-full bg-green-500 hover:bg-green-600 text-white py-2 rounded">Update Profile</button>
+      <p id="profileMsg" class="mt-2 text-sm text-gray-600"></p>
+    </section>
+
+    <!-- Loan Application -->
+    <section class="bg-white shadow-lg rounded-lg p-6">
+      <h2 class="text-xl font-bold mb-4 text-blue-600">Loan Application</h2>
+      <input id="loanAmount" placeholder="Loan Amount" class="w-full border p-2 mb-2 rounded">
+      <textarea id="loanPurpose" placeholder="Loan Purpose" class="w-full border p-2 mb-2 rounded"></textarea>
+      <button onclick="applyLoan()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 rounded">Apply Loan</button>
+      <p id="loanMsg" class="mt-2 text-sm text-gray-600"></p>
+    </section>
+
+    <!-- Loan Status -->
+    <section class="bg-white shadow-lg rounded-lg p-6">
+      <h2 class="text-xl font-bold mb-4 text-blue-600">Loan Status</h2>
+      <p id="loanStatus" class="text-gray-700">No application yet.</p>
+      <progress id="loanProgress" value="0" max="100" class="w-full mt-2"></progress>
+    </section>
+
+    <!-- Savings -->
+    <section class="bg-white shadow-lg rounded-lg p-6">
+      <h2 class="text-xl font-bold mb-4 text-blue-600">Savings</h2>
+      <input id="savingsAmount" placeholder="Amount to Save" class="w-full border p-2 mb-2 rounded">
+      <button onclick="addSavings()" class="w-full bg-purple-500 hover:bg-purple-600 text-white py-2 rounded">Add Savings</button>
+      <p id="savingsMsg" class="mt-2 text-sm text-gray-600"></p>
+    </section>
+
+    <!-- Shares -->
+    <section class="bg-white shadow-lg rounded-lg p-6">
+      <h2 class="text-xl font-bold mb-4 text-blue-600">Shares</h2>
+      <input id="sharesAmount" placeholder="Number of Shares" class="w-full border p-2 mb-2 rounded">
+      <button onclick="addShares()" class="w-full bg-pink-500 hover:bg-pink-600 text-white py-2 rounded">Add Shares</button>
+      <p id="sharesMsg" class="mt-2 text-sm text-gray-600"></p>
+    </section>
+
+    <!-- Loan Repayment -->
+    <section class="bg-white shadow-lg rounded-lg p-6">
+      <h2 class="text-xl font-bold mb-4 text-blue-600">Loan Repayment</h2>
+      <input id="repaymentAmount" placeholder="Repayment Amount" class="w-full border p-2 mb-2 rounded">
+      <button onclick="repayLoan()" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white py-2 rounded">Repay Loan</button>
+      <p id="repayMsg" class="mt-2 text-sm text-gray-600"></p>
+    </section>
+
+  </main>
+
+  <script>
+    // Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
       authDomain: "your-app.firebaseapp.com",
-      databaseURL: "https://your-app-default-rtdb.firebaseio.com",
+      databaseURL: "https://your-app.firebaseio.com",
       projectId: "your-app",
       storageBucket: "your-app.appspot.com",
       messagingSenderId: "1234567890",
-      appId: "1:1234567890:web:abc123"
+      appId: "1:1234567890:web:abcdef"
     };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
 
-    // Init Firebase
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getDatabase(app);
+    // Logout
+    function logout() {
+      auth.signOut().then(() => window.location.href = "index.html");
+    }
 
-    let currentUser = null;
-
-    // Wait for login
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        currentUser = user;
-        loadDashboardData(user.uid);
-      } else {
-        window.location.href = "index.html"; // redirect to login
-      }
-    });
-
-    // Load user data
-    function loadDashboardData(uid) {
-      const profileRef = ref(db, "users/" + uid + "/profile");
-      get(profileRef).then((snapshot) => {
-        if (snapshot.exists()) {
-          const data = snapshot.val();
-          document.getElementById("fullName").value = data.fullName || "";
-          document.getElementById("email").value = data.email || "";
-          document.getElementById("phone").value = data.phone || "";
-        }
-      });
-
-      const financeRef = ref(db, "users/" + uid + "/finance");
-      get(financeRef).then((snapshot) => {
-        if (snapshot.exists()) {
-          const data = snapshot.val();
-          document.getElementById("savings").value = data.savings || 0;
-          document.getElementById("shares").value = data.shares || 0;
-          updateChart(data.savings, data.shares);
-        }
-      });
-
-      const loanRef = ref(db, "users/" + uid + "/loan");
-      get(loanRef).then((snapshot) => {
-        if (snapshot.exists()) {
-          const loan = snapshot.val();
-          document.getElementById("loanStage").textContent = loan.stage || "Registered";
-          updateLoanProgress(loan.stage);
-        }
+    // Profile Update
+    function updateProfile() {
+      const user = auth.currentUser;
+      if (!user) return;
+      const profileData = {
+        name: document.getElementById("name").value,
+        email: document.getElementById("email").value,
+        phone: document.getElementById("phone").value
+      };
+      db.ref("members/" + user.uid + "/profile").set(profileData).then(() => {
+        document.getElementById("profileMsg").innerText = "Profile updated successfully!";
       });
     }
 
-    // Save Profile
-    document.addEventListener("DOMContentLoaded", () => {
-      document.getElementById("profileForm").addEventListener("submit", (e) => {
-        e.preventDefault();
-        if (!currentUser) return;
-        const profile = {
-          fullName: document.getElementById("fullName").value,
-          email: document.getElementById("email").value,
-          phone: document.getElementById("phone").value
-        };
-        set(ref(db, "users/" + currentUser.uid + "/profile"), profile).then(() => {
-          document.getElementById("profileMsg").classList.remove("hidden");
-        });
+    // Loan Application
+    function applyLoan() {
+      const user = auth.currentUser;
+      if (!user) return;
+      const loanData = {
+        amount: document.getElementById("loanAmount").value,
+        purpose: document.getElementById("loanPurpose").value,
+        status: "Pending",
+        progress: 20
+      };
+      db.ref("members/" + user.uid + "/loan").set(loanData).then(() => {
+        document.getElementById("loanMsg").innerText = "Loan application submitted!";
+        document.getElementById("loanStatus").innerText = "Pending Approval";
+        document.getElementById("loanProgress").value = 20;
       });
+    }
 
-      // Savings & Shares
-      document.getElementById("savingsForm").addEventListener("submit", (e) => {
-        e.preventDefault();
-        if (!currentUser) return;
-        const savings = parseFloat(document.getElementById("savings").value) || 0;
-        const shares = parseFloat(document.getElementById("shares").value) || 0;
-        set(ref(db, "users/" + currentUser.uid + "/finance"), { savings, shares }).then(() => {
-          document.getElementById("savingsMsg").classList.remove("hidden");
-          updateChart(savings, shares);
-        });
+    // Loan Repayment
+    function repayLoan() {
+      const user = auth.currentUser;
+      if (!user) return;
+      const repayment = document.getElementById("repaymentAmount").value;
+      db.ref("members/" + user.uid + "/repayments").push({
+        amount: repayment,
+        date: new Date().toLocaleDateString()
+      }).then(() => {
+        document.getElementById("repayMsg").innerText = "Repayment recorded!";
       });
+    }
 
-      // Loan Application
-      document.getElementById("loanForm").addEventListener("submit", (e) => {
-        e.preventDefault();
-        if (!currentUser) return;
-        const loan = {
-          amount: document.getElementById("loanAmount").value,
-          purpose: document.getElementById("loanPurpose").value,
-          guarantors: document.getElementById("guarantors").value,
-          stage: "Registered"
-        };
-        set(ref(db, "users/" + currentUser.uid + "/loan"), loan).then(() => {
-          document.getElementById("loanMsg").classList.remove("hidden");
-          updateLoanProgress("Registered");
-        });
+    // Savings
+    function addSavings() {
+      const user = auth.currentUser;
+      if (!user) return;
+      const savings = document.getElementById("savingsAmount").value;
+      db.ref("members/" + user.uid + "/savings").push({
+        amount: savings,
+        date: new Date().toLocaleDateString()
+      }).then(() => {
+        document.getElementById("savingsMsg").innerText = "Savings added successfully!";
       });
+    }
 
-      // Loan Repayment
-      document.getElementById("repaymentForm").addEventListener("submit", (e) => {
-        e.preventDefault();
-        if (!currentUser) return;
-        const repayment = parseFloat(document.getElementById("repaymentAmount").value) || 0;
-        const loanRef = ref(db, "users/" + currentUser.uid + "/loan");
-        get(loanRef).then((snapshot) => {
+    // Shares
+    function addShares() {
+      const user = auth.currentUser;
+      if (!user) return;
+      const shares = document.getElementById("sharesAmount").value;
+      db.ref("members/" + user.uid + "/shares").push({
+        amount: shares,
+        date: new Date().toLocaleDateString()
+      }).then(() => {
+        document.getElementById("sharesMsg").innerText = "Shares recorded!";
+      });
+    }
+
+    // Auto-load data
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        window.location.href = "index.html";
+      } else {
+        db.ref("members/" + user.uid + "/loan").on("value", snapshot => {
           if (snapshot.exists()) {
-            let loan = snapshot.val();
-            let nextStage = getNextStage(loan.stage);
-            loan.stage = nextStage;
-            update(loanRef, loan).then(() => {
-              document.getElementById("repaymentMsg").classList.remove("hidden");
-              updateLoanProgress(nextStage);
-            });
+            const loan = snapshot.val();
+            document.getElementById("loanStatus").innerText = loan.status;
+            document.getElementById("loanProgress").value = loan.progress || 0;
           }
         });
-      });
-
-      // Logout
-      document.getElementById("logoutBtn").addEventListener("click", () => {
-        signOut(auth).then(() => window.location.href = "index.html");
-      });
+      }
     });
-
-    // Loan Stages
-    const stages = ["Registered", "Verification", "Approved", "Disbursed"];
-    function getNextStage(stage) {
-      const idx = stages.indexOf(stage);
-      return idx < stages.length - 1 ? stages[idx + 1] : stage;
-    }
-
-    function updateLoanProgress(stage) {
-      const loanProgress = document.getElementById("loanProgress");
-      const loanStage = document.getElementById("loanStage");
-      loanStage.textContent = stage;
-      const idx = stages.indexOf(stage);
-      loanProgress.style.width = ((idx + 1) / stages.length) * 100 + "%";
-      loanProgress.textContent = stage;
-    }
-
-    // Chart
-    let chart;
-    function updateChart(savings, shares) {
-      if (chart) chart.destroy();
-      const ctx = document.getElementById("financeChart").getContext("2d");
-      chart = new Chart(ctx, {
-        type: "doughnut",
-        data: {
-          labels: ["Savings", "Shares"],
-          datasets: [{
-            data: [savings, shares],
-            backgroundColor: ["#2563eb", "#9333ea"]
-          }]
-        }
-      });
-    }
   </script>
-</head>
-<body class="bg-gray-100 font-sans">
-
-  <!-- Navbar -->
-  <nav class="bg-blue-700 text-white p-4 flex justify-between items-center">
-    <h1 class="text-2xl font-bold">Member Dashboard</h1>
-    <button id="logoutBtn" class="bg-red-500 px-3 py-1 rounded hover:bg-red-600">Logout</button>
-  </nav>
-
-  <!-- Main Container -->
-  <div class="max-w-7xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-    <!-- Profile Card -->
-    <div class="bg-white shadow rounded-lg p-5 col-span-1">
-      <h2 class="text-lg font-bold mb-3">Profile</h2>
-      <form id="profileForm" class="space-y-3">
-        <input type="text" id="fullName" placeholder="Full Name" class="w-full border p-2 rounded">
-        <input type="email" id="email" placeholder="Email" class="w-full border p-2 rounded">
-        <input type="text" id="phone" placeholder="Phone Number" class="w-full border p-2 rounded">
-        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Update</button>
-      </form>
-      <p id="profileMsg" class="text-green-600 mt-2 hidden">✅ Profile updated</p>
-    </div>
-
-    <!-- Savings & Shares -->
-    <div class="bg-white shadow rounded-lg p-5 col-span-1">
-      <h2 class="text-lg font-bold mb-3">Savings & Shares</h2>
-      <form id="savingsForm" class="space-y-3">
-        <input type="number" id="savings" placeholder="Savings Amount" class="w-full border p-2 rounded">
-        <input type="number" id="shares" placeholder="Shares Amount" class="w-full border p-2 rounded">
-        <button type="submit" class="bg-purple-600 text-white px-4 py-2 rounded">Save</button>
-      </form>
-      <p id="savingsMsg" class="text-green-600 mt-2 hidden">✅ Updated successfully</p>
-      <canvas id="financeChart" class="mt-4"></canvas>
-    </div>
-
-    <!-- Loan Application -->
-    <div class="bg-white shadow rounded-lg p-5 col-span-1">
-      <h2 class="text-lg font-bold mb-3">Loan Application</h2>
-      <form id="loanForm" class="space-y-3">
-        <input type="number" id="loanAmount" placeholder="Loan Amount" class="w-full border p-2 rounded">
-        <input type="text" id="loanPurpose" placeholder="Loan Purpose" class="w-full border p-2 rounded">
-        <input type="text" id="guarantors" placeholder="Guarantors" class="w-full border p-2 rounded">
-        <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded">Apply</button>
-      </form>
-      <p id="loanMsg" class="text-green-600 mt-2 hidden">✅ Loan submitted</p>
-    </div>
-
-    <!-- Loan Status -->
-    <div class="bg-white shadow rounded-lg p-5 col-span-2">
-      <h2 class="text-lg font-bold mb-3">Loan Status</h2>
-      <div class="w-full bg-gray-200 rounded-full h-6">
-        <div id="loanProgress" class="bg-green-500 h-6 rounded-full text-center text-white text-sm" style="width: 20%">
-          Registered
-        </div>
-      </div>
-      <p class="mt-3 text-gray-700">Current Status: <span id="loanStage">Registered</span></p>
-    </div>
-
-    <!-- Loan Repayment -->
-    <div class="bg-white shadow rounded-lg p-5 col-span-1">
-      <h2 class="text-lg font-bold mb-3">Loan Repayment</h2>
-      <form id="repaymentForm" class="space-y-3">
-        <input type="number" id="repaymentAmount" placeholder="Repayment Amount" class="w-full border p-2 rounded">
-        <button type="submit" class="bg-yellow-600 text-white px-4 py-2 rounded">Repay</button>
-      </form>
-      <p id="repaymentMsg" class="text-green-600 mt-2 hidden">✅ Repayment recorded</p>
-    </div>
-
-    <!-- Statement -->
-    <div class="bg-white shadow rounded-lg p-5 col-span-3 text-center">
-      <h2 class="text-lg font-bold mb-3">Download Statement</h2>
-      <button id="downloadStatement" class="bg-indigo-600 text-white px-6 py-2 rounded">Download PDF</button>
-    </div>
-  </div>
 
 </body>
 </html>
