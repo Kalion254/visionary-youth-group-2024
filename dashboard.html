@@ -8,66 +8,79 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@heroicons/react/outline"></script>
 </head>
-<body class="bg-gray-100">
+<body class="bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100 min-h-screen">
 
   <!-- Header -->
-  <header class="bg-blue-700 text-white p-4 flex justify-between items-center shadow-lg">
-    <h1 class="text-2xl font-bold">Member Dashboard</h1>
-    <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded">Logout</button>
+  <header class="bg-gradient-to-r from-blue-700 to-purple-700 text-white p-4 flex justify-between items-center shadow-lg">
+    <h1 class="text-2xl font-bold flex items-center gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-yellow-300" viewBox="0 0 20 20" fill="currentColor">
+        <path d="M10 15l-5.878 3.09 1.122-6.545L.488 6.91l6.561-.955L10 0l2.951 5.955 6.561.955-4.756 4.635 1.122 6.545z"/>
+      </svg>
+      Member Dashboard
+    </h1>
+    <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg shadow-md flex items-center gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1m0-10V5m0 0h4m-4 0H9" />
+      </svg>
+      Logout
+    </button>
   </header>
 
   <!-- Main Content -->
   <main class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
     <!-- Profile -->
-    <section class="bg-white shadow-lg rounded-lg p-6">
-      <h2 class="text-xl font-bold mb-4 text-blue-600">Profile</h2>
+    <section class="bg-white shadow-lg rounded-xl p-6 hover:shadow-2xl transition">
+      <h2 class="text-xl font-bold mb-4 text-blue-700 flex items-center gap-2">
+        👤 Profile
+      </h2>
       <input id="name" placeholder="Full Name" class="w-full border p-2 mb-2 rounded">
       <input id="email" placeholder="Email" class="w-full border p-2 mb-2 rounded">
       <input id="phone" placeholder="Phone" class="w-full border p-2 mb-2 rounded">
-      <button onclick="updateProfile()" class="w-full bg-green-500 hover:bg-green-600 text-white py-2 rounded">Update Profile</button>
-      <p id="profileMsg" class="mt-2 text-sm text-gray-600"></p>
+      <button onclick="updateProfile()" class="w-full bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg">Update Profile</button>
+      <p id="profileMsg" class="mt-2 text-sm text-green-600 font-semibold"></p>
     </section>
 
     <!-- Loan Application -->
-    <section class="bg-white shadow-lg rounded-lg p-6">
-      <h2 class="text-xl font-bold mb-4 text-blue-600">Loan Application</h2>
+    <section class="bg-white shadow-lg rounded-xl p-6 hover:shadow-2xl transition">
+      <h2 class="text-xl font-bold mb-4 text-yellow-600">💳 Loan Application</h2>
       <input id="loanAmount" placeholder="Loan Amount" class="w-full border p-2 mb-2 rounded">
       <textarea id="loanPurpose" placeholder="Loan Purpose" class="w-full border p-2 mb-2 rounded"></textarea>
-      <button onclick="applyLoan()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 rounded">Apply Loan</button>
-      <p id="loanMsg" class="mt-2 text-sm text-gray-600"></p>
+      <button onclick="applyLoan()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 rounded-lg">Apply Loan</button>
+      <p id="loanMsg" class="mt-2 text-sm text-yellow-600 font-semibold"></p>
     </section>
 
     <!-- Loan Status -->
-    <section class="bg-white shadow-lg rounded-lg p-6">
-      <h2 class="text-xl font-bold mb-4 text-blue-600">Loan Status</h2>
-      <p id="loanStatus" class="text-gray-700">No application yet.</p>
+    <section class="bg-white shadow-lg rounded-xl p-6 hover:shadow-2xl transition">
+      <h2 class="text-xl font-bold mb-4 text-purple-600">📊 Loan Status</h2>
+      <p id="loanStatus" class="text-gray-700 font-semibold">No application yet.</p>
       <progress id="loanProgress" value="0" max="100" class="w-full mt-2"></progress>
     </section>
 
     <!-- Savings -->
-    <section class="bg-white shadow-lg rounded-lg p-6">
-      <h2 class="text-xl font-bold mb-4 text-blue-600">Savings</h2>
+    <section class="bg-white shadow-lg rounded-xl p-6 hover:shadow-2xl transition">
+      <h2 class="text-xl font-bold mb-4 text-green-600">💰 Savings</h2>
       <input id="savingsAmount" placeholder="Amount to Save" class="w-full border p-2 mb-2 rounded">
-      <button onclick="addSavings()" class="w-full bg-purple-500 hover:bg-purple-600 text-white py-2 rounded">Add Savings</button>
-      <p id="savingsMsg" class="mt-2 text-sm text-gray-600"></p>
+      <button onclick="addSavings()" class="w-full bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg">Add Savings</button>
+      <p id="savingsMsg" class="mt-2 text-sm text-green-600 font-semibold"></p>
     </section>
 
     <!-- Shares -->
-    <section class="bg-white shadow-lg rounded-lg p-6">
-      <h2 class="text-xl font-bold mb-4 text-blue-600">Shares</h2>
+    <section class="bg-white shadow-lg rounded-xl p-6 hover:shadow-2xl transition">
+      <h2 class="text-xl font-bold mb-4 text-pink-600">📈 Shares</h2>
       <input id="sharesAmount" placeholder="Number of Shares" class="w-full border p-2 mb-2 rounded">
-      <button onclick="addShares()" class="w-full bg-pink-500 hover:bg-pink-600 text-white py-2 rounded">Add Shares</button>
-      <p id="sharesMsg" class="mt-2 text-sm text-gray-600"></p>
+      <button onclick="addShares()" class="w-full bg-pink-500 hover:bg-pink-600 text-white py-2 rounded-lg">Add Shares</button>
+      <p id="sharesMsg" class="mt-2 text-sm text-pink-600 font-semibold"></p>
     </section>
 
     <!-- Loan Repayment -->
-    <section class="bg-white shadow-lg rounded-lg p-6">
-      <h2 class="text-xl font-bold mb-4 text-blue-600">Loan Repayment</h2>
+    <section class="bg-white shadow-lg rounded-xl p-6 hover:shadow-2xl transition">
+      <h2 class="text-xl font-bold mb-4 text-indigo-600">💵 Loan Repayment</h2>
       <input id="repaymentAmount" placeholder="Repayment Amount" class="w-full border p-2 mb-2 rounded">
-      <button onclick="repayLoan()" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white py-2 rounded">Repay Loan</button>
-      <p id="repayMsg" class="mt-2 text-sm text-gray-600"></p>
+      <button onclick="repayLoan()" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white py-2 rounded-lg">Repay Loan</button>
+      <p id="repayMsg" class="mt-2 text-sm text-indigo-600 font-semibold"></p>
     </section>
 
   </main>
@@ -102,7 +115,7 @@
         phone: document.getElementById("phone").value
       };
       db.ref("members/" + user.uid + "/profile").set(profileData).then(() => {
-        document.getElementById("profileMsg").innerText = "Profile updated successfully!";
+        document.getElementById("profileMsg").innerText = "✅ Profile updated successfully!";
       });
     }
 
@@ -117,7 +130,7 @@
         progress: 20
       };
       db.ref("members/" + user.uid + "/loan").set(loanData).then(() => {
-        document.getElementById("loanMsg").innerText = "Loan application submitted!";
+        document.getElementById("loanMsg").innerText = "✅ Loan application submitted!";
         document.getElementById("loanStatus").innerText = "Pending Approval";
         document.getElementById("loanProgress").value = 20;
       });
@@ -132,7 +145,7 @@
         amount: repayment,
         date: new Date().toLocaleDateString()
       }).then(() => {
-        document.getElementById("repayMsg").innerText = "Repayment recorded!";
+        document.getElementById("repayMsg").innerText = "✅ Repayment recorded!";
       });
     }
 
@@ -145,7 +158,7 @@
         amount: savings,
         date: new Date().toLocaleDateString()
       }).then(() => {
-        document.getElementById("savingsMsg").innerText = "Savings added successfully!";
+        document.getElementById("savingsMsg").innerText = "✅ Savings added successfully!";
       });
     }
 
@@ -158,7 +171,7 @@
         amount: shares,
         date: new Date().toLocaleDateString()
       }).then(() => {
-        document.getElementById("sharesMsg").innerText = "Shares recorded!";
+        document.getElementById("sharesMsg").innerText = "✅ Shares recorded!";
       });
     }
 
