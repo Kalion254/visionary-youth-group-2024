@@ -1,131 +1,172 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Member Dashboard - Visionary Youth Group</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Member Dashboard - Visionary Youth Group</title>
 
-  <!-- Fonts & Icons -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-  <style>
-    body { margin:0; font-family:'Poppins', sans-serif; background:#f0f2f5; color:#333; }
-    header { background:#007bff; color:white; padding:20px; display:flex; justify-content: space-between; align-items:center; }
-    header h1 { margin:0; font-size:1.8rem; }
-    #logoutBtn { background:#ff6600; border:none; color:white; padding:10px 15px; border-radius:8px; cursor:pointer; font-weight:600; transition:0.3s; }
-    #logoutBtn:hover { background:#ffcc00; color:#333; }
-    nav { background:#0056b3; display:flex; justify-content:center; padding:12px; flex-wrap:wrap; }
-    nav a { color:white; margin:5px 15px; text-decoration:none; font-weight:600; display:flex; align-items:center; }
-    nav a i { margin-right:6px; }
-    nav a:hover { text-decoration:underline; }
-    section { padding:30px; max-width:900px; margin:20px auto; background:white; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.2); }
-    h2 { color:#007bff; margin-bottom:15px; }
-    .card-detail p { margin:5px 0; }
-  </style>
+<!-- Fonts & Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+body { margin:0; font-family:'Poppins',sans-serif; background:#f0f2f5; color:#333; }
+header { background:#007bff; color:white; padding:20px; text-align:center; position:relative; }
+header h1 { margin:0; font-size:2rem; }
+header button { position:absolute; right:20px; top:20px; background:#ff6600; border:none; padding:10px 15px; border-radius:8px; color:white; cursor:pointer; transition:0.3s; }
+header button:hover { background:#ffcc00; color:#333; }
+.container { max-width:1200px; margin:20px auto; padding:0 20px; display:grid; grid-template-columns:1fr 2fr; gap:25px; }
+.card { background:white; padding:20px; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,0.1); }
+h2 { margin-top:0; color:#007bff; text-align:center; }
+.details p { margin:8px 0; }
+.loans table { width:100%; border-collapse:collapse; }
+.loans th, .loans td { border:1px solid #ccc; padding:10px; text-align:center; }
+.progress-bar { background:#f1f1f1; border-radius:8px; overflow:hidden; height:20px; margin-top:5px; }
+.progress { height:100%; background:#007bff; width:0; transition:0.5s; text-align:center; color:white; font-size:0.9rem; line-height:20px; }
+button.download { background:#28a745; border:none; padding:10px 15px; border-radius:8px; color:white; cursor:pointer; transition:0.3s; margin-top:10px; }
+button.download:hover { background:#218838; }
+.logout-msg { text-align:center; margin-top:50px; font-size:1.2rem; color:#ff0000; }
+</style>
 </head>
 <body>
 
-  <header>
-    <h1>Welcome, <span id="userName">Member</span></h1>
-    <button id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
-  </header>
+<header>
+  <h1>Member Dashboard</h1>
+  <button id="logoutBtn">Logout</button>
+</header>
 
-  <nav>
-    <a href="#account"><i class="fas fa-user"></i> My Account</a>
-    <a href="#savings"><i class="fas fa-piggy-bank"></i> Savings</a>
-    <a href="#loans"><i class="fas fa-hand-holding-usd"></i> Loans</a>
-    <a href="#statements"><i class="fas fa-file-alt"></i> Statements</a>
-    <a href="#events"><i class="fas fa-calendar-alt"></i> Events</a>
-    <a href="#news"><i class="fas fa-newspaper"></i> News</a>
-  </nav>
+<div class="container">
+  <!-- Left: Personal Details -->
+  <div class="card details" id="personalDetails">
+    <h2>Personal Details</h2>
+    <p><strong>Name:</strong> <span id="userName">Loading...</span></p>
+    <p><strong>Email:</strong> <span id="userEmail">Loading...</span></p>
+    <p><strong>Phone:</strong> <span id="userPhone">Loading...</span></p>
+    <p><strong>ID Number:</strong> <span id="userID">Loading...</span></p>
+    <p><strong>Place of Origin:</strong> <span id="userOrigin">Loading...</span></p>
+  </div>
 
-  <section id="account">
-    <h2>My Account</h2>
-    <div class="card-detail">
-      <p><i class="fas fa-user"></i> Name: <span id="accName"></span></p>
-      <p><i class="fas fa-envelope"></i> Email: <span id="accEmail"></span></p>
-      <p><i class="fas fa-phone"></i> Phone: <span id="accPhone"></span></p>
-      <p><i class="fas fa-id-card"></i> ID Number: <span id="accId"></span></p>
-      <p><i class="fas fa-map-marker-alt"></i> Place of Origin: <span id="accOrigin"></span></p>
-    </div>
-  </section>
+  <!-- Right: Loans & Savings -->
+  <div class="card loans">
+    <h2>Loans Overview</h2>
+    <table id="loansTable">
+      <thead>
+        <tr>
+          <th>Loan Amount</th>
+          <th>Status</th>
+          <th>Application Date</th>
+          <th>Progress</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td colspan="4">Loading loans...</td></tr>
+      </tbody>
+    </table>
 
-  <section id="savings">
-    <h2>Savings</h2>
-    <p><i class="fas fa-piggy-bank"></i> Total Savings: <strong>Ksh <span id="savingsBalance">0</span></strong></p>
-  </section>
+    <h2>Savings & Statements</h2>
+    <p><strong>Total Savings:</strong> <span id="totalSavings">Loading...</span></p>
+    <button class="download" id="downloadStmt">Download Statement</button>
+  </div>
+</div>
 
-  <section id="loans">
-    <h2>Loans</h2>
-    <p><i class="fas fa-hand-holding-usd"></i> Outstanding Loan: <strong>Ksh <span id="loanBalance">0</span></strong></p>
-  </section>
+<p class="logout-msg" id="notLogged" style="display:none;">You must log in to view this page.</p>
 
-  <section id="statements">
-    <h2>Statements</h2>
-    <p><i class="fas fa-file-alt"></i> Download or view your transaction history here.</p>
-  </section>
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-  <section id="events">
-    <h2>Events</h2>
-    <ul>
-      <li><i class="fas fa-calendar-alt"></i> Youth Empowerment Workshop - Sept 15, 2024</li>
-      <li><i class="fas fa-calendar-alt"></i> Annual General Meeting - Dec 20, 2024</li>
-    </ul>
-  </section>
+const firebaseConfig = {
+  apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
+  authDomain: "visionary-youth-grou-2024.firebaseapp.com",
+  projectId: "visionary-youth-grou-2024",
+  storageBucket: "visionary-youth-grou-2024.firebasestorage.app",
+  messagingSenderId: "372978592717",
+  appId: "1:372978592717:web:1c15aec728ee5f854f3284"
+};
 
-  <section id="news">
-    <h2>News</h2>
-    <p><i class="fas fa-newspaper"></i> Stay updated with latest announcements and opportunities in the group.</p>
-  </section>
+const app = initializeApp(firebaseConfig);
+const auth = getAuth();
+const db = getFirestore(app);
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+const personalDetails = document.getElementById('personalDetails');
+const loansTable = document.getElementById('loansTable').querySelector('tbody');
+const totalSavingsEl = document.getElementById('totalSavings');
+const notLogged = document.getElementById('notLogged');
 
-  <script>
-    // Firebase config
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT_ID.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+// Logout button
+document.getElementById('logoutBtn').addEventListener('click', async ()=>{
+  await signOut(auth);
+  window.location.href = "index.html"; // redirect to landing page
+});
 
-    // Redirect if not logged in
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        db.collection("members").doc(user.uid).get().then(doc => {
-          if (doc.exists) {
-            const data = doc.data();
-            document.getElementById("userName").textContent = data.name;
-            document.getElementById("accName").textContent = data.name;
-            document.getElementById("accEmail").textContent = data.email;
-            document.getElementById("accPhone").textContent = data.phone;
-            document.getElementById("accId").textContent = data.idNumber;
-            document.getElementById("accOrigin").textContent = data.origin;
-          }
-        });
-      } else {
-        window.location.href = "index.html";
-      }
+// Auth check
+onAuthStateChanged(auth, async (user)=>{
+  if(user){
+    notLogged.style.display = "none";
+    personalDetails.style.display = "block";
+    loansTable.innerHTML = "<tr><td colspan='4'>Loading loans...</td></tr>";
+
+    // Load user details
+    const userDoc = await getDoc(doc(db, "members", user.uid));
+    if(userDoc.exists()){
+      const data = userDoc.data();
+      document.getElementById('userName').textContent = data.name;
+      document.getElementById('userEmail').textContent = data.email;
+      document.getElementById('userPhone').textContent = data.phone;
+      document.getElementById('userID').textContent = data.idNumber;
+      document.getElementById('userOrigin').textContent = data.origin;
+    }
+
+    // Load loans
+    const loansSnap = await getDocs(collection(db, "members", user.uid, "loans"));
+    loansTable.innerHTML = "";
+    let totalSavings = 0;
+    loansSnap.forEach(docSnap=>{
+      const loan = docSnap.data();
+      totalSavings += loan.savings || 0;
+      const progressMap = { "Applied":25, "Verified":50, "Approved":75, "Paid":100 };
+      const progWidth = progressMap[loan.status] || 0;
+      loansTable.innerHTML += `
+        <tr>
+          <td>${loan.amount}</td>
+          <td>${loan.status}</td>
+          <td>${loan.date || "N/A"}</td>
+          <td>
+            <div class="progress-bar">
+              <div class="progress" style="width:${progWidth}%">${loan.status}</div>
+            </div>
+          </td>
+        </tr>
+      `;
     });
+    totalSavingsEl.textContent = totalSavings;
+  } else {
+    personalDetails.style.display = "none";
+    loansTable.innerHTML = "";
+    totalSavingsEl.textContent = "";
+    notLogged.style.display = "block";
+  }
+});
 
-    // Logout
-    document.getElementById("logoutBtn").addEventListener("click", () => {
-      auth.signOut().then(() => {
-        alert("✅ You have been logged out.");
-        window.location.href = "index.html";
-      }).catch(error => {
-        alert("❌ Logout failed: " + error.message);
-      });
-    });
-  </script>
+// Download statement as CSV
+document.getElementById('downloadStmt').addEventListener('click', async ()=>{
+  const user = auth.currentUser;
+  if(!user) return alert("Not logged in");
+  const loansSnap = await getDocs(collection(db, "members", user.uid, "loans"));
+  let csv = "Loan Amount,Status,Date\n";
+  loansSnap.forEach(docSnap=>{
+    const loan = docSnap.data();
+    csv += `${loan.amount},${loan.status},${loan.date || "N/A"}\n`;
+  });
+  const blob = new Blob([csv], {type:"text/csv"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = "statement.csv";
+  a.click();
+  URL.revokeObjectURL(url);
+});
+</script>
 </body>
 </html>
