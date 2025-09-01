@@ -104,7 +104,9 @@ footer { text-align:center; padding:15px; background:#333; color:white; margin-t
 <section id="auth" data-aos="fade-up">
   <h2>Join Our Community</h2>
   <p><strong>All fields are required. Sign up below.</strong></p>
-  <form id="signupForm">
+  
+  <!-- SIGNUP -->
+  <form id="signupForm" onsubmit="return false;">
     <input type="text" id="signupName" placeholder="Full Name" required>
     <input type="text" id="signupPhone" placeholder="Phone Number" required>
     <input type="text" id="signupId" placeholder="ID Number" required>
@@ -115,7 +117,8 @@ footer { text-align:center; padding:15px; background:#333; color:white; margin-t
   </form>
 
   <h3>Already a member?</h3>
-  <form id="loginForm">
+  <!-- LOGIN -->
+  <form id="loginForm" onsubmit="return false;">
     <input type="email" id="loginEmail" placeholder="Email" required>
     <input type="password" id="loginPassword" placeholder="Password" required>
     <button type="button" id="loginBtn">Login</button>
@@ -147,7 +150,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Signup
+// SIGNUP
 document.getElementById('signupBtn').addEventListener('click', async ()=>{
   const signupInfo = {
     name: document.getElementById('signupName').value,
@@ -159,14 +162,22 @@ document.getElementById('signupBtn').addEventListener('click', async ()=>{
   };
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, signupInfo.email, signupInfo.password);
-    await setDoc(doc(db, "members", userCredential.user.uid), {...signupInfo, createdAt: serverTimestamp()});
+    await setDoc(doc(db, "members", userCredential.user.uid), {
+      name: signupInfo.name,
+      phone: signupInfo.phone,
+      id: signupInfo.id,
+      origin: signupInfo.origin,
+      email: signupInfo.email,
+      createdAt: serverTimestamp()
+    });
     alert("Signup successful! Please login.");
+    document.getElementById('signupForm').reset();
   } catch(err){
-    alert(err.message);
+    alert("Signup failed: " + err.message);
   }
 });
 
-// Login
+// LOGIN
 document.getElementById('loginBtn').addEventListener('click', async ()=>{
   const email = document.getElementById('loginEmail').value;
   const password = document.getElementById('loginPassword').value;
@@ -174,11 +185,11 @@ document.getElementById('loginBtn').addEventListener('click', async ()=>{
     await signInWithEmailAndPassword(auth, email, password);
     window.location.href = "dashboard.html"; // redirect to dashboard
   } catch(err){
-    alert(err.message);
+    alert("Login failed: " + err.message);
   }
 });
 
-// Reset password
+// RESET PASSWORD
 document.getElementById('resetPasswordBtn').addEventListener('click', async ()=>{
   const email = document.getElementById('loginEmail').value;
   if(!email){ alert("Enter your email to reset password"); return; }
@@ -186,7 +197,7 @@ document.getElementById('resetPasswordBtn').addEventListener('click', async ()=>
     await sendPasswordResetEmail(auth, email);
     alert("Password reset email sent!");
   } catch(err){
-    alert(err.message);
+    alert("Error: " + err.message);
   }
 });
 </script>
