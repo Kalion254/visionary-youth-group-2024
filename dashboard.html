@@ -1,294 +1,546 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Member Dashboard</title>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    body { background: #f8f9fa; }
-    .card { border-radius: 12px; box-shadow: 0px 2px 6px rgba(0,0,0,0.1); }
-    .success-msg { color: green; font-size: 14px; margin-top: 5px; display:none; }
-  </style>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>VISIONARY YOUTH GROUP — Member Dashboard (RTDB)</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+<style>
+  :root{
+    --primary:#007bff; --accent:#ff6600; --muted:#f1f3f5; --ok:#28a745; --warn:#ffcc00; --err:#dc3545;
+  }
+  *{box-sizing:border-box}
+  body{font-family:'Poppins',sans-serif;margin:0;background:#f6f8fb;color:#222}
+  header{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;padding:16px 24px;background:linear-gradient(90deg,var(--primary),#0062d6);color:#fff;box-shadow:0 6px 18px rgba(2,6,23,0.18)}
+  header h1{margin:0;font-size:1.1rem}
+  header .actions{display:flex;gap:10px;align-items:center}
+  header button, .btn{background:var(--primary);border:none;color:#fff;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:600}
+  .btn.alt{background:#fff;color:var(--primary);border:1px solid #dfe6ef}
+  .btn.ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.4)}
+  .btn.success{background:var(--ok)}
+  .btn.warn{background:var(--accent)}
+  .container{max-width:1200px;margin:28px auto;padding:0 18px}
+  .grid{display:grid;gap:18px}
+  .cols-3{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+  .card{background:#fff;padding:16px;border-radius:16px;box-shadow:0 10px 30px rgba(2,6,23,0.08)}
+  .card h3{margin:0 0 8px;color:var(--primary)}
+  .muted{color:#6b7280}
+  .small{font-size:.92rem}
+  .row{display:flex;gap:12px;flex-wrap:wrap}
+  .field{flex:1 1 180px}
+  label{display:block;font-size:.85rem;color:#6b7280;margin-bottom:6px}
+  input,select,textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #e5eaf2;background:#fff}
+  .pill{display:inline-flex;gap:6px;align-items:center;padding:8px 12px;border-radius:999px;background:#eef4ff;color:#1b4fd6;font-weight:600}
+  .progress-track{height:12px;background:#eef3f9;border-radius:999px;overflow:hidden}
+  .progress-fill{height:12px;background:linear-gradient(90deg,#28a745,#1e7be7);width:0%;color:#fff;text-align:center;font-size:10px;font-weight:700}
+  .loan-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+  .loan-card{display:flex;flex-direction:column;gap:10px}
+  .status{padding:6px 10px;border-radius:999px;font-weight:700;width:max-content}
+  .st-Registered,.st-Pending{background:var(--warn);color:#222}
+  .st-RequestedVerification{background:#ffd37a;color:#222}
+  .st-Verified{background:#6ddf8e}
+  .st-Approved{background:#1e7be7;color:#fff}
+  .st-Rejected{background:#ffc5cc;color:#8b0000}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+  .tab{background:#fff;border:1px solid #e5eaf2;border-radius:999px;padding:8px 14px;cursor:pointer}
+  .tab.active{background:#1b4fd6;color:#fff;border-color:#1b4fd6}
+  .toast{position:fixed;right:18px;bottom:18px;background:#111;color:#fff;padding:12px 16px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.2);opacity:0;transform:translateY(12px);transition:all .25s;z-index:999}
+  .toast.show{opacity:1;transform:translateY(0)}
+  .chip{display:inline-flex;align-items:center;gap:6px;background:#f1f4f9;color:#3b4453;border-radius:999px;padding:6px 10px;font-weight:600}
+  .link{color:var(--primary);text-decoration:none;font-weight:600}
+  @media (max-width:720px){ header{flex-direction:column;gap:8px;align-items:flex-start} }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
-  <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <div class="container">
-      <a class="navbar-brand fw-bold" href="#">🌍 Sacco Dashboard</a>
-      <button class="btn btn-danger" id="logoutBtn">Logout</button>
-    </div>
-  </nav>
+<header>
+  <h1>VISIONARY YOUTH GROUP — Member Dashboard</h1>
+  <div class="actions">
+    <button id="btnAdmin" class="btn ghost" style="display:none"><i class="fa-solid fa-shield-halved"></i> Admin</button>
+    <button id="btnRefresh" title="Refresh"><i class="fa-solid fa-rotate"></i> Refresh</button>
+    <button id="btnLogout" class="btn warn"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+  </div>
+</header>
 
-  <!-- Dashboard -->
-  <div class="container my-4">
-    <h2 class="text-center mb-4">Welcome, <span id="userName">Member</span></h2>
+<main class="container">
 
-    <!-- Profile -->
-    <div class="card mb-3">
-      <div class="card-header bg-info text-white">👤 Profile Details</div>
-      <div class="card-body">
-        <form id="profileForm">
-          <div class="row g-2">
-            <div class="col-md-6"><input type="text" id="fullName" class="form-control" placeholder="Full Name"></div>
-            <div class="col-md-6"><input type="text" id="idNumber" class="form-control" placeholder="ID Number"></div>
-            <div class="col-md-6"><input type="text" id="phone" class="form-control" placeholder="Phone"></div>
-            <div class="col-md-6"><input type="text" id="address" class="form-control" placeholder="Address"></div>
-            <div class="col-md-6"><input type="text" id="occupation" class="form-control" placeholder="Occupation"></div>
-            <div class="col-md-6"><input type="text" id="guarantor" class="form-control" placeholder="Guarantor"></div>
-          </div>
-          <button type="submit" class="btn btn-success mt-3">💾 Update Profile</button>
-          <p id="profileSuccess" class="success-msg">✅ Profile updated successfully</p>
-        </form>
+  <!-- Welcome + quick -->
+  <section class="grid cols-3" style="margin-bottom:18px">
+    <div class="card">
+      <h3>Welcome, <span id="nameTop">Member</span></h3>
+      <p class="small muted" id="emailTop">Loading…</p>
+      <div class="row" style="margin-top:8px">
+        <span class="pill"><i class="fa-solid fa-piggy-bank"></i> Savings: <span id="pillSavings">KES 0</span></span>
+        <span class="pill" style="background:#fff1e8;color:#b24d00"><i class="fa-solid fa-coins"></i> Shares: <span id="pillShares">0</span></span>
+      </div>
+      <div style="margin-top:12px">
+        <a href="#" id="btnDownloadPdf" class="link"><i class="fa-solid fa-file-arrow-down"></i> Download PDF Statement</a>
+        &nbsp;•&nbsp;
+        <a href="#" id="btnDownloadCsv" class="link">CSV</a>
       </div>
     </div>
 
-    <!-- Loan Application -->
-    <div class="card mb-3">
-      <div class="card-header bg-warning">💰 Loan Application</div>
-      <div class="card-body">
-        <form id="loanForm">
-          <div class="row g-2">
-            <div class="col-md-6"><input type="number" id="loanAmount" class="form-control" placeholder="Loan Amount (KES)" required></div>
-            <div class="col-md-6"><input type="number" id="loanPeriod" class="form-control" placeholder="Repayment Period (Months)" required></div>
-          </div>
-          <textarea id="loanReason" class="form-control my-2" placeholder="Loan Purpose" required></textarea>
-          <button type="submit" class="btn btn-primary">📤 Apply for Loan</button>
-        </form>
-        <h6 class="mt-3">My Loan Applications</h6>
-        <ul id="loanList" class="list-group"></ul>
-      </div>
+    <div class="card">
+      <h3>Savings Progress</h3>
+      <p class="small muted">Target progress</p>
+      <div class="progress-track"><div id="savingsFill" class="progress-fill">0%</div></div>
+      <p style="margin-top:8px"><strong id="savingsText">KES 0</strong> saved</p>
+      <form id="formAddSavings" class="row">
+        <div class="field">
+          <label>Top-up (KES)</label>
+          <input id="inSavingsAdd" type="number" min="1" placeholder="e.g., 500"/>
+        </div>
+        <div class="field" style="align-self:flex-end">
+          <button class="btn" type="submit"><i class="fa-solid fa-plus"></i> Add</button>
+        </div>
+      </form>
     </div>
 
-    <!-- Savings -->
-    <div class="card mb-3">
-      <div class="card-header bg-success text-white">💵 Savings</div>
-      <div class="card-body">
-        <p>Total Savings: <b><span id="savingsTotal">0</span> KES</b></p>
-        <button class="btn btn-outline-success" id="addSavingsBtn">➕ Add Savings</button>
-        <h6 class="mt-3">Savings History</h6>
-        <ul id="savingsHistory" class="list-group"></ul>
+    <div class="card">
+      <h3>Quick Actions</h3>
+      <div class="row" style="margin-top:6px">
+        <button id="btnOpenLoan" class="btn"><i class="fa-solid fa-hand-holding-dollar"></i> Apply Loan</button>
+        <button id="btnOpenProfile" class="btn alt">Edit Profile</button>
       </div>
+      <form id="formAddShares" class="row" style="margin-top:10px">
+        <div class="field">
+          <label>Buy Shares (units)</label>
+          <input id="inSharesAdd" type="number" min="1" placeholder="e.g., 10"/>
+        </div>
+        <div class="field" style="align-self:flex-end">
+          <button class="btn" type="submit"><i class="fa-solid fa-plus"></i> Buy</button>
+        </div>
+      </form>
     </div>
+  </section>
 
-    <!-- Shares -->
-    <div class="card mb-3">
-      <div class="card-header bg-dark text-white">📈 Shares</div>
-      <div class="card-body">
-        <p>Total Shares: <b><span id="sharesTotal">0</span></b></p>
-        <button class="btn btn-outline-dark" id="buySharesBtn">➕ Buy Shares</button>
-        <h6 class="mt-3">Shares History</h6>
-        <ul id="sharesHistory" class="list-group"></ul>
-      </div>
-    </div>
-
-    <!-- Statement -->
-    <div class="card mb-3">
-      <div class="card-header bg-secondary text-white">📑 Account Statement</div>
-      <div class="card-body">
-        <button class="btn btn-dark" id="downloadStatement">⬇️ Download PDF</button>
-      </div>
-    </div>
-
-    <!-- Admin Section -->
-    <div class="card mb-3 d-none" id="adminSection">
-      <div class="card-header bg-danger text-white">🛠 Admin Panel (Loan Approvals)</div>
-      <div class="card-body">
-        <ul id="pendingLoans" class="list-group"></ul>
-      </div>
-    </div>
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" data-tab="profileTab"><i class="fa-solid fa-user"></i> Profile</button>
+    <button class="tab" data-tab="loanTab"><i class="fa-solid fa-sack-dollar"></i> Loans</button>
+    <button class="tab" data-tab="guarantorTab"><i class="fa-solid fa-people-group"></i> Guarantors</button>
+    <button class="tab" data-tab="statsTab"><i class="fa-solid fa-chart-pie"></i> Insights</button>
   </div>
 
-  <script>
-    // Firebase Config
-    const firebaseConfig = {
-      apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
-      authDomain: "your-project-id.firebaseapp.com",
-      projectId: "your-project-id",
-      storageBucket: "your-project-id.appspot.com",
-      messagingSenderId: "123456789",
-      appId: "1:123456789:web:yourappid"
+  <!-- Profile -->
+  <section id="profileTab" class="card">
+    <h3>Edit Profile</h3>
+    <form id="formProfile">
+      <div class="row">
+        <div class="field"><label>Full name</label><input id="inName" required/></div>
+        <div class="field"><label>Phone</label><input id="inPhone" required/></div>
+        <div class="field"><label>Place of origin</label><input id="inOrigin"/></div>
+      </div>
+      <p class="small"><strong>Email:</strong> <span id="accountEmail">—</span> &nbsp;•&nbsp; <strong>Member ID:</strong> <span id="accountId">—</span> &nbsp;•&nbsp; <strong>Joined:</strong> <span id="accountJoined">—</span></p>
+      <div class="row" style="margin-top:8px">
+        <button class="btn" type="submit"><i class="fa-solid fa-floppy-disk"></i> Save Profile</button>
+        <button id="btnResetPass" class="btn alt" type="button"><i class="fa-solid fa-key"></i> Reset Password Email</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- Loans -->
+  <section id="loanTab" class="card" style="display:none">
+    <h3>Apply for a Loan</h3>
+    <form id="formLoan">
+      <div class="row">
+        <div class="field"><label>Title</label><input id="loanTitle" placeholder="e.g., Business Seed Loan" required/></div>
+        <div class="field"><label>Amount (KES)</label><input id="loanAmount" type="number" min="1" required/></div>
+        <div class="field"><label>Purpose</label>
+          <select id="loanPurpose" required>
+            <option value="">Select</option>
+            <option>Business</option><option>Education</option><option>Personal</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="field"><label>Repayment Months</label><input id="loanMonths" type="number" min="1" placeholder="e.g., 12"/></div>
+        <div class="field"><label>Notes (optional)</label><input id="loanNotes" placeholder="Short description"/></div>
+      </div>
+      <button class="btn" type="submit"><i class="fa-solid fa-paper-plane"></i> Submit Application</button>
+    </form>
+
+    <h3 style="margin-top:16px">Your Loans</h3>
+    <div id="loanGrid" class="loan-grid"></div>
+    <p id="noLoans" class="muted" style="display:none">No loans yet — apply above.</p>
+  </section>
+
+  <!-- Guarantors -->
+  <section id="guarantorTab" class="card" style="display:none">
+    <h3>Guarantors</h3>
+    <form id="formGuarantor" class="row">
+      <div class="field"><label>Name</label><input id="gName" required/></div>
+      <div class="field"><label>Phone</label><input id="gPhone" required/></div>
+      <div class="field"><label>Relationship</label><input id="gRelation" placeholder="e.g., Brother"/></div>
+      <div class="field" style="align-self:flex-end"><button class="btn" type="submit"><i class="fa-solid fa-user-plus"></i> Add</button></div>
+    </form>
+    <div id="guarantorList" class="row" style="margin-top:10px"></div>
+  </section>
+
+  <!-- Insights -->
+  <section id="statsTab" class="card" style="display:none">
+    <h3>Savings vs Loans</h3>
+    <canvas id="summaryChart" height="120"></canvas>
+  </section>
+</main>
+
+<div id="toast" class="toast">Saved!</div>
+
+<script type="module">
+  /* ---------------- Firebase (Auth + RTDB) ---------------- */
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+  import {
+    getDatabase, ref, get, set, update, push, onValue, serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
+    authDomain: "visionary-youth-grou-2024.firebaseapp.com",
+    projectId: "visionary-youth-grou-2024",
+    databaseURL: "https://visionary-youth-grou-2024-default-rtdb.firebaseio.com",
+    storageBucket: "visionary-youth-grou-2024.firebasestorage.app",
+    messagingSenderId: "372978592717",
+    appId: "1:372978592717:web:1c15aec728ee5f854f3284",
+    measurementId: "G-QP1RBT2ZCP"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth();
+  const db = getDatabase();
+
+  /* ---------------- UI Helpers ---------------- */
+  const $ = sel => document.querySelector(sel);
+  const $$ = sel => [...document.querySelectorAll(sel)];
+  const toast = $("#toast");
+  function showToast(msg, type="ok"){
+    toast.textContent = msg;
+    toast.style.background = type==="ok" ? "#111" : (type==="err" ? "var(--err)" : "var(--accent)");
+    toast.classList.add("show");
+    setTimeout(()=>toast.classList.remove("show"), 2200);
+  }
+  function fmtKES(n){ return "KES " + Number(n||0).toLocaleString(); }
+
+  /* ---------------- Refs ---------------- */
+  const nameTop=$("#nameTop"), emailTop=$("#emailTop"), pillSavings=$("#pillSavings"), pillShares=$("#pillShares");
+  const savingsFill=$("#savingsFill"), savingsText=$("#savingsText");
+  const btnDownloadPdf=$("#btnDownloadPdf"), btnDownloadCsv=$("#btnDownloadCsv");
+  const btnRefresh=$("#btnRefresh"), btnLogout=$("#btnLogout"), btnAdmin=$("#btnAdmin");
+  const btnOpenLoan=$("#btnOpenLoan"), btnOpenProfile=$("#btnOpenProfile");
+  const accountEmail=$("#accountEmail"), accountId=$("#accountId"), accountJoined=$("#accountJoined");
+  const inName=$("#inName"), inPhone=$("#inPhone"), inOrigin=$("#inOrigin");
+  const formProfile=$("#formProfile"), formLoan=$("#formLoan"), formGuarantor=$("#formGuarantor");
+  const loanTitle=$("#loanTitle"), loanAmount=$("#loanAmount"), loanPurpose=$("#loanPurpose"), loanMonths=$("#loanMonths"), loanNotes=$("#loanNotes");
+  const guarantorList=$("#guarantorList");
+  const formAddSavings=$("#formAddSavings"), inSavingsAdd=$("#inSavingsAdd");
+  const formAddShares=$("#formAddShares"), inSharesAdd=$("#inSharesAdd");
+  const loanGrid=$("#loanGrid"), noLoans=$("#noLoans");
+  const btnResetPass=$("#btnResetPass");
+  const chartCanvas=$("#summaryChart");
+  let chartInstance=null;
+
+  let user=null;
+  let uid=null;
+
+  /* ---------------- Tabs ---------------- */
+  $$(".tab").forEach(t=>{
+    t.addEventListener("click", ()=>{
+      $$(".tab").forEach(x=>x.classList.remove("active"));
+      t.classList.add("active");
+      ["profileTab","loanTab","guarantorTab","statsTab"].forEach(id=>$("#"+id).style.display="none");
+      $("#"+t.dataset.tab).style.display="block";
+    });
+  });
+  btnOpenLoan.addEventListener("click", ()=>{ document.querySelector('.tab[data-tab="loanTab"]').click(); });
+  btnOpenProfile.addEventListener("click", ()=>{ document.querySelector('.tab[data-tab="profileTab"]').click(); });
+
+  /* ---------------- Auth gate ---------------- */
+  onAuthStateChanged(auth, async (_user)=>{
+    if(!_user){ window.location.href="index.html"; return; }
+    user=_user; uid=user.uid;
+    accountEmail.textContent = user.email || "—";
+    accountId.textContent = uid.slice(0,10)+"...";
+    emailTop.textContent = user.email || "—";
+    await ensureMemberRecord();
+    wireLiveBindings();
+    await refreshAll();
+  });
+
+  async function ensureMemberRecord(){
+    const mRef = ref(db, `members/${uid}`);
+    const snap = await get(mRef);
+    if(!snap.exists()){
+      await set(mRef, {
+        email: user.email || "",
+        name: user.displayName || "",
+        phone: "",
+        origin: "",
+        savings: 0,
+        shares: 0,
+        role: "member",
+        createdAt: Date.now()
+      });
+    }
+  }
+
+  /* ---------------- Live bindings (keep display updated) ---------------- */
+  function wireLiveBindings(){
+    onValue(ref(db, `members/${uid}`), (s)=>{
+      const m=s.val()||{};
+      nameTop.textContent = m.name || "Member";
+      inName.value = m.name || "";
+      inPhone.value = m.phone || "";
+      inOrigin.value = m.origin || "";
+      pillSavings.textContent = fmtKES(m.savings||0);
+      savingsText.textContent = fmtKES(m.savings||0);
+      const perc = Math.max(0, Math.min(100, Number(m.savings || 0))); // treat value as %
+      savingsFill.style.width = perc + "%";
+      savingsFill.textContent = perc + "%";
+      pillShares.textContent = Number(m.shares||0);
+      accountJoined.textContent = m.createdAt ? new Date(m.createdAt).toLocaleDateString() : "—";
+      if((m.role||"member")==="admin"){ btnAdmin.style.display="inline-block"; }
+    });
+
+    onValue(ref(db, `guarantors/${uid}`), (s)=>{
+      guarantorList.innerHTML="";
+      const data=s.val()||{};
+      const entries=Object.entries(data);
+      if(entries.length===0){
+        guarantorList.innerHTML = `<span class="chip"><i class="fa-regular fa-circle"></i> No guarantors yet</span>`;
+      }else{
+        entries.forEach(([gid, g])=>{
+          const el=document.createElement('span');
+          el.className="chip";
+          el.innerHTML=`<i class="fa-solid fa-user-shield"></i> ${g.name} — ${g.phone} (${g.relation||'—'})`;
+          guarantorList.appendChild(el);
+        });
+      }
+    });
+
+    onValue(ref(db, `loans/${uid}`), (s)=>{
+      loanGrid.innerHTML="";
+      const data=s.val()||{};
+      const list=Object.entries(data).sort((a,b)=> (b[1].createdAt||0)-(a[1].createdAt||0));
+      if(list.length===0){ noLoans.style.display="block"; return; }
+      noLoans.style.display="none";
+      list.forEach(([lid, L])=>{
+        const prog = statusToProgress(L.status);
+        const card=document.createElement('div');
+        card.className="card loan-card";
+        card.innerHTML=`
+          <div class="row" style="justify-content:space-between">
+            <div>
+              <h4 style="margin:0">${L.title||"Loan"}</h4>
+              <div class="small muted">${L.purpose||''} • ${L.date||''}</div>
+            </div>
+            <div style="text-align:right">
+              <span class="status st-${L.status||'Registered'}">${L.status||'Registered'}</span>
+              <div class="small muted" style="margin-top:6px">Amount</div>
+              <div style="font-weight:700">${fmtKES(L.amount||0)}</div>
+            </div>
+          </div>
+          <div class="progress-track"><div class="progress-fill" style="width:${prog}%">${prog}%</div></div>
+          <div class="row" style="margin-top:8px">
+            <button class="btn btnVerify" data-id="${lid}"><i class="fa-solid fa-shield"></i> Request Verification</button>
+            <button class="btn alt btnLoanPdf" data-id="${lid}"><i class="fa-solid fa-file"></i> Download</button>
+          </div>
+        `;
+        loanGrid.appendChild(card);
+      });
+
+      // wire buttons
+      $$(".btnVerify").forEach(b=>b.addEventListener("click", async()=>{
+        const lid=b.getAttribute("data-id");
+        await update(ref(db, `loans/${uid}/${lid}`), { status:"RequestedVerification", requestedVerification:true });
+        showToast("Verification requested");
+      }));
+      $$(".btnLoanPdf").forEach(b=>b.addEventListener("click", async()=>{
+        const lid=b.getAttribute("data-id");
+        const snap=await get(ref(db, `loans/${uid}/${lid}`));
+        if(!snap.exists()) return;
+        generateLoanPdf(snap.val());
+      }));
+
+      // refresh chart on loans change
+      renderChart();
+    });
+  }
+
+  /* ---------------- Actions ---------------- */
+  btnRefresh.addEventListener("click", refreshAll);
+  btnLogout.addEventListener("click", async()=>{ await signOut(auth); window.location.href="index.html"; });
+  btnAdmin.addEventListener("click", ()=>{ window.location.href="admin.html"; });
+
+  formProfile.addEventListener("submit", async(e)=>{
+    e.preventDefault();
+    await update(ref(db, `members/${uid}`), {
+      name: inName.value.trim(),
+      phone: inPhone.value.trim(),
+      origin: inOrigin.value.trim()
+    });
+    showToast("Profile updated");
+  });
+
+  btnResetPass.addEventListener("click", async()=>{
+    try{
+      await sendPasswordResetEmail(auth, user.email);
+      showToast("Password reset email sent","ok");
+    }catch(err){ console.error(err); showToast(err.message,"err"); }
+  });
+
+  formLoan.addEventListener("submit", async(e)=>{
+    e.preventDefault();
+    const title=loanTitle.value.trim();
+    const amount=Number(loanAmount.value);
+    const purpose=loanPurpose.value;
+    const months=Number(loanMonths.value||0);
+    if(!title || !amount || !purpose){ showToast("Fill all loan fields","warn"); return; }
+
+    const loanData={
+      title, amount, purpose, months: months||null,
+      notes: loanNotes.value.trim()||null,
+      status:"Registered",
+      date: new Date().toLocaleDateString(),
+      createdAt: Date.now()
     };
-    firebase.initializeApp(firebaseConfig);
+    const newRef = push(ref(db, `loans/${uid}`));
+    await set(newRef, loanData);
 
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+    // Queue for admin review
+    const adminRef = push(ref(db, `admin/pendingLoans`));
+    await set(adminRef, { userId: uid, loanId: newRef.key, ...loanData });
 
-    // Auth Protection
-    auth.onAuthStateChanged(user => {
-      if (!user) {
-        window.location.href = "index.html";
-      } else {
-        document.getElementById("userName").innerText = user.email;
-        loadProfile(user.uid);
-        loadLoans(user.uid);
-        loadSavings(user.uid);
-        loadShares(user.uid);
+    formLoan.reset();
+    showToast("Loan application submitted");
+  });
 
-        // Check Admin
-        db.collection("users").doc(user.uid).get().then(doc => {
-          if (doc.exists && doc.data().role === "admin") {
-            document.getElementById("adminSection").classList.remove("d-none");
-            loadPendingLoans();
-          }
-        });
-      }
+  formGuarantor.addEventListener("submit", async(e)=>{
+    e.preventDefault();
+    const name=$("#gName").value.trim();
+    const phone=$("#gPhone").value.trim();
+    const relation=$("#gRelation").value.trim();
+    if(!name || !phone){ showToast("Enter name & phone","warn"); return; }
+    const newRef=push(ref(db, `guarantors/${uid}`));
+    await set(newRef, { name, phone, relation: relation||null, createdAt: Date.now() });
+    formGuarantor.reset();
+    showToast("Guarantor added");
+  });
+
+  formAddSavings.addEventListener("submit", async(e)=>{
+    e.preventDefault();
+    const add = Number(inSavingsAdd.value||0);
+    if(add<=0){ showToast("Enter amount","warn"); return; }
+    const mRef=ref(db, `members/${uid}`);
+    const snap=await get(mRef);
+    const cur = (snap.val()&&snap.val().savings) || 0;
+    await update(mRef, { savings: cur + add });
+    inSavingsAdd.value="";
+    showToast("Savings updated");
+  });
+
+  formAddShares.addEventListener("submit", async(e)=>{
+    e.preventDefault();
+    const add = Number(inSharesAdd.value||0);
+    if(add<=0){ showToast("Enter share units","warn"); return; }
+    const mRef=ref(db, `members/${uid}`);
+    const snap=await get(mRef);
+    const cur = (snap.val()&&snap.val().shares) || 0;
+    await update(mRef, { shares: cur + add });
+    inSharesAdd.value="";
+    showToast("Shares updated");
+  });
+
+  btnDownloadPdf.addEventListener("click", async(e)=>{ e.preventDefault(); await downloadFullPdf(); });
+  btnDownloadCsv.addEventListener("click", async(e)=>{ e.preventDefault(); await downloadCsv(); });
+
+  /* ---------------- Load all ---------------- */
+  async function refreshAll(){
+    await get(ref(db, `members/${uid}`)); // triggers onValue anyway
+    await get(ref(db, `guarantors/${uid}`));
+    await get(ref(db, `loans/${uid}`));
+    renderChart();
+    showToast("Refreshed");
+  }
+
+  /* ---------------- Chart ---------------- */
+  async function renderChart(){
+    const mSnap=await get(ref(db, `members/${uid}`));
+    const member=mSnap.val()||{};
+    const loansSnap=await get(ref(db, `loans/${uid}`));
+    let totalLoans=0;
+    if(loansSnap.exists()){
+      Object.values(loansSnap.val()).forEach(l=> totalLoans += Number(l.amount||0));
+    }
+    const ctx=chartCanvas.getContext('2d');
+    if(chartInstance) chartInstance.destroy();
+    chartInstance=new Chart(ctx,{
+      type:'doughnut',
+      data:{ labels:['Savings','Total Loans'], datasets:[{ data:[Number(member.savings||0), totalLoans] }]},
+      options:{ plugins:{legend:{position:'bottom'}} }
     });
+  }
 
-    // Logout
-    document.getElementById("logoutBtn").addEventListener("click", () => {
-      auth.signOut().then(() => window.location.href = "index.html");
-    });
+  function statusToProgress(st){
+    return { Registered:25, Pending:25, RequestedVerification:40, Verified:70, Approved:100, Rejected:100 }[st||"Registered"]||0;
+  }
 
-    // Load Profile
-    function loadProfile(uid) {
-      db.collection("users").doc(uid).get().then(doc => {
-        if (doc.exists) {
-          let d = doc.data();
-          fullName.value = d.fullName || "";
-          idNumber.value = d.idNumber || "";
-          phone.value = d.phone || "";
-          address.value = d.address || "";
-          occupation.value = d.occupation || "";
-          guarantor.value = d.guarantor || "";
-          savingsTotal.innerText = d.savings || 0;
-          sharesTotal.innerText = d.shares || 0;
-        }
+  /* ---------------- Statements ---------------- */
+  async function downloadCsv(){
+    const m=(await get(ref(db, `members/${uid}`))).val()||{};
+    const loansSnap=await get(ref(db, `loans/${uid}`));
+    let csv=`Member,${m.name||''}\nEmail,${m.email||user.email||''}\nSavings,${m.savings||0}\nShares,${m.shares||0}\n\nLoan Title,Amount,Status,Date\n`;
+    if(loansSnap.exists()){
+      Object.values(loansSnap.val()).forEach(l=>{
+        csv+=`"${l.title||''}",${l.amount||0},"${l.status||''}","${l.date||''}"\n`;
       });
     }
+    const blob=new Blob([csv],{type:'text/csv'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=url; a.download=`statement_${(m.name||'member').replace(/\s+/g,'_')}.csv`; a.click();
+    URL.revokeObjectURL(url);
+  }
 
-    // Update Profile
-    profileForm.addEventListener("submit", e => {
-      e.preventDefault();
-      const user = auth.currentUser;
-      db.collection("users").doc(user.uid).set({
-        fullName: fullName.value,
-        idNumber: idNumber.value,
-        phone: phone.value,
-        address: address.value,
-        occupation: occupation.value,
-        guarantor: guarantor.value,
-        email: user.email
-      }, { merge: true }).then(() => {
-        profileSuccess.style.display = "block";
-        setTimeout(()=> profileSuccess.style.display = "none", 3000);
-      });
+  async function downloadFullPdf(){
+    const m=(await get(ref(db, `members/${uid}`))).val()||{};
+    const loansSnap=await get(ref(db, `loans/${uid}`));
+    const loans = loansSnap.exists()? Object.values(loansSnap.val()) : [];
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF();
+    pdf.setFontSize(16); pdf.text("VISIONARY YOUTH GROUP - Member Statement", 14, 18);
+    pdf.setFontSize(11);
+    pdf.text(`Name: ${m.name||''}`,14,28);
+    pdf.text(`Email: ${m.email||user.email||''}`,14,36);
+    pdf.text(`Phone: ${m.phone||''}`,14,44);
+    pdf.text(`Savings: ${fmtKES(m.savings||0)}`,14,52);
+    pdf.text(`Shares: ${m.shares||0}`,14,60);
+    pdf.setFontSize(13); pdf.text("Loans:",14,74);
+    let y=82; pdf.setFontSize(11);
+    loans.forEach(l=>{
+      pdf.text(`- ${l.title||'Loan'} | ${fmtKES(l.amount||0)} | ${l.status||''} | ${l.date||''}`,14,y);
+      y+=7; if(y>270){ pdf.addPage(); y=20; }
     });
+    pdf.save(`statement_${(m.name||'member').replace(/\s+/g,'_')}.pdf`);
+  }
 
-    // Loan Application
-    loanForm.addEventListener("submit", e => {
-      e.preventDefault();
-      const user = auth.currentUser;
-      db.collection("loans").add({
-        uid: user.uid,
-        amount: loanAmount.value,
-        period: loanPeriod.value,
-        reason: loanReason.value,
-        status: "Pending",
-        createdAt: new Date()
-      }).then(()=> loadLoans(user.uid));
-      loanAmount.value = loanPeriod.value = loanReason.value = "";
-    });
-
-    function loadLoans(uid) {
-      db.collection("loans").where("uid", "==", uid).get().then(snapshot => {
-        loanList.innerHTML = "";
-        snapshot.forEach(doc => {
-          let loan = doc.data();
-          loanList.innerHTML += `<li class="list-group-item">KES ${loan.amount} (${loan.period} months) - <b>${loan.status}</b></li>`;
-        });
-      });
-    }
-
-    // Admin Panel
-    function loadPendingLoans() {
-      db.collection("loans").where("status", "==", "Pending").get().then(snapshot => {
-        pendingLoans.innerHTML = "";
-        snapshot.forEach(doc => {
-          let loan = doc.data();
-          pendingLoans.innerHTML += `
-            <li class="list-group-item">
-              ${loan.amount} KES - ${loan.reason}
-              <button class="btn btn-sm btn-success ms-2" onclick="approveLoan('${doc.id}')">Approve</button>
-              <button class="btn btn-sm btn-danger ms-2" onclick="rejectLoan('${doc.id}')">Reject</button>
-            </li>`;
-        });
-      });
-    }
-    function approveLoan(id){ db.collection("loans").doc(id).update({status:"Approved"}).then(loadPendingLoans); }
-    function rejectLoan(id){ db.collection("loans").doc(id).update({status:"Rejected"}).then(loadPendingLoans); }
-
-    // Savings
-    addSavingsBtn.addEventListener("click", () => {
-      const user = auth.currentUser;
-      let amount = parseInt(prompt("Enter savings amount:"));
-      if (!isNaN(amount)) {
-        const userRef = db.collection("users").doc(user.uid);
-        userRef.get().then(doc => {
-          let current = doc.exists && doc.data().savings ? doc.data().savings : 0;
-          userRef.update({ savings: current + amount });
-          db.collection("savings").add({ uid: user.uid, amount, date: new Date() });
-          loadSavings(user.uid);
-        });
-      }
-    });
-
-    function loadSavings(uid) {
-      db.collection("savings").where("uid","==",uid).orderBy("date","desc").get().then(snapshot=>{
-        savingsHistory.innerHTML="";
-        let total=0;
-        snapshot.forEach(doc=>{
-          let s=doc.data();
-          savingsHistory.innerHTML+=`<li class="list-group-item">KES ${s.amount} on ${s.date.toDate().toLocaleDateString()}</li>`;
-          total+=s.amount;
-        });
-        savingsTotal.innerText=total;
-      });
-    }
-
-    // Shares
-    buySharesBtn.addEventListener("click", () => {
-      const user = auth.currentUser;
-      let shares = parseInt(prompt("Enter number of shares to buy:"));
-      if (!isNaN(shares)) {
-        const userRef = db.collection("users").doc(user.uid);
-        userRef.get().then(doc => {
-          let current = doc.exists && doc.data().shares ? doc.data().shares : 0;
-          userRef.update({ shares: current + shares });
-          db.collection("shares").add({ uid: user.uid, shares, date: new Date() });
-          loadShares(user.uid);
-        });
-      }
-    });
-
-    function loadShares(uid) {
-      db.collection("shares").where("uid","==",uid).orderBy("date","desc").get().then(snapshot=>{
-        sharesHistory.innerHTML="";
-        let total=0;
-        snapshot.forEach(doc=>{
-          let sh=doc.data();
-          sharesHistory.innerHTML+=`<li class="list-group-item">${sh.shares} shares on ${sh.date.toDate().toLocaleDateString()}</li>`;
-          total+=sh.shares;
-        });
-        sharesTotal.innerText=total;
-      });
-    }
-
-    // Statement PDF
-    downloadStatement.addEventListener("click", () => {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      doc.text("Member Account Statement", 20, 20);
-      doc.text("Name: " + fullName.value, 20, 30);
-      doc.text("Total Savings: " + savingsTotal.innerText + " KES", 20, 40);
-      doc.text("Total Shares: " + sharesTotal.innerText, 20, 50);
-      doc.save("statement.pdf");
-    });
-  </script>
+  function generateLoanPdf(l){
+    const { jsPDF } = window.jspdf;
+    const pdf=new jsPDF();
+    pdf.setFontSize(14); pdf.text("Loan Summary",14,18);
+    pdf.setFontSize(11);
+    pdf.text(`Title: ${l.title||''}`,14,30);
+    pdf.text(`Amount: ${fmtKES(l.amount||0)}`,14,38);
+    pdf.text(`Purpose: ${l.purpose||''}`,14,46);
+    pdf.text(`Months: ${l.months||'-'}`,14,54);
+    pdf.text(`Date: ${l.date||''}`,14,62);
+    pdf.text(`Status: ${l.status||''}`,14,70);
+    pdf.save(`loan_${(l.title||'loan').replace(/\s+/g,'_')}.pdf`);
+  }
+</script>
 </body>
 </html>
