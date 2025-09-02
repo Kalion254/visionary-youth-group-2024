@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Visionary Youth Dashboard</title>
+<title>Modern Visionary Youth Dashboard</title>
 
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
@@ -18,209 +18,169 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-body { font-family: Arial, sans-serif; margin:0; background: linear-gradient(to right, #2193b0, #6dd5ed); color: #333; }
-.header { background: #0d47a1; color: white; padding: 20px; text-align: center; position: relative; }
-.header button { position: absolute; right: 20px; top: 20px; background: #ff5252; border: none; color: white; padding: 10px 15px; border-radius: 6px; cursor: pointer; }
-.header button:hover { background: #ff1744; }
-.container { display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; }
-.card { flex: 1 1 350px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); }
-h3 { margin-top: 0; display:flex; align-items:center; }
-h3 i { margin-right: 10px; color: #1976d2; }
-input, select { width: 100%; padding: 10px; margin: 8px 0; border-radius: 6px; border: 1px solid #ccc; }
-button { padding: 10px 20px; margin-top: 10px; border-radius: 6px; border: none; background: #1976d2; color: white; cursor: pointer; }
-button:hover { background: #115293; }
-.progress-bar { height: 20px; background: #eee; border-radius: 10px; overflow: hidden; margin-top: 5px; }
-.progress { height: 100%; background: #1976d2; text-align: right; color: white; padding-right: 5px; border-radius: 10px; transition: width 0.5s; }
-canvas { max-width: 100%; margin-top: 10px; }
-.loanStep { display: none; }
+body{margin:0;font-family:'Segoe UI',sans-serif;background:#f5f7fa;color:#333;}
+.header{background:#1976d2;color:white;padding:20px;text-align:center;position:relative;box-shadow:0 5px 15px rgba(0,0,0,0.2);}
+.header button{position:absolute;right:20px;top:20px;background:#ff5252;border:none;color:white;padding:10px 15px;border-radius:6px;cursor:pointer;transition:0.3s;}
+.header button:hover{background:#ff1744;}
+.container{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;padding:20px;}
+.card{background:white;padding:20px;border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,0.1);transition:0.3s;}
+.card:hover{transform:translateY(-5px);box-shadow:0 12px 25px rgba(0,0,0,0.2);}
+h3{margin-top:0;display:flex;align-items:center;}
+h3 i{margin-right:10px;color:#1976d2;}
+input,select,button{width:100%;padding:10px;margin:8px 0;border-radius:6px;border:1px solid #ccc;}
+button{background:#1976d2;color:white;border:none;cursor:pointer;transition:0.3s;}
+button:hover{background:#115293;}
+.progress-bar{height:20px;background:#eee;border-radius:10px;overflow:hidden;margin-top:5px;}
+.progress{height:100%;background:#1976d2;text-align:right;color:white;padding-right:5px;border-radius:10px;transition:width 0.7s;}
+.loanStep{display:none;transition:opacity 0.5s ease-in-out;}
 </style>
 </head>
 <body>
 
 <div class="header">
-  <h1>Welcome, <span id="userName"></span></h1>
-  <p>Email: <span id="emailDisplay"></span></p>
-  <button onclick="logout()">Logout</button>
+<h1>Welcome, <span id="userName"></span></h1>
+<p>Email: <span id="emailDisplay"></span></p>
+<button onclick="logout()">Logout</button>
 </div>
 
 <div class="container">
-  <!-- Financial Cards -->
-  <div class="card"><i class="fa-solid fa-money-bill-wave"></i><h3>Weekly Savings</h3><p id="weeklySavings">0</p><div class="progress-bar"><div class="progress" id="weeklyProgress">0%</div></div></div>
-  <div class="card"><i class="fa-solid fa-calendar-days"></i><h3>Monthly Savings</h3><p id="monthlySavings">0</p><div class="progress-bar"><div class="progress" id="monthlyProgress">0%</div></div></div>
-  <div class="card"><i class="fa-solid fa-chart-simple"></i><h3>Shares</h3><p id="shares">0</p><div class="progress-bar"><div class="progress" id="sharesProgress">0%</div></div></div>
-  <div class="card"><i class="fa-solid fa-hand-holding-dollar"></i><h3>Loan</h3><p id="loan">0</p><div class="progress-bar"><div class="progress" id="loanProgress">0%</div></div></div>
-  <div class="card"><i class="fa-solid fa-circle-exclamation"></i><h3>Unpaid Balances</h3><p id="unpaidBalances">0</p></div>
-  <div class="card"><i class="fa-solid fa-gem"></i><h3>Dividends</h3><p id="dividends">0</p></div>
 
-  <!-- Profile Update -->
-  <div class="card">
-    <h3><i class="fa-solid fa-user"></i> Profile Update</h3>
-    <form id="profileForm" onsubmit="event.preventDefault(); updateProfile();">
-      <label>Name</label><input id="profileName" required>
-      <label>ID</label><input id="profileID" required>
-      <label>Email</label><input type="email" id="profileEmail" required>
-      <label>Phone Number</label><input id="profilePhone" required>
-      <label>Origin</label><input id="profileOrigin" required>
-      <label>Member Number</label><input id="profileMember" required>
-      <label>Passport Upload</label><input type="file" id="passport" accept="image/*" required>
-      <button type="submit">Update Profile</button>
-    </form>
-  </div>
+<!-- Financial Cards -->
+<div class="card"><i class="fa-solid fa-money-bill-wave"></i><h3>Weekly Savings</h3><p id="weeklySavings">0</p><div class="progress-bar"><div class="progress" id="weeklyProgress">0%</div></div></div>
+<div class="card"><i class="fa-solid fa-calendar-days"></i><h3>Monthly Savings</h3><p id="monthlySavings">0</p><div class="progress-bar"><div class="progress" id="monthlyProgress">0%</div></div></div>
+<div class="card"><i class="fa-solid fa-chart-simple"></i><h3>Shares</h3><p id="shares">0</p><div class="progress-bar"><div class="progress" id="sharesProgress">0%</div></div></div>
+<div class="card"><i class="fa-solid fa-hand-holding-dollar"></i><h3>Loan</h3><p id="loan">0</p><div class="progress-bar"><div class="progress" id="loanProgress">0%</div></div></div>
+<div class="card"><i class="fa-solid fa-circle-exclamation"></i><h3>Unpaid Balances</h3><p id="unpaidBalances">0</p></div>
+<div class="card"><i class="fa-solid fa-gem"></i><h3>Dividends</h3><p id="dividends">0</p></div>
 
-  <!-- Loan Application Multi-Step -->
-  <div class="card">
-    <h3><i class="fa-solid fa-hand-holding-dollar"></i> Loan Application</h3>
-    <div id="loanProgressBar" style="height:10px;background:#eee;border-radius:5px;margin-bottom:10px;">
-      <div id="loanProgressFill" style="height:100%;width:0%;background:#1976d2;border-radius:5px;transition:width 0.5s;"></div>
-    </div>
-    <form id="loanMultiForm">
-      <!-- Step 1: Personal -->
-      <div class="loanStep" style="display:block;">
-        <label>Name</label><input id="loanName" required>
-        <label>ID</label><input id="loanID" required>
-        <label>Email</label><input type="email" id="loanEmail" required>
-        <label>Phone</label><input id="loanPhone" required>
-        <label>Origin</label><input id="loanOrigin" required>
-        <button type="button" onclick="nextStep(1)">Next <i class='fa-solid fa-arrow-right'></i></button>
-      </div>
-      <!-- Step 2: Loan Details -->
-      <div class="loanStep">
-        <label>Amount</label><input type="number" id="loanAmount" required>
-        <label>Category</label>
-        <select id="loanCategory" required>
-          <option value="">Select</option>
-          <option value="Business">Business</option>
-          <option value="Education">Education</option>
-          <option value="Emergency">Emergency</option>
-        </select>
-        <label>Purpose</label><input id="loanPurpose" required>
-        <label>Duration (Months)</label><input type="number" id="loanDuration" required>
-        <button type="button" onclick="prevStep(2)"><i class='fa-solid fa-arrow-left'></i> Back</button>
-        <button type="button" onclick="nextStep(2)">Next <i class='fa-solid fa-arrow-right'></i></button>
-      </div>
-      <!-- Step 3: Guarantor -->
-      <div class="loanStep">
-        <label>Guarantor Name</label><input id="guarantorName" required>
-        <label>Guarantor ID</label><input id="guarantorID" required>
-        <label>Guarantor Phone</label><input id="guarantorPhone" required>
-        <label>Guarantor Email</label><input type="email" id="guarantorEmail" required>
-        <button type="button" onclick="prevStep(3)"><i class='fa-solid fa-arrow-left'></i> Back</button>
-        <button type="button" onclick="nextStep(3)">Next <i class='fa-solid fa-arrow-right'></i></button>
-      </div>
-      <!-- Step 4: Repayment -->
-      <div class="loanStep">
-        <label>Repayment Plan</label>
-        <select id="repaymentPlan" required>
-          <option value="">Select</option>
-          <option value="Weekly">Weekly</option>
-          <option value="Monthly">Monthly</option>
-        </select>
-        <label>Installment Amount</label><input type="number" id="installmentAmount" required>
-        <label>Due Date</label><input type="date" id="dueDate" required>
-        <button type="button" onclick="prevStep(4)"><i class='fa-solid fa-arrow-left'></i> Back</button>
-        <button type="button" onclick="submitLoanApplication()">Submit <i class='fa-solid fa-paper-plane'></i></button>
-      </div>
-    </form>
-  </div>
+<!-- Profile Update -->
+<div class="card">
+<h3><i class="fa-solid fa-user"></i> Profile Update</h3>
+<form id="profileForm" onsubmit="event.preventDefault(); updateProfile();">
+<label>Name</label><input id="profileName" required>
+<label>ID</label><input id="profileID" required>
+<label>Email</label><input type="email" id="profileEmail" required>
+<label>Phone Number</label><input id="profilePhone" required>
+<label>Origin</label><input id="profileOrigin" required>
+<label>Member Number</label><input id="profileMember" required>
+<label>Passport Upload</label><input type="file" id="passport" accept="image/*" required>
+<button type="submit" id="profileUpdateBtn">Update Profile</button>
+</form>
+</div>
 
-  <!-- Download CSV -->
-  <div class="card">
-    <h3><i class="fa-solid fa-file-csv"></i> Account Statement</h3>
-    <button onclick="downloadStatement()">Download CSV</button>
-  </div>
+<!-- Loan Application -->
+<div class="card">
+<h3><i class="fa-solid fa-hand-holding-dollar"></i> Loan Application</h3>
+<div id="loanProgressBar" style="height:10px;background:#eee;border-radius:5px;margin-bottom:10px;">
+<div id="loanProgressFill" style="height:100%;width:0%;background:#1976d2;border-radius:5px;transition:width 0.5s;"></div>
+</div>
+<form id="loanMultiForm">
+<div class="loanStep" style="display:block;">
+<label>Name</label><input id="loanName" required>
+<label>ID</label><input id="loanID" required>
+<label>Email</label><input type="email" id="loanEmail" required>
+<label>Phone</label><input id="loanPhone" required>
+<label>Origin</label><input id="loanOrigin" required>
+<button type="button" onclick="nextStep(1)">Next <i class='fa-solid fa-arrow-right'></i></button>
+</div>
+<div class="loanStep">
+<label>Amount</label><input type="number" id="loanAmount" required>
+<label>Category</label>
+<select id="loanCategory" required>
+<option value="">Select</option>
+<option value="Business">Business</option>
+<option value="Education">Education</option>
+<option value="Emergency">Emergency</option>
+</select>
+<label>Purpose</label><input id="loanPurpose" required>
+<label>Duration (Months)</label><input type="number" id="loanDuration" required>
+<button type="button" onclick="prevStep(2)"><i class='fa-solid fa-arrow-left'></i> Back</button>
+<button type="button" onclick="nextStep(2)">Next <i class='fa-solid fa-arrow-right'></i></button>
+</div>
+<div class="loanStep">
+<label>Guarantor Name</label><input id="guarantorName" required>
+<label>Guarantor ID</label><input id="guarantorID" required>
+<label>Guarantor Phone</label><input id="guarantorPhone" required>
+<label>Guarantor Email</label><input type="email" id="guarantorEmail" required>
+<button type="button" onclick="prevStep(3)"><i class='fa-solid fa-arrow-left'></i> Back</button>
+<button type="button" onclick="nextStep(3)">Next <i class='fa-solid fa-arrow-right'></i></button>
+</div>
+<div class="loanStep">
+<label>Repayment Plan</label>
+<select id="repaymentPlan" required>
+<option value="">Select</option>
+<option value="Weekly">Weekly</option>
+<option value="Monthly">Monthly</option>
+</select>
+<label>Installment Amount</label><input type="number" id="installmentAmount" required>
+<label>Due Date</label><input type="date" id="dueDate" required>
+<button type="button" onclick="prevStep(4)"><i class='fa-solid fa-arrow-left'></i> Back</button>
+<button type="button" onclick="submitLoanApplication()">Submit <i class='fa-solid fa-paper-plane'></i></button>
+</div>
+</form>
+<button id="downloadLoanBtn" style="display:none;">Download Your Application</button>
+</div>
 
+<!-- Account Statement -->
+<div class="card">
+<h3><i class="fa-solid fa-file-csv"></i> Account Statement</h3>
+<button onclick="downloadStatement()">Download CSV</button>
 </div>
 
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
-  authDomain: "visionary-youth-grou-2024.firebaseapp.com",
-  databaseURL: "https://visionary-youth-grou-2024-default-rtdb.firebaseio.com/",
-  projectId: "visionary-youth-grou-2024",
-  storageBucket: "visionary-youth-grou-2024.firebasestorage.app",
-  messagingSenderId: "372978592717",
-  appId: "1:372978592717:web:624596619d41aab84f3284",
-  measurementId: "G-FEHC1GM3B7"
-};
-
+// Firebase config
+const firebaseConfig = {apiKey:"AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",authDomain:"visionary-youth-grou-2024.firebaseapp.com",databaseURL:"https://visionary-youth-grou-2024-default-rtdb.firebaseio.com/",projectId:"visionary-youth-grou-2024",storageBucket:"visionary-youth-grou-2024.firebasestorage.app",messagingSenderId:"372978592717",appId:"1:372978592717:web:624596619d41aab84f3284",measurementId:"G-FEHC1GM3B7"};
 firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.database();
-const storage = firebase.storage();
-let currentUserUid;
-let currentStep = 1;
+const auth=firebase.auth(), db=firebase.database(), storage=firebase.storage();
+let currentUserUid, currentStep=1, inactivityTimer;
+
+// Auto logout after inactivity
+function resetInactivityTimer(){ clearTimeout(inactivityTimer); inactivityTimer=setTimeout(()=>{alert("Logged out due to inactivity."); logout();},3*60*1000);}
+document.onmousemove=resetInactivityTimer; document.onkeypress=resetInactivityTimer;
 
 // Login check
-auth.onAuthStateChanged(user=>{
-  if(user){ currentUserUid=user.uid; loadProfile(); loadFinancials(); } 
-  else{ alert("Login first!"); window.location.href="index.html"; }
-});
+auth.onAuthStateChanged(user=>{if(user){currentUserUid=user.uid;loadProfile();loadFinancials();}else{window.location.href="index.html";}});
 
 // Logout
-function logout(){ auth.signOut().then(()=> window.location.href="index.html"); }
+function logout(){auth.signOut().then(()=>window.location.href="index.html");}
 
-// Profile update
+// Profile update - one-time
 async function updateProfile(){
-  const name=document.getElementById("profileName").value.trim();
-  const id=document.getElementById("profileID").value.trim();
-  const email=document.getElementById("profileEmail").value.trim();
-  const phone=document.getElementById("profilePhone").value.trim();
-  const origin=document.getElementById("profileOrigin").value.trim();
-  const member=document.getElementById("profileMember").value.trim();
-  const passportFile=document.getElementById("passport").files[0];
-  if(!name||!id||!email||!phone||!origin||!member||!passportFile) return alert("All fields including passport required!");
-  const ref=storage.ref(`passports/${currentUserUid}_${passportFile.name}`);
-  await ref.put(passportFile);
-  const url=await ref.getDownloadURL();
-  db.ref(`users/${currentUserUid}/profile`).set({name,id,email,phone,origin,member_number:member,passport:url});
-  alert("Profile updated successfully!");
+const name=document.getElementById("profileName").value.trim(),id=document.getElementById("profileID").value.trim(),email=document.getElementById("profileEmail").value.trim(),phone=document.getElementById("profilePhone").value.trim(),origin=document.getElementById("profileOrigin").value.trim(),member=document.getElementById("profileMember").value.trim(),passportFile=document.getElementById("passport").files[0];
+if(!name||!id||!email||!phone||!origin||!member||!passportFile)return alert("All fields including passport required!");
+const ref=storage.ref(`passports/${currentUserUid}_${passportFile.name}`);await ref.put(passportFile);const url=await ref.getDownloadURL();
+db.ref(`users/${currentUserUid}/profile`).set({name,id,email,phone,origin,member_number:member,passport:url}).then(()=>{
+alert("Profile updated successfully!");document.getElementById("profileUpdateBtn").disabled=true;});
 }
 
-// Financials load
-function loadFinancials(){
-  db.ref(`users/${currentUserUid}/financials`).on('value',snap=>{
-    const d=snap.val()||{};
-    document.getElementById("weeklySavings").innerText=d.weekly_savings||0;
-    document.getElementById("monthlySavings").innerText=d.monthly_savings||0;
-    document.getElementById("shares").innerText=d.shares||0;
-    document.getElementById("loan").innerText=d.loan||0;
-    document.getElementById("unpaidBalances").innerText=d.unpaid_balances||0;
-    document.getElementById("dividends").innerText=d.dividends||0;
-    document.getElementById("weeklyProgress").style.width=Math.min((d.weekly_savings||0)/10000*100,100)+'%';
-    document.getElementById("monthlyProgress").style.width=Math.min((d.monthly_savings||0)/50000*100,100)+'%';
-    document.getElementById("sharesProgress").style.width=Math.min((d.shares||0)/5000*100,100)+'%';
-    document.getElementById("loanProgress").style.width=Math.min((d.loan||0)/20000*100,100)+'%';
-  });
-}
+// Financials
+function loadFinancials(){db.ref(`users/${currentUserUid}/financials`).on('value',snap=>{const d=snap.val()||{};document.getElementById("userName").innerText=(d.name||"");document.getElementById("emailDisplay").innerText=(d.email||"");document.getElementById("weeklySavings").innerText=d.weekly_savings||0;document.getElementById("monthlySavings").innerText=d.monthly_savings||0;document.getElementById("shares").innerText=d.shares||0;document.getElementById("loan").innerText=d.loan||0;document.getElementById("unpaidBalances").innerText=d.unpaid_balances||0;document.getElementById("dividends").innerText=d.dividends||0;document.getElementById("weeklyProgress").style.width=Math.min((d.weekly_savings||0)/10000*100,100)+'%';document.getElementById("monthlyProgress").style.width=Math.min((d.monthly_savings||0)/50000*100,100)+'%';document.getElementById("sharesProgress").style.width=Math.min((d.shares||0)/5000*100,100)+'%';document.getElementById("loanProgress").style.width=Math.min((d.loan||0)/20000*100,100)+'%';});}
 
-// Loan application steps
-function updateLoanProgress(){ document.getElementById('loanProgressFill').style.width=((currentStep-1)/3*100)+'%'; }
-function nextStep(step){ const divs=document.querySelectorAll('.loanStep'); for(let inp of divs[step-1].querySelectorAll('input,select')) if(!inp.value) return alert("All fields required!"); divs[step-1].style.display='none'; divs[step].style.display='block'; currentStep++; updateLoanProgress();}
-function prevStep(step){ const divs=document.querySelectorAll('.loanStep'); divs[step-1].style.display='block'; divs[step].style.display='none'; currentStep--; updateLoanProgress(); }
+// Loan Application Steps & Submission
+function updateLoanProgress(){document.getElementById('loanProgressFill').style.width=((currentStep-1)/3*100)+'%';}
+function nextStep(step){const divs=document.querySelectorAll('.loanStep');for(let inp of divs[step-1].querySelectorAll('input,select'))if(!inp.value)return alert("All fields required!");divs[step-1].style.display='none';divs[step].style.display='block';currentStep++;updateLoanProgress();}
+function prevStep(step){const divs=document.querySelectorAll('.loanStep');divs[step-1].style.display='block';divs[step].style.display='none';currentStep--;updateLoanProgress();}
 function submitLoanApplication(){
-  const loanData={
-    personal:{name:document.getElementById("loanName").value,id:document.getElementById("loanID").value,email:document.getElementById("loanEmail").value,phone:document.getElementById("loanPhone").value,origin:document.getElementById("loanOrigin").value},
-    loanDetails:{amount:parseFloat(document.getElementById("loanAmount").value),category:document.getElementById("loanCategory").value,purpose:document.getElementById("loanPurpose").value,duration:parseInt(document.getElementById("loanDuration").value)},
-    guarantor:{name:document.getElementById("guarantorName").value,id:document.getElementById("guarantorID").value,phone:document.getElementById("guarantorPhone").value,email:document.getElementById("guarantorEmail").value},
-    repayment:{plan:document.getElementById("repaymentPlan").value,installmentAmount:parseFloat(document.getElementById("installmentAmount").value),dueDate:document.getElementById("dueDate").value},
-    status:"Pending",timestamp:Date.now()
-  };
-  db.ref(`users/${currentUserUid}/loan_applications`).push(loanData);
-  alert("Loan application submitted successfully!");
-  document.getElementById("loanMultiForm").reset();
-  document.querySelectorAll('.loanStep').forEach((d,i)=>i===0?d.style.display='block':d.style.display='none');
-  currentStep=1; updateLoanProgress();
+const loanData={personal:{name:document.getElementById("loanName").value,id:document.getElementById("loanID").value,email:document.getElementById("loanEmail").value,phone:document.getElementById("loanPhone").value,origin:document.getElementById("loanOrigin").value},loanDetails:{amount:parseFloat(document.getElementById("loanAmount").value),category:document.getElementById("loanCategory").value,purpose:document.getElementById("loanPurpose").value,duration:parseInt(document.getElementById("loanDuration").value)},guarantor:{name:document.getElementById("guarantorName").value,id:document.getElementById("guarantorID").value,phone:document.getElementById("guarantorPhone").value,email:document.getElementById("guarantorEmail").value},repayment:{plan:document.getElementById("repaymentPlan").value,installmentAmount:parseFloat(document.getElementById("installmentAmount").value),dueDate:document.getElementById("dueDate").value},status:"Applied",timestamp:Date.now()};
+
+db.ref(`users/${currentUserUid}/loan_applications`).push(loanData).then(ref=>{
+alert("Loan application submitted successfully!");document.getElementById("loanMultiForm").reset();document.querySelectorAll('.loanStep').forEach((d,i)=>i===0?d.style.display='block':d.style.display='none');currentStep=1;updateLoanProgress();
+document.getElementById("downloadLoanBtn").style.display="block";
+document.getElementById("downloadLoanBtn").onclick=()=>downloadLoanApplication(ref.key);
+});
 }
 
-// Download CSV
-function downloadStatement(){
-  db.ref(`users/${currentUserUid}/financials`).once('value').then(snap=>{
-    const d=snap.val()||{};
-    const csv=`Type,Amount\nWeekly Savings,${d.weekly_savings||0}\nMonthly Savings,${d.monthly_savings||0}\nShares,${d.shares||0}\nLoan,${d.loan||0}\nUnpaid Balances,${d.unpaid_balances||0}\nDividends,${d.dividends||0}`;
-    const blob=new Blob([csv],{type:'text/csv'});
-    const link=document.createElement('a'); link.href=URL.createObjectURL(blob); link.download='account_statement.csv'; link.click();
-  });
+// Download Loan Application
+function downloadLoanApplication(loanKey){
+db.ref(`users/${currentUserUid}/loan_applications/${loanKey}`).once('value').then(snap=>{
+const d=snap.val();let csv="Section,Field,Value\n";for(let section in d){for(let key in d[section]){csv+=`${section},${key},${d[section][key]}\n`;}}
+const blob=new Blob([csv],{type:'text/csv'});const link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download='loan_application.csv';link.click();
+});
 }
+
+// Download Statement
+function downloadStatement(){db.ref(`users/${currentUserUid}/financials`).once('value').then(snap=>{const d=snap.val()||{};const csv=`Type,Amount\nWeekly Savings,${d.weekly_savings||0}\nMonthly Savings,${d.monthly_savings||0}\nShares,${d.shares||0}\nLoan,${d.loan||0}\nUnpaid Balances,${d.unpaid_balances||0}\nDividends,${d.dividends||0}`;const blob=new Blob([csv],{type:'text/csv'});const link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download='account_statement.csv';link.click();});}
+
 </script>
 </body>
 </html>
