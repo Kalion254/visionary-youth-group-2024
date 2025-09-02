@@ -3,15 +3,64 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Member Dashboard</title>
+<title>Visionary Youth Dashboard</title>
 
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+
+<!-- Icons -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+<style>
+  body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    background: linear-gradient(to right, #2193b0, #6dd5ed);
+    color: #333;
+  }
+  .header {
+    background: #0d47a1;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+  }
+  .header button {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    background: #ff5252;
+    border: none;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .header button:hover { background: #ff1744; }
+  .container { display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; }
+  .card {
+    flex: 1 1 300px;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    position: relative;
+  }
+  .card i { font-size: 30px; color: #1976d2; margin-right: 10px; }
+  h3 { margin-top: 0; }
+  input, select { width: 100%; padding: 10px; margin: 8px 0; border-radius: 6px; border: 1px solid #ccc; }
+  button { padding: 10px 20px; margin-top: 10px; border-radius: 6px; border: none; background: #1976d2; color: white; cursor: pointer; }
+  button:hover { background: #115293; }
+  .progress-bar { height: 20px; background: #eee; border-radius: 10px; overflow: hidden; margin-top: 5px; }
+  .progress { height: 100%; background: #1976d2; text-align: right; color: white; padding-right: 5px; border-radius: 10px; }
+  label { font-weight: bold; }
+</style>
 
 <script>
-  // Firebase Config
+  // Firebase config
   const firebaseConfig = {
     apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
     authDomain: "visionary-youth-grou-2024.firebaseapp.com",
@@ -23,136 +72,124 @@
     measurementId: "G-FEHC1GM3B7"
   };
 
-  // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
   const db = firebase.database();
+  const storage = firebase.storage();
 
   let currentUserUid;
 
-  // Check login state
+  // Check login
   auth.onAuthStateChanged(user => {
-    if (user) {
+    if(user) {
       currentUserUid = user.uid;
-      loadUserData(user.uid);
+      loadProfile();
+      loadFinancials();
     } else {
       alert("Please login first!");
       window.location.href = "index.html";
     }
   });
 
-  // Load user data
-  function loadUserData(uid) {
-    const userRef = db.ref(`users/${uid}`);
-    userRef.on('value', snapshot => {
-      const data = snapshot.val();
-      if (data) {
-        document.getElementById("userName").innerText = data.name;
-        document.getElementById("emailDisplay").innerText = data.email;
-        document.getElementById("weeklySavings").innerText = data.financials.weekly_savings;
-        document.getElementById("monthlySavings").innerText = data.financials.monthly_savings;
-        document.getElementById("shares").innerText = data.financials.shares;
-        document.getElementById("loan").innerText = data.financials.loan;
+  // Logout
+  function logout() {
+    auth.signOut().then(()=> window.location.href="index.html");
+  }
 
-        // Populate profile form
-        document.getElementById("profileName").value = data.name;
-        document.getElementById("profileEmail").value = data.email;
+  // Load Profile
+  function loadProfile() {
+    const profileRef = db.ref(`users/${currentUserUid}/profile`);
+    profileRef.on('value', snapshot=>{
+      const data = snapshot.val();
+      if(data){
+        document.getElementById("profileName").value = data.name || "";
+        document.getElementById("profileID").value = data.id || "";
+        document.getElementById("profileEmail").value = data.email || "";
+        document.getElementById("profilePhone").value = data.phone || "";
+        document.getElementById("profileOrigin").value = data.origin || "";
+        document.getElementById("profileMember").value = data.member_number || "";
       }
     });
   }
 
-  // Logout
-  function logout() {
-    auth.signOut().then(() => {
-      alert("Logged out successfully!");
-      window.location.href = "index.html";
-    });
-  }
+  // Update Profile
+  async function updateProfile() {
+    const name = document.getElementById("profileName").value.trim();
+    const id = document.getElementById("profileID").value.trim();
+    const email = document.getElementById("profileEmail").value.trim();
+    const phone = document.getElementById("profilePhone").value.trim();
+    const origin = document.getElementById("profileOrigin").value.trim();
+    const member = document.getElementById("profileMember").value.trim();
+    const passportFile = document.getElementById("passport").files[0];
 
-  // Update profile
-  function updateProfile() {
-    const name = document.getElementById("profileName").value;
-    const email = document.getElementById("profileEmail").value;
-    db.ref(`users/${currentUserUid}/name`).set(name);
-    db.ref(`users/${currentUserUid}/email`).set(email);
+    if(!name || !id || !email || !phone || !origin || !member || !passportFile){
+      return alert("All fields including passport are required!");
+    }
+
+    // Upload passport
+    const storageRef = storage.ref(`passports/${currentUserUid}_${passportFile.name}`);
+    await storageRef.put(passportFile);
+    const passportURL = await storageRef.getDownloadURL();
+
+    // Save to RTDB
+    db.ref(`users/${currentUserUid}/profile`).set({
+      name,id,email,phone,origin,member_number: member,passport: passportURL
+    });
+
     alert("Profile updated successfully!");
-    loadUserData(currentUserUid);
   }
 
-  // Apply loan
-  function applyLoan() {
-    const amount = prompt("Enter loan amount:");
-    if (!amount || isNaN(amount)) return alert("Invalid amount");
-    db.ref(`users/${currentUserUid}/loan_applications`).push({
-      amount: parseFloat(amount),
-      status: "Pending",
-      timestamp: Date.now()
-    });
-    alert("Loan application submitted!");
-  }
-
-  // Download account statement
-  function downloadStatement() {
-    db.ref(`users/${currentUserUid}/financials`).once('value').then(snapshot => {
+  // Load Financials
+  function loadFinancials(){
+    const finRef = db.ref(`users/${currentUserUid}/financials`);
+    finRef.on('value', snapshot=>{
       const data = snapshot.val();
-      const csv = `Type,Amount\nWeekly Savings,${data.weekly_savings}\nMonthly Savings,${data.monthly_savings}\nShares,${data.shares}\nLoan,${data.loan}`;
-      const blob = new Blob([csv], {type: 'text/csv'});
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = 'account_statement.csv';
-      link.click();
+      if(data){
+        document.getElementById("weeklySavings").innerText = data.weekly_savings;
+        document.getElementById("monthlySavings").innerText = data.monthly_savings;
+        document.getElementById("shares").innerText = data.shares;
+        document.getElementById("loan").innerText = data.loan;
+
+        // Update progress bars
+        document.getElementById("weeklyProgress").style.width = Math.min(data.weekly_savings/10000*100,100)+"%";
+        document.getElementById("monthlyProgress").style.width = Math.min(data.monthly_savings/50000*100,100)+"%";
+        document.getElementById("sharesProgress").style.width = Math.min(data.shares/5000*100,100)+"%";
+        document.getElementById("loanProgress").style.width = Math.min(data.loan/20000*100,100)+"%";
+      }
     });
   }
+
+  // Loan Application
+  function applyLoan() {
+    const name = document.getElementById("loanName").value.trim();
+    const amount = document.getElementById("loanAmount").value.trim();
+    const category = document.getElementById("loanCategory").value;
+    const guarantor = document.getElementById("loanGuarantor").value.trim();
+    const phone = document.getElementById("loanPhone").value.trim();
+
+    if(!name || !amount || !category || !guarantor || !phone) return alert("All loan fields required!");
+
+    db.ref(`users/${currentUserUid}/loan_applications`).push({
+      name, amount: parseFloat(amount), category, guarantor, phone, status: "Pending", timestamp: Date.now()
+    });
+
+    alert("Loan application submitted!");
+    document.getElementById("loanForm").reset();
+  }
+
 </script>
 
-<style>
-  body { font-family: Arial; background: #f0f4f8; margin: 0; }
-  .header { background: #1976d2; color: white; padding: 20px; text-align: center; }
-  .container { display: flex; flex-wrap: wrap; margin: 20px; gap: 20px; }
-  .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); flex: 1 1 250px; }
-  h2, h3 { margin: 0 0 10px 0; }
-  button { padding: 10px 20px; border: none; border-radius: 6px; background: #1976d2; color: white; cursor: pointer; margin-top: 10px; }
-  button:hover { background: #115293; }
-  input { width: 100%; padding: 8px; margin: 5px 0; border-radius: 6px; border: 1px solid #ccc; }
-</style>
 </head>
 <body>
 
 <div class="header">
-  <h1>Welcome, <span id="userName">User</span></h1>
-  <p>Email: <span id="emailDisplay">email@example.com</span></p>
+  <h1>Welcome, <span id="userName"></span></h1>
+  <p>Email: <span id="emailDisplay"></span></p>
   <button onclick="logout()">Logout</button>
 </div>
 
 <div class="container">
+  <!-- Financial Cards -->
   <div class="card">
-    <h3>Weekly Savings</h3>
-    <p id="weeklySavings">0</p>
-  </div>
-  <div class="card">
-    <h3>Monthly Savings</h3>
-    <p id="monthlySavings">0</p>
-  </div>
-  <div class="card">
-    <h3>Shares</h3>
-    <p id="shares">0</p>
-  </div>
-  <div class="card">
-    <h3>Loan</h3>
-    <p id="loan">0</p>
-    <button onclick="applyLoan()">Apply Loan</button>
-  </div>
-  <div class="card">
-    <h3>Profile Update</h3>
-    <input type="text" id="profileName" placeholder="Full Name">
-    <input type="email" id="profileEmail" placeholder="Email">
-    <button onclick="updateProfile()">Update Profile</button>
-  </div>
-  <div class="card">
-    <h3>Account Statement</h3>
-    <button onclick="downloadStatement()">Download CSV</button>
-  </div>
-</div>
-
-</body>
-</html>
+    <i class="fa-solid fa-money-bill-wave"></i>
+    <h3>Weekly Sav
