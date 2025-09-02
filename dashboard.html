@@ -320,7 +320,7 @@ container.appendChild(div);
 });
 }
 
-// Download account statement
+// Account statement
 document.getElementById("downloadStatementBtn").addEventListener("click",()=>{
 db.ref(`users/${currentUserUid}/financials`).once('value').then(snap=>{
 const d=snap.val()||{};
