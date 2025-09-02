@@ -32,7 +32,8 @@ nav button.active{background:#0d47a1;color:white;box-shadow:0 4px 10px rgba(0,0,
 button{cursor:pointer;padding:10px 12px;border-radius:6px;border:none;background:#1e3c72;color:white;font-weight:bold;transition:0.3s;box-shadow:0 2px 5px rgba(0,0,0,0.2);}
 button:hover{background:#0d47a1;}
 form input,form select{width:100%;padding:10px;margin:8px 0;border-radius:8px;border:1px solid #ccc;font-size:15px;}
-#loanTimeline div{padding:10px;margin-bottom:8px;border-left:4px solid #1e3c72;}
+#loanTimeline div{padding:10px;margin-bottom:8px;border-left:4px solid #1e3c72;transition:all 0.4s ease;}
+#loanProgressFill{height:15px;background:#42a5f5;width:0%;border-radius:8px;margin-bottom:15px;}
 </style>
 </head>
 <body>
@@ -103,11 +104,25 @@ form input,form select{width:100%;padding:10px;margin:8px 0;border-radius:8px;bo
 </form>
 </div>
 
-<!-- Loan Application -->
+<!-- Loan Application Multi-Step -->
 <div id="loan" class="section">
 <h2>Loan Application</h2>
-<form id="loanForm">
+<div class="progress-bar">
+<div id="loanProgressFill"></div>
+</div>
+
+<div class="loanStep">
+<h3>Personal Details</h3>
 <label>Name</label><input id="loanName" required>
+<label>ID</label><input id="loanID" required>
+<label>Email</label><input type="email" id="loanEmail" required>
+<label>Phone</label><input id="loanPhone" required>
+<label>Origin</label><input id="loanOrigin" required>
+<button type="button" class="nextBtn">Next</button>
+</div>
+
+<div class="loanStep" style="display:none">
+<h3>Loan Details</h3>
 <label>Amount</label><input id="loanAmount" required>
 <label>Category</label>
 <select id="loanCategory" required>
@@ -116,11 +131,32 @@ form input,form select{width:100%;padding:10px;margin:8px 0;border-radius:8px;bo
 <option>Education</option>
 <option>Emergency</option>
 </select>
-<label>Guarantor</label><input id="loanGuarantor" required>
-<label>Phone</label><input id="loanPhone" required>
-<button type="submit">Apply</button>
-</form>
-<button id="downloadLoanBtn" style="display:none;">Download Loan CSV</button>
+<label>Purpose</label><input id="loanPurpose" required>
+<label>Duration (months)</label><input type="number" id="loanDuration" required>
+<button type="button" class="prevBtn">Previous</button>
+<button type="button" class="nextBtn">Next</button>
+</div>
+
+<div class="loanStep" style="display:none">
+<h3>Guarantor Details</h3>
+<label>Name</label><input id="guarantorName" required>
+<label>ID</label><input id="guarantorID" required>
+<label>Email</label><input type="email" id="guarantorEmail" required>
+<label>Phone</label><input id="guarantorPhone" required>
+<button type="button" class="prevBtn">Previous</button>
+<button type="button" class="nextBtn">Next</button>
+</div>
+
+<div class="loanStep" style="display:none">
+<h3>Repayment Plan</h3>
+<label>Plan</label><input id="repaymentPlan" required>
+<label>Installment Amount</label><input id="installmentAmount" required>
+<label>Due Date</label><input type="date" id="dueDate" required>
+<button type="button" class="prevBtn">Previous</button>
+<button type="button" id="submitLoanBtn">Submit Application</button>
+</div>
+
+<button id="downloadLoanBtn" style="display:none;margin-top:10px;">Download Loan CSV</button>
 </div>
 
 <!-- Loan Progress -->
@@ -154,6 +190,8 @@ const auth=firebase.auth();
 const db=firebase.database();
 const storage=firebase.storage();
 let currentUserUid;
+let currentStep=0;
+const steps=document.querySelectorAll(".loanStep");
 
 // Tabs
 document.querySelectorAll(".tab-btn").forEach(btn=>{
@@ -170,8 +208,7 @@ document.getElementById("logoutBtn").addEventListener("click",()=>auth.signOut()
 
 // Auth check
 auth.onAuthStateChanged(user=>{
-if(user){
-currentUserUid=user.uid;
+if(user){currentUserUid=user.uid;
 document.getElementById("emailDisplay").textContent=user.email;
 loadFinancials();
 loadLoanProgress();
@@ -214,19 +251,40 @@ document.getElementById("loanProgress").style.width=((data.loan||0)/10000*100)+"
 });
 }
 
-// Loan Application
-document.getElementById("loanForm").addEventListener("submit",async e=>{
-e.preventDefault();
+// Loan multi-step navigation
+document.querySelectorAll(".nextBtn").forEach((btn,i)=>btn.addEventListener("click",()=>{
+steps[i].style.display="none";
+steps[i+1].style.display="block";
+currentStep=i+1;
+document.getElementById("loanProgressFill").style.width=((currentStep+1)/steps.length*100)+"%";
+}));
+document.querySelectorAll(".prevBtn").forEach((btn,i)=>btn.addEventListener("click",()=>{
+steps[i+1].style.display="none";
+steps[i].style.display="block";
+currentStep=i;
+document.getElementById("loanProgressFill").style.width=((currentStep+1)/steps.length*100)+"%";
+}));
+
+// Submit loan
+document.getElementById("submitLoanBtn").addEventListener("click",async ()=>{
+try{
 const loanData={
-personal:{name:document.getElementById("loanName").value},
-loanDetails:{amount:document.getElementById("loanAmount").value,category:document.getElementById("loanCategory").value},
-guarantor:{name:document.getElementById("loanGuarantor").value,phone:document.getElementById("loanPhone").value},
+personal:{name:document.getElementById("loanName").value,id:document.getElementById("loanID").value,email:document.getElementById("loanEmail").value,phone:document.getElementById("loanPhone").value,origin:document.getElementById("loanOrigin").value},
+loanDetails:{amount:parseFloat(document.getElementById("loanAmount").value),category:document.getElementById("loanCategory").value,purpose:document.getElementById("loanPurpose").value,duration:parseInt(document.getElementById("loanDuration").value)},
+guarantor:{name:document.getElementById("guarantorName").value,id:document.getElementById("guarantorID").value,email:document.getElementById("guarantorEmail").value,phone:document.getElementById("guarantorPhone").value},
+repayment:{plan:document.getElementById("repaymentPlan").value,installmentAmount:parseFloat(document.getElementById("installmentAmount").value),dueDate:document.getElementById("dueDate").value},
 status:"Applied",timestamp:Date.now()
 };
 const ref=await db.ref(`users/${currentUserUid}/loan_applications`).push(loanData);
 alert("Loan application submitted successfully!");
+steps.forEach(s=>s.style.display="none");
+steps[0].style.display="block";
+currentStep=0;
+document.getElementById("loanProgressFill").style.width="0%";
 document.getElementById("downloadLoanBtn").style.display="block";
 document.getElementById("downloadLoanBtn").onclick=()=>downloadLoanCSV(ref.key);
+loadLoanProgress();
+}catch(err){alert(err.message);}
 });
 
 // Loan CSV download
@@ -254,14 +312,15 @@ const loan=child.val();
 const stages=["Applied","Registered","Verified","Allocation","Disbursement in Progress","Disbursed"];
 stages.forEach(stage=>{
 const div=document.createElement("div");
-div.textContent=`${stage} - Amount: ${loan.loanDetails.amount} - Status: ${loan.status}`;
+const stageDate=(loan.stageDates && loan.stageDates[stage]) ? new Date(loan.stageDates[stage]).toLocaleString() : "-";
+div.textContent=`${stage} - Amount: ${loan.loanDetails.amount} - Status: ${loan.status} - Date: ${stageDate}`;
 container.appendChild(div);
 });
 });
 });
 }
 
-// Account statement
+// Download account statement
 document.getElementById("downloadStatementBtn").addEventListener("click",()=>{
 db.ref(`users/${currentUserUid}/financials`).once('value').then(snap=>{
 const d=snap.val()||{};
