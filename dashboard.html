@@ -208,14 +208,15 @@ document.getElementById("logoutBtn").addEventListener("click",()=>auth.signOut()
 
 // Auth check
 auth.onAuthStateChanged(user=>{
-if(user){currentUserUid=user.uid;
+if(user){
+currentUserUid=user.uid;
 document.getElementById("emailDisplay").textContent=user.email;
 loadFinancials();
 loadLoanProgress();
 }else{window.location.href="index.html";}
 });
 
-// Profile
+// Profile update
 document.getElementById("profileForm").addEventListener("submit",async e=>{
 e.preventDefault();
 const file=document.getElementById("passport").files[0];
@@ -234,7 +235,7 @@ passportURL:url
 alert("Profile updated successfully!");
 });
 
-// Financials
+// Load financials
 function loadFinancials(){
 db.ref(`users/${currentUserUid}/financials`).on("value",snap=>{
 const data=snap.val()||{};
@@ -265,15 +266,36 @@ currentStep=i;
 document.getElementById("loanProgressFill").style.width=((currentStep+1)/steps.length*100)+"%";
 }));
 
-// Submit loan
+// Submit loan application
 document.getElementById("submitLoanBtn").addEventListener("click",async ()=>{
 try{
 const loanData={
-personal:{name:document.getElementById("loanName").value,id:document.getElementById("loanID").value,email:document.getElementById("loanEmail").value,phone:document.getElementById("loanPhone").value,origin:document.getElementById("loanOrigin").value},
-loanDetails:{amount:parseFloat(document.getElementById("loanAmount").value),category:document.getElementById("loanCategory").value,purpose:document.getElementById("loanPurpose").value,duration:parseInt(document.getElementById("loanDuration").value)},
-guarantor:{name:document.getElementById("guarantorName").value,id:document.getElementById("guarantorID").value,email:document.getElementById("guarantorEmail").value,phone:document.getElementById("guarantorPhone").value},
-repayment:{plan:document.getElementById("repaymentPlan").value,installmentAmount:parseFloat(document.getElementById("installmentAmount").value),dueDate:document.getElementById("dueDate").value},
-status:"Applied",timestamp:Date.now()
+personal:{
+name:document.getElementById("loanName").value,
+id:document.getElementById("loanID").value,
+email:document.getElementById("loanEmail").value,
+phone:document.getElementById("loanPhone").value,
+origin:document.getElementById("loanOrigin").value
+},
+loanDetails:{
+amount:parseFloat(document.getElementById("loanAmount").value),
+category:document.getElementById("loanCategory").value,
+purpose:document.getElementById("loanPurpose").value,
+duration:parseInt(document.getElementById("loanDuration").value)
+},
+guarantor:{
+name:document.getElementById("guarantorName").value,
+id:document.getElementById("guarantorID").value,
+email:document.getElementById("guarantorEmail").value,
+phone:document.getElementById("guarantorPhone").value
+},
+repayment:{
+plan:document.getElementById("repaymentPlan").value,
+installmentAmount:parseFloat(document.getElementById("installmentAmount").value),
+dueDate:document.getElementById("dueDate").value
+},
+status:"Applied",
+stageDates:{"Applied":Date.now()}
 };
 const ref=await db.ref(`users/${currentUserUid}/loan_applications`).push(loanData);
 alert("Loan application submitted successfully!");
@@ -301,7 +323,7 @@ link.click();
 });
 }
 
-// Loan progress
+// Load loan progress
 function loadLoanProgress(){
 const container=document.getElementById("loanTimeline");
 container.innerHTML="";
@@ -320,7 +342,7 @@ container.appendChild(div);
 });
 }
 
-// Account statement
+// Download account statement
 document.getElementById("downloadStatementBtn").addEventListener("click",()=>{
 db.ref(`users/${currentUserUid}/financials`).once('value').then(snap=>{
 const d=snap.val()||{};
