@@ -192,4 +192,72 @@
   <!-- Financial Cards -->
   <div class="card">
     <i class="fa-solid fa-money-bill-wave"></i>
-    <h3>Weekly Sav
+    <h3>Weekly Savings</h3>
+    <p id="weeklySavings">0</p>
+    <div class="progress-bar"><div class="progress" id="weeklyProgress">0%</div></div>
+  </div>
+
+  <div class="card">
+    <i class="fa-solid fa-calendar-days"></i>
+    <h3>Monthly Savings</h3>
+    <p id="monthlySavings">0</p>
+    <div class="progress-bar"><div class="progress" id="monthlyProgress">0%</div></div>
+  </div>
+
+  <div class="card">
+    <i class="fa-solid fa-chart-simple"></i>
+    <h3>Shares</h3>
+    <p id="shares">0</p>
+    <div class="progress-bar"><div class="progress" id="sharesProgress">0%</div></div>
+  </div>
+
+  <div class="card">
+    <i class="fa-solid fa-hand-holding-dollar"></i>
+    <h3>Loan</h3>
+    <p id="loan">0</p>
+    <div class="progress-bar"><div class="progress" id="loanProgress">0%</div></div>
+  </div>
+
+  <!-- Profile Update -->
+  <div class="card">
+    <h3>Profile Update</h3>
+    <form id="profileForm" onsubmit="event.preventDefault(); updateProfile();">
+      <label>Name</label><input id="profileName" required>
+      <label>ID</label><input id="profileID" required>
+      <label>Email</label><input type="email" id="profileEmail" required>
+      <label>Phone Number</label><input id="profilePhone" required>
+      <label>Origin</label><input id="profileOrigin" required>
+      <label>Member Number</label><input id="profileMember" required>
+      <label>Passport Upload</label><input type="file" id="passport" accept="image/*" required>
+      <button type="submit">Update Profile</button>
+    </form>
+  </div>
+
+  <!-- Loan Application -->
+  <div class="card">
+    <h3>Loan Application</h3>
+    <form id="loanForm" onsubmit="event.preventDefault(); applyLoan();">
+      <label>Name</label><input id="loanName" required>
+      <label>Amount</label><input type="number" id="loanAmount" required>
+      <label>Loan Category</label>
+      <select id="loanCategory" required>
+        <option value="">Select Category</option>
+        <option value="Business">Business</option>
+        <option value="Education">Education</option>
+        <option value="Emergency">Emergency</option>
+      </select>
+      <label>Guarantor</label><input id="loanGuarantor" required>
+      <label>Phone Number</label><input id="loanPhone" required>
+      <button type="submit">Apply Loan</button>
+    </form>
+  </div>
+
+  <!-- Download Statement -->
+  <div class="card">
+    <h3>Account Statement</h3>
+    <button onclick="downloadStatement()">Download CSV</button>
+  </div>
+
+</div>
+</body>
+</html>
