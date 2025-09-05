@@ -1,164 +1,165 @@
-:root{
-  --green: #4caf50;
-  --green-dark:#2e7d32;
-  --green-light:#81c784;
-  --glass: rgba(255,255,255,0.08);
-  --glass-strong: rgba(255,255,255,0.16);
-  --accent: #ffeb3b;
-  --text: #ffffff;
-  --bg1: #0f2027;
-  --bg2: #203a43;
-  --bg3: #2c5364;
-  --radius: 14px;
-}
-*{box-sizing:border-box;scroll-behavior:smooth}
-body{
-  margin:0;
-  font-family: 'Poppins', 'Inter', system-ui, sans-serif;
-  background: linear-gradient(135deg,var(--bg1),var(--bg2),var(--bg3));
-  color:var(--text);
-  min-height:100vh;
-  display:flex;
-  overflow:hidden;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | Visionary Youth Group</title>
 
-/* ---------- Scrollbars ---------- */
-::-webkit-scrollbar{width:10px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{
-  background:linear-gradient(var(--green),var(--green-dark));
-  border-radius:10px;
-}
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-/* ---------- Sidebar ---------- */
-.sidebar{
-  width:240px;
-  background:var(--glass);
-  backdrop-filter: blur(18px);
-  border-right:1px solid var(--glass-strong);
-  padding:20px;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-  box-shadow: 2px 0 30px rgba(0,0,0,0.4);
-}
-.brand{
-  display:flex;align-items:center;gap:12px;margin-bottom:14px
-}
-.brand .logo{
-  width:44px;height:44px;border-radius:12px;
-  background:linear-gradient(135deg,var(--green),var(--green-dark));
-  display:flex;align-items:center;justify-content:center;
-  font-weight:800;color:#041006;font-size:20px;
-}
-.brand h3{margin:0;font-size:20px;color:var(--accent)}
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: #f0f2f5;
+      color: #333;
+    }
+    nav {
+      background: #007bff;
+      padding: 15px 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: white;
+    }
+    nav h2 { margin: 0; font-size: 20px; }
+    nav button {
+      background: #ffcc00;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    nav button:hover { background: #ff6600; color: white; }
 
-.nav-btn{
-  background:none;border:none;color:var(--text);
-  text-align:left;padding:12px;border-radius:var(--radius);
-  cursor:pointer;display:flex;gap:12px;align-items:center;
-  transition:all .2s ease;
-  font-size:15px;font-weight:500;
-}
-.nav-btn:hover{background:var(--glass-strong);transform:translateX(3px)}
-.nav-btn.active{
-  background:linear-gradient(90deg,var(--green-light),var(--green));
-  color:#041006;font-weight:700;
-  box-shadow:0 6px 18px rgba(0,0,0,.35)
-}
+    .container {
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1 { color: #007bff; text-align: center; }
+    .card {
+      background: #f9f9f9;
+      padding: 20px;
+      border-radius: 12px;
+      margin: 15px 0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+    .card h3 { margin: 0 0 10px; }
+    button.download {
+      background: #28a745;
+      color: white;
+      padding: 10px 18px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+    button.download:hover { background: #218838; }
+  </style>
+</head>
+<body>
 
-/* ---------- Main ---------- */
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
-header{
-  padding:14px 22px;
-  background:linear-gradient(90deg,var(--green-dark),var(--green));
-  display:flex;justify-content:space-between;align-items:center;
-  font-weight:600;letter-spacing:0.3px;
-}
-header .user-email{font-weight:700}
+  <nav>
+    <h2>Visionary Youth Group</h2>
+    <button id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+  </nav>
 
-.content{
-  padding:22px;
-  flex:1;
-  overflow-y:auto;
-  display:grid;
-  gap:20px;
-}
+  <div class="container">
+    <h1>Welcome, <span id="userName">Loading...</span></h1>
 
-/* ---------- Sections ---------- */
-.section{
-  display:none;
-  background:var(--glass);
-  backdrop-filter:blur(14px);
-  padding:22px;
-  border-radius:var(--radius);
-  box-shadow:0 10px 30px rgba(0,0,0,.35);
-  animation:fade .35s ease;
-}
-.section.active{display:block}
-@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    <div class="card">
+      <h3>Account Information</h3>
+      <p><strong>Email:</strong> <span id="userEmail"></span></p>
+      <p><strong>Phone:</strong> <span id="userPhone"></span></p>
+      <p><strong>ID Number:</strong> <span id="userId"></span></p>
+      <p><strong>Place of Origin:</strong> <span id="userOrigin"></span></p>
+    </div>
 
-h2{margin-top:0;color:var(--accent);font-size:20px}
+    <div class="card">
+      <h3>Account Statement</h3>
+      <p>Download your account statement in PDF format.</p>
+      <button class="download" id="downloadStatement"><i class="fas fa-file-pdf"></i> Download Statement</button>
+    </div>
+  </div>
 
-/* ---------- Mini-tabs ---------- */
-.mini-tabs{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
-.mini-btn{
-  flex:1;padding:10px;border-radius:999px;border:none;
-  background:rgba(255,255,255,0.05);
-  color:var(--text);cursor:pointer;font-weight:500;
-  transition:all .2s ease;
-}
-.mini-btn:hover{background:rgba(255,255,255,0.15)}
-.mini-btn.active{
-  background:linear-gradient(90deg,var(--green-light),var(--green-dark));
-  color:#041006;font-weight:700
-}
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-/* ---------- Progress ---------- */
-.metric{margin:12px 0}
-.progress{
-  height:14px;border-radius:999px;
-  background:rgba(255,255,255,0.15);overflow:hidden;margin-top:6px
-}
-.fill{
-  height:100%;width:0;
-  background:linear-gradient(90deg,var(--accent),#ffa751);
-  transition:width 900ms ease;
-  border-radius:999px
-}
+    const firebaseConfig = {
+      apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
+      authDomain: "visionary-youth-grou-2024.firebaseapp.com",
+      projectId: "visionary-youth-grou-2024",
+      storageBucket: "visionary-youth-grou-2024.appspot.com",
+      messagingSenderId: "372978592717",
+      appId: "1:372978592717:web:1c15aec728ee5f854f3284",
+      measurementId: "G-QP1RBT2ZCP"
+    };
 
-/* ---------- Forms ---------- */
-form input,form select{
-  width:100%;padding:12px;border-radius:var(--radius);
-  border:none;margin-top:6px;
-  background:rgba(255,255,255,0.08);color:var(--text);
-  font-size:15px
-}
-form label{display:block;margin-top:14px;font-weight:600;font-size:14px}
-form button{
-  margin-top:16px;padding:12px 16px;border-radius:var(--radius);
-  border:none;background:linear-gradient(90deg,var(--green),var(--green-dark));
-  color:#041006;cursor:pointer;font-weight:700;
-  transition:all .2s ease;
-}
-form button:hover{opacity:.9;transform:translateY(-2px)}
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-/* ---------- Footer ---------- */
-footer{padding:14px;text-align:center;color:rgba(255,255,255,0.8);font-size:14px}
+    // Load user data
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "index.html";
+        return;
+      }
 
-/* ---------- Toast ---------- */
-.toast{
-  position:fixed;right:20px;bottom:20px;
-  padding:14px 18px;border-radius:var(--radius);
-  background:rgba(0,0,0,0.85);color:white;
-  transform:translateY(20px);opacity:0;transition:all .3s
-}
-.toast.show{opacity:1;transform:translateY(0)}
+      const docRef = doc(db, "members", user.uid);
+      const snap = await getDoc(docRef);
+      if (snap.exists()) {
+        const data = snap.data();
+        document.getElementById("userName").textContent = data.name;
+        document.getElementById("userEmail").textContent = data.email;
+        document.getElementById("userPhone").textContent = data.phone;
+        document.getElementById("userId").textContent = data.id;
+        document.getElementById("userOrigin").textContent = data.origin;
+      } else {
+        alert("No data found for this user.");
+      }
+    });
 
-/* ---------- Responsive ---------- */
-@media (max-width:880px){
-  .sidebar{position:fixed;z-index:99;left:-260px;top:0;height:100%;transition:left .3s}
-  .sidebar.open{left:0}
-  body{flex-direction:column}
-  .main{margin-left:0}
-}
+    // Logout
+    document.getElementById("logoutBtn").addEventListener("click", async () => {
+      await signOut(auth);
+      window.location.href = "index.html";
+    });
+
+    // Download Statement
+    document.getElementById("downloadStatement").addEventListener("click", () => {
+      const name = document.getElementById("userName").textContent;
+      const email = document.getElementById("userEmail").textContent;
+      const phone = document.getElementById("userPhone").textContent;
+      const idNo = document.getElementById("userId").textContent;
+      const origin = document.getElementById("userOrigin").textContent;
+
+      const content = `
+        Visionary Youth Group - Account Statement\n
+        Name: ${name}
+        Email: ${email}
+        Phone: ${phone}
+        ID Number: ${idNo}
+        Place of Origin: ${origin}
+        Date: ${new Date().toLocaleDateString()}
+      `;
+
+      const blob = new Blob([content], { type: "application/pdf" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "Account_Statement.pdf";
+      link.click();
+    });
+  </script>
+
+</body>
+</html>
