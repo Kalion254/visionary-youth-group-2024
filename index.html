@@ -8,8 +8,6 @@
 <!-- Fonts & Icons -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-<!-- AOS Animations -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
 
 <style>
@@ -18,28 +16,13 @@ nav { position:fixed; top:0; width:100%; background:rgba(0,0,0,0.7); display:fle
 nav a { color:white; margin:0 15px; text-decoration:none; font-weight:600; transition:0.3s; }
 nav a:hover { color:#ffcc00; }
 
-header { 
-  position:relative; 
-  height:100vh; 
-  background:url('banner.png') no-repeat center center/cover; 
-}
-
-.hero-btn { background:#ffcc00; color:#333; padding:15px 25px; border:none; border-radius:8px; font-weight:600; font-size:1rem; cursor:pointer; transition:0.3s; margin-top:20px; }
-.hero-btn:hover { background:#ff6600; color:white; transform:scale(1.05); }
+header { position:relative; height:100vh; overflow:hidden; }
+.slideshow-container { position:absolute; width:100%; height:100%; top:0; left:0; }
+.slide { position:absolute; width:100%; height:100%; opacity:0; transition:opacity 1.5s ease-in-out; background-size:cover; background-position:center; }
+.slide.active { opacity:1; }
 
 section { padding:60px 20px; max-width:1000px; margin:40px auto; background:white; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.1); }
 h2 { color:#007bff; margin-bottom:25px; text-align:center; }
-.benefits, .programs, .news { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:25px; }
-.benefit, .card { background:#f9f9f9; padding:25px; border-radius:12px; text-align:center; transition:transform 0.3s; }
-.benefit:hover, .card:hover { transform:scale(1.05); }
-.benefit i, .card i { font-size:40px; color:#ffcc00; margin-bottom:10px; }
-#contact p i { margin-right:8px; color:#007bff; }
-.social-icons a { margin:0 10px; font-size:24px; color:#007bff; transition:0.3s; }
-.social-icons a:hover { color:#ff6600; transform:rotate(15deg) scale(1.2); }
-form { background:#f9f9f9; padding:25px; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,0.1); margin-top:20px; }
-input { display:block; width:100%; margin:10px 0; padding:10px; border-radius:8px; border:1px solid #ccc; }
-button { background:#007bff; color:white; padding:10px 20px; border:none; border-radius:8px; cursor:pointer; transition:0.3s; }
-button:hover { background:#ff6600; transform:scale(1.05); }
 footer { text-align:center; padding:15px; background:#333; color:white; margin-top:40px; border-radius:12px; }
 </style>
 </head>
@@ -54,8 +37,11 @@ footer { text-align:center; padding:15px; background:#333; color:white; margin-t
   <a href="#auth"><i class="fas fa-user-plus"></i> Join</a>
 </nav>
 
-<header data-aos="fade-down">
-  <!-- Banner only, no text overlay -->
+<header>
+  <div class="slideshow-container">
+    <div class="slide active" style="background-image:url('slide1.jpg');"></div>
+    <div class="slide" style="background-image:url('slide2.jpg');"></div>
+  </div>
 </header>
 
 <section id="about" data-aos="fade-up">
@@ -66,29 +52,29 @@ footer { text-align:center; padding:15px; background:#333; color:white; margin-t
 <section id="benefits" data-aos="fade-up">
   <h2>Member Benefits</h2>
   <div class="benefits">
-    <div class="benefit"><i class="fas fa-piggy-bank"></i><h3>Savings</h3><p>Grow your money safely with structured group savings plans.</p></div>
-    <div class="benefit"><i class="fas fa-hand-holding-usd"></i><h3>Loans</h3><p>Access affordable loans to fund personal or business projects.</p></div>
-    <div class="benefit"><i class="fas fa-users"></i><h3>Networking</h3><p>Connect with motivated youth and expand your opportunities.</p></div>
-    <div class="benefit"><i class="fas fa-chalkboard-teacher"></i><h3>Training</h3><p>Attend workshops and seminars to develop skills and knowledge.</p></div>
+    <div><i class="fas fa-piggy-bank"></i><h3>Savings</h3><p>Grow your money safely with structured group savings plans.</p></div>
+    <div><i class="fas fa-hand-holding-usd"></i><h3>Loans</h3><p>Access affordable loans to fund personal or business projects.</p></div>
+    <div><i class="fas fa-users"></i><h3>Networking</h3><p>Connect with motivated youth and expand your opportunities.</p></div>
+    <div><i class="fas fa-chalkboard-teacher"></i><h3>Training</h3><p>Attend workshops and seminars to develop skills and knowledge.</p></div>
   </div>
 </section>
 
 <section id="programs" data-aos="fade-up">
   <h2>Our Programs</h2>
   <div class="programs">
-    <div class="card"><i class="fas fa-hand-holding-heart"></i><h3>Community Service</h3><p>Engage in projects that uplift the community and build teamwork.</p></div>
-    <div class="card"><i class="fas fa-briefcase"></i><h3>Entrepreneurship Support</h3><p>Mentorship, business training, and funding opportunities for young entrepreneurs.</p></div>
-    <div class="card"><i class="fas fa-chart-line"></i><h3>Financial Literacy</h3><p>Learn smart money management, investments, and savings strategies.</p></div>
-    <div class="card"><i class="fas fa-handshake"></i><h3>Networking Events</h3><p>Meet other motivated youth to share ideas, projects, and opportunities.</p></div>
+    <div><i class="fas fa-hand-holding-heart"></i><h3>Community Service</h3><p>Engage in projects that uplift the community and build teamwork.</p></div>
+    <div><i class="fas fa-briefcase"></i><h3>Entrepreneurship Support</h3><p>Mentorship, business training, and funding opportunities for young entrepreneurs.</p></div>
+    <div><i class="fas fa-chart-line"></i><h3>Financial Literacy</h3><p>Learn smart money management, investments, and savings strategies.</p></div>
+    <div><i class="fas fa-handshake"></i><h3>Networking Events</h3><p>Meet other motivated youth to share ideas, projects, and opportunities.</p></div>
   </div>
 </section>
 
 <section id="news" data-aos="fade-up">
   <h2>Latest News</h2>
   <div class="news">
-    <div class="card"><h3>Youth Workshop 2024</h3><p>Join our next financial literacy workshop on Sept 15, 2024.</p></div>
-    <div class="card"><h3>Annual General Meeting</h3><p>Don't miss our AGM scheduled for Dec 20, 2024.</p></div>
-    <div class="card"><h3>Entrepreneur Grant Program</h3><p>Apply for funding to support your business ideas and projects.</p></div>
+    <div><h3>Youth Workshop 2024</h3><p>Join our next financial literacy workshop on Sept 15, 2024.</p></div>
+    <div><h3>Annual General Meeting</h3><p>Don't miss our AGM scheduled for Dec 20, 2024.</p></div>
+    <div><h3>Entrepreneur Grant Program</h3><p>Apply for funding to support your business ideas and projects.</p></div>
   </div>
 </section>
 
@@ -97,18 +83,10 @@ footer { text-align:center; padding:15px; background:#333; color:white; margin-t
   <p><i class="fas fa-envelope"></i> visionaryyouthgroup32@gmail.com</p>
   <p><i class="fas fa-phone"></i> +254 741 453336</p>
   <p><i class="fas fa-map-marker-alt"></i> Nairobi, Kenya</p>
-  <div class="social-icons">
-    <a href="#"><i class="fab fa-facebook"></i></a>
-    <a href="#"><i class="fab fa-twitter"></i></a>
-    <a href="#"><i class="fab fa-instagram"></i></a>
-  </div>
 </section>
 
 <section id="auth" data-aos="fade-up">
   <h2>Join Our Community</h2>
-  <p><strong>All fields are required. Sign up below.</strong></p>
-  
-  <!-- SIGNUP -->
   <form id="signupForm" onsubmit="return false;">
     <input type="text" id="signupName" placeholder="Full Name" required>
     <input type="text" id="signupPhone" placeholder="Phone Number" required>
@@ -118,9 +96,7 @@ footer { text-align:center; padding:15px; background:#333; color:white; margin-t
     <input type="password" id="signupPassword" placeholder="Password" required>
     <button type="button" id="signupBtn">Sign Up</button>
   </form>
-
   <h3>Already a member?</h3>
-  <!-- LOGIN -->
   <form id="loginForm" onsubmit="return false;">
     <input type="email" id="loginEmail" placeholder="Email" required>
     <input type="password" id="loginPassword" placeholder="Password" required>
@@ -129,7 +105,7 @@ footer { text-align:center; padding:15px; background:#333; color:white; margin-t
   </form>
 </section>
 
-<footer data-aos="fade-up">
+<footer>
   <p>© 2024 VISIONARY YOUTH GROUP. All Rights Reserved.</p>
 </footer>
 
@@ -154,8 +130,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 // SIGNUP
-document.getElementById('signupBtn').addEventListener('click', async (event)=>{
-  event.preventDefault();
+document.getElementById('signupBtn').addEventListener('click', async ()=>{
   const signupInfo = {
     name: document.getElementById('signupName').value,
     phone: document.getElementById('signupPhone').value,
@@ -176,36 +151,40 @@ document.getElementById('signupBtn').addEventListener('click', async (event)=>{
     });
     alert("Signup successful! Please login.");
     document.getElementById('signupForm').reset();
-  } catch(err){
-    alert("Signup failed: " + err.message);
-  }
+  } catch(err){ alert("Signup failed: " + err.message); }
 });
 
 // LOGIN
-document.getElementById('loginBtn').addEventListener('click', async (event)=>{
-  event.preventDefault();
+document.getElementById('loginBtn').addEventListener('click', async ()=>{
   const email = document.getElementById('loginEmail').value;
   const password = document.getElementById('loginPassword').value;
   try {
     await signInWithEmailAndPassword(auth, email, password);
     window.location.href = "dashboard.html";
-  } catch(err){
-    alert("Login failed: " + err.message);
-  }
+  } catch(err){ alert("Login failed: " + err.message); }
 });
 
 // RESET PASSWORD
-document.getElementById('resetPasswordBtn').addEventListener('click', async (event)=>{
-  event.preventDefault();
+document.getElementById('resetPasswordBtn').addEventListener('click', async ()=>{
   const email = document.getElementById('loginEmail').value;
   if(!email){ alert("Enter your email to reset password"); return; }
   try {
     await sendPasswordResetEmail(auth, email);
     alert("Password reset email sent!");
-  } catch(err){
-    alert("Error: " + err.message);
-  }
+  } catch(err){ alert("Error: " + err.message); }
 });
+</script>
+
+<!-- Slideshow -->
+<script>
+let slides = document.querySelectorAll(".slide");
+let current = 0;
+function showNextSlide() {
+  slides[current].classList.remove("active");
+  current = (current + 1) % slides.length;
+  slides[current].classList.add("active");
+}
+setInterval(showNextSlide, 4000);
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
