@@ -9,10 +9,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
+<!-- jsPDF for PDF generation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <style>
   body {margin:0; font-family:'Poppins',sans-serif; background:#f4f6f9; color:#333;}
-  nav {background:#28a745; color:white; padding:15px 25px; display:flex; justify-content:space-between; align-items:center;}
+  nav {background:#28a745; color:white; padding:15px 25px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 2px 6px rgba(0,0,0,0.1);}
   nav h1 {margin:0; font-size:1.7rem; font-weight:700;}
+  nav span {font-weight:400; font-size:1rem;}
   nav button {background:#ffc107; border:none; padding:10px 18px; border-radius:6px; cursor:pointer; font-weight:600; transition:0.3s;}
   nav button:hover {background:#218838; color:white;}
   .container {display:grid; grid-template-columns:250px 1fr; min-height:100vh;}
@@ -39,7 +43,8 @@
   .tab.active {background:#28a745; color:white;}
   .tab-content {display:none;}
   .tab-content.active {display:block;}
-  input, select, textarea, button {width:100%; padding:10px; margin:5px 0 15px 0; border-radius:6px; border:1px solid #ccc;}
+  input, select, textarea, button {width:100%; padding:10px; margin:5px 0 15px 0; border-radius:6px; border:1px solid #ccc; background:#fefefe; transition:0.3s;}
+  input:focus, select:focus, textarea:focus {border-color:#28a745; outline:none; background:#e6f4ea;}
   button.submit-btn {background:#28a745; color:white; border:none; cursor:pointer; transition:0.3s;}
   button.submit-btn:hover {background:#218838;}
   .popup {position:fixed; top:20%; left:50%; transform:translateX(-50%); background:#28a745; color:white; padding:20px; border-radius:12px; display:none; z-index:1000;}
@@ -51,6 +56,7 @@
 
 <nav>
   <h1>Visionary Youth Group</h1>
+  <span id="userEmailHeader">Email: - </span>
   <button id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
 </nav>
 
@@ -61,15 +67,15 @@
       <a href="#"><i class="fas fa-user"></i> Profile</a>
       <a href="#"><i class="fas fa-wallet"></i> Savings</a>
       <a href="#"><i class="fas fa-calendar-week"></i> Weekly Savings</a>
-      <a href="#"><i class="fas fa-file-download"></i> Account Statement</a>
+      <a href="#" id="downloadStatementBtn"><i class="fas fa-file-download"></i> Account Statement</a>
       <a href="#"><i class="fas fa-hand-holding-usd"></i> Loans</a>
       <a href="#"><i class="fas fa-users"></i> Networking</a>
       <a href="#"><i class="fas fa-cogs"></i> Update Profile</a>
+      <a href="#"><i class="fas fa-coins"></i> Shares</a>
     </div>
   </aside>
 
   <main class="main">
-
     <div class="user-info">
       <div>
         <h2>Welcome, <span id="userName">Member</span></h2>
@@ -112,7 +118,6 @@
       </ul>
     </div>
 
-    <!-- Loan Application -->
     <div class="loan-section">
       <h3>Loan Application</h3>
       <div class="tabs">
@@ -144,7 +149,6 @@
       </form>
     </div>
 
-    <!-- Update Profile -->
     <div class="update-profile">
       <h3>Update Profile</h3>
       <form id="updateProfileForm">
@@ -164,11 +168,11 @@
   <p>© 2024 Visionary Youth Group. Dashboard</p>
 </footer>
 
-<!-- Firebase -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, collection, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, collection, addDoc, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+const { jsPDF } = window.jspdf;
 
 const firebaseConfig = {
   apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
@@ -184,83 +188,101 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Tabs functionality
-document.querySelectorAll('.tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+// Tabs
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
     tab.classList.add('active');
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
     document.getElementById(tab.dataset.tab).classList.add('active');
   });
 });
 
-// Check user
-onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    const userRef = doc(db, "members", user.uid);
+// Load user
+onAuthStateChanged(auth, async user=>{
+  if(user){
+    document.getElementById("userEmailHeader").textContent = "Email: "+user.email;
+    const userRef = doc(db,"members",user.uid);
     const userSnap = await getDoc(userRef);
     if(userSnap.exists()){
       const data = userSnap.data();
-      document.getElementById("userName").textContent = data.name || "Member";
-      document.getElementById("userEmail").textContent = data.email || user.email;
-      document.getElementById("userPhone").textContent = data.phone || "N/A";
-      document.getElementById("totalSavings").textContent = data.savings || "0.00";
-      document.getElementById("weeklySavings").textContent = data.weeklySavings || "0.00";
-      document.getElementById("activeLoans").textContent = data.loans || "0.00";
-      document.getElementById("monthlyContrib").textContent = data.monthlyContrib || "0.00";
+      document.getElementById("userName").textContent = data.name||"Member";
+      document.getElementById("userEmail").textContent = data.email||user.email;
+      document.getElementById("userPhone").textContent = data.phone||"N/A";
+      document.getElementById("totalSavings").textContent = data.savings||"0.00";
+      document.getElementById("weeklySavings").textContent = data.weeklySavings||"0.00";
+      document.getElementById("activeLoans").textContent = data.loans||"0.00";
+      document.getElementById("monthlyContrib").textContent = data.monthlyContrib||"0.00";
     }
-
-    const activityRef = collection(db, "members", user.uid, "activity");
-    const q = query(activityRef, orderBy("date","desc"), limit(5));
-    const querySnapshot = await getDocs(q);
-    const recentActivity = document.getElementById("recentActivity");
-    recentActivity.innerHTML = "";
-    if(querySnapshot.empty){
-      recentActivity.innerHTML = '<li><i class="fas fa-circle-check"></i> No recent activity yet.</li>';
-    } else {
-      querySnapshot.forEach(doc => {
-        const item = doc.data();
-        recentActivity.innerHTML += `<li><i class="fas fa-circle-check"></i> ${item.message} - ${new Date(item.date.seconds*1000).toLocaleDateString()}</li>`;
-      });
-    }
-  } else {
-    window.location.href="index.html";
-  }
+    // Recent activity
+    const q = query(collection(db,"members",user.uid,"activity"), orderBy("date","desc"), limit(5));
+    const snapshot = await getDocs(q);
+    const actEl = document.getElementById("recentActivity");
+    actEl.innerHTML="";
+    if(snapshot.empty) actEl.innerHTML='<li><i class="fas fa-circle-check"></i> No recent activity yet.</li>';
+    else snapshot.forEach(doc=>{
+      const item = doc.data();
+      actEl.innerHTML+=`<li><i class="fas fa-circle-check"></i> ${item.message} - ${new Date(item.date.seconds*1000).toLocaleDateString()}</li>`;
+    });
+  } else window.location.href="index.html";
 });
 
 // Logout
-document.getElementById("logoutBtn").addEventListener("click", async () => { await signOut(auth); window.location.href="index.html"; });
+document.getElementById("logoutBtn").addEventListener("click",async()=>{await signOut(auth);window.location.href="index.html";});
 
 // Update profile
-document.getElementById("updateProfileForm").addEventListener("submit", async e=>{
+document.getElementById("updateProfileForm").addEventListener("submit",async e=>{
   e.preventDefault();
   const user = auth.currentUser;
   if(user){
-    await updateProfile(user, {displayName: e.target[0].value});
-    await setDoc(doc(db,"members",user.uid),{
-      name:e.target[0].value,
-      email:e.target[1].value,
-      phone:e.target[2].value
-    }, {merge:true});
+    await updateProfile(user,{displayName:e.target[0].value});
+    await setDoc(doc(db,"members",user.uid),{name:e.target[0].value,email:e.target[1].value,phone:e.target[2].value},{merge:true});
     const popup = document.getElementById("popupMsg");
     popup.style.display="block";
-    setTimeout(async ()=>{
-      popup.style.display="none";
-      await signOut(auth);
-      window.location.href="index.html";
-    },3000);
+    setTimeout(async()=>{popup.style.display="none";await signOut(auth);window.location.href="index.html";},3000);
   }
 });
 
-// Loan form submit
+// Loan submission
 document.getElementById("loanForm").addEventListener("submit", async e=>{
   e.preventDefault();
+  const user = auth.currentUser;
+  if(!user) return;
+  const data = {
+    personal:{name:e.target[0].value,email:e.target[1].value,phone:e.target[2].value},
+    guarantor:{name:e.target[3].value,phone:e.target[4].value,id:e.target[5].value},
+    loan:{amount:e.target[6].value,purpose:e.target[7].value},
+    repayment:{months:e.target[8].value},
+    progress:"Pending",
+    date:new Date()
+  };
+  await addDoc(collection(db,"members",user.uid,"loans"),data);
   alert("Loan request submitted successfully!");
 });
 
-// Download statement (dummy)
-document.querySelector('.sidebar a[href="#"]:nth-child(4)').addEventListener("click", ()=>{
-  alert("Account statement downloaded (dummy)!");
+// Download Account Statement
+document.getElementById("downloadStatementBtn").addEventListener("click", async ()=>{
+  const user = auth.currentUser;
+  if(!user) return;
+  const loansSnap = await getDocs(collection(db,"members",user.uid,"loans"));
+  const userRef = doc(db,"members",user.uid);
+  const userSnap = await getDoc(userRef);
+  const data = userSnap.exists()?userSnap.data():{};
+  const docPDF = new jsPDF();
+  docPDF.setFontSize(16);
+  docPDF.text("Account Statement - Visionary Youth Group",10,10);
+  docPDF.setFontSize(12);
+  docPDF.text(`Name: ${data.name||''}`,10,20);
+  docPDF.text(`Email: ${data.email||user.email}`,10,28);
+  docPDF.text(`Phone: ${data.phone||''}`,10,36);
+  let y=50;
+  docPDF.text("Loans:",10,y);
+  loansSnap.forEach(loan=>{
+    y+=8;
+    const l = loan.data();
+    docPDF.text(`- ${l.loan.amount} KES, ${l.loan.purpose}, Status: ${l.progress}`,10,y);
+  });
+  docPDF.save("AccountStatement.pdf");
 });
 </script>
 
