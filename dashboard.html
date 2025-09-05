@@ -1,285 +1,329 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Visionary Youth Dashboard</title>
-
-  <!-- Fonts & Icons -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-  <style>
-    body { margin:0; font-family:'Poppins',sans-serif; background:#111; color:#333; }
-    nav { background:#28a745; color:white; padding:15px 20px; display:flex; justify-content:space-between; align-items:center; }
-    nav h1 { margin:0; font-size:1.5rem; font-weight:700; }
-    nav span { font-size:0.9rem; }
-    nav button { background:#ffc107; border:none; padding:10px 18px; border-radius:6px; cursor:pointer; font-weight:600; transition:0.3s; }
-    nav button:hover { background:#ff6600; color:white; }
-
-    .container { display:grid; grid-template-columns:250px 1fr; min-height:100vh; }
-    .sidebar { background:#222; color:white; padding:20px; }
-    .sidebar h2 { color:#28a745; margin-bottom:20px; }
-    .sidebar a { display:block; padding:12px; margin-bottom:10px; color:white; text-decoration:none; border-radius:6px; transition:0.3s; }
-    .sidebar a:hover { background:#28a745; }
-
-    .main { padding:30px; background:#111; color:white; }
-    .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:20px; margin-bottom:30px; }
-    .card { background:#222; padding:20px; border-radius:12px; text-align:center; transition:transform 0.3s; }
-    .card:hover { transform:scale(1.05); }
-    .card i { font-size:40px; color:#ffc107; margin-bottom:15px; }
-    .card h3 { margin:10px 0; }
-
-    .user-info { margin-bottom:20px; background:#222; padding:15px; border-radius:12px; box-shadow:0 2px 6px rgba(0,0,0,0.5); }
-    .tabs { display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; }
-    .tab-button { background:#28a745; border:none; padding:10px 15px; border-radius:6px; cursor:pointer; color:white; transition:0.3s; }
-    .tab-button.active { background:#ffc107; color:#111; }
-    .tab-content { display:none; background:#222; padding:20px; border-radius:12px; }
-    .tab-content.active { display:block; }
-
-    input, select, textarea { display:block; width:100%; margin:10px 0; padding:10px; border-radius:8px; border:1px solid #ccc; }
-    button.submit-btn { background:#28a745; color:white; padding:10px 20px; border:none; border-radius:8px; cursor:pointer; transition:0.3s; }
-    button.submit-btn:hover { background:#ffc107; color:#111; }
-
-    footer { text-align:center; padding:15px; background:#222; color:white; margin-top:20px; border-radius:12px; }
-    .popup { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#222; padding:25px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.5); z-index:100; }
-    .popup.active { display:block; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VISIONARY YOUTH — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+body {
+    margin:0;
+    font-family:'Poppins',sans-serif;
+    background:#111;
+    color:#fff;
+}
+nav {
+    background:#1a1a1a;
+    padding:12px 20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+nav h2 {
+    color:#ffcc00;
+}
+nav button {
+    background:#ffcc00;
+    color:#111;
+    border:none;
+    padding:8px 15px;
+    border-radius:5px;
+    cursor:pointer;
+}
+nav button:hover {
+    background:#ff6600;
+    color:#fff;
+}
+.tabs {
+    display:flex;
+    justify-content:center;
+    margin:20px 0;
+    flex-wrap:wrap;
+}
+.tab-btn {
+    background:#222;
+    color:#ffcc00;
+    border:none;
+    padding:10px 20px;
+    margin:5px;
+    border-radius:8px;
+    cursor:pointer;
+    transition:0.3s;
+}
+.tab-btn.active, .tab-btn:hover {
+    background:#ffcc00;
+    color:#111;
+}
+.tab-content {
+    display:none;
+    max-width:900px;
+    margin:0 auto 40px auto;
+    background:#222;
+    padding:20px;
+    border-radius:12px;
+}
+.tab-content.active {
+    display:block;
+}
+input, select, textarea {
+    width:100%;
+    padding:10px;
+    margin:10px 0;
+    border-radius:8px;
+    border:none;
+}
+button.submit-btn {
+    background:#ffcc00;
+    color:#111;
+    border:none;
+    padding:10px 20px;
+    border-radius:8px;
+    cursor:pointer;
+}
+button.submit-btn:hover {
+    background:#ff6600;
+    color:#fff;
+}
+</style>
 </head>
 <body>
 
-  <nav>
-    <h1>Visionary Youth Dashboard</h1>
-    <span id="userEmail">Loading...</span>
-    <button id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
-  </nav>
+<nav>
+    <h2 id="userEmail">Dashboard</h2>
+    <button id="logoutBtn">Logout</button>
+</nav>
 
-  <div class="container">
-    <aside class="sidebar">
-      <h2>Menu</h2>
-      <a href="#" data-tab="savings">Savings</a>
-      <a href="#" data-tab="loans">Loans</a>
-      <a href="#" data-tab="shares">Shares</a>
-      <a href="#" data-tab="account">Account Statement</a>
-      <a href="#" id="updateProfileBtn">Update Profile</a>
-    </aside>
+<div class="tabs">
+    <button class="tab-btn active" data-tab="personal">Personal Info</button>
+    <button class="tab-btn" data-tab="guarantor">Guarantor</button>
+    <button class="tab-btn" data-tab="loan">Loan</button>
+    <button class="tab-btn" data-tab="repayment">Repayment</button>
+    <button class="tab-btn" data-tab="savings">Weekly Savings</button>
+    <button class="tab-btn" data-tab="shares">Shares</button>
+    <button class="tab-btn" data-tab="update">Update Profile</button>
+</div>
 
-    <main class="main">
-      <div class="user-info">
-        <h2>Welcome, <span id="userName">Member</span></h2>
-        <p>Phone: <span id="userPhone"></span></p>
-      </div>
+<!-- PERSONAL -->
+<div id="personal" class="tab-content active">
+    <h3>Personal Information</h3>
+    <p id="personalData">Loading...</p>
+</div>
 
-      <!-- Cards -->
-      <div class="cards">
-        <div class="card"><i class="fas fa-piggy-bank"></i><h3>Savings</h3></div>
-        <div class="card"><i class="fas fa-hand-holding-usd"></i><h3>Loans</h3></div>
-        <div class="card"><i class="fas fa-coins"></i><h3>Shares</h3></div>
-        <div class="card"><i class="fas fa-file-alt"></i><h3>Account Statement</h3></div>
-      </div>
+<!-- GUARANTOR -->
+<div id="guarantor" class="tab-content">
+    <h3>Guarantor Details</h3>
+    <form id="guarantorForm">
+        <input type="text" id="guarantorName" placeholder="Guarantor Full Name" required>
+        <input type="text" id="guarantorPhone" placeholder="Guarantor Phone" required>
+        <button type="button" class="submit-btn" id="saveGuarantor">Save Guarantor</button>
+    </form>
+</div>
 
-      <!-- Tab Contents -->
-      <div id="savings" class="tab-content">
-        <h3>Weekly Savings</h3>
-        <form id="savingsForm">
-          <input type="number" placeholder="Amount" required>
-          <button class="submit-btn" type="submit">Submit Savings</button>
-        </form>
-      </div>
+<!-- LOAN -->
+<div id="loan" class="tab-content">
+    <h3>Loan Application</h3>
+    <form id="loanForm">
+        <input type="number" id="loanAmount" placeholder="Loan Amount" required>
+        <input type="text" id="loanPurpose" placeholder="Loan Purpose" required>
+        <select id="loanDuration" required>
+            <option value="">Select Duration</option>
+            <option value="1 month">1 Month</option>
+            <option value="3 months">3 Months</option>
+            <option value="6 months">6 Months</option>
+        </select>
+        <button type="button" class="submit-btn" id="applyLoan">Apply Loan</button>
+    </form>
+    <div id="loanStatus">No active loans</div>
+</div>
 
-      <div id="loans" class="tab-content">
-        <h3>Loan Application</h3>
-        <div class="tabs">
-          <button class="tab-button active" data-tab="personal">Personal</button>
-          <button class="tab-button" data-tab="guarantor">Guarantor</button>
-          <button class="tab-button" data-tab="loan">Loan Details</button>
-          <button class="tab-button" data-tab="repayment">Repayment</button>
-        </div>
+<!-- REPAYMENT -->
+<div id="repayment" class="tab-content">
+    <h3>Repayment</h3>
+    <form id="repaymentForm">
+        <input type="number" id="repayAmount" placeholder="Repayment Amount" required>
+        <button type="button" class="submit-btn" id="repayLoan">Submit Repayment</button>
+    </form>
+</div>
 
-        <div id="personal" class="tab-content active">
-          <input type="text" placeholder="Full Name" required>
-          <input type="text" placeholder="Phone" required>
-        </div>
-        <div id="guarantor" class="tab-content">
-          <input type="text" placeholder="Guarantor Name" required>
-          <input type="text" placeholder="Guarantor Phone" required>
-        </div>
-        <div id="loan" class="tab-content">
-          <input type="number" placeholder="Loan Amount" required>
-          <textarea placeholder="Purpose of Loan" required></textarea>
-        </div>
-        <div id="repayment" class="tab-content">
-          <p>Loan Progress: <span id="loanProgress">0%</span></p>
-        </div>
-        <button class="submit-btn" id="loanSubmitBtn">Submit Loan</button>
-      </div>
+<!-- SAVINGS -->
+<div id="savings" class="tab-content">
+    <h3>Weekly Savings</h3>
+    <form id="savingsForm">
+        <input type="number" id="saveAmount" placeholder="Amount Saved" required>
+        <button type="button" class="submit-btn" id="saveBtn">Save</button>
+    </form>
+    <button class="submit-btn" id="downloadSavings">Download Account Statement</button>
+</div>
 
-      <div id="shares" class="tab-content">
-        <h3>Shares Contribution</h3>
-        <form id="sharesForm">
-          <input type="number" placeholder="Amount" required>
-          <button class="submit-btn" type="submit">Submit Shares</button>
-        </form>
-      </div>
+<!-- SHARES -->
+<div id="shares" class="tab-content">
+    <h3>Shares</h3>
+    <form id="sharesForm">
+        <input type="number" id="sharesAmount" placeholder="Number of Shares" required>
+        <button type="button" class="submit-btn" id="saveShares">Save Shares</button>
+    </form>
+</div>
 
-      <div id="account" class="tab-content">
-        <h3>Download Account Statement</h3>
-        <button class="submit-btn" id="downloadStatement">Download CSV</button>
-      </div>
-
-    </main>
-  </div>
-
-  <footer>
-    <p>© 2024 Visionary Youth Group. All Rights Reserved.</p>
-  </footer>
-
-  <!-- Profile Popup -->
-  <div class="popup" id="profilePopup">
+<!-- UPDATE PROFILE -->
+<div id="update" class="tab-content">
     <h3>Update Profile</h3>
-    <input type="text" id="updateName" placeholder="Full Name">
-    <input type="text" id="updatePhone" placeholder="Phone Number">
-    <button class="submit-btn" id="profileSubmitBtn">Update</button>
-    <button class="submit-btn" id="profileCloseBtn">Close</button>
-  </div>
+    <form id="updateForm">
+        <input type="text" id="updateName" placeholder="Full Name" required>
+        <input type="text" id="updatePhone" placeholder="Phone" required>
+        <button type="button" class="submit-btn" id="updateProfile">Update Profile</button>
+    </form>
+</div>
 
-  <!-- Firebase + JS -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "...",
-      authDomain: "...",
-      projectId: "...",
-      storageBucket: "...",
-      messagingSenderId: "...",
-      appId: "...",
-    };
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+const firebaseConfig = {
+    apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
+    authDomain: "visionary-youth-grou-2024.firebaseapp.com",
+    projectId: "visionary-youth-grou-2024",
+    storageBucket: "visionary-youth-grou-2024.appspot.com",
+    messagingSenderId: "372978592717",
+    appId: "1:372978592717:web:1c15aec728ee5f854f3284"
+};
 
-    // DOM Loaded
-    document.addEventListener('DOMContentLoaded', () => {
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-      // User Data
-      onAuthStateChanged(auth, async user => {
-        if (!user) return window.location.href='index.html';
-        document.getElementById('userEmail').textContent = user.email;
-        const docRef = doc(db,'members',user.uid);
-        const docSnap = await getDoc(docRef);
-        if(docSnap.exists()){
-          const data = docSnap.data();
-          document.getElementById('userName').textContent = data.name;
-          document.getElementById('userPhone').textContent = data.phone;
-        }
-      });
+let logoutTimer;
+function startLogoutTimer() {
+    clearTimeout(logoutTimer);
+    logoutTimer = setTimeout(() => {
+        alert("Session expired due to inactivity.");
+        signOut(auth).then(()=>{window.location.href="index.html"});
+    }, 3*60*1000); // 3 minutes
+}
 
-      // Logout
-      document.getElementById('logoutBtn').addEventListener('click', async () => {
-        await signOut(auth);
-        window.location.href='index.html';
-      });
+document.body.addEventListener("mousemove", startLogoutTimer);
+document.body.addEventListener("keypress", startLogoutTimer);
+startLogoutTimer();
 
-      // Tabs Sidebar
-      document.querySelectorAll('.sidebar a[data-tab]').forEach(a=>{
-        a.addEventListener('click', e=>{
-          e.preventDefault();
-          const tab=a.dataset.tab;
-          document.querySelectorAll('.tab-content').forEach(tc=>tc.classList.remove('active'));
-          document.getElementById(tab).classList.add('active');
-        });
-      });
-
-      // Loan Tabs
-      document.querySelectorAll('#loans .tab-button').forEach(btn=>{
-        btn.addEventListener('click', ()=>{
-          document.querySelectorAll('#loans .tab-button').forEach(b=>b.classList.remove('active'));
-          document.querySelectorAll('#loans .tab-content').forEach(tc=>tc.classList.remove('active'));
-          btn.classList.add('active');
-          document.getElementById(btn.dataset.tab).classList.add('active');
-        });
-      });
-
-      // Savings Submit
-      document.getElementById('savingsForm').addEventListener('submit', async e=>{
-        e.preventDefault();
-        const amount = e.target[0].value;
-        const user = auth.currentUser;
-        if(user){
-          await addDoc(collection(db,'savings'),{uid:user.uid,amount,createdAt:Date.now()});
-          alert('Savings submitted!');
-          e.target.reset();
-        }
-      });
-
-      // Shares Submit
-      document.getElementById('sharesForm').addEventListener('submit', async e=>{
-        e.preventDefault();
-        const amount = e.target[0].value;
-        const user = auth.currentUser;
-        if(user){
-          await addDoc(collection(db,'shares'),{uid:user.uid,amount,createdAt:Date.now()});
-          alert('Shares submitted!');
-          e.target.reset();
-        }
-      });
-
-      // Loan Submit
-      document.getElementById('loanSubmitBtn').addEventListener('click', async ()=>{
-        const user = auth.currentUser;
-        if(!user) return;
-        const personal = document.querySelector('#personal input');
-        const guarantor = document.querySelector('#guarantor input');
-        const loanAmount = document.querySelector('#loan input').value;
-        const purpose = document.querySelector('#loan textarea').value;
-        if(!loanAmount || !purpose){
-          alert('Loan amount and purpose required!');
-          return;
-        }
-        await addDoc(collection(db,'loans'),{uid:user.uid,loanAmount,purpose,progress:0,createdAt:Date.now()});
-        alert('Loan submitted!');
-        document.getElementById('loanProgress').textContent='0%';
-      });
-
-      // Profile Popup
-      const profilePopup = document.getElementById('profilePopup');
-      document.getElementById('updateProfileBtn').addEventListener('click', ()=>profilePopup.classList.add('active'));
-      document.getElementById('profileCloseBtn').addEventListener('click', ()=>profilePopup.classList.remove('active'));
-      document.getElementById('profileSubmitBtn').addEventListener('click', async ()=>{
-        const user = auth.currentUser;
-        if(!user) return;
-        const name = document.getElementById('updateName').value;
-        const phone = document.getElementById('updatePhone').value;
-        await setDoc(doc(db,'members',user.uid),{name,phone},{merge:true});
-        alert('Profile updated successfully!');
-        profilePopup.classList.remove('active');
-      });
-
-      // Download Account Statement
-      document.getElementById('downloadStatement').addEventListener('click', async ()=>{
-        const user = auth.currentUser;
-        if(!user) return;
-        const savingsSnap = await getDoc(doc(db,'members',user.uid));
-        let csvContent = "data:text/csv;charset=utf-8,Type,Amount,Date\n";
-        csvContent += `Savings,1000,2024-09-05\n`; // Placeholder data
-        const encodedUri = encodeURI(csvContent);
-        const link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", "account_statement.csv");
-        document.body.appendChild(link);
-        link.click();
-      });
-
-      // Auto logout after 3 min
-      setTimeout(async ()=>{
-        await signOut(auth);
-        alert('You have been logged out due to inactivity.');
-        window.location.href='index.html';
-      },180000);
+// Tabs
+const tabButtons = document.querySelectorAll(".tab-btn");
+const tabContents = document.querySelectorAll(".tab-content");
+tabButtons.forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+        tabButtons.forEach(b=>b.classList.remove("active"));
+        tabContents.forEach(c=>c.classList.remove("active"));
+        btn.classList.add("active");
+        document.getElementById(btn.dataset.tab).classList.add("active");
     });
-  </script>
+});
+
+// Auth & Load User
+let currentUser;
+onAuthStateChanged(auth, async user=>{
+    if(user){
+        currentUser=user;
+        document.getElementById("userEmail").textContent=user.email;
+        // Load Personal Info
+        const docSnap = await getDoc(doc(db,"members",user.uid));
+        if(docSnap.exists()){
+            const data=docSnap.data();
+            document.getElementById("personalData").innerHTML=
+            `<p><b>Name:</b> ${data.name}</p>
+             <p><b>Phone:</b> ${data.phone}</p>
+             <p><b>ID:</b> ${data.id}</p>
+             <p><b>Origin:</b> ${data.origin}</p>
+             <p><b>Email:</b> ${data.email}</p>`;
+            // Pre-fill update
+            document.getElementById("updateName").value=data.name;
+            document.getElementById("updatePhone").value=data.phone;
+        }
+    } else {
+        window.location.href="index.html";
+    }
+});
+
+// Logout
+document.getElementById("logoutBtn").addEventListener("click", ()=>{
+    signOut(auth).then(()=>window.location.href="index.html");
+});
+
+// Guarantor
+document.getElementById("saveGuarantor").addEventListener("click", async ()=>{
+    const name=document.getElementById("guarantorName").value;
+    const phone=document.getElementById("guarantorPhone").value;
+    if(name && phone){
+        await setDoc(doc(db,"guarantors",currentUser.uid),{name,phone,createdAt:serverTimestamp()});
+        alert("Guarantor saved successfully");
+        document.getElementById("guarantorForm").reset();
+    }
+});
+
+// Loan
+document.getElementById("applyLoan").addEventListener("click", async ()=>{
+    const amount=document.getElementById("loanAmount").value;
+    const purpose=document.getElementById("loanPurpose").value;
+    const duration=document.getElementById("loanDuration").value;
+    if(amount && purpose && duration){
+        await setDoc(doc(db,"loans",currentUser.uid),{amount,purpose,duration,status:"Pending",createdAt:serverTimestamp()});
+        alert("Loan applied successfully");
+        document.getElementById("loanForm").reset();
+        document.getElementById("loanStatus").textContent="Loan Pending";
+    }
+});
+
+// Repayment
+document.getElementById("repayLoan").addEventListener("click", async ()=>{
+    const amt=document.getElementById("repayAmount").value;
+    if(amt){
+        await addDoc(collection(db,"repayments"),{uid:currentUser.uid,amount:amt,createdAt:serverTimestamp()});
+        alert("Repayment recorded");
+        document.getElementById("repaymentForm").reset();
+    }
+});
+
+// Weekly Savings
+document.getElementById("saveBtn").addEventListener("click", async ()=>{
+    const amt=document.getElementById("saveAmount").value;
+    if(amt){
+        await addDoc(collection(db,"savings"),{uid:currentUser.uid,amount:amt,createdAt:serverTimestamp()});
+        alert("Saved successfully");
+        document.getElementById("savingsForm").reset();
+    }
+});
+
+// Download Savings Statement
+document.getElementById("downloadSavings").addEventListener("click", async ()=>{
+    const snapshot=await getDoc(doc(db,"members",currentUser.uid));
+    const data=snapshot.data();
+    const csv=`Name,Email,Phone\n${data.name},${data.email},${data.phone}`;
+    const blob=new Blob([csv],{type:'text/csv'});
+    const link=document.createElement("a");
+    link.href=URL.createObjectURL(blob);
+    link.download="account_statement.csv";
+    link.click();
+});
+
+// Shares
+document.getElementById("saveShares").addEventListener("click", async ()=>{
+    const amt=document.getElementById("sharesAmount").value;
+    if(amt){
+        await addDoc(collection(db,"shares"),{uid:currentUser.uid,amount:amt,createdAt:serverTimestamp()});
+        alert("Shares saved");
+        document.getElementById("sharesForm").reset();
+    }
+});
+
+// Update Profile
+document.getElementById("updateProfile").addEventListener("click", async ()=>{
+    const name=document.getElementById("updateName").value;
+    const phone=document.getElementById("updatePhone").value;
+    if(name && phone){
+        await updateDoc(doc(db,"members",currentUser.uid),{name,phone});
+        alert("Profile updated successfully");
+    }
+});
+</script>
+
 </body>
 </html>
