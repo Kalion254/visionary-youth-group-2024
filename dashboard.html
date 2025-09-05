@@ -102,6 +102,80 @@ nav button.active {
   to {opacity:1; transform: translateY(0);}
 }
 
+/* ---------- Mini Tabs ---------- */
+.mini-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.mini-btn {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.15);
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.mini-btn.active, .mini-btn:hover {
+  background: #2196f3;
+}
+
+.mini-section { display: none; }
+.mini-section.active { display: block; }
+
+/* ---------- Progress Bars ---------- */
+.progress-bar {
+  background: rgba(255,255,255,0.2);
+  border-radius: 20px;
+  overflow: hidden;
+  margin: 10px 0;
+  height: 20px;
+}
+
+.progress-fill {
+  background: #ffeb3b;
+  height: 100%;
+  width: 0;
+  border-radius: 20px;
+  transition: width 1s ease-in-out;
+}
+
+/* ---------- Achievements ---------- */
+.achievements-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.achievement-card {
+  background: rgba(255,255,255,0.1);
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+  text-align: center;
+  transition: transform 0.2s;
+}
+
+.achievement-card:hover { transform: scale(1.05); }
+.achievement-card i { font-size: 40px; color: #ffeb3b; margin-bottom: 12px; }
+
+.achievement-card button {
+  background: #2196f3;
+  border: none;
+  color: white;
+  padding: 8px 15px;
+  border-radius: 8px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+.achievement-card button:hover { background: #1565c0; }
+
 /* ---------- Forms ---------- */
 form input, form select {
   width: 100%;
@@ -123,49 +197,7 @@ form button {
   transition: 0.3s;
 }
 
-form button:hover {
-  background: #0d47a1;
-}
-
-/* ---------- Achievements ---------- */
-.achievements-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
-}
-
-.achievement-card {
-  background: rgba(255,255,255,0.1);
-  padding: 20px;
-  border-radius: 15px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.25);
-  text-align: center;
-  transition: transform 0.2s;
-}
-
-.achievement-card:hover {
-  transform: scale(1.05);
-}
-
-.achievement-card i {
-  font-size: 40px;
-  color: #ffeb3b;
-  margin-bottom: 12px;
-}
-
-.achievement-card button {
-  background: #2196f3;
-  border: none;
-  color: white;
-  padding: 8px 15px;
-  border-radius: 8px;
-  margin-top: 10px;
-  cursor: pointer;
-}
-
-.achievement-card button:hover {
-  background: #1565c0;
-}
+form button:hover { background: #0d47a1; }
 
 /* ---------- Footer ---------- */
 footer {
@@ -176,21 +208,14 @@ footer {
   color: #ddd;
 }
 
-footer a {
-  color: #ffeb3b;
-  margin: 0 5px;
-  text-decoration: none;
-}
-
-footer a:hover {
-  text-decoration: underline;
-}
+footer a { color: #ffeb3b; margin: 0 5px; text-decoration: none; }
+footer a:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
 <header>
   <h1><i class="fa-solid fa-users"></i> Visionary Youth</h1>
-  <div id="emailDisplay"></div>
+  <div id="emailDisplay" style="font-weight:bold;"></div>
   <button id="logoutBtn">Logout</button>
 </header>
 
@@ -204,17 +229,42 @@ footer a:hover {
 </nav>
 
 <div class="container">
-  <!-- Sections remain same as before -->
+  <!-- Financial -->
   <div id="financial" class="section active">
     <h2>📊 Financial Overview</h2>
-    <p>Weekly Savings: <span id="weeklySavings">0</span></p>
-    <p>Monthly Savings: <span id="monthlySavings">0</span></p>
-    <p>Shares: <span id="shares">0</span></p>
-    <p>Loan: <span id="loan">0</span></p>
-    <p>Unpaid Balances: <span id="unpaidBalances">0</span></p>
-    <p>Dividends: <span id="dividends">0</span></p>
+    <div class="mini-tabs">
+      <button class="mini-btn active" data-mini="savings">Savings</button>
+      <button class="mini-btn" data-mini="shares">Shares</button>
+      <button class="mini-btn" data-mini="loans">Loans</button>
+      <button class="mini-btn" data-mini="balances">Balances</button>
+      <button class="mini-btn" data-mini="dividends">Dividends</button>
+    </div>
+
+    <div id="savings" class="mini-section active">
+      <p>Weekly Savings: <span id="weeklySavings">0</span></p>
+      <div class="progress-bar"><div id="weeklyBar" class="progress-fill"></div></div>
+      <p>Monthly Savings: <span id="monthlySavings">0</span></p>
+      <div class="progress-bar"><div id="monthlyBar" class="progress-fill"></div></div>
+    </div>
+    <div id="shares" class="mini-section">
+      <p>Shares: <span id="shares">0</span></p>
+      <div class="progress-bar"><div id="sharesBar" class="progress-fill"></div></div>
+    </div>
+    <div id="loans" class="mini-section">
+      <p>Loan: <span id="loan">0</span></p>
+      <div class="progress-bar"><div id="loanBar" class="progress-fill"></div></div>
+    </div>
+    <div id="balances" class="mini-section">
+      <p>Unpaid Balances: <span id="unpaidBalances">0</span></p>
+      <div class="progress-bar"><div id="balancesBar" class="progress-fill"></div></div>
+    </div>
+    <div id="dividends" class="mini-section">
+      <p>Dividends: <span id="dividends">0</span></p>
+      <div class="progress-bar"><div id="dividendsBar" class="progress-fill"></div></div>
+    </div>
   </div>
 
+  <!-- Profile -->
   <div id="profile" class="section">
     <h2>👤 Profile Update</h2>
     <form id="profileForm">
@@ -229,6 +279,7 @@ footer a:hover {
     </form>
   </div>
 
+  <!-- Loan -->
   <div id="loan" class="section">
     <h2>💵 Loan Application</h2>
     <form id="loanForm">
@@ -248,16 +299,19 @@ footer a:hover {
     <button id="downloadLoanBtn" style="display:none;">Download Loan CSV</button>
   </div>
 
+  <!-- Loan Progress -->
   <div id="loanProgress" class="section">
     <h2>📅 Loan Progress</h2>
     <div id="loanTimeline"></div>
   </div>
 
+  <!-- Achievements -->
   <div id="achievements" class="section">
     <h2>🏅 Achievements & Documents</h2>
     <div id="achievementList" class="achievements-grid"></div>
   </div>
 
+  <!-- Statement -->
   <div id="statement" class="section">
     <h2>📑 Account Statement</h2>
     <button id="downloadStatementBtn">Download CSV</button>
@@ -265,24 +319,20 @@ footer a:hover {
 </div>
 
 <footer>
-  <p>© 2024 Visionary Youth Group | Powered by Firebase</p>
-  <p>
-    <a href="#">About</a> | 
-    <a href="#">Contact</a> | 
-    <a href="#">Support</a>
-  </p>
+  <p>© 2025 Visionary Youth Group | Powered by Firebase</p>
+  <p><a href="#">About</a> | <a href="#">Contact</a> | <a href="#">Support</a></p>
 </footer>
 
 <script>
-/* ✅ Firebase Config (same as before) */
-const firebaseConfig={/* your config */};
+/* 🔹 Firebase Config */
+const firebaseConfig={/* your config here */};
 firebase.initializeApp(firebaseConfig);
 const auth=firebase.auth();
 const db=firebase.database();
 const storage=firebase.storage();
 let currentUserUid;
 
-/* ✅ Tabs */
+/* 🔹 Tabs */
 document.querySelectorAll(".tab-btn").forEach(btn=>{
   btn.addEventListener("click",()=>{
     document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
@@ -292,22 +342,56 @@ document.querySelectorAll(".tab-btn").forEach(btn=>{
   });
 });
 
-/* ✅ Logout */
+/* 🔹 Mini Tabs */
+document.querySelectorAll(".mini-btn").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll(".mini-section").forEach(s=>s.classList.remove("active"));
+    document.querySelectorAll(".mini-btn").forEach(b=>b.classList.remove("active"));
+    document.getElementById(btn.dataset.mini).classList.add("active");
+    btn.classList.add("active");
+  });
+});
+
+/* 🔹 Logout */
 document.getElementById("logoutBtn").addEventListener("click",()=>auth.signOut().then(()=>window.location.href="index.html"));
 
-/* ✅ Auth Check */
+/* 🔹 Auth */
 auth.onAuthStateChanged(user=>{
   if(user){
     currentUserUid=user.uid;
-    document.getElementById("emailDisplay").textContent=user.email;
+    document.getElementById("emailDisplay").textContent="Welcome, "+user.email;
     loadFinancials(); loadLoanProgress(); loadAchievements();
-  } else {
-    window.location.href="index.html";
-  }
+  } else { window.location.href="index.html"; }
 });
 
-/* ✅ Profile Update */
-document.getElementById("profileForm").addEventListener("submit",async e=>{
+/* 🔹 Financials with progress bars */
+function animateBar(id,value,max=10000){
+  const bar=document.getElementById(id);
+  const width=Math.min((value/max)*100,100);
+  setTimeout(()=>{ bar.style.width=width+"%"; },200);
+}
+
+function loadFinancials(){
+  db.ref(`users/${currentUserUid}/financials`).on("value",snap=>{
+    const d=snap.val()||{};
+    weeklySavings.textContent=d.weekly_savings||0;
+    monthlySavings.textContent=d.monthly_savings||0;
+    shares.textContent=d.shares||0;
+    loan.textContent=d.loan||0;
+    unpaidBalances.textContent=d.unpaid_balances||0;
+    dividends.textContent=d.dividends||0;
+
+    animateBar("weeklyBar",d.weekly_savings||0);
+    animateBar("monthlyBar",d.monthly_savings||0);
+    animateBar("sharesBar",d.shares||0);
+    animateBar("loanBar",d.loan||0);
+    animateBar("balancesBar",d.unpaid_balances||0);
+    animateBar("dividendsBar",d.dividends||0);
+  });
+}
+
+/* 🔹 Profile Update */
+profileForm.addEventListener("submit",async e=>{
   e.preventDefault();
   const file=document.getElementById("passport").files[0];
   const storageRef=storage.ref(`passports/${currentUserUid}`);
@@ -321,46 +405,34 @@ document.getElementById("profileForm").addEventListener("submit",async e=>{
   alert("✅ Profile updated successfully!");
 });
 
-/* ✅ Load Financials */
-function loadFinancials(){
-  db.ref(`users/${currentUserUid}/financials`).on("value",snap=>{
-    const d=snap.val()||{};
-    weeklySavings.textContent=d.weekly_savings||0;
-    monthlySavings.textContent=d.monthly_savings||0;
-    shares.textContent=d.shares||0;
-    loan.textContent=d.loan||0;
-    unpaidBalances.textContent=d.unpaid_balances||0;
-    dividends.textContent=d.dividends||0;
-  });
-}
-
-/* ✅ Loan Application */
+/* 🔹 Loan Application */
 loanForm.addEventListener("submit",async e=>{
   e.preventDefault();
-  const loanData={
-    personal:{name:loanName.value},
+  if(!loanName.value||!loanAmount.value||!loanCategory.value||!loanGuarantor.value||!loanPhone.value){
+    alert("⚠️ Fill all loan fields."); return;
+  }
+  const loanData={ personal:{name:loanName.value},
     loanDetails:{amount:loanAmount.value,category:loanCategory.value},
     guarantor:{name:loanGuarantor.value,phone:loanPhone.value},
-    status:"Applied",timestamp:Date.now()
-  };
+    status:"Applied",timestamp:Date.now() };
   const ref=await db.ref(`users/${currentUserUid}/loan_applications`).push(loanData);
   alert("🎉 Loan application submitted!");
   downloadLoanBtn.style.display="block";
   downloadLoanBtn.onclick=()=>downloadLoanCSV(ref.key);
 });
 
-/* ✅ Loan CSV */
+/* 🔹 Loan CSV */
 function downloadLoanCSV(loanKey){
   db.ref(`users/${currentUserUid}/loan_applications/${loanKey}`).once('value').then(snap=>{
     const d=snap.val(); let csv="Section,Field,Value\n";
     for(let sec in d) for(let key in d[sec]) csv+=`${sec},${key},${d[sec][key]}\n`;
     const blob=new Blob([csv],{type:'text/csv'});
-    const link=document.createElement('a');
-    link.href=URL.createObjectURL(blob); link.download='loan_application.csv'; link.click();
+    const link=document.createElement('a'); link.href=URL.createObjectURL(blob);
+    link.download='loan_application.csv'; link.click();
   });
 }
 
-/* ✅ Loan Progress */
+/* 🔹 Loan Progress */
 function loadLoanProgress(){
   loanTimeline.innerHTML="";
   db.ref(`users/${currentUserUid}/loan_applications`).on('value',snap=>{
@@ -377,44 +449,41 @@ function loadLoanProgress(){
   });
 }
 
-/* ✅ Achievements */
+/* 🔹 Achievements */
 function loadAchievements(){
   achievementList.innerHTML="";
   db.ref(`users/${currentUserUid}/achievements`).on("value",snap=>{
     achievementList.innerHTML="";
     const data=snap.val()||{};
-    if(Object.keys(data).length===0){
-      achievementList.innerHTML="<p>No achievements uploaded yet.</p>"; return;
-    }
-    for(let key in data){
-      const doc=data[key];
-      const div=document.createElement("div");
-      div.className="achievement-card";
-      div.innerHTML=`
-        <i class="fa fa-file-alt"></i>
-        <h3>${doc.title}</h3>
-        <small>Uploaded: ${doc.uploadedAt}</small><br>
-        <button onclick="window.open('${doc.fileURL}','_blank')">Download</button>
-      `;
-      achievementList.appendChild(div);
+    if(Object.keys(data).length===0){ achievementList.innerHTML="<p>No achievements yet</p>"; return; }
+    for(const key in data){
+      const a=data[key];
+      achievementList.innerHTML+=`
+        <div class="achievement-card">
+          <i class="fa-solid fa-certificate"></i>
+          <h3>${a.title}</h3>
+          <p>${a.description}</p>
+          <button onclick="downloadAchievement('${key}')">Download</button>
+        </div>`;
     }
   });
 }
+function downloadAchievement(id){
+  db.ref(`users/${currentUserUid}/achievements/${id}`).once("value").then(snap=>{
+    const d=snap.val(); const blob=new Blob([`Achievement: ${d.title}\n${d.description}`],{type:"text/plain"});
+    const link=document.createElement("a"); link.href=URL.createObjectURL(blob);
+    link.download="achievement.txt"; link.click();
+  });
+}
 
-/* ✅ Statement */
+/* 🔹 Statement Download */
 downloadStatementBtn.addEventListener("click",()=>{
   db.ref(`users/${currentUserUid}/financials`).once('value').then(snap=>{
-    const d=snap.val()||{};
-    let csv=`Type,Amount
-Weekly Savings,${d.weekly_savings||0}
-Monthly Savings,${d.monthly_savings||0}
-Shares,${d.shares||0}
-Loan,${d.loan||0}
-Unpaid Balances,${d.unpaid_balances||0}
-Dividends,${d.dividends||0}`;
+    const d=snap.val()||{}; let csv="Field,Value\n";
+    for(let k in d) csv+=`${k},${d[k]}\n`;
     const blob=new Blob([csv],{type:'text/csv'});
-    const link=document.createElement('a');
-    link.href=URL.createObjectURL(blob); link.download='account_statement.csv'; link.click();
+    const link=document.createElement("a"); link.href=URL.createObjectURL(blob);
+    link.download="statement.csv"; link.click();
   });
 });
 </script>
