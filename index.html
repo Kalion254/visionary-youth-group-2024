@@ -9,6 +9,8 @@
   <!-- Fonts & Icons -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- AOS Animations -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
 
   <style>
@@ -17,6 +19,7 @@
       font-family: 'Poppins', sans-serif;
       background: #f0f2f5;
       color: #333;
+      scroll-behavior: smooth;
     }
 
     nav {
@@ -42,6 +45,7 @@
       color: #ffcc00;
     }
 
+    /* Slideshow */
     header {
       position: relative;
       height: 100vh;
@@ -80,6 +84,7 @@
       text-align: center;
       color: white;
       background: rgba(0, 0, 0, 0.4);
+      padding: 0 20px;
     }
 
     header h1 {
@@ -232,10 +237,10 @@
   <header data-aos="fade-down">
     <div class="slideshow">
       <img src="https://source.unsplash.com/1600x900/?youth,community" class="active" alt="Slide 1">
-      <img src="https://source.unsplash.com/1600x900/?youth,finance" alt="Slide 2">
-      <img src="https://source.unsplash.com/1600x900/?education,team" alt="Slide 3">
-      <img src="https://source.unsplash.com/1600x900/?entrepreneurship" alt="Slide 4">
-      <img src="https://source.unsplash.com/1600x900/?networking" alt="Slide 5">
+      <img src="https://source.unsplash.com/1600x900/?youth,leadership" alt="Slide 2">
+      <img src="https://source.unsplash.com/1600x900/?entrepreneurship" alt="Slide 3">
+      <img src="https://source.unsplash.com/1600x900/?education" alt="Slide 4">
+      <img src="https://source.unsplash.com/1600x900/?volunteering" alt="Slide 5">
     </div>
     <div class="content">
       <h1>VISIONARY YOUTH GROUP 2024</h1>
@@ -244,85 +249,97 @@
     </div>
   </header>
 
+  <!-- About -->
   <section id="about" data-aos="fade-up">
     <h2>About Us</h2>
     <p>VISIONARY YOUTH GROUP 2024 empowers young people through financial literacy, entrepreneurship, and community service. We foster leadership, accountability, and growth among youth to positively impact society.</p>
   </section>
 
+  <!-- Benefits -->
   <section id="benefits" data-aos="fade-up">
     <h2>Benefits</h2>
     <div class="benefits">
-      <div class="benefit"><i class="fas fa-piggy-bank"></i>
-        <h3>Savings</h3>
-        <p>Contribute regularly and track your weekly and monthly savings progress.</p>
+      <div class="benefit">
+        <i class="fas fa-piggy-bank"></i>
+        <h3>Financial Literacy</h3>
+        <p>Learn to manage money, save wisely, and grow wealth responsibly.</p>
       </div>
-      <div class="benefit"><i class="fas fa-hand-holding-usd"></i>
-        <h3>Loans</h3>
-        <p>Apply for loans with clear repayment plans and track loan progress.</p>
+      <div class="benefit">
+        <i class="fas fa-hand-holding-usd"></i>
+        <h3>Loans & Funding</h3>
+        <p>Access small loans, funding, and grants for youth projects.</p>
       </div>
-      <div class="benefit"><i class="fas fa-users"></i>
+      <div class="benefit">
+        <i class="fas fa-users"></i>
         <h3>Networking</h3>
-        <p>Connect with fellow youth and build meaningful relationships.</p>
+        <p>Connect with like-minded youth, mentors, and industry leaders.</p>
       </div>
-      <div class="benefit"><i class="fas fa-chart-line"></i>
-        <h3>Reports</h3>
-        <p>Receive regular statements and insights on your contributions.</p>
-      </div>
-      <div class="benefit"><i class="fas fa-share-alt"></i>
-        <h3>Shares</h3>
-        <p>Participate in group shares and collective investment opportunities.</p>
+      <div class="benefit">
+        <i class="fas fa-chart-line"></i>
+        <h3>Progress Tracking</h3>
+        <p>Track personal and group achievements, growth, and contributions.</p>
       </div>
     </div>
   </section>
 
+  <!-- Programs -->
   <section id="programs" data-aos="fade-up">
     <h2>Programs</h2>
     <div class="programs">
-      <div class="card"><i class="fas fa-lightbulb"></i>
-        <h3>Entrepreneurship</h3>
-        <p>Workshops and mentorship for young entrepreneurs.</p>
+      <div class="card">
+        <i class="fas fa-lightbulb"></i>
+        <h3>Entrepreneurship Training</h3>
+        <p>Workshops and mentorship to develop your business ideas.</p>
       </div>
-      <div class="card"><i class="fas fa-chalkboard-teacher"></i>
-        <h3>Financial Literacy</h3>
-        <p>Training sessions to improve financial knowledge and planning.</p>
+      <div class="card">
+        <i class="fas fa-book-open"></i>
+        <h3>Education & Skills</h3>
+        <p>Learn skills needed for employment, entrepreneurship, and leadership.</p>
       </div>
-      <div class="card"><i class="fas fa-hand-holding-heart"></i>
+      <div class="card">
+        <i class="fas fa-hands-helping"></i>
         <h3>Community Service</h3>
-        <p>Engage in activities that give back to the community.</p>
+        <p>Participate in local initiatives to make a positive social impact.</p>
       </div>
     </div>
   </section>
 
+  <!-- News -->
   <section id="news" data-aos="fade-up">
     <h2>News & Updates</h2>
     <div class="news">
-      <div class="card"><i class="fas fa-newspaper"></i>
-        <h3>Latest Articles</h3>
-        <p>Stay informed about youth initiatives, financial tips, and upcoming events.</p>
+      <div class="card">
+        <i class="fas fa-newspaper"></i>
+        <h3>Upcoming Workshop</h3>
+        <p>Join our entrepreneurship workshop next month. Sign up early to secure your spot!</p>
       </div>
-      <div class="card"><i class="fas fa-bullhorn"></i>
-        <h3>Announcements</h3>
-        <p>Get instant updates on new programs, opportunities, and alerts.</p>
+      <div class="card">
+        <i class="fas fa-bullhorn"></i>
+        <h3>Community Initiative</h3>
+        <p>Our youth team cleaned up local neighborhoods, promoting health and safety.</p>
       </div>
-      <div class="card"><i class="fas fa-calendar-alt"></i>
-        <h3>Events</h3>
-        <p>Details on workshops, seminars, and group activities for youth members.</p>
+      <div class="card">
+        <i class="fas fa-calendar-check"></i>
+        <h3>Annual Conference</h3>
+        <p>Register now for our 2024 youth conference focusing on innovation and leadership.</p>
       </div>
     </div>
   </section>
 
+  <!-- Contact -->
   <section id="contact" data-aos="fade-up">
-    <h2>Contact Us</h2>
+    <h2>Contact</h2>
     <p><i class="fas fa-map-marker-alt"></i> Nairobi, Kenya</p>
-    <p><i class="fas fa-envelope"></i> visionaryyouthgroup.gmail.com</p>
+    <p><i class="fas fa-envelope"></i> info@visionaryyouth32.gmail.com</p>
     <p><i class="fas fa-phone"></i> +254 741453336</p>
     <div class="social-icons">
-      <a href="#"><i class="fab fa-facebook"></i></a>
+      <a href="#"><i class="fab fa-facebook-f"></i></a>
       <a href="#"><i class="fab fa-twitter"></i></a>
       <a href="#"><i class="fab fa-instagram"></i></a>
     </div>
   </section>
 
+  <!-- Join / Auth -->
   <section id="auth" data-aos="fade-up">
     <h2>Join Our Community</h2>
     <p><strong>All fields are required. Sign up below.</strong></p>
@@ -352,7 +369,7 @@
     <p>© 2024 VISIONARY YOUTH GROUP. All Rights Reserved.</p>
   </footer>
 
-  <!-- Firebase -->
+  <!-- Firebase & Scripts -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
@@ -372,16 +389,15 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // Listen for auth state and redirect if logged in
+    // Redirect if already logged in
     onAuthStateChanged(auth, (user) => {
-      if (user) {
+      if (user && window.location.pathname.endsWith("index.html")) {
         window.location.href = "dashboard.html";
       }
     });
 
     // SIGNUP
-    document.getElementById('signupBtn').addEventListener('click', async (event) => {
-      event.preventDefault();
+    document.getElementById('signupBtn').addEventListener('click', async () => {
       const signupInfo = {
         name: document.getElementById('signupName').value,
         phone: document.getElementById('signupPhone').value,
@@ -408,20 +424,19 @@
     });
 
     // LOGIN
-    document.getElementById('loginBtn').addEventListener('click', async (event) => {
-      event.preventDefault();
+    document.getElementById('loginBtn').addEventListener('click', async () => {
       const email = document.getElementById('loginEmail').value;
       const password = document.getElementById('loginPassword').value;
       try {
         await signInWithEmailAndPassword(auth, email, password);
+        window.location.href = "dashboard.html";
       } catch (err) {
         alert("Login failed: " + err.message);
       }
     });
 
     // RESET PASSWORD
-    document.getElementById('resetPasswordBtn').addEventListener('click', async (event) => {
-      event.preventDefault();
+    document.getElementById('resetPasswordBtn').addEventListener('click', async () => {
       const email = document.getElementById('loginEmail').value;
       if (!email) {
         alert("Enter your email to reset password");
@@ -435,7 +450,7 @@
       }
     });
 
-    // Slideshow logic
+    // Slideshow
     let slides = document.querySelectorAll('.slideshow img');
     let current = 0;
     setInterval(() => {
@@ -449,6 +464,6 @@
   <script>
     AOS.init({ duration: 1000, once: true });
   </script>
-
 </body>
+
 </html>
