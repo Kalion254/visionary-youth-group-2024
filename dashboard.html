@@ -17,33 +17,34 @@ body {
   color:#fff; display:flex; min-height:100vh;
 }
 .sidebar {
-  width:220px; background:rgba(0,0,0,0.4);
-  display:flex; flex-direction:column; padding:20px; box-shadow:2px 0 10px rgba(0,0,0,0.5);
+  width:220px; background:rgba(0,0,0,0.6);
+  display:flex; flex-direction:column; padding:20px;
 }
-.sidebar h2 { color:#ffeb3b; margin-bottom:20px; font-size:20px; }
+.sidebar h2 { color:#4caf50; margin-bottom:20px; font-size:20px; }
 .sidebar button {
   background:none; border:none; color:white; padding:12px; text-align:left;
   border-radius:8px; display:flex; align-items:center; gap:8px;
   cursor:pointer; transition:0.3s;
 }
-.sidebar button:hover, .sidebar button.active { background:#1565c0; }
+.sidebar button:hover, .sidebar button.active {
+  background:#4caf50; /* Green active */
+}
 .main { flex:1; display:flex; flex-direction:column; }
 header {
-  background:rgba(21,101,192,0.9); padding:15px;
+  background:#4caf50; padding:15px;
   display:flex; justify-content:space-between; align-items:center;
 }
 .container { flex:1; padding:20px; overflow-y:auto; }
 .section { display:none; background:rgba(255,255,255,0.08); padding:20px; border-radius:12px; }
-.section.active { display:block; animation:fadeIn .4s ease; }
-@keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.section.active { display:block; }
 .mini-tabs { display:flex; gap:8px; margin-bottom:10px; }
 .mini-btn { flex:1; padding:8px; border:none; border-radius:8px; background:rgba(255,255,255,0.2); color:white; cursor:pointer; }
-.mini-btn.active { background:#2196f3; }
+.mini-btn.active { background:#4caf50; }
 .progress-bar { background:rgba(255,255,255,0.2); border-radius:20px; overflow:hidden; margin:5px 0; height:20px; }
 .progress-fill { background:#ffeb3b; height:100%; width:0; transition:width 1s; }
 form input, form select { width:100%; padding:10px; margin:6px 0; border-radius:8px; border:none; }
-form button { background:#1565c0; color:white; padding:10px; border:none; border-radius:8px; cursor:pointer; }
-form button:hover { background:#0d47a1; }
+form button { background:#4caf50; color:white; padding:10px; border:none; border-radius:8px; cursor:pointer; }
+form button:hover { background:#388e3c; }
 footer { background:rgba(0,0,0,0.4); padding:10px; text-align:center; font-size:13px; }
 .toast {
   position:fixed; bottom:20px; right:20px;
@@ -144,7 +145,7 @@ footer { background:rgba(0,0,0,0.4); padding:10px; text-align:center; font-size:
 <div id="toast" class="toast"></div>
 
 <script>
-const firebaseConfig={/* your firebase config */};
+const firebaseConfig={/* your firebase config here */};
 firebase.initializeApp(firebaseConfig);
 const auth=firebase.auth(), db=firebase.database(), storage=firebase.storage();
 let currentUserUid;
@@ -152,16 +153,28 @@ let currentUserUid;
 /* Toast */
 function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),3000);}
 
-/* Tabs */
+/* Sidebar Navigation */
 document.querySelectorAll(".tab-btn").forEach(btn=>{
-  btn.onclick=()=>{document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));document.getElementById(btn.dataset.target).classList.add("active");btn.classList.add("active");};
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+    document.getElementById(btn.dataset.target).classList.add("active");
+    btn.classList.add("active");
+  });
 });
+
+/* Mini-tabs */
 document.querySelectorAll(".mini-btn").forEach(btn=>{
-  btn.onclick=()=>{document.querySelectorAll(".mini-section").forEach(s=>s.classList.remove("active"));document.querySelectorAll(".mini-btn").forEach(b=>b.classList.remove("active"));document.getElementById(btn.dataset.mini).classList.add("active");btn.classList.add("active");};
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll(".mini-section").forEach(s=>s.classList.remove("active"));
+    document.querySelectorAll(".mini-btn").forEach(b=>b.classList.remove("active"));
+    document.getElementById(btn.dataset.mini).classList.add("active");
+    btn.classList.add("active");
+  });
 });
 
 /* Logout */
-document.getElementById("logoutBtn").onclick=()=>auth.signOut().then(()=>location.href="index.html");
+logoutBtn.onclick=()=>auth.signOut().then(()=>location.href="index.html");
 
 /* Auth */
 auth.onAuthStateChanged(user=>{
@@ -176,11 +189,13 @@ function loadFinancials(){
     const d=s.val()||{};
     weeklySavings.textContent=d.weekly_savings||0;monthlySavings.textContent=d.monthly_savings||0;
     sharesVal.textContent=d.shares||0;loanVal.textContent=d.loan||0;balanceVal.textContent=d.unpaid_balances||0;divVal.textContent=d.dividends||0;
-    animateBar("weeklyBar",d.weekly_savings||0);animateBar("monthlyBar",d.monthly_savings||0);animateBar("sharesBar",d.shares||0);animateBar("loanBar",d.loan||0);animateBar("balanceBar",d.unpaid_balances||0);animateBar("divBar",d.dividends||0);
+    animateBar("weeklyBar",d.weekly_savings||0);animateBar("monthlyBar",d.monthly_savings||0);
+    animateBar("sharesBar",d.shares||0);animateBar("loanBar",d.loan||0);
+    animateBar("balanceBar",d.unpaid_balances||0);animateBar("divBar",d.dividends||0);
   });
 }
 
-/* Profile Update Once */
+/* Profile Update */
 profileForm.onsubmit=async e=>{
   e.preventDefault();
   const ref=db.ref("users/"+currentUserUid+"/profile");
@@ -193,19 +208,40 @@ profileForm.onsubmit=async e=>{
 /* Loan Apply */
 loanForm.onsubmit=async e=>{
   e.preventDefault();
-  const data={personal:{name:loanName.value,id:loanID.value,phone:loanPhone.value},residence:{address:loanAddress.value,origin:loanOrigin.value},guarantor:{name:guarantorName.value,phone:guarantorPhone.value},loan:{amount:loanAmount.value,category:loanCategory.value},status:"Applied",timestamp:Date.now()};
+  const data={personal:{name:loanName.value,id:loanID.value,phone:loanPhone.value},
+    residence:{address:loanAddress.value,origin:loanOrigin.value},
+    guarantor:{name:guarantorName.value,phone:guarantorPhone.value},
+    loan:{amount:loanAmount.value,category:loanCategory.value},
+    status:"Applied",timestamp:Date.now()};
   await db.ref("users/"+currentUserUid+"/loan_applications").push(data);
   showToast("Loan application submitted!");
 };
 
 /* Loan Progress */
-function loadLoanProgress(){loanTimeline.innerHTML="";db.ref("users/"+currentUserUid+"/loan_applications").on("value",snap=>{loanTimeline.innerHTML="";snap.forEach(c=>{const loan=c.val();loanTimeline.innerHTML+=`<p>${loan.loan.amount} - ${loan.status}</p>`;});});}
+function loadLoanProgress(){
+  loanTimeline.innerHTML="";
+  db.ref("users/"+currentUserUid+"/loan_applications").on("value",snap=>{
+    loanTimeline.innerHTML="";
+    snap.forEach(c=>{
+      const loan=c.val();
+      loanTimeline.innerHTML+=`<p>${loan.loan.amount} - ${loan.status}</p>`;
+    });
+  });
+}
 
 /* Achievements */
-function loadAchievements(){achievementList.innerHTML="";db.ref("users/"+currentUserUid+"/achievements").on("value",s=>{achievementList.innerHTML="";const d=s.val()||{};if(!Object.keys(d).length)achievementList.textContent="No achievements";for(let k in d){const a=d[k];achievementList.innerHTML+=`<div><h4>${a.title}</h4><p>${a.description}</p></div>`;}});}
+function loadAchievements(){
+  achievementList.innerHTML="";
+  db.ref("users/"+currentUserUid+"/achievements").on("value",s=>{
+    achievementList.innerHTML="";
+    const d=s.val()||{};
+    if(!Object.keys(d).length) achievementList.textContent="No achievements yet";
+    for(let k in d){const a=d[k];achievementList.innerHTML+=`<div><h4>${a.title}</h4><p>${a.description}</p></div>`;}
+  });
+}
 
 /* Statement */
-downloadStatementBtn.onclick=()=>{db.ref("users/"+currentUserUid+"/financials").once("value").then(s=>{let d=s.val()||{},csv="Field,Value\\n";for(let k in d)csv+=k+","+d[k]+"\\n";const blob=new Blob([csv],{type:"text/csv"});const link=document.createElement("a");link.href=URL.createObjectURL(blob);link.download="statement.csv";link.click();});};
+downloadStatementBtn.onclick=()=>{db.ref("users/"+currentUserUid+"/financials").once("value").then(s=>{let d=s.val()||{},csv="Field,Value\n";for(let k in d)csv+=k+","+d[k]+"\n";const blob=new Blob([csv],{type:"text/csv"});const link=document.createElement("a");link.href=URL.createObjectURL(blob);link.download="statement.csv";link.click();});};
 
 /* Auto logout 3min */
 let logoutTimer;function resetTimer(){clearTimeout(logoutTimer);logoutTimer=setTimeout(()=>{showToast("Logged out for inactivity");auth.signOut().then(()=>location.href="index.html");},180000);}
