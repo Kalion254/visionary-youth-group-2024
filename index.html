@@ -43,6 +43,7 @@
         nav a:hover {
             color: #ffcc00;
         }
+        /* Slideshow */
         
         header {
             position: relative;
@@ -56,24 +57,24 @@
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: -1;
         }
         
         .slideshow img {
+            position: absolute;
             width: 100%;
             height: 100%;
             object-fit: cover;
-            position: absolute;
             opacity: 0;
-            transition: opacity 1s ease-in-out;
+            transition: opacity 1.5s ease-in-out;
         }
         
         .slideshow img.active {
             opacity: 1;
         }
         
-        .header-content {
+        header .content {
             position: relative;
+            z-index: 2;
             height: 100%;
             display: flex;
             flex-direction: column;
@@ -232,21 +233,20 @@
     </nav>
 
     <header data-aos="fade-down">
-        <!-- Slideshow -->
         <div class="slideshow">
-            <img src="slide1.png.png" class="active">
-            <img src="slide2.png.jpg">
-            <img src="slide3.jpg.jpg">
-            <img src="2025 executive.jpg" executive "">
+            <img src="slide1.png.png" class="active" alt="Slide 1">
+            <img src="slide2.png.jpg" alt="Slide 2">
+            <img src="slide3.jpg.jpg" alt="Slide 3">
+            <img src="networking.jpg" alt="Slide 4">
+            <img src="2025 executive.jpg" alt="Slide 5">
         </div>
-        <div class="header-content">
+        <div class="content">
             <h1>VISIONARY YOUTH GROUP 2024</h1>
             <p>Empowering Youth Through Financial Literacy, Entrepreneurship & Community Impact</p>
             <button class="hero-btn" onclick="document.getElementById('auth').scrollIntoView({behavior:'smooth'})">Join Us Today</button>
         </div>
     </header>
 
-    <!-- Keep all your original sections -->
     <section id="about" data-aos="fade-up">
         <h2>About Us</h2>
         <p>VISIONARY YOUTH GROUP 2024 empowers young people through financial literacy, entrepreneurship, and community service. We foster leadership, accountability, and growth among youth to positively impact society.</p>
@@ -355,7 +355,7 @@
         <p>© 2024 VISIONARY YOUTH GROUP. All Rights Reserved.</p>
     </footer>
 
-    <!-- Firebase Auth Logic -->
+    <!-- Firebase -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"; import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
         import { getFirestore, setDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js"; const firebaseConfig = { apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4", authDomain: "visionary-youth-grou-2024.firebaseapp.com",
@@ -366,18 +366,8 @@
         signupInfo.origin, email: signupInfo.email, createdAt: serverTimestamp() }); alert("Signup successful! Please login."); document.getElementById('signupForm').reset(); } catch(err){ alert("Signup failed: " + err.message); } }); // LOGIN document.getElementById('loginBtn').addEventListener('click',
         async (event)=>{ event.preventDefault(); const email = document.getElementById('loginEmail').value; const password = document.getElementById('loginPassword').value; try { await signInWithEmailAndPassword(auth, email, password); window.location.href
         = "dashboard.html"; } catch(err){ alert("Login failed: " + err.message); } }); // RESET PASSWORD document.getElementById('resetPasswordBtn').addEventListener('click', async (event)=>{ event.preventDefault(); const email = document.getElementById('loginEmail').value;
-        if(!email){ alert("Enter your email to reset password"); return; } try { await sendPasswordResetEmail(auth, email); alert("Password reset email sent!"); } catch(err){ alert("Error: " + err.message); } });
-    </script>
-
-    <!-- Slideshow Script -->
-    <script>
-        let slides = document.querySelectorAll('.slideshow img');
-        let current = 0;
-        setInterval(() => {
-            slides[current].classList.remove('active');
-            current = (current + 1) % slides.length;
-            slides[current].classList.add('active');
-        }, 7000);
+        if(!email){ alert("Enter your email to reset password"); return; } try { await sendPasswordResetEmail(auth, email); alert("Password reset email sent!"); } catch(err){ alert("Error: " + err.message); } }); // Slideshow logic let slides = document.querySelectorAll('.slideshow
+        img'); let current = 0; setInterval(()=>{ slides[current].classList.remove('active'); current = (current + 1) % slides.length; slides[current].classList.add('active'); }, 5000); // 5 seconds per slide
     </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
