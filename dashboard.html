@@ -3,326 +3,241 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VISIONARY YOUTH — Dashboard</title>
+<title>Visionary Youth Dashboard</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+
 <style>
 body {
-    margin:0;
-    font-family:'Poppins',sans-serif;
-    background:#111;
-    color:#fff;
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: #1a1a1a;
+    color: #fff;
 }
-nav {
-    background:#1a1a1a;
-    padding:12px 20px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
+header {
+    background: #111;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
-nav h2 {
-    color:#ffcc00;
+header h1 {
+    font-size: 1.8rem;
+    color: #ffcc00;
 }
-nav button {
-    background:#ffcc00;
-    color:#111;
-    border:none;
-    padding:8px 15px;
-    border-radius:5px;
-    cursor:pointer;
+nav a {
+    color: #ffcc00;
+    margin-left: 15px;
+    text-decoration: none;
+    font-weight: 600;
 }
-nav button:hover {
-    background:#ff6600;
-    color:#fff;
+nav a:hover {
+    color: #ff6600;
+}
+.container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 20px;
+}
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+.card {
+    background: #222;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    transition: transform 0.3s;
+}
+.card:hover {
+    transform: scale(1.05);
+}
+.card h3 {
+    margin-top: 0;
+    color: #ffcc00;
+}
+.card p {
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+button {
+    background: #333;
+    color: #ffcc00;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-top: 10px;
+}
+button:hover {
+    background: #ff6600;
+    color: #fff;
+    transform: scale(1.05);
 }
 .tabs {
-    display:flex;
-    justify-content:center;
-    margin:20px 0;
-    flex-wrap:wrap;
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
 }
 .tab-btn {
-    background:#222;
-    color:#ffcc00;
-    border:none;
-    padding:10px 20px;
-    margin:5px;
-    border-radius:8px;
-    cursor:pointer;
-    transition:0.3s;
+    background: #333;
+    color: #ffcc00;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
 }
-.tab-btn.active, .tab-btn:hover {
-    background:#ffcc00;
-    color:#111;
+.tab-btn.active {
+    background: #ffcc00;
+    color: #111;
+}
+.tab-btn:hover {
+    background: #ff6600;
+    color: #fff;
 }
 .tab-content {
-    display:none;
-    max-width:900px;
-    margin:0 auto 40px auto;
-    background:#222;
-    padding:20px;
-    border-radius:12px;
+    background: #222;
+    padding: 20px;
+    border-radius: 12px;
+    display: none;
 }
 .tab-content.active {
-    display:block;
+    display: block;
 }
-input, select, textarea {
-    width:100%;
-    padding:10px;
-    margin:10px 0;
-    border-radius:8px;
-    border:none;
-}
-button.submit-btn {
-    background:#ffcc00;
-    color:#111;
-    border:none;
-    padding:10px 20px;
-    border-radius:8px;
-    cursor:pointer;
-}
-button.submit-btn:hover {
-    background:#ff6600;
-    color:#fff;
+footer {
+    text-align: center;
+    padding: 15px;
+    background: #111;
+    color: #ffcc00;
+    border-radius: 12px;
+    margin-top: 30px;
 }
 </style>
 </head>
 <body>
 
-<nav>
-    <h2 id="userEmail">Dashboard</h2>
-    <button id="logoutBtn">Logout</button>
-</nav>
+<header>
+    <h1>Dashboard - <span id="userEmail">user@example.com</span></h1>
+    <nav>
+        <a href="#" id="logoutBtn">Logout</a>
+    </nav>
+</header>
 
-<div class="tabs">
-    <button class="tab-btn active" data-tab="personal">Personal Info</button>
-    <button class="tab-btn" data-tab="guarantor">Guarantor</button>
-    <button class="tab-btn" data-tab="loan">Loan</button>
-    <button class="tab-btn" data-tab="repayment">Repayment</button>
-    <button class="tab-btn" data-tab="savings">Weekly Savings</button>
-    <button class="tab-btn" data-tab="shares">Shares</button>
-    <button class="tab-btn" data-tab="update">Update Profile</button>
+<div class="container">
+    <div class="cards">
+        <div class="card" data-aos="fade-up">
+            <h3>Weekly Savings</h3>
+            <p>Your current weekly savings balance.</p>
+            <button id="viewSavingsBtn">View Savings</button>
+        </div>
+        <div class="card" data-aos="fade-up">
+            <h3>Shares</h3>
+            <p>View your shares and contribution status.</p>
+            <button id="viewSharesBtn">View Shares</button>
+        </div>
+        <div class="card" data-aos="fade-up">
+            <h3>Account Statement</h3>
+            <p>Download your account statement in PDF format.</p>
+            <button id="downloadStatementBtn">Download Statement</button>
+        </div>
+    </div>
+
+    <h2>Loan Application & Progress</h2>
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="personal">Personal</button>
+        <button class="tab-btn" data-tab="guarantor">Guarantor</button>
+        <button class="tab-btn" data-tab="loan">Loan</button>
+        <button class="tab-btn" data-tab="repayment">Repayment</button>
+        <button class="tab-btn" data-tab="update">Update Profile</button>
+    </div>
+
+    <div id="personal" class="tab-content active">
+        <h3>Personal Details</h3>
+        <p>Edit your personal information.</p>
+        <form id="personalForm">
+            <input type="text" placeholder="Full Name" required>
+            <input type="text" placeholder="Phone Number" required>
+            <button type="submit">Save</button>
+        </form>
+    </div>
+
+    <div id="guarantor" class="tab-content">
+        <h3>Guarantor Details</h3>
+        <p>Provide guarantor information for loan application.</p>
+        <form id="guarantorForm">
+            <input type="text" placeholder="Guarantor Name" required>
+            <input type="text" placeholder="Guarantor Phone" required>
+            <button type="submit">Save</button>
+        </form>
+    </div>
+
+    <div id="loan" class="tab-content">
+        <h3>Loan Application</h3>
+        <p>Apply for a new loan.</p>
+        <form id="loanForm">
+            <input type="number" placeholder="Loan Amount" required>
+            <input type="text" placeholder="Purpose of Loan" required>
+            <button type="submit">Apply</button>
+        </form>
+    </div>
+
+    <div id="repayment" class="tab-content">
+        <h3>Repayment</h3>
+        <p>View your loan repayment schedule and progress.</p>
+        <button id="viewRepaymentBtn">View Repayment</button>
+    </div>
+
+    <div id="update" class="tab-content">
+        <h3>Update Profile</h3>
+        <p>Update your account information.</p>
+        <form id="updateProfileForm">
+            <input type="text" placeholder="Full Name" required>
+            <input type="text" placeholder="Phone Number" required>
+            <button type="submit">Update</button>
+        </form>
+    </div>
 </div>
 
-<!-- PERSONAL -->
-<div id="personal" class="tab-content active">
-    <h3>Personal Information</h3>
-    <p id="personalData">Loading...</p>
-</div>
+<footer>
+    <p>© 2024 VISIONARY YOUTH GROUP. All Rights Reserved.</p>
+</footer>
 
-<!-- GUARANTOR -->
-<div id="guarantor" class="tab-content">
-    <h3>Guarantor Details</h3>
-    <form id="guarantorForm">
-        <input type="text" id="guarantorName" placeholder="Guarantor Full Name" required>
-        <input type="text" id="guarantorPhone" placeholder="Guarantor Phone" required>
-        <button type="button" class="submit-btn" id="saveGuarantor">Save Guarantor</button>
-    </form>
-</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script>
+AOS.init({duration:1000,once:true});
 
-<!-- LOAN -->
-<div id="loan" class="tab-content">
-    <h3>Loan Application</h3>
-    <form id="loanForm">
-        <input type="number" id="loanAmount" placeholder="Loan Amount" required>
-        <input type="text" id="loanPurpose" placeholder="Loan Purpose" required>
-        <select id="loanDuration" required>
-            <option value="">Select Duration</option>
-            <option value="1 month">1 Month</option>
-            <option value="3 months">3 Months</option>
-            <option value="6 months">6 Months</option>
-        </select>
-        <button type="button" class="submit-btn" id="applyLoan">Apply Loan</button>
-    </form>
-    <div id="loanStatus">No active loans</div>
-</div>
-
-<!-- REPAYMENT -->
-<div id="repayment" class="tab-content">
-    <h3>Repayment</h3>
-    <form id="repaymentForm">
-        <input type="number" id="repayAmount" placeholder="Repayment Amount" required>
-        <button type="button" class="submit-btn" id="repayLoan">Submit Repayment</button>
-    </form>
-</div>
-
-<!-- SAVINGS -->
-<div id="savings" class="tab-content">
-    <h3>Weekly Savings</h3>
-    <form id="savingsForm">
-        <input type="number" id="saveAmount" placeholder="Amount Saved" required>
-        <button type="button" class="submit-btn" id="saveBtn">Save</button>
-    </form>
-    <button class="submit-btn" id="downloadSavings">Download Account Statement</button>
-</div>
-
-<!-- SHARES -->
-<div id="shares" class="tab-content">
-    <h3>Shares</h3>
-    <form id="sharesForm">
-        <input type="number" id="sharesAmount" placeholder="Number of Shares" required>
-        <button type="button" class="submit-btn" id="saveShares">Save Shares</button>
-    </form>
-</div>
-
-<!-- UPDATE PROFILE -->
-<div id="update" class="tab-content">
-    <h3>Update Profile</h3>
-    <form id="updateForm">
-        <input type="text" id="updateName" placeholder="Full Name" required>
-        <input type="text" id="updatePhone" placeholder="Phone" required>
-        <button type="button" class="submit-btn" id="updateProfile">Update Profile</button>
-    </form>
-</div>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
-
-const firebaseConfig = {
-    apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
-    authDomain: "visionary-youth-grou-2024.firebaseapp.com",
-    projectId: "visionary-youth-grou-2024",
-    storageBucket: "visionary-youth-grou-2024.appspot.com",
-    messagingSenderId: "372978592717",
-    appId: "1:372978592717:web:1c15aec728ee5f854f3284"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-let logoutTimer;
-function startLogoutTimer() {
-    clearTimeout(logoutTimer);
-    logoutTimer = setTimeout(() => {
-        alert("Session expired due to inactivity.");
-        signOut(auth).then(()=>{window.location.href="index.html"});
-    }, 3*60*1000); // 3 minutes
-}
-
-document.body.addEventListener("mousemove", startLogoutTimer);
-document.body.addEventListener("keypress", startLogoutTimer);
-startLogoutTimer();
-
-// Tabs
-const tabButtons = document.querySelectorAll(".tab-btn");
-const tabContents = document.querySelectorAll(".tab-content");
-tabButtons.forEach(btn=>{
-    btn.addEventListener("click", ()=>{
-        tabButtons.forEach(b=>b.classList.remove("active"));
-        tabContents.forEach(c=>c.classList.remove("active"));
-        btn.classList.add("active");
-        document.getElementById(btn.dataset.tab).classList.add("active");
+// Tab functionality
+const tabs = document.querySelectorAll('.tab-btn');
+const contents = document.querySelectorAll('.tab-content');
+tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        const tabId = tab.getAttribute('data-tab');
+        contents.forEach(c => c.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
     });
 });
 
-// Auth & Load User
-let currentUser;
-onAuthStateChanged(auth, async user=>{
-    if(user){
-        currentUser=user;
-        document.getElementById("userEmail").textContent=user.email;
-        // Load Personal Info
-        const docSnap = await getDoc(doc(db,"members",user.uid));
-        if(docSnap.exists()){
-            const data=docSnap.data();
-            document.getElementById("personalData").innerHTML=
-            `<p><b>Name:</b> ${data.name}</p>
-             <p><b>Phone:</b> ${data.phone}</p>
-             <p><b>ID:</b> ${data.id}</p>
-             <p><b>Origin:</b> ${data.origin}</p>
-             <p><b>Email:</b> ${data.email}</p>`;
-            // Pre-fill update
-            document.getElementById("updateName").value=data.name;
-            document.getElementById("updatePhone").value=data.phone;
-        }
-    } else {
-        window.location.href="index.html";
-    }
-});
-
 // Logout
-document.getElementById("logoutBtn").addEventListener("click", ()=>{
-    signOut(auth).then(()=>window.location.href="index.html");
+document.getElementById('logoutBtn').addEventListener('click', () => {
+    alert('Logged out successfully.');
+    window.location.href = 'index.html';
 });
 
-// Guarantor
-document.getElementById("saveGuarantor").addEventListener("click", async ()=>{
-    const name=document.getElementById("guarantorName").value;
-    const phone=document.getElementById("guarantorPhone").value;
-    if(name && phone){
-        await setDoc(doc(db,"guarantors",currentUser.uid),{name,phone,createdAt:serverTimestamp()});
-        alert("Guarantor saved successfully");
-        document.getElementById("guarantorForm").reset();
-    }
-});
-
-// Loan
-document.getElementById("applyLoan").addEventListener("click", async ()=>{
-    const amount=document.getElementById("loanAmount").value;
-    const purpose=document.getElementById("loanPurpose").value;
-    const duration=document.getElementById("loanDuration").value;
-    if(amount && purpose && duration){
-        await setDoc(doc(db,"loans",currentUser.uid),{amount,purpose,duration,status:"Pending",createdAt:serverTimestamp()});
-        alert("Loan applied successfully");
-        document.getElementById("loanForm").reset();
-        document.getElementById("loanStatus").textContent="Loan Pending";
-    }
-});
-
-// Repayment
-document.getElementById("repayLoan").addEventListener("click", async ()=>{
-    const amt=document.getElementById("repayAmount").value;
-    if(amt){
-        await addDoc(collection(db,"repayments"),{uid:currentUser.uid,amount:amt,createdAt:serverTimestamp()});
-        alert("Repayment recorded");
-        document.getElementById("repaymentForm").reset();
-    }
-});
-
-// Weekly Savings
-document.getElementById("saveBtn").addEventListener("click", async ()=>{
-    const amt=document.getElementById("saveAmount").value;
-    if(amt){
-        await addDoc(collection(db,"savings"),{uid:currentUser.uid,amount:amt,createdAt:serverTimestamp()});
-        alert("Saved successfully");
-        document.getElementById("savingsForm").reset();
-    }
-});
-
-// Download Savings Statement
-document.getElementById("downloadSavings").addEventListener("click", async ()=>{
-    const snapshot=await getDoc(doc(db,"members",currentUser.uid));
-    const data=snapshot.data();
-    const csv=`Name,Email,Phone\n${data.name},${data.email},${data.phone}`;
-    const blob=new Blob([csv],{type:'text/csv'});
-    const link=document.createElement("a");
-    link.href=URL.createObjectURL(blob);
-    link.download="account_statement.csv";
-    link.click();
-});
-
-// Shares
-document.getElementById("saveShares").addEventListener("click", async ()=>{
-    const amt=document.getElementById("sharesAmount").value;
-    if(amt){
-        await addDoc(collection(db,"shares"),{uid:currentUser.uid,amount:amt,createdAt:serverTimestamp()});
-        alert("Shares saved");
-        document.getElementById("sharesForm").reset();
-    }
-});
-
-// Update Profile
-document.getElementById("updateProfile").addEventListener("click", async ()=>{
-    const name=document.getElementById("updateName").value;
-    const phone=document.getElementById("updatePhone").value;
-    if(name && phone){
-        await updateDoc(doc(db,"members",currentUser.uid),{name,phone});
-        alert("Profile updated successfully");
-    }
-});
+// Auto logout after 3 mins
+setTimeout(() => {
+    alert('Session expired. Logging out.');
+    window.location.href = 'index.html';
+}, 180000);
 </script>
 
 </body>
