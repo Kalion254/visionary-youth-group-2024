@@ -234,9 +234,9 @@
 
   <header data-aos="fade-down">
     <div class="slideshow">
-      <img src="slide1.png.png" class="active" alt="Slide 1">
-      <img src="slide2.png.jpg" alt="Slide 2">
-      <img src="slide3.jpg.jpg" alt="Slide 3">
+      <img src="slide1.png" class="active" alt="Slide 1">
+      <img src="slide2.jpg" alt="Slide 2">
+      <img src="slide3.jpg" alt="Slide 3">
       <img src="slide4.jpg" alt="Slide 4">
       <img src="networking.jpg" alt="Slide 5">
     </div>
@@ -247,7 +247,85 @@
     </div>
   </header>
 
-  <!-- Sections (About, Benefits, Programs, News, Contact, Auth) remain unchanged -->
+  <section id="about" data-aos="fade-up">
+    <h2>About Us</h2>
+    <p>VISIONARY YOUTH GROUP 2024 empowers young people through financial literacy, entrepreneurship, and community
+      service. We foster leadership, accountability, and growth among youth to positively impact society.</p>
+  </section>
+
+  <section id="benefits" data-aos="fade-up">
+    <h2>Member Benefits</h2>
+    <div class="benefits">
+      <div class="benefit"><i class="fas fa-piggy-bank"></i>
+        <h3>Savings</h3>
+        <p>Grow your money safely with structured group savings plans.</p>
+      </div>
+      <div class="benefit"><i class="fas fa-hand-holding-usd"></i>
+        <h3>Loans</h3>
+        <p>Access affordable loans to fund personal or business projects.</p>
+      </div>
+      <div class="benefit"><i class="fas fa-users"></i>
+        <h3>Networking</h3>
+        <p>Connect with motivated youth and expand your opportunities.</p>
+      </div>
+      <div class="benefit"><i class="fas fa-chalkboard-teacher"></i>
+        <h3>Training</h3>
+        <p>Attend workshops and seminars to develop skills and knowledge.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="programs" data-aos="fade-up">
+    <h2>Our Programs</h2>
+    <div class="programs">
+      <div class="card"><i class="fas fa-hand-holding-heart"></i>
+        <h3>Community Service</h3>
+        <p>Engage in projects that uplift the community and build teamwork.</p>
+      </div>
+      <div class="card"><i class="fas fa-briefcase"></i>
+        <h3>Entrepreneurship Support</h3>
+        <p>Mentorship, business training, and funding opportunities for young entrepreneurs.</p>
+      </div>
+      <div class="card"><i class="fas fa-chart-line"></i>
+        <h3>Financial Literacy</h3>
+        <p>Learn smart money management, investments, and savings strategies.</p>
+      </div>
+      <div class="card"><i class="fas fa-handshake"></i>
+        <h3>Networking Events</h3>
+        <p>Meet other motivated youth to share ideas, projects, and opportunities.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="news" data-aos="fade-up">
+    <h2>Latest News</h2>
+    <div class="news">
+      <div class="card">
+        <h3>Youth Workshop 2024</h3>
+        <p>Join our next financial literacy workshop on Sept 15, 2024.</p>
+      </div>
+      <div class="card">
+        <h3>Annual General Meeting</h3>
+        <p>Don't miss our AGM scheduled for Dec 20, 2024.</p>
+      </div>
+      <div class="card">
+        <h3>Entrepreneur Grant Program</h3>
+        <p>Apply for funding to support your business ideas and projects.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" data-aos="fade-up">
+    <h2>Contact Us</h2>
+    <p><i class="fas fa-envelope"></i> visionaryyouthgroup32@gmail.com</p>
+    <p><i class="fas fa-phone"></i> +254 741 453336</p>
+    <p><i class="fas fa-map-marker-alt"></i> Nairobi, Kenya</p>
+    <div class="social-icons">
+      <a href="#"><i class="fab fa-facebook"></i></a>
+      <a href="#"><i class="fab fa-twitter"></i></a>
+      <a href="#"><i class="fab fa-instagram"></i></a>
+    </div>
+  </section>
 
   <section id="auth" data-aos="fade-up">
     <h2>Join Our Community</h2>
@@ -281,18 +359,8 @@
   <!-- Firebase -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-    import {
-      getAuth,
-      createUserWithEmailAndPassword,
-      signInWithEmailAndPassword,
-      sendPasswordResetEmail
-    } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-    import {
-      getFirestore,
-      setDoc,
-      doc,
-      serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import { getFirestore, setDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
@@ -309,8 +377,7 @@
     const db = getFirestore(app);
 
     // SIGNUP
-    document.getElementById('signupBtn').addEventListener('click', async (event) => {
-      event.preventDefault();
+    document.getElementById('signupBtn').addEventListener('click', async () => {
       const signupInfo = {
         name: document.getElementById('signupName').value,
         phone: document.getElementById('signupPhone').value,
@@ -319,6 +386,7 @@
         email: document.getElementById('signupEmail').value,
         password: document.getElementById('signupPassword').value
       };
+
       try {
         const userCredential = await createUserWithEmailAndPassword(auth, signupInfo.email, signupInfo.password);
         await setDoc(doc(db, "members", userCredential.user.uid), {
@@ -337,10 +405,10 @@
     });
 
     // LOGIN
-    document.getElementById('loginBtn').addEventListener('click', async (event) => {
-      event.preventDefault();
+    document.getElementById('loginBtn').addEventListener('click', async () => {
       const email = document.getElementById('loginEmail').value;
       const password = document.getElementById('loginPassword').value;
+
       try {
         await signInWithEmailAndPassword(auth, email, password);
         window.location.href = "dashboard.html";
@@ -350,8 +418,7 @@
     });
 
     // RESET PASSWORD
-    document.getElementById('resetPasswordBtn').addEventListener('click', async (event) => {
-      event.preventDefault();
+    document.getElementById('resetPasswordBtn').addEventListener('click', async () => {
       const email = document.getElementById('loginEmail').value;
       if (!email) {
         alert("Enter your email to reset password");
@@ -372,10 +439,9 @@
       slides[current].classList.remove('active');
       current = (current + 1) % slides.length;
       slides[current].classList.add('active');
-    }, 5000); // 5 seconds per slide
+    }, 5000); // 5 seconds
   </script>
 
-  <!-- AOS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
   <script>
     AOS.init({ duration: 1000, once: true });
