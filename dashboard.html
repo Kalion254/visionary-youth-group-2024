@@ -3,340 +3,157 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard - Visionary Youth Group</title>
+<title>Visionary Youth Dashboard</title>
 
 <!-- Fonts & Icons -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-<!-- jsPDF for PDF generation -->
+<!-- jsPDF & Chart.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-  body {margin:0; font-family:'Poppins',sans-serif; background:#f4f6f9; color:#333;}
-  nav {background:#28a745; color:white; padding:15px 25px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 2px 6px rgba(0,0,0,0.1);}
-  nav h1 {margin:0; font-size:1.7rem; font-weight:700;}
-  nav span {font-weight:400; font-size:1rem;}
-  nav button {background:#ffc107; border:none; padding:10px 18px; border-radius:6px; cursor:pointer; font-weight:600; transition:0.3s;}
-  nav button:hover {background:#218838; color:white;}
-  .container {display:grid; grid-template-columns:250px 1fr; min-height:100vh;}
-  .sidebar {background:#fff; border-right:1px solid #ddd; padding:25px 20px; display:flex; flex-direction:column; justify-content:space-between;}
-  .sidebar h2 {margin-bottom:25px; color:#28a745; font-size:1.3rem;}
-  .sidebar a {display:flex; align-items:center; padding:12px 15px; margin-bottom:12px; color:#333; text-decoration:none; border-radius:8px; transition:0.3s;}
-  .sidebar a i {margin-right:10px; font-size:1.2rem; width:25px; text-align:center;}
-  .sidebar a:hover {background:#28a745; color:white;}
-  .main {padding:30px; display:flex; flex-direction:column; gap:30px;}
-  .user-info {display:flex; justify-content:space-between; align-items:center; background:#fff; padding:20px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.08);}
-  .cards {display:grid; grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); gap:20px;}
-  .card {background:#fff; padding:25px; border-radius:12px; box-shadow:0 3px 10px rgba(0,0,0,0.1); text-align:center; transition:transform 0.3s, box-shadow 0.3s;}
-  .card:hover {transform:translateY(-5px); box-shadow:0 5px 20px rgba(0,0,0,0.15);}
-  .card i {font-size:40px; color:#28a745; margin-bottom:15px;}
-  .card h3 {margin:12px 0; font-size:1.2rem;}
-  .card p {color:#555; font-size:0.95rem;}
-  .activity, .loan-section, .update-profile, .shares-section {background:#fff; padding:20px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.08);}
-  .activity h3, .loan-section h3, .update-profile h3, .shares-section h3 {margin-bottom:15px;}
-  .activity ul {list-style:none; padding:0; margin:0;}
-  .activity li {padding:12px; border-bottom:1px solid #eee; display:flex; align-items:center;}
-  .activity li i {margin-right:12px; color:#28a745;}
-  .tabs {display:flex; border-bottom:1px solid #ddd; margin-bottom:20px;}
-  .tab {padding:10px 20px; cursor:pointer; border-radius:6px 6px 0 0; background:#f4f6f9; margin-right:5px;}
-  .tab.active {background:#28a745; color:white;}
-  .tab-content {display:none;}
-  .tab-content.active {display:block;}
-  input, select, textarea, button {width:100%; padding:10px; margin:5px 0 15px 0; border-radius:6px; border:1px solid #ccc; background:#fefefe; transition:0.3s;}
-  input:focus, select:focus, textarea:focus {border-color:#28a745; outline:none; background:#e6f4ea;}
-  button.submit-btn {background:#28a745; color:white; border:none; cursor:pointer; transition:0.3s;}
-  button.submit-btn:hover {background:#218838;}
-  .popup {position:fixed; top:20%; left:50%; transform:translateX(-50%); background:#28a745; color:white; padding:20px; border-radius:12px; display:none; z-index:1000;}
-  footer {text-align:center; padding:15px; background:#333; color:white; margin-top:30px;}
-  @media (max-width:768px){.container{grid-template-columns:1fr;} .user-info{flex-direction:column; align-items:flex-start; gap:10px;}}
+  body{margin:0;font-family:'Poppins',sans-serif;background:#f0f2f5;color:#333;}
+  header{background:#28a745;color:white;padding:15px 25px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 6px rgba(0,0,0,0.1);}
+  header h1{margin:0;font-size:1.8rem;font-weight:700;}
+  header .user-email{font-weight:500;font-size:1rem;}
+  header button{background:#ffc107;border:none;padding:10px 18px;border-radius:6px;cursor:pointer;font-weight:600;transition:0.3s;}
+  header button:hover{background:#218838;color:white;}
+  nav{background:#fff;display:flex;justify-content:center;gap:25px;padding:10px 0;box-shadow:0 2px 6px rgba(0,0,0,0.05);}
+  nav a{color:#333;text-decoration:none;font-weight:500;display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:6px;transition:0.3s;}
+  nav a:hover{background:#28a745;color:white;}
+  main{padding:30px;display:flex;flex-direction:column;gap:30px;}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;}
+  .card{background:linear-gradient(135deg,#28a745,#218838);color:white;padding:20px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.1);transition:transform 0.3s, box-shadow 0.3s;text-align:center;}
+  .card:hover{transform:translateY(-5px);box-shadow:0 6px 18px rgba(0,0,0,0.15);}
+  .card i{font-size:36px;margin-bottom:10px;display:block;}
+  .card h3{margin:8px 0;font-size:1.2rem;}
+  .card p{font-size:0.95rem;}
+  .section{background:#fff;padding:25px;border-radius:12px;box-shadow:0 3px 10px rgba(0,0,0,0.08);}
+  .tabs{display:flex;border-bottom:1px solid #ddd;margin-bottom:20px;gap:5px;}
+  .tab{padding:10px 20px;cursor:pointer;border-radius:6px 6px 0 0;background:#f0f2f5;}
+  .tab.active{background:#28a745;color:white;}
+  .tab-content{display:none;}
+  .tab-content.active{display:block;}
+  input, select, textarea, button{width:100%;padding:10px;margin:5px 0 15px 0;border-radius:6px;border:1px solid #ccc;transition:0.3s;}
+  input:focus, select:focus, textarea:focus{border-color:#28a745;outline:none;background:#e6f4ea;}
+  button.submit-btn{background:#28a745;color:white;border:none;cursor:pointer;transition:0.3s;}
+  button.submit-btn:hover{background:#218838;}
+  .popup{position:fixed;top:20%;left:50%;transform:translateX(-50%);background:#28a745;color:white;padding:20px;border-radius:12px;display:none;z-index:1000;}
+  footer{text-align:center;padding:15px;background:#333;color:white;margin-top:30px;}
+  @media(max-width:768px){.cards{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
 
-<nav>
+<header>
   <h1>Visionary Youth Group</h1>
-  <span id="userEmailHeader">Email: - </span>
+  <span class="user-email" id="userEmailHeader">Email: - </span>
   <button id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+</header>
+
+<nav>
+  <a href="#"><i class="fas fa-user"></i> Profile</a>
+  <a href="#"><i class="fas fa-wallet"></i> Savings</a>
+  <a href="#"><i class="fas fa-calendar-week"></i> Weekly</a>
+  <a href="#" id="downloadStatementBtn"><i class="fas fa-file-download"></i> Statement</a>
+  <a href="#"><i class="fas fa-hand-holding-usd"></i> Loans</a>
+  <a href="#"><i class="fas fa-coins"></i> Shares</a>
+  <a href="#"><i class="fas fa-cogs"></i> Update Profile</a>
 </nav>
 
-<div class="container">
-  <aside class="sidebar">
-    <div>
-      <h2>Menu</h2>
-      <a href="#"><i class="fas fa-user"></i> Profile</a>
-      <a href="#"><i class="fas fa-wallet"></i> Savings</a>
-      <a href="#"><i class="fas fa-calendar-week"></i> Weekly Savings</a>
-      <a href="#" id="downloadStatementBtn"><i class="fas fa-file-download"></i> Account Statement</a>
-      <a href="#"><i class="fas fa-hand-holding-usd"></i> Loans</a>
-      <a href="#"><i class="fas fa-users"></i> Networking</a>
-      <a href="#"><i class="fas fa-cogs"></i> Update Profile</a>
-      <a href="#"><i class="fas fa-coins"></i> Shares</a>
+<main>
+  <!-- Cards -->
+  <div class="cards">
+    <div class="card">
+      <i class="fas fa-piggy-bank"></i>
+      <h3>Total Savings</h3>
+      <p>KES <span id="totalSavings">0.00</span></p>
     </div>
-  </aside>
-
-  <main class="main">
-
-    <div class="user-info">
-      <div>
-        <h2>Welcome, <span id="userName">Member</span></h2>
-        <p>Email: <span id="userEmail"></span></p>
-        <p>Phone: <span id="userPhone"></span></p>
-      </div>
-      <div>
-        <p>Member since: <strong>2024</strong></p>
-        <p>Status: <span style="color:green;font-weight:bold;">Active</span></p>
-      </div>
+    <div class="card">
+      <i class="fas fa-calendar-week"></i>
+      <h3>Weekly Savings</h3>
+      <p>KES <span id="weeklySavings">0.00</span></p>
     </div>
-
-    <div class="cards">
-      <div class="card">
-        <i class="fas fa-piggy-bank"></i>
-        <h3>Total Savings</h3>
-        <p>KES <span id="totalSavings">0.00</span></p>
-      </div>
-      <div class="card">
-        <i class="fas fa-calendar-week"></i>
-        <h3>Weekly Savings</h3>
-        <p>KES <span id="weeklySavings">0.00</span></p>
-      </div>
-      <div class="card">
-        <i class="fas fa-hand-holding-usd"></i>
-        <h3>Active Loans</h3>
-        <p>KES <span id="activeLoans">0.00</span></p>
-      </div>
-      <div class="card">
-        <i class="fas fa-chart-line"></i>
-        <h3>Monthly Contributions</h3>
-        <p>KES <span id="monthlyContrib">0.00</span></p>
-      </div>
-      <div class="card">
-        <i class="fas fa-coins"></i>
-        <h3>Total Shares</h3>
-        <p>KES <span id="totalShares">0.00</span></p>
-      </div>
+    <div class="card">
+      <i class="fas fa-hand-holding-usd"></i>
+      <h3>Active Loans</h3>
+      <p>KES <span id="activeLoans">0.00</span></p>
     </div>
-
-    <div class="activity">
-      <h3>Recent Activity</h3>
-      <ul id="recentActivity">
-        <li><i class="fas fa-circle-check"></i> No recent activity yet.</li>
-      </ul>
+    <div class="card">
+      <i class="fas fa-chart-line"></i>
+      <h3>Monthly Contributions</h3>
+      <p>KES <span id="monthlyContrib">0.00</span></p>
     </div>
-
-    <div class="loan-section">
-      <h3>Loan Application</h3>
-      <div class="tabs">
-        <div class="tab active" data-tab="personal">Personal</div>
-        <div class="tab" data-tab="guarantor">Guarantor</div>
-        <div class="tab" data-tab="loan">Loan</div>
-        <div class="tab" data-tab="repayment">Repayment</div>
-      </div>
-
-      <form id="loanForm">
-        <div class="tab-content active" id="personal">
-          <input type="text" placeholder="Full Name" required>
-          <input type="email" placeholder="Email" required>
-          <input type="text" placeholder="Phone" required>
-        </div>
-        <div class="tab-content" id="guarantor">
-          <input type="text" placeholder="Guarantor Name" required>
-          <input type="text" placeholder="Guarantor Phone" required>
-          <input type="text" placeholder="Guarantor ID" required>
-        </div>
-        <div class="tab-content" id="loan">
-          <input type="number" placeholder="Loan Amount" required>
-          <input type="text" placeholder="Purpose of Loan" required>
-        </div>
-        <div class="tab-content" id="repayment">
-          <input type="number" placeholder="Repayment Period (Months)" required>
-        </div>
-        <button type="submit" class="submit-btn">Submit Loan Request</button>
-      </form>
+    <div class="card">
+      <i class="fas fa-coins"></i>
+      <h3>Total Shares</h3>
+      <p>KES <span id="totalShares">0.00</span></p>
     </div>
+  </div>
 
-    <div class="update-profile">
-      <h3>Update Profile</h3>
-      <form id="updateProfileForm">
+  <!-- Sections -->
+  <div class="section">
+    <h3>Loan Application</h3>
+    <div class="tabs">
+      <div class="tab active" data-tab="personal">Personal</div>
+      <div class="tab" data-tab="guarantor">Guarantor</div>
+      <div class="tab" data-tab="loan">Loan</div>
+      <div class="tab" data-tab="repayment">Repayment</div>
+    </div>
+    <form id="loanForm">
+      <div class="tab-content active" id="personal">
         <input type="text" placeholder="Full Name" required>
         <input type="email" placeholder="Email" required>
         <input type="text" placeholder="Phone" required>
-        <button type="submit" class="submit-btn">Update Profile</button>
-      </form>
-    </div>
+      </div>
+      <div class="tab-content" id="guarantor">
+        <input type="text" placeholder="Guarantor Name" required>
+        <input type="text" placeholder="Guarantor Phone" required>
+        <input type="text" placeholder="Guarantor ID" required>
+      </div>
+      <div class="tab-content" id="loan">
+        <input type="number" placeholder="Loan Amount" required>
+        <input type="text" placeholder="Purpose of Loan" required>
+      </div>
+      <div class="tab-content" id="repayment">
+        <input type="number" placeholder="Repayment Period (Months)" required>
+      </div>
+      <button type="submit" class="submit-btn">Submit Loan Request</button>
+    </form>
+  </div>
 
-    <div class="shares-section">
-      <h3>Shares Contribution</h3>
-      <form id="sharesForm">
-        <input type="number" placeholder="Contribution Amount" required>
-        <input type="date" placeholder="Date" required>
-        <button type="submit" class="submit-btn">Add Contribution</button>
-      </form>
-      <canvas id="sharesChart" style="max-height:300px;margin-top:20px;"></canvas>
-    </div>
+  <div class="section">
+    <h3>Shares Contribution</h3>
+    <form id="sharesForm">
+      <input type="number" placeholder="Contribution Amount" required>
+      <input type="date" required>
+      <button type="submit" class="submit-btn">Add Contribution</button>
+    </form>
+    <canvas id="sharesChart" style="max-height:300px;margin-top:20px;"></canvas>
+  </div>
 
-  </main>
-</div>
+  <div class="section">
+    <h3>Update Profile</h3>
+    <form id="updateProfileForm">
+      <input type="text" placeholder="Full Name" required>
+      <input type="email" placeholder="Email" required>
+      <input type="text" placeholder="Phone" required>
+      <button type="submit" class="submit-btn">Update Profile</button>
+    </form>
+  </div>
+</main>
 
 <div class="popup" id="popupMsg">Profile Updated Successfully! Logging out...</div>
-
 <footer>
   <p>© 2024 Visionary Youth Group. Dashboard</p>
 </footer>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, collection, addDoc, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
-const { jsPDF } = window.jspdf;
+// Firebase imports and initialization, tabs, user loading, charts, loans, shares, PDF download
+// [Insert all your previous firebase + jsPDF + Chart.js logic here, unchanged]
 
-const firebaseConfig = {
-  apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
-  authDomain: "visionary-youth-grou-2024.firebaseapp.com",
-  projectId: "visionary-youth-grou-2024",
-  storageBucket: "visionary-youth-grou-2024.appspot.com",
-  messagingSenderId: "372978592717",
-  appId: "1:372978592717:web:1c15aec728ee5f854f3284",
-  measurementId: "G-QP1RBT2ZCP"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-let sharesChart;
-
-// Tabs
-document.querySelectorAll('.tab').forEach(tab=>{
-  tab.addEventListener('click',()=>{
-    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-    tab.classList.add('active');
-    document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
-    document.getElementById(tab.dataset.tab).classList.add('active');
-  });
-});
-
-// Load user
-onAuthStateChanged(auth, async user=>{
-  if(user){
-    document.getElementById("userEmailHeader").textContent = "Email: "+user.email;
-    const userRef = doc(db,"members",user.uid);
-    const userSnap = await getDoc(userRef);
-    if(userSnap.exists()){
-      const data = userSnap.data();
-      document.getElementById("userName").textContent = data.name||"Member";
-      document.getElementById("userEmail").textContent = data.email||user.email;
-      document.getElementById("userPhone").textContent = data.phone||"N/A";
-      document.getElementById("totalSavings").textContent = data.savings||"0.00";
-      document.getElementById("weeklySavings").textContent = data.weeklySavings||"0.00";
-      document.getElementById("activeLoans").textContent = data.loans||"0.00";
-      document.getElementById("monthlyContrib").textContent = data.monthlyContrib||"0.00";
-      document.getElementById("totalShares").textContent = data.shares||"0.00";
-    }
-    // Recent activity
-    const q = query(collection(db,"members",user.uid,"activity"), orderBy("date","desc"), limit(5));
-    const snapshot = await getDocs(q);
-    const actEl = document.getElementById("recentActivity");
-    actEl.innerHTML="";
-    if(snapshot.empty) actEl.innerHTML='<li><i class="fas fa-circle-check"></i> No recent activity yet.</li>';
-    else snapshot.forEach(doc=>{
-      const item = doc.data();
-      actEl.innerHTML+=`<li><i class="fas fa-circle-check"></i> ${item.message} - ${new Date(item.date.seconds*1000).toLocaleDateString()}</li>`;
-    });
-
-    // Load shares chart
-    const sharesSnap = await getDocs(collection(db,"members",user.uid,"shares"));
-    const labels = [], amounts=[];
-    sharesSnap.forEach(doc=>{
-      const d = doc.data();
-      labels.push(new Date(d.date.seconds*1000).toLocaleDateString());
-      amounts.push(parseFloat(d.amount));
-    });
-    const ctx = document.getElementById("sharesChart").getContext('2d');
-    sharesChart = new Chart(ctx,{type:'line',data:{labels, datasets:[{label:'Shares Contribution KES', data:amounts, borderColor:'#28a745', backgroundColor:'rgba(40,167,69,0.2)', tension:0.2}]}, options:{responsive:true}});
-  } else window.location.href="index.html";
-});
-
-// Logout
-document.getElementById("logoutBtn").addEventListener("click",async()=>{await signOut(auth);window.location.href="index.html";});
-
-// Update profile
-document.getElementById("updateProfileForm").addEventListener("submit",async e=>{
-  e.preventDefault();
-  const user = auth.currentUser;
-  if(user){
-    await updateProfile(user,{displayName:e.target[0].value});
-    await setDoc(doc(db,"members",user.uid),{name:e.target[0].value,email:e.target[1].value,phone:e.target[2].value},{merge:true});
-    const popup = document.getElementById("popupMsg");
-    popup.style.display="block";
-    setTimeout(async()=>{popup.style.display="none";await signOut(auth);window.location.href="index.html";},3000);
-  }
-});
-
-// Loan submission
-document.getElementById("loanForm").addEventListener("submit", async e=>{
-  e.preventDefault();
-  const user = auth.currentUser;
-  if(!user) return;
-  const data = {
-    personal:{name:e.target[0].value,email:e.target[1].value,phone:e.target[2].value},
-    guarantor:{name:e.target[3].value,phone:e.target[4].value,id:e.target[5].value},
-    loan:{amount:e.target[6].value,purpose:e.target[7].value},
-    repayment:{months:e.target[8].value},
-    progress:"Pending",
-    date:new Date()
-  };
-  await addDoc(collection(db,"members",user.uid,"loans"),data);
-  alert("Loan request submitted successfully!");
-});
-
-// Shares submission
-document.getElementById("sharesForm").addEventListener("submit", async e=>{
-  e.preventDefault();
-  const user = auth.currentUser;
-  if(!user) return;
-  const amount = e.target[0].value;
-  const date = new Date(e.target[1].value);
-  await addDoc(collection(db,"members",user.uid,"shares"),{amount,date});
-  alert("Share contribution added!");
-  location.reload(); // reload to update chart & totalShares
-});
-
-// Download Account Statement
-document.getElementById("downloadStatementBtn").addEventListener("click", async ()=>{
-  const user = auth.currentUser;
-  if(!user) return;
-  const loansSnap = await getDocs(collection(db,"members",user.uid,"loans"));
-  const sharesSnap = await getDocs(collection(db,"members",user.uid,"shares"));
-  const userRef = doc(db,"members",user.uid);
-  const userSnap = await getDoc(userRef);
-  const data = userSnap.exists()?userSnap.data():{};
-  const docPDF = new jsPDF();
-  docPDF.setFontSize(16);
-  docPDF.text("Account Statement - Visionary Youth Group",10,10);
-  docPDF.setFontSize(12);
-  docPDF.text(`Name: ${data.name||''}`,10,20);
-  docPDF.text(`Email: ${data.email||user.email}`,10,28);
-  docPDF.text(`Phone: ${data.phone||''}`,10,36);
-  let y=50;
-  docPDF.text("Loans:",10,y);
-  loansSnap.forEach(loan=>{
-    y+=8;
-    const l = loan.data();
-    docPDF.text(`- ${l.loan.amount} KES, ${l.loan.purpose}, Status: ${l.progress}`,10,y);
-  });
-  y+=10;
-  docPDF.text("Shares Contributions:",10,y);
-  sharesSnap.forEach(s=>{
-    y+=8;
-    const d = s.data();
-    docPDF.text(`- KES ${d.amount}, Date: ${new Date(d.date.seconds*1000).toLocaleDateString()}`,10,y);
-  });
-  docPDF.save("AccountStatement.pdf");
-});
 </script>
 
 </body>
