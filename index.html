@@ -9,6 +9,8 @@
   <!-- Fonts & Icons -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- AOS Animations -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
 
   <style>
@@ -17,6 +19,7 @@
       font-family: 'Poppins', sans-serif;
       background: #f0f2f5;
       color: #333;
+      scroll-behavior: smooth;
     }
 
     nav {
@@ -27,7 +30,7 @@
       display: flex;
       justify-content: center;
       padding: 12px;
-      z-index: 100;
+      z-index: 10;
     }
 
     nav a {
@@ -80,6 +83,7 @@
       text-align: center;
       color: white;
       background: rgba(0, 0, 0, 0.4);
+      padding: 0 20px;
     }
 
     header h1 {
@@ -229,14 +233,13 @@
     <a href="#auth"><i class="fas fa-user-plus"></i> Join</a>
   </nav>
 
-  <!-- HEADER SLIDESHOW -->
   <header data-aos="fade-down">
     <div class="slideshow">
-      <img src="https://source.unsplash.com/1600x900/?youth,team" class="active" alt="Slide 1">
-      <img src="https://source.unsplash.com/1600x900/?community,meeting" alt="Slide 2">
-      <img src="https://source.unsplash.com/1600x900/?entrepreneur,work" alt="Slide 3">
-      <img src="https://source.unsplash.com/1600x900/?networking,event" alt="Slide 4">
-      <img src="https://source.unsplash.com/1600x900/?leadership,conference" alt="Slide 5">
+      <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1470&q=80" class="active" alt="Slide 1">
+      <img src="https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=1470&q=80" alt="Slide 2">
+      <img src="https://images.unsplash.com/photo-1531297484001-80022131f5a1?auto=format&fit=crop&w=1470&q=80" alt="Slide 3">
+      <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1470&q=80" alt="Slide 4">
+      <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1470&q=80" alt="Slide 5">
     </div>
     <div class="content">
       <h1>VISIONARY YOUTH GROUP 2024</h1>
@@ -245,96 +248,85 @@
     </div>
   </header>
 
-  <!-- ABOUT -->
   <section id="about" data-aos="fade-up">
     <h2>About Us</h2>
     <p>VISIONARY YOUTH GROUP 2024 empowers young people through financial literacy, entrepreneurship, and community service. We foster leadership, accountability, and growth among youth to positively impact society.</p>
   </section>
 
-  <!-- BENEFITS -->
   <section id="benefits" data-aos="fade-up">
-    <h2>Benefits</h2>
+    <h2>Our Benefits</h2>
     <div class="benefits">
       <div class="benefit"><i class="fas fa-piggy-bank"></i>
-        <h3>Financial Literacy</h3>
-        <p>Learn smart saving and investment practices to grow your wealth responsibly.</p>
+        <h3>Savings</h3>
+        <p>Build your savings and achieve financial goals with our structured saving programs.</p>
       </div>
       <div class="benefit"><i class="fas fa-hand-holding-usd"></i>
-        <h3>Loan Access</h3>
-        <p>Access small loans with low interest rates to fund your entrepreneurial ideas.</p>
+        <h3>Loans</h3>
+        <p>Access affordable loans for education, business, and emergencies with minimal paperwork.</p>
       </div>
       <div class="benefit"><i class="fas fa-users"></i>
         <h3>Networking</h3>
-        <p>Connect with other youth members for collaboration and mentorship opportunities.</p>
+        <p>Connect with like-minded youth and expand your professional and social network.</p>
       </div>
       <div class="benefit"><i class="fas fa-chart-line"></i>
-        <h3>Reports & Progress</h3>
-        <p>Track your financial growth, loan repayment, and savings over time.</p>
+        <h3>Financial Growth</h3>
+        <p>Monitor your financial progress and receive personalized reports to guide your growth.</p>
       </div>
     </div>
   </section>
 
-  <!-- PROGRAMS -->
   <section id="programs" data-aos="fade-up">
     <h2>Programs</h2>
     <div class="programs">
-      <div class="card"><i class="fas fa-chalkboard-teacher"></i>
-        <h3>Workshops</h3>
-        <p>Attend financial literacy, entrepreneurship, and leadership workshops.</p>
+      <div class="card"><i class="fas fa-lightbulb"></i>
+        <h3>Entrepreneurship Training</h3>
+        <p>Learn business and entrepreneurial skills through workshops and mentorship.</p>
       </div>
-      <div class="card"><i class="fas fa-handshake"></i>
-        <h3>Mentorship</h3>
-        <p>Get mentorship from experienced professionals in business and community service.</p>
+      <div class="card"><i class="fas fa-chalkboard-teacher"></i>
+        <h3>Financial Literacy</h3>
+        <p>Gain knowledge on budgeting, saving, investment, and smart financial planning.</p>
       </div>
       <div class="card"><i class="fas fa-hands-helping"></i>
         <h3>Community Service</h3>
-        <p>Participate in community projects to make a real positive impact.</p>
+        <p>Participate in community projects and initiatives to give back to society.</p>
       </div>
-      <div class="card"><i class="fas fa-calendar-alt"></i>
-        <h3>Events</h3>
-        <p>Join youth events and networking gatherings regularly throughout the year.</p>
+      <div class="card"><i class="fas fa-people-arrows"></i>
+        <h3>Networking Events</h3>
+        <p>Join events to meet other members and build valuable connections.</p>
       </div>
     </div>
   </section>
 
-  <!-- NEWS -->
   <section id="news" data-aos="fade-up">
     <h2>News & Updates</h2>
     <div class="news">
       <div class="card"><i class="fas fa-newspaper"></i>
-        <h3>Latest Announcements</h3>
-        <p>Stay updated on upcoming events, loan availability, and new programs for youth.</p>
+        <h3>Monthly Newsletter</h3>
+        <p>Stay updated with the latest news, events, and announcements from the group.</p>
       </div>
       <div class="card"><i class="fas fa-bullhorn"></i>
-        <h3>Campaigns</h3>
-        <p>Participate in awareness campaigns, competitions, and community initiatives.</p>
+        <h3>Announcements</h3>
+        <p>Receive important announcements about programs, workshops, and community service.</p>
       </div>
-      <div class="card"><i class="fas fa-lightbulb"></i>
-        <h3>Innovation Hub</h3>
-        <p>Discover creative solutions and innovative projects led by our members.</p>
-      </div>
-      <div class="card"><i class="fas fa-award"></i>
-        <h3>Achievements</h3>
-        <p>Read about members’ accomplishments and success stories in entrepreneurship.</p>
+      <div class="card"><i class="fas fa-calendar-alt"></i>
+        <h3>Upcoming Events</h3>
+        <p>Plan your participation in events, trainings, and seminars organized by the group.</p>
       </div>
     </div>
   </section>
 
-  <!-- CONTACT -->
   <section id="contact" data-aos="fade-up">
     <h2>Contact Us</h2>
-    <p><i class="fas fa-envelope"></i> Email: visionaryyouthgroup32.gmail.com</p>
-    <p><i class="fas fa-phone"></i> Phone: +254 741 453 336</p>
-    <p><i class="fas fa-map-marker-alt"></i> Address: Nairobi, Kenya</p>
+    <p><i class="fas fa-map-marker-alt"></i> Nairobi, Kenya</p>
+    <p><i class="fas fa-envelope"></i> visionaryyouthgroup32@gmail.com</p>
+    <p><i class="fas fa-phone"></i> +254 741453336</p>
     <div class="social-icons">
       <a href="#"><i class="fab fa-facebook"></i></a>
       <a href="#"><i class="fab fa-twitter"></i></a>
       <a href="#"><i class="fab fa-instagram"></i></a>
-      <a href="#"><i class="fab fa-linkedin"></i></a>
     </div>
   </section>
 
-  <!-- SIGNUP / LOGIN -->
   <section id="auth" data-aos="fade-up">
     <h2>Join Our Community</h2>
     <p><strong>All fields are required. Sign up below.</strong></p>
@@ -383,7 +375,8 @@
     const db = getFirestore(app);
 
     // SIGNUP
-    document.getElementById('signupBtn').addEventListener('click', async () => {
+    document.getElementById('signupBtn').addEventListener('click', async (e) => {
+      e.preventDefault();
       const signupInfo = {
         name: document.getElementById('signupName').value,
         phone: document.getElementById('signupPhone').value,
@@ -410,7 +403,8 @@
     });
 
     // LOGIN
-    document.getElementById('loginBtn').addEventListener('click', async () => {
+    document.getElementById('loginBtn').addEventListener('click', async (e) => {
+      e.preventDefault();
       const email = document.getElementById('loginEmail').value;
       const password = document.getElementById('loginPassword').value;
       try {
@@ -422,12 +416,10 @@
     });
 
     // RESET PASSWORD
-    document.getElementById('resetPasswordBtn').addEventListener('click', async () => {
+    document.getElementById('resetPasswordBtn').addEventListener('click', async (e) => {
+      e.preventDefault();
       const email = document.getElementById('loginEmail').value;
-      if (!email) {
-        alert("Enter your email to reset password");
-        return;
-      }
+      if (!email) { alert("Enter your email to reset password"); return; }
       try {
         await sendPasswordResetEmail(auth, email);
         alert("Password reset email sent!");
@@ -437,24 +429,19 @@
     });
 
     // Slideshow
-    const slides = document.querySelectorAll('.slideshow img');
+    let slides = document.querySelectorAll('.slideshow img');
     let current = 0;
-    slides[current].classList.add('active');
     setInterval(() => {
       slides[current].classList.remove('active');
       current = (current + 1) % slides.length;
       slides[current].classList.add('active');
     }, 5000);
-
-    // Prevent default form submit
-    document.getElementById('signupForm').addEventListener('submit', e => e.preventDefault());
-    document.getElementById('loginForm').addEventListener('submit', e => e.preventDefault());
   </script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
   <script>
     AOS.init({ duration: 1000, once: true });
   </script>
-
 </body>
+
 </html>
