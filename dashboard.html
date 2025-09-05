@@ -1,251 +1,592 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Visionary Youth Dashboard</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Visionary Youth — Dashboard (Fixed Buttons)</title>
+
+<!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<!-- Icons -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
 
 <style>
-body {
-  margin:0; font-family:"Poppins",sans-serif;
-  background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
-  color:#fff; display:flex; min-height:100vh;
-}
-.sidebar {
-  width:220px; background:rgba(0,0,0,0.6);
-  display:flex; flex-direction:column; padding:20px;
-}
-.sidebar h2 { color:#4caf50; margin-bottom:20px; font-size:20px; }
-.sidebar button {
-  background:none; border:none; color:white; padding:12px; text-align:left;
-  border-radius:8px; display:flex; align-items:center; gap:8px;
-  cursor:pointer; transition:0.3s;
-}
-.sidebar button:hover, .sidebar button.active {
-  background:#4caf50; /* Green active */
-}
-.main { flex:1; display:flex; flex-direction:column; }
-header {
-  background:#4caf50; padding:15px;
-  display:flex; justify-content:space-between; align-items:center;
-}
-.container { flex:1; padding:20px; overflow-y:auto; }
-.section { display:none; background:rgba(255,255,255,0.08); padding:20px; border-radius:12px; }
-.section.active { display:block; }
-.mini-tabs { display:flex; gap:8px; margin-bottom:10px; }
-.mini-btn { flex:1; padding:8px; border:none; border-radius:8px; background:rgba(255,255,255,0.2); color:white; cursor:pointer; }
-.mini-btn.active { background:#4caf50; }
-.progress-bar { background:rgba(255,255,255,0.2); border-radius:20px; overflow:hidden; margin:5px 0; height:20px; }
-.progress-fill { background:#ffeb3b; height:100%; width:0; transition:width 1s; }
-form input, form select { width:100%; padding:10px; margin:6px 0; border-radius:8px; border:none; }
-form button { background:#4caf50; color:white; padding:10px; border:none; border-radius:8px; cursor:pointer; }
-form button:hover { background:#388e3c; }
-footer { background:rgba(0,0,0,0.4); padding:10px; text-align:center; font-size:13px; }
-.toast {
-  position:fixed; bottom:20px; right:20px;
-  background:#333; color:#fff; padding:10px 20px; border-radius:6px;
-  opacity:0; transform:translateY(20px); transition:0.3s;
-}
-.toast.show { opacity:1; transform:translateY(0); }
+  :root{
+    --green: #4caf50;
+    --green-dark:#388e3c;
+    --glass: rgba(255,255,255,0.06);
+    --glass-strong: rgba(255,255,255,0.10);
+    --accent: #ffeb3b;
+    --text: #ffffff;
+    --bg1: #0f2027;
+    --bg2: #203a43;
+    --bg3: #2c5364;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:Inter, Poppins, system-ui, Arial, sans-serif;
+    background: linear-gradient(135deg,var(--bg1),var(--bg2),var(--bg3));
+    color:var(--text);
+    min-height:100vh;
+    display:flex;
+  }
+
+  /* Sidebar */
+  .sidebar{
+    width:220px;
+    background: rgba(0,0,0,0.45);
+    padding:18px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    box-shadow: 2px 0 30px rgba(0,0,0,0.4);
+  }
+  .brand{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+  .brand .logo{
+    width:40px;height:40px;border-radius:10px;
+    background:linear-gradient(135deg,var(--green),var(--green-dark));
+    display:flex;align-items:center;justify-content:center;color:#051013;font-weight:800;
+  }
+  .brand h3{margin:0;font-size:18px;color:var(--accent)}
+
+  .nav-btn{
+    background:none;border:none;color:var(--text);text-align:left;padding:10px;border-radius:10px;cursor:pointer;display:flex;gap:10px;align-items:center;
+    transition:background .18s,transform .12s;
+  }
+  .nav-btn:hover{background:rgba(255,255,255,0.03);transform:translateY(-2px)}
+  .nav-btn.active{background:linear-gradient(90deg,var(--green),var(--green-dark));box-shadow:0 8px 20px rgba(0,0,0,.35)}
+
+  /* Main area */
+  .main{flex:1;display:flex;flex-direction:column}
+  header{padding:14px 20px;background:linear-gradient(90deg,var(--green-dark),var(--green));display:flex;justify-content:space-between;align-items:center}
+  header .user-email{font-weight:700}
+  .content{padding:20px;flex:1;overflow:auto}
+
+  .section{display:none;background:var(--glass);padding:18px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+  .section.active{display:block;animation:fade .28s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+  /* mini-tabs and progress bars */
+  .mini-tabs{display:flex;gap:8px;margin-bottom:12px}
+  .mini-btn{flex:1;padding:8px;border-radius:10px;border:none;background:rgba(255,255,255,0.06);color:var(--text);cursor:pointer}
+  .mini-btn.active{background:linear-gradient(90deg,var(--green),var(--green-dark))}
+
+  .metric{margin:8px 0}
+  .progress{height:16px;border-radius:999px;background:rgba(255,255,255,0.12);overflow:hidden}
+  .fill{height:100%;width:0;background:linear-gradient(90deg,var(--accent),#ffa751);transition:width 900ms ease}
+
+  /* forms */
+  form input,form select{width:100%;padding:10px;border-radius:8px;border:none;margin-top:8px;background:rgba(255,255,255,0.04);color:var(--text)}
+  form label{display:block;margin-top:12px;font-weight:700}
+  form button{margin-top:14px;padding:10px 14px;border-radius:8px;border:none;background:var(--green);color:#04210b;cursor:pointer;font-weight:800}
+  form button:hover{background:var(--green-dark)}
+
+  /* footer & toast */
+  footer{padding:12px;text-align:center;color:rgba(255,255,255,0.8)}
+  .toast{position:fixed;right:20px;bottom:20px;padding:12px 16px;border-radius:8px;background:rgba(0,0,0,0.8);color:white;transform:translateY(16px);opacity:0;transition:all .25s}
+  .toast.show{opacity:1;transform:translateY(0)}
+  /* small responsive */
+  @media (max-width:880px){
+    .sidebar{display:none}
+    body{flex-direction:column}
+  }
 </style>
 </head>
 <body>
-<div class="sidebar">
-  <h2>Menu</h2>
-  <button class="tab-btn active" data-target="financial"><i class="fa-solid fa-chart-line"></i> Financial</button>
-  <button class="tab-btn" data-target="profile"><i class="fa-solid fa-user"></i> Profile</button>
-  <button class="tab-btn" data-target="loan"><i class="fa-solid fa-money-check-dollar"></i> Loan</button>
-  <button class="tab-btn" data-target="loanProgress"><i class="fa-solid fa-clock"></i> Loan Progress</button>
-  <button class="tab-btn" data-target="achievements"><i class="fa-solid fa-award"></i> Achievements</button>
-  <button class="tab-btn" data-target="statement"><i class="fa-solid fa-file-invoice"></i> Statement</button>
-  <button id="logoutBtn"><i class="fa-solid fa-sign-out-alt"></i> Logout</button>
-</div>
-
-<div class="main">
-<header>
-  <div id="emailDisplay"></div>
-</header>
-<div class="container">
-  <!-- Financial -->
-  <div id="financial" class="section active">
-    <h2>Financial Overview</h2>
-    <div class="mini-tabs">
-      <button class="mini-btn active" data-mini="savings">Savings</button>
-      <button class="mini-btn" data-mini="shares">Shares</button>
-      <button class="mini-btn" data-mini="loans">Loans</button>
-      <button class="mini-btn" data-mini="balances">Balances</button>
-      <button class="mini-btn" data-mini="dividends">Dividends</button>
+  <!-- Sidebar -->
+  <aside class="sidebar" aria-label="Main menu">
+    <div class="brand">
+      <div class="logo">VY</div>
+      <h3>Visionary</h3>
     </div>
-    <div id="savings" class="mini-section active">
-      <p>Weekly: <span id="weeklySavings">0</span></p><div class="progress-bar"><div id="weeklyBar" class="progress-fill"></div></div>
-      <p>Monthly: <span id="monthlySavings">0</span></p><div class="progress-bar"><div id="monthlyBar" class="progress-fill"></div></div>
+
+    <button class="nav-btn tab-btn active" type="button" data-target="financial"><i class="fa-solid fa-chart-line"></i> Financial</button>
+    <button class="nav-btn tab-btn" type="button" data-target="profile"><i class="fa-solid fa-user"></i> Profile</button>
+    <button class="nav-btn tab-btn" type="button" data-target="loan"><i class="fa-solid fa-money-check-dollar"></i> Loan</button>
+    <button class="nav-btn tab-btn" type="button" data-target="loanProgress"><i class="fa-solid fa-clock"></i> Loan Progress</button>
+    <button class="nav-btn tab-btn" type="button" data-target="achievements"><i class="fa-solid fa-award"></i> Achievements</button>
+    <button class="nav-btn tab-btn" type="button" data-target="statement"><i class="fa-solid fa-file-invoice"></i> Statement</button>
+
+    <div style="flex:1"></div>
+    <button id="logoutBtn" class="nav-btn" type="button"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+  </aside>
+
+  <!-- Main -->
+  <div class="main">
+    <header>
+      <div class="user-email" id="emailDisplay">Not signed in</div>
+      <div style="opacity:.9;font-weight:700">Visionary Youth Dashboard</div>
+    </header>
+
+    <div class="content">
+      <!-- Financial (default visible) -->
+      <section id="financial" class="section active" aria-labelledby="financial">
+        <h2>Financial Overview</h2>
+        <div class="mini-tabs" id="miniTabs">
+          <button class="mini-btn active" type="button" data-mini="miniSavings">Savings</button>
+          <button class="mini-btn" type="button" data-mini="miniShares">Shares</button>
+          <button class="mini-btn" type="button" data-mini="miniLoans">Loans</button>
+          <button class="mini-btn" type="button" data-mini="miniBalances">Balances</button>
+          <button class="mini-btn" type="button" data-mini="miniDividends">Dividends</button>
+        </div>
+
+        <div id="miniSavings" class="mini-section">
+          <div class="metric"><strong>Weekly:</strong> <span id="weeklySavings">0</span>
+            <div class="progress"><div id="weeklyFill" class="fill"></div></div></div>
+          <div class="metric"><strong>Monthly:</strong> <span id="monthlySavings">0</span>
+            <div class="progress"><div id="monthlyFill" class="fill"></div></div></div>
+        </div>
+
+        <div id="miniShares" class="mini-section" style="display:none">
+          <div class="metric"><strong>Shares:</strong> <span id="shares">0</span>
+            <div class="progress"><div id="sharesFill" class="fill"></div></div></div>
+        </div>
+
+        <div id="miniLoans" class="mini-section" style="display:none">
+          <div class="metric"><strong>Loan:</strong> <span id="loanAmountVal">0</span>
+            <div class="progress"><div id="loanFill" class="fill"></div></div></div>
+        </div>
+
+        <div id="miniBalances" class="mini-section" style="display:none">
+          <div class="metric"><strong>Unpaid Balances:</strong> <span id="balances">0</span>
+            <div class="progress"><div id="balancesFill" class="fill"></div></div></div>
+        </div>
+
+        <div id="miniDividends" class="mini-section" style="display:none">
+          <div class="metric"><strong>Dividends:</strong> <span id="dividends">0</span>
+            <div class="progress"><div id="dividendsFill" class="fill"></div></div></div>
+        </div>
+      </section>
+
+      <!-- Profile -->
+      <section id="profile" class="section" aria-labelledby="profile" style="display:none">
+        <h2>Profile (one-time update)</h2>
+        <form id="profileForm">
+          <label for="profileName">Full name</label>
+          <input id="profileName" name="profileName" required>
+
+          <label for="profileID">ID number</label>
+          <input id="profileID" name="profileID" required>
+
+          <label for="profileEmail">Email</label>
+          <input id="profileEmail" type="email" required>
+
+          <label for="profilePhone">Phone</label>
+          <input id="profilePhone" required>
+
+          <label for="profileOrigin">Origin</label>
+          <input id="profileOrigin" required>
+
+          <label for="profileMember">Member number</label>
+          <input id="profileMember" required>
+
+          <label for="passport">Passport (image)</label>
+          <input id="passport" type="file" accept="image/*" required>
+
+          <button type="submit">Save profile</button>
+        </form>
+      </section>
+
+      <!-- Loan -->
+      <section id="loan" class="section" style="display:none">
+        <h2>Loan Application</h2>
+        <form id="loanForm">
+          <h3>Personal</h3>
+          <label>Name</label><input id="loanName" required>
+          <label>ID</label><input id="loanID" required>
+          <label>Phone</label><input id="loanPhone" required>
+
+          <h3>Residence</h3>
+          <label>Address</label><input id="loanAddress" required>
+          <label>Origin</label><input id="loanOrigin" required>
+
+          <h3>Guarantor</h3>
+          <label>Guarantor name</label><input id="guarantorName" required>
+          <label>Guarantor phone</label><input id="guarantorPhone" required>
+
+          <h3>Loan Details</h3>
+          <label>Amount</label><input id="loanAmount" type="number" min="1" required>
+          <label>Category</label>
+          <select id="loanCategory" required>
+            <option value="">Select</option>
+            <option>Business</option><option>Education</option><option>Emergency</option>
+          </select>
+
+          <button type="submit">Submit Application</button>
+        </form>
+      </section>
+
+      <!-- Loan Progress -->
+      <section id="loanProgress" class="section" style="display:none">
+        <h2>Loan Progress</h2>
+        <div id="loanTimeline">No loan applications yet.</div>
+      </section>
+
+      <!-- Achievements -->
+      <section id="achievements" class="section" style="display:none">
+        <h2>Achievements & Documents</h2>
+        <div id="achievementList">No achievements yet.</div>
+      </section>
+
+      <!-- Statement -->
+      <section id="statement" class="section" style="display:none">
+        <h2>Account Statement</h2>
+        <button id="downloadStatement" type="button">Download CSV</button>
+      </section>
     </div>
-    <div id="shares" class="mini-section"><p>Shares: <span id="sharesVal">0</span></p><div class="progress-bar"><div id="sharesBar" class="progress-fill"></div></div></div>
-    <div id="loans" class="mini-section"><p>Loans: <span id="loanVal">0</span></p><div class="progress-bar"><div id="loanBar" class="progress-fill"></div></div></div>
-    <div id="balances" class="mini-section"><p>Balances: <span id="balanceVal">0</span></p><div class="progress-bar"><div id="balanceBar" class="progress-fill"></div></div></div>
-    <div id="dividends" class="mini-section"><p>Dividends: <span id="divVal">0</span></p><div class="progress-bar"><div id="divBar" class="progress-fill"></div></div></div>
+
+    <footer>© 2025 Visionary Youth</footer>
   </div>
 
-  <!-- Profile -->
-  <div id="profile" class="section">
-    <h2>Profile Update</h2>
-    <form id="profileForm">
-      <input id="profileName" placeholder="Name" required>
-      <input id="profileID" placeholder="ID" required>
-      <input type="email" id="profileEmail" placeholder="Email" required>
-      <input id="profilePhone" placeholder="Phone" required>
-      <input id="profileOrigin" placeholder="Origin" required>
-      <input id="profileMember" placeholder="Member Number" required>
-      <input type="file" id="passport" accept="image/*" required>
-      <button type="submit">Update Profile</button>
-    </form>
-  </div>
-
-  <!-- Loan -->
-  <div id="loan" class="section">
-    <h2>Loan Application</h2>
-    <form id="loanForm">
-      <h3>Personal</h3>
-      <input id="loanName" placeholder="Full Name" required>
-      <input id="loanID" placeholder="ID Number" required>
-      <input id="loanPhone" placeholder="Phone Number" required>
-      <h3>Residence</h3>
-      <input id="loanAddress" placeholder="Address" required>
-      <input id="loanOrigin" placeholder="Origin" required>
-      <h3>Guarantor</h3>
-      <input id="guarantorName" placeholder="Guarantor Name" required>
-      <input id="guarantorPhone" placeholder="Guarantor Phone" required>
-      <h3>Loan Details</h3>
-      <input id="loanAmount" placeholder="Amount" required>
-      <select id="loanCategory" required>
-        <option value="">Select Category</option>
-        <option>Business</option><option>Education</option><option>Emergency</option>
-      </select>
-      <button type="submit">Apply</button>
-    </form>
-  </div>
-
-  <!-- Loan Progress -->
-  <div id="loanProgress" class="section"><h2>Loan Progress</h2><div id="loanTimeline"></div></div>
-
-  <!-- Achievements -->
-  <div id="achievements" class="section"><h2>Achievements</h2><div id="achievementList"></div></div>
-
-  <!-- Statement -->
-  <div id="statement" class="section"><h2>Statement</h2><button id="downloadStatementBtn">Download</button></div>
-</div>
-<footer>© 2025 Visionary Youth</footer>
-</div>
-
-<div id="toast" class="toast"></div>
+  <div id="toast" class="toast" aria-live="polite"></div>
 
 <script>
-const firebaseConfig={/* your firebase config here */};
-firebase.initializeApp(firebaseConfig);
-const auth=firebase.auth(), db=firebase.database(), storage=firebase.storage();
-let currentUserUid;
+document.addEventListener('DOMContentLoaded', () => {
+  // ---------- Firebase config (your real config) ----------
+  const firebaseConfig = {
+    apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
+    authDomain: "visionary-youth-grou-2024.firebaseapp.com",
+    databaseURL: "https://visionary-youth-grou-2024-default-rtdb.firebaseio.com/",
+    projectId: "visionary-youth-grou-2024",
+    storageBucket: "visionary-youth-grou-2024.firebasestorage.app",
+    messagingSenderId: "372978592717",
+    appId: "1:372978592717:web:624596619d41aab84f3284",
+    measurementId: "G-FEHC1GM3B7"
+  };
+  try { firebase.initializeApp(firebaseConfig); } catch(e) { /* already initialized */ }
+  const auth = firebase.auth();
+  const db = firebase.database();
+  const storage = firebase.storage();
 
-/* Toast */
-function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),3000);}
+  // ---------- helpers ----------
+  const $ = id => document.getElementById(id);
+  function showToast(msg, time = 3000){
+    const t = $('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(()=> t.classList.remove('show'), time);
+  }
 
-/* Sidebar Navigation */
-document.querySelectorAll(".tab-btn").forEach(btn=>{
-  btn.addEventListener("click",()=>{
-    document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
-    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
-    document.getElementById(btn.dataset.target).classList.add("active");
-    btn.classList.add("active");
-  });
-});
+  // ---------- UI elements ----------
+  const tabButtons = Array.from(document.querySelectorAll('.tab-btn'));
+  const sections = Array.from(document.querySelectorAll('.section'));
+  const miniBtns = Array.from(document.querySelectorAll('.mini-btn'));
+  const miniSections = Array.from(document.querySelectorAll('.mini-section'));
 
-/* Mini-tabs */
-document.querySelectorAll(".mini-btn").forEach(btn=>{
-  btn.addEventListener("click",()=>{
-    document.querySelectorAll(".mini-section").forEach(s=>s.classList.remove("active"));
-    document.querySelectorAll(".mini-btn").forEach(b=>b.classList.remove("active"));
-    document.getElementById(btn.dataset.mini).classList.add("active");
-    btn.classList.add("active");
-  });
-});
+  // safe getters for some elements we use
+  const logoutBtn = $('logoutBtn');
+  const emailDisplay = $('emailDisplay');
+  const downloadStatement = $('downloadStatement');
 
-/* Logout */
-logoutBtn.onclick=()=>auth.signOut().then(()=>location.href="index.html");
+  // ---------- robust tab switching ----------
+  function showSection(id){
+    sections.forEach(s => {
+      if (s.id === id){
+        s.classList.add('active');
+        s.style.display = '';
+      } else {
+        s.classList.remove('active');
+        s.style.display = 'none';
+      }
+    });
+    tabButtons.forEach(b => b.classList.toggle('active', b.dataset.target === id));
+    // reset scroll to top of content
+    document.querySelector('.content').scrollTop = 0;
+  }
 
-/* Auth */
-auth.onAuthStateChanged(user=>{
-  if(user){currentUserUid=user.uid;emailDisplay.textContent="Welcome, "+user.email;loadFinancials();loadLoanProgress();loadAchievements();}
-  else location.href="index.html";
-});
-
-/* Financials */
-function animateBar(id,val,max=10000){document.getElementById(id).style.width=Math.min(val/max*100,100)+"%";}
-function loadFinancials(){
-  db.ref("users/"+currentUserUid+"/financials").on("value",s=>{
-    const d=s.val()||{};
-    weeklySavings.textContent=d.weekly_savings||0;monthlySavings.textContent=d.monthly_savings||0;
-    sharesVal.textContent=d.shares||0;loanVal.textContent=d.loan||0;balanceVal.textContent=d.unpaid_balances||0;divVal.textContent=d.dividends||0;
-    animateBar("weeklyBar",d.weekly_savings||0);animateBar("monthlyBar",d.monthly_savings||0);
-    animateBar("sharesBar",d.shares||0);animateBar("loanBar",d.loan||0);
-    animateBar("balanceBar",d.unpaid_balances||0);animateBar("divBar",d.dividends||0);
-  });
-}
-
-/* Profile Update */
-profileForm.onsubmit=async e=>{
-  e.preventDefault();
-  const ref=db.ref("users/"+currentUserUid+"/profile");
-  const snap=await ref.get(); if(snap.exists()){showToast("Profile already updated!");return;}
-  const file=passport.files[0];const url=file?await storage.ref("passports/"+currentUserUid).put(file).then(s=>s.ref.getDownloadURL()):"";
-  await ref.set({name:profileName.value,id:profileID.value,email:profileEmail.value,phone:profilePhone.value,origin:profileOrigin.value,memberNumber:profileMember.value,passportURL:url});
-  showToast("Profile saved!");
-};
-
-/* Loan Apply */
-loanForm.onsubmit=async e=>{
-  e.preventDefault();
-  const data={personal:{name:loanName.value,id:loanID.value,phone:loanPhone.value},
-    residence:{address:loanAddress.value,origin:loanOrigin.value},
-    guarantor:{name:guarantorName.value,phone:guarantorPhone.value},
-    loan:{amount:loanAmount.value,category:loanCategory.value},
-    status:"Applied",timestamp:Date.now()};
-  await db.ref("users/"+currentUserUid+"/loan_applications").push(data);
-  showToast("Loan application submitted!");
-};
-
-/* Loan Progress */
-function loadLoanProgress(){
-  loanTimeline.innerHTML="";
-  db.ref("users/"+currentUserUid+"/loan_applications").on("value",snap=>{
-    loanTimeline.innerHTML="";
-    snap.forEach(c=>{
-      const loan=c.val();
-      loanTimeline.innerHTML+=`<p>${loan.loan.amount} - ${loan.status}</p>`;
+  tabButtons.forEach(btn => {
+    // ensure button is type=button to avoid form submissions
+    btn.type = 'button';
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.target;
+      if (!target) return;
+      showSection(target);
     });
   });
-}
 
-/* Achievements */
-function loadAchievements(){
-  achievementList.innerHTML="";
-  db.ref("users/"+currentUserUid+"/achievements").on("value",s=>{
-    achievementList.innerHTML="";
-    const d=s.val()||{};
-    if(!Object.keys(d).length) achievementList.textContent="No achievements yet";
-    for(let k in d){const a=d[k];achievementList.innerHTML+=`<div><h4>${a.title}</h4><p>${a.description}</p></div>`;}
+  // mini-tabs inside Financial
+  function showMini(id){
+    miniSections.forEach(s => {
+      if (s.id === id) { s.style.display = ''; s.classList.add('active'); }
+      else { s.style.display = 'none'; s.classList.remove('active'); }
+    });
+    miniBtns.forEach(b => b.classList.toggle('active', b.dataset.mini === id));
+  }
+  miniBtns.forEach(b => { b.type = 'button'; b.addEventListener('click', ()=> showMini(b.dataset.mini)); });
+
+  // Logout (button)
+  logoutBtn.type = 'button';
+  logoutBtn.addEventListener('click', () => {
+    auth.signOut().then(()=> { showToast('Signed out'); window.location.href = 'index.html'; })
+      .catch(e => showToast('Sign out failed'));
   });
-}
 
-/* Statement */
-downloadStatementBtn.onclick=()=>{db.ref("users/"+currentUserUid+"/financials").once("value").then(s=>{let d=s.val()||{},csv="Field,Value\n";for(let k in d)csv+=k+","+d[k]+"\n";const blob=new Blob([csv],{type:"text/csv"});const link=document.createElement("a");link.href=URL.createObjectURL(blob);link.download="statement.csv";link.click();});};
+  // ---------- auth state ----------
+  let currentUid = null;
+  auth.onAuthStateChanged(user => {
+    if(!user){
+      emailDisplay.textContent = 'Not signed in';
+      // hide profile/loan actions that require auth? we keep UI visible but saving will prompt
+      currentUid = null;
+      return;
+    }
+    currentUid = user.uid;
+    emailDisplay.textContent = `Welcome, ${user.email}`;
+    // load user-specific data
+    bindFinancials();
+    bindLoanProgress();
+    bindAchievements();
+  });
 
-/* Auto logout 3min */
-let logoutTimer;function resetTimer(){clearTimeout(logoutTimer);logoutTimer=setTimeout(()=>{showToast("Logged out for inactivity");auth.signOut().then(()=>location.href="index.html");},180000);}
-["click","mousemove","keydown","scroll","touchstart"].forEach(e=>document.addEventListener(e,resetTimer));resetTimer();
+  // ---------- financials (live) ----------
+  function animateFill(el, percent){ if(!el) return; el.style.width = percent + '%'; }
+  function bindFinancials(){
+    if (!currentUid) return;
+    const ref = db.ref(`users/${currentUid}/financials`);
+    ref.on('value', snap => {
+      const v = snap.val() || {};
+      $('weeklySavings').textContent = v.weekly_savings || 0;
+      $('monthlySavings').textContent = v.monthly_savings || 0;
+      $('shares').textContent = v.shares || 0;
+      $('loanAmountVal').textContent = v.loan || 0;
+      $('balances').textContent = v.unpaid_balances || 0;
+      $('dividends').textContent = v.dividends || 0;
+
+      // animate fills (use some max values for normalisation)
+      animateFill($('weeklyFill'), Math.min(((v.weekly_savings||0)/5000)*100,100));
+      animateFill($('monthlyFill'), Math.min(((v.monthly_savings||0)/5000)*100,100));
+      animateFill($('sharesFill'), Math.min(((v.shares||0)/1000)*100,100));
+      animateFill($('loanFill'), Math.min(((v.loan||0)/10000)*100,100));
+      animateFill($('balancesFill'), Math.min(((v.unpaid_balances||0)/10000)*100,100));
+      animateFill($('dividendsFill'), Math.min(((v.dividends||0)/10000)*100,100));
+    }, err => { console.error(err); });
+  }
+
+  // ---------- Profile (one-time save) ----------
+  const profileForm = $('profileForm');
+  profileForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!currentUid) { showToast('Please sign in before updating profile'); return; }
+    try{
+      const profileRef = db.ref(`users/${currentUid}/profile`);
+      const existsSnap = await profileRef.once('value');
+      if (existsSnap.exists()){
+        showToast('Profile already updated — update is locked');
+        return;
+      }
+      const fileInput = $('passport');
+      let url = '';
+      if (fileInput.files && fileInput.files[0]){
+        const file = fileInput.files[0];
+        const uploadRef = storage.ref(`passports/${currentUid}/${file.name}`);
+        const uploadSnap = await uploadRef.put(file);
+        url = await uploadSnap.ref.getDownloadURL();
+      }
+      await profileRef.set({
+        name: $('profileName').value.trim(),
+        id: $('profileID').value.trim(),
+        email: $('profileEmail').value.trim(),
+        phone: $('profilePhone').value.trim(),
+        origin: $('profileOrigin').value.trim(),
+        memberNumber: $('profileMember').value.trim(),
+        passportURL: url,
+        updatedAt: Date.now()
+      });
+      showToast('Profile saved successfully');
+    }catch(err){
+      console.error(err);
+      showToast('Error saving profile');
+    }
+  });
+
+  // ---------- Loan apply (multi-section fields in a single form) ----------
+  const loanForm = $('loanForm');
+  loanForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!currentUid) { showToast('Please sign in before applying'); return; }
+    // basic validation
+    if(!$('loanName').value.trim() || !$('loanAmount').value || !$('loanCategory').value){
+      showToast('Please fill required loan fields');
+      return;
+    }
+    // build data object
+    const loanObj = {
+      personal: {
+        name: $('loanName').value.trim(),
+        id: $('loanID').value.trim(),
+        phone: $('loanPhone').value.trim()
+      },
+      residence: {
+        address: $('loanAddress').value.trim(),
+        origin: $('loanOrigin').value.trim()
+      },
+      guarantor: {
+        name: $('guarantorName').value.trim(),
+        phone: $('guarantorPhone').value.trim()
+      },
+      loanDetails: {
+        amount: Number($('loanAmount').value),
+        category: $('loanCategory').value
+      },
+      status: 'Applied',
+      stageDates: { Applied: Date.now() },
+      createdAt: Date.now()
+    };
+    try{
+      const ref = await db.ref(`users/${currentUid}/loan_applications`).push(loanObj);
+      showToast('Loan application submitted');
+      // offer download link (CSV)
+      const csvBtn = document.createElement('button');
+      csvBtn.type = 'button';
+      csvBtn.textContent = 'Download application CSV';
+      csvBtn.style.marginTop = '10px';
+      csvBtn.onclick = () => {
+        db.ref(`users/${currentUid}/loan_applications/${ref.key}`).once('value').then(snap=>{
+          const d = snap.val();
+          let csv = 'section,field,value\n';
+          for (const sec in d){
+            if (typeof d[sec] === 'object'){
+              for (const key in d[sec]){
+                csv += `${sec},${key},"${String(d[sec][key]).replace(/"/g,'""')}"\n`;
+              }
+            } else {
+              csv += `${sec},,${String(d[sec])}\n`;
+            }
+          }
+          const blob = new Blob([csv], {type:'text/csv'});
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          a.download = 'loan_application.csv';
+          a.click();
+        });
+      };
+      // append to loan form so user can download immediately
+      loanForm.appendChild(csvBtn);
+    }catch(err){
+      console.error(err); showToast('Failed to submit loan');
+    }
+  });
+
+  // ---------- Loan progress ----------
+  function bindLoanProgress(){
+    if (!currentUid) return;
+    const ref = db.ref(`users/${currentUid}/loan_applications`);
+    ref.on('value', snap => {
+      const container = $('loanTimeline');
+      container.innerHTML = '';
+      if (!snap.exists()){ container.textContent = 'No loan applications'; return; }
+      snap.forEach(child => {
+        const loan = child.val();
+        const wrapper = document.createElement('div');
+        wrapper.style.background = 'rgba(255,255,255,0.04)';
+        wrapper.style.padding = '10px';
+        wrapper.style.borderRadius = '8px';
+        wrapper.style.marginBottom = '8px';
+        wrapper.innerHTML = `<strong>Amount:</strong> ${loan.loanDetails?.amount || '-'} &nbsp; <strong>Status:</strong> ${loan.status || 'N/A'}<br>
+          <small>Applied: ${new Date(loan.stageDates?.Applied || loan.createdAt || Date.now()).toLocaleString()}</small>`;
+        container.appendChild(wrapper);
+      });
+    });
+  }
+
+  function bindLoanProgress(){
+    if (!currentUid) return;
+    const ref = db.ref(`users/${currentUid}/loan_applications`);
+    ref.on('value', snap => {
+      const container = $('loanTimeline');
+      container.innerHTML = '';
+      if (!snap.exists()){ container.textContent = 'No loan applications'; return; }
+      snap.forEach(child => {
+        const loan = child.val();
+        const wrapper = document.createElement('div');
+        wrapper.style.background = 'rgba(255,255,255,0.04)';
+        wrapper.style.padding = '10px';
+        wrapper.style.borderRadius = '8px';
+        wrapper.style.marginBottom = '8px';
+        // Show timeline entries if present
+        let timelineHtml = '';
+        const stages = ['Applied','Registered','Verified','Allocation','Disbursement in Progress','Disbursed'];
+        stages.forEach(st => {
+          const dt = loan.stageDates && loan.stageDates[st] ? new Date(loan.stageDates[st]).toLocaleString() : '-';
+          const active = loan.status === st || (st === 'Applied' && loan.status === 'Applied');
+          timelineHtml += `<div style="margin-bottom:6px"><strong style="color:${active? 'var(--green)' : '#ddd'}">${st}</strong> — ${dt}</div>`;
+        });
+        wrapper.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center"><div><strong>Amount:</strong> ${loan.loanDetails?.amount || '-'} &nbsp; <strong>Status:</strong> ${loan.status || 'N/A'}</div><div><small>${new Date(loan.createdAt||Date.now()).toLocaleString()}</small></div></div><div style="margin-top:8px">${timelineHtml}</div>`;
+        container.appendChild(wrapper);
+      });
+    });
+  }
+
+  // ---------- Achievements ----------
+  function bindAchievements(){
+    if (!currentUid) return;
+    const ref = db.ref(`users/${currentUid}/achievements`);
+    ref.on('value', snap => {
+      const list = $('achievementList');
+      list.innerHTML = '';
+      const data = snap.val() || {};
+      const keys = Object.keys(data);
+      if (!keys.length) { list.textContent = 'No achievements yet'; return; }
+      keys.forEach(k => {
+        const a = data[k];
+        const card = document.createElement('div');
+        card.style.background = 'rgba(255,255,255,0.04)';
+        card.style.padding = '10px'; card.style.borderRadius = '8px'; card.style.marginBottom = '8px';
+        const descr = a.description ? `<p>${a.description}</p>` : '';
+        const fileBtn = a.fileURL ? `<button type="button">Download</button>` : '';
+        card.innerHTML = `<strong>${a.title || 'Document'}</strong>${descr}${fileBtn}`;
+        if (a.fileURL){
+          card.querySelector('button').addEventListener('click', ()=> window.open(a.fileURL, '_blank'));
+        }
+        list.appendChild(card);
+      });
+    });
+  }
+
+  // ---------- Statement download ----------
+  $('downloadStatement').addEventListener('click', () => {
+    if (!currentUid) { showToast('Sign in to download'); return; }
+    db.ref(`users/${currentUid}/financials`).once('value').then(snap => {
+      const v = snap.val() || {};
+      let csv = 'field,value\n';
+      for(const k in v) csv += `${k},${String(v[k]).replace(/,/g,'')}\n`;
+      const blob = new Blob([csv], {type:'text/csv'});
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'statement.csv'; a.click();
+    });
+  });
+
+  // ---------- bind listeners (safe) ----------
+  function bindFinancials(){ if (currentUid) bindFinancials; } // placeholder left intentionally
+
+  // call binds when user signed in inside auth.onAuthStateChanged above
+  // but if user is already signed in before load, onAuthStateChanged will have fired.
+
+  // ---------- Auto-logout after 3 minutes (180000ms) ----------
+  let logoutTimer = null;
+  const INACTIVITY_LIMIT = 180000; // 3 minutes
+  function resetLogoutTimer(){
+    if (logoutTimer) clearTimeout(logoutTimer);
+    logoutTimer = setTimeout(()=>{
+      showToast('Logging out due to inactivity');
+      auth.signOut().then(()=> window.location.href = 'index.html');
+    }, INACTIVITY_LIMIT);
+  }
+  ['click','mousemove','keydown','scroll','touchstart'].forEach(ev => document.addEventListener(ev, resetLogoutTimer));
+  resetLogoutTimer();
+
+  // ---------- ensure default UI state ----------
+  showSection('financial'); // show only financial on load
+  showMini('miniSavings');  // show only savings mini-section
+
+  // Make sure everything is reachable from current scope for dev debugging if needed:
+  window.__VY = { showSection, showMini, showToast, auth, db, storage };
+
+}); // end DOMContentLoaded
 </script>
 </body>
 </html>
