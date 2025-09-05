@@ -14,34 +14,34 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-  body{margin:0;font-family:'Poppins',sans-serif;background:#f0f2f5;color:#333;}
-  header{background:#28a745;color:white;padding:15px 25px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 6px rgba(0,0,0,0.1);}
+  body{margin:0;font-family:'Poppins',sans-serif;background:#1c1c1c;color:white;}
+  header{background:#28a745;color:white;padding:15px 25px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 6px rgba(0,0,0,0.2);}
   header h1{margin:0;font-size:1.8rem;font-weight:700;}
   header .user-email{font-weight:500;font-size:1rem;}
   header button{background:#ffc107;border:none;padding:10px 18px;border-radius:6px;cursor:pointer;font-weight:600;transition:0.3s;}
   header button:hover{background:#218838;color:white;}
-  nav{background:#fff;display:flex;justify-content:center;gap:25px;padding:10px 0;box-shadow:0 2px 6px rgba(0,0,0,0.05);}
-  nav a{color:#333;text-decoration:none;font-weight:500;display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:6px;transition:0.3s;}
+  nav{background:#222;display:flex;justify-content:center;gap:25px;padding:10px 0;}
+  nav a{color:white;text-decoration:none;font-weight:500;display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:6px;transition:0.3s;}
   nav a:hover{background:#28a745;color:white;}
   main{padding:30px;display:flex;flex-direction:column;gap:30px;}
   .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;}
-  .card{background:linear-gradient(135deg,#28a745,#218838);color:white;padding:20px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.1);transition:transform 0.3s, box-shadow 0.3s;text-align:center;}
-  .card:hover{transform:translateY(-5px);box-shadow:0 6px 18px rgba(0,0,0,0.15);}
+  .card{background:linear-gradient(135deg,#28a745,#218838);color:white;padding:20px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.2);transition:transform 0.3s, box-shadow 0.3s;text-align:center;}
+  .card:hover{transform:translateY(-5px);box-shadow:0 6px 18px rgba(0,0,0,0.3);}
   .card i{font-size:36px;margin-bottom:10px;display:block;}
   .card h3{margin:8px 0;font-size:1.2rem;}
   .card p{font-size:0.95rem;}
-  .section{background:#fff;padding:25px;border-radius:12px;box-shadow:0 3px 10px rgba(0,0,0,0.08);}
-  .tabs{display:flex;border-bottom:1px solid #ddd;margin-bottom:20px;gap:5px;}
-  .tab{padding:10px 20px;cursor:pointer;border-radius:6px 6px 0 0;background:#f0f2f5;}
+  .section{background:#2c2c2c;padding:25px;border-radius:12px;box-shadow:0 3px 10px rgba(0,0,0,0.3);}
+  .tabs{display:flex;border-bottom:1px solid #444;margin-bottom:20px;gap:5px;}
+  .tab{padding:10px 20px;cursor:pointer;border-radius:6px 6px 0 0;background:#444;color:white;}
   .tab.active{background:#28a745;color:white;}
   .tab-content{display:none;}
   .tab-content.active{display:block;}
-  input, select, textarea, button{width:100%;padding:10px;margin:5px 0 15px 0;border-radius:6px;border:1px solid #ccc;transition:0.3s;}
-  input:focus, select:focus, textarea:focus{border-color:#28a745;outline:none;background:#e6f4ea;}
+  input, select, textarea, button{width:100%;padding:10px;margin:5px 0 15px 0;border-radius:6px;border:1px solid #555;background:#1c1c1c;color:white;transition:0.3s;}
+  input:focus, select:focus, textarea:focus{border-color:#28a745;outline:none;background:#2c2c2c;}
   button.submit-btn{background:#28a745;color:white;border:none;cursor:pointer;transition:0.3s;}
   button.submit-btn:hover{background:#218838;}
   .popup{position:fixed;top:20%;left:50%;transform:translateX(-50%);background:#28a745;color:white;padding:20px;border-radius:12px;display:none;z-index:1000;}
-  footer{text-align:center;padding:15px;background:#333;color:white;margin-top:30px;}
+  footer{text-align:center;padding:15px;background:#111;color:white;margin-top:30px;}
   @media(max-width:768px){.cards{grid-template-columns:1fr;}}
 </style>
 </head>
@@ -64,36 +64,14 @@
 </nav>
 
 <main>
-  <!-- Cards -->
   <div class="cards">
-    <div class="card">
-      <i class="fas fa-piggy-bank"></i>
-      <h3>Total Savings</h3>
-      <p>KES <span id="totalSavings">0.00</span></p>
-    </div>
-    <div class="card">
-      <i class="fas fa-calendar-week"></i>
-      <h3>Weekly Savings</h3>
-      <p>KES <span id="weeklySavings">0.00</span></p>
-    </div>
-    <div class="card">
-      <i class="fas fa-hand-holding-usd"></i>
-      <h3>Active Loans</h3>
-      <p>KES <span id="activeLoans">0.00</span></p>
-    </div>
-    <div class="card">
-      <i class="fas fa-chart-line"></i>
-      <h3>Monthly Contributions</h3>
-      <p>KES <span id="monthlyContrib">0.00</span></p>
-    </div>
-    <div class="card">
-      <i class="fas fa-coins"></i>
-      <h3>Total Shares</h3>
-      <p>KES <span id="totalShares">0.00</span></p>
-    </div>
+    <div class="card"><i class="fas fa-piggy-bank"></i><h3>Total Savings</h3><p>KES <span id="totalSavings">0.00</span></p></div>
+    <div class="card"><i class="fas fa-calendar-week"></i><h3>Weekly Savings</h3><p>KES <span id="weeklySavings">0.00</span></p></div>
+    <div class="card"><i class="fas fa-hand-holding-usd"></i><h3>Active Loans</h3><p>KES <span id="activeLoans">0.00</span></p></div>
+    <div class="card"><i class="fas fa-chart-line"></i><h3>Monthly Contributions</h3><p>KES <span id="monthlyContrib">0.00</span></p></div>
+    <div class="card"><i class="fas fa-coins"></i><h3>Total Shares</h3><p>KES <span id="totalShares">0.00</span></p></div>
   </div>
 
-  <!-- Sections -->
   <div class="section">
     <h3>Loan Application</h3>
     <div class="tabs">
@@ -146,14 +124,42 @@
 </main>
 
 <div class="popup" id="popupMsg">Profile Updated Successfully! Logging out...</div>
-<footer>
-  <p>© 2024 Visionary Youth Group. Dashboard</p>
-</footer>
+<footer>© 2024 Visionary Youth Group. Dashboard</footer>
 
 <script type="module">
-// Firebase imports and initialization, tabs, user loading, charts, loans, shares, PDF download
-// [Insert all your previous firebase + jsPDF + Chart.js logic here, unchanged]
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, collection, addDoc, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+const { jsPDF } = window.jspdf;
+import Chart from "https://cdn.jsdelivr.net/npm/chart.js";
 
+const firebaseConfig = { /* your firebase config here */ };
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// Tabs
+const tabs = document.querySelectorAll(".tab");
+tabs.forEach(tab => {
+  tab.addEventListener("click", () => {
+    tabs.forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+    document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+    document.getElementById(tab.dataset.tab).classList.add("active");
+  });
+});
+
+// Auto logout after 3 minutes inactivity
+let logoutTimer;
+function resetTimer() {
+  clearTimeout(logoutTimer);
+  logoutTimer = setTimeout(()=>{signOut(auth); alert("Logged out due to inactivity"); window.location.href="index.html";}, 3*60*1000);
+}
+document.onmousemove = document.onkeypress = resetTimer;
+resetTimer();
+
+// Load user data, shares chart, loans, statements, profile update
+// [Insert your previous firebase + jsPDF + Chart.js logic here unchanged]
 </script>
 
 </body>
