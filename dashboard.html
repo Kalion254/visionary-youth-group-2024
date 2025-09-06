@@ -13,23 +13,26 @@
 body {
     margin: 0;
     font-family: 'Poppins', sans-serif;
-    background: #121212;
-    color: #fff;
+    background: #f4f6f8;
+    color: #333;
 }
 header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #1f1f1f;
+    background: #1f2937;
+    color: #fff;
     padding: 15px 20px;
     position: fixed;
     top: 0;
     width: 100%;
     z-index: 1000;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
 header h2 {
     margin:0;
     font-weight:600;
+    font-size:1.4rem;
 }
 .hamburger {
     font-size: 1.8rem;
@@ -38,11 +41,12 @@ header h2 {
 nav {
     display: none;
     flex-direction: column;
-    background: #1f1f1f;
+    background: #1f2937;
     position: fixed;
     top: 60px;
     left: 0;
     width: 100%;
+    z-index: 999;
 }
 nav a {
     padding: 15px 20px;
@@ -57,7 +61,7 @@ nav a i {
     color: #ffcc00;
 }
 nav a:hover {
-    background: #333;
+    background: #374151;
 }
 .container {
     padding: 80px 20px 20px;
@@ -65,15 +69,15 @@ nav a:hover {
     margin: auto;
 }
 .card {
-    background: #1e1e1e;
+    background: #fff;
     border-radius: 12px;
     padding: 20px;
     margin-bottom: 20px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 .card h3 {
     margin:0 0 10px;
-    color: #ffcc00;
+    color: #1f2937;
 }
 .card p {
     margin:0;
@@ -81,21 +85,24 @@ nav a:hover {
 }
 .tabs {
     display: flex;
+    flex-wrap: wrap;
     margin-bottom: 20px;
+    gap:10px;
 }
 .tab-btn {
     flex:1;
     padding:10px;
     cursor:pointer;
     text-align:center;
-    background:#1e1e1e;
-    border:1px solid #333;
-    color:#fff;
+    background:#e5e7eb;
+    border-radius:8px;
+    color:#1f2937;
     transition:0.3s;
+    font-weight:600;
 }
 .tab-btn.active {
     background:#ffcc00;
-    color:#121212;
+    color:#1f2937;
 }
 .tab-content {
     display:none;
@@ -109,31 +116,33 @@ form input, form select {
     padding:10px;
     margin:10px 0;
     border-radius:8px;
-    border:none;
+    border:1px solid #ccc;
 }
 form button {
     background:#ffcc00;
-    color:#121212;
+    color:#1f2937;
     padding:10px 20px;
     border:none;
     border-radius:8px;
     cursor:pointer;
     font-weight:600;
     margin-top:10px;
+    transition:0.3s;
 }
 form button:hover {
-    background:#ffa500;
+    background:#f59e0b;
 }
 .success-popup {
     position: fixed;
     top:10px;
     right:10px;
-    background:#28a745;
+    background:#22c55e;
     color:#fff;
     padding:10px 20px;
     border-radius:8px;
     display:none;
     z-index: 2000;
+    box-shadow:0 4px 10px rgba(0,0,0,0.3);
 }
 </style>
 </head>
