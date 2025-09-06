@@ -3,234 +3,267 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VISIONARY YOUTH DASHBOARD</title>
+<title>Visionary Youth Dashboard</title>
 
 <!-- Fonts & Icons -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
-body {
-    margin:0;
-    font-family:'Poppins', sans-serif;
-    background:#1a1a1a;
-    color:#f0f0f0;
+body{
+    margin:0; font-family:'Poppins',sans-serif; background:#1a1a1a; color:#f0f0f0;
 }
-header {
-    background:#111;
-    padding:15px 30px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    color:#ffcc00;
-    position:sticky;
-    top:0;
-    z-index:10;
+header{
+    background:#111; padding:15px 30px; display:flex; justify-content:space-between; align-items:center; color:#ffcc00;
+    position:sticky; top:0; z-index:10;
 }
-header h1 { font-size:1.8rem; margin:0; }
-header button {
-    background:#333; color:#ffcc00; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;
-    transition:0.3s;
-}
-header button:hover { background:#555; color:#fff; }
+header h1{ margin:0; font-size:1.8rem; }
+header div{ display:flex; align-items:center; gap:15px; }
+header button{ background:#333; color:#ffcc00; border:none; padding:8px 15px; border-radius:6px; cursor:pointer; transition:0.3s; }
+header button:hover{ background:#555; color:#fff; }
 
-nav.tabs {
-    display:flex;
-    background:#222;
-    justify-content:space-around;
-    padding:10px 0;
-    margin-top:10px;
-    border-radius:8px;
+nav.tabs{
+    display:flex; flex-wrap:wrap; background:#222; justify-content:space-around; padding:10px 0; border-radius:8px;
 }
-nav.tabs button {
-    background:transparent;
-    border:none;
-    color:#ccc;
-    padding:10px 20px;
-    cursor:pointer;
-    font-weight:600;
-    transition:0.3s;
+nav.tabs button{
+    background:transparent; border:none; color:#ccc; padding:10px 20px; cursor:pointer; font-weight:600; transition:0.3s;
 }
-nav.tabs button.active { color:#ffcc00; border-bottom:2px solid #ffcc00; }
-nav.tabs button:hover { color:#fff; }
+nav.tabs button.active{ color:#ffcc00; border-bottom:2px solid #ffcc00; }
+nav.tabs button:hover{ color:#fff; }
 
-section.tab-content {
-    display:none;
-    background:#1f1f1f;
-    margin:20px;
-    padding:25px;
-    border-radius:12px;
-    box-shadow:0 4px 15px rgba(0,0,0,0.3);
-}
-section.tab-content.active { display:block; }
+section.tab-content{ display:none; background:#1f1f1f; margin:20px; padding:25px; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.3); }
+section.tab-content.active{ display:block; }
 
-form {
-    display:flex;
-    flex-direction:column;
-}
-form input, form select {
-    margin:10px 0;
-    padding:10px;
-    border-radius:6px;
-    border:1px solid #555;
-    background:#222;
-    color:#fff;
-}
-form button {
-    background:#333;
-    color:#ffcc00;
-    padding:10px;
-    margin-top:15px;
-    border:none;
-    border-radius:6px;
-    cursor:pointer;
-}
-form button:hover { background:#555; color:#fff; }
+.card{ background:#222; padding:20px; border-radius:10px; margin:10px 0; box-shadow:0 4px 12px rgba(0,0,0,0.4);}
+.card h3{ margin-top:0; color:#ffcc00; }
 
-.card {
-    background:#222;
-    padding:20px;
-    border-radius:10px;
-    margin:10px 0;
-    box-shadow:0 4px 12px rgba(0,0,0,0.4);
-}
-.card h3 { margin-top:0; color:#ffcc00; }
+form{ display:flex; flex-direction:column; }
+form input, form select{ margin:10px 0; padding:10px; border-radius:6px; border:1px solid #555; background:#222; color:#fff; }
+form button{ background:#333; color:#ffcc00; padding:10px; margin-top:15px; border:none; border-radius:6px; cursor:pointer; }
+form button:hover{ background:#555; color:#fff; }
 
-.download-btn {
-    background:#333; color:#ffcc00; padding:8px 15px; border:none; border-radius:6px; cursor:pointer;
-    transition:0.3s;
-}
-.download-btn:hover { background:#555; color:#fff; }
+.download-btn{ background:#333; color:#ffcc00; padding:8px 15px; border:none; border-radius:6px; cursor:pointer; transition:0.3s; }
+.download-btn:hover{ background:#555; color:#fff; }
 
+.success-popup{
+    position:fixed; top:20px; right:20px; background:#28a745; color:white; padding:15px 20px; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.4); display:none; z-index:100;
+}
 </style>
 </head>
 <body>
 
 <header>
-<h1>VISIONARY YOUTH DASHBOARD</h1>
+<h1>Visionary Youth Dashboard</h1>
 <div>
 <span id="userEmail">user@example.com</span>
+<span id="userStatus">(Active)</span>
 <button id="logoutBtn">Logout</button>
 </div>
 </header>
 
 <nav class="tabs">
-<button class="tab-btn active" data-tab="personal">Personal Info</button>
-<button class="tab-btn" data-tab="guarantor">Guarantor</button>
-<button class="tab-btn" data-tab="loan">Loan Application</button>
+<button class="tab-btn active" data-tab="monthly">Monthly Savings</button>
+<button class="tab-btn" data-tab="weekly">Weekly Savings</button>
+<button class="tab-btn" data-tab="loans">Loans</button>
+<button class="tab-btn" data-tab="loanApp">Loan Application</button>
+<button class="tab-btn" data-tab="personal">Personal Info</button>
+<button class="tab-btn" data-tab="residence">Residence</button>
 <button class="tab-btn" data-tab="repayment">Repayment</button>
-<button class="tab-btn" data-tab="update">Update Profile</button>
 <button class="tab-btn" data-tab="shares">Shares</button>
+<button class="tab-btn" data-tab="dividends">Dividends</button>
+<button class="tab-btn" data-tab="balances">Unpaid Balances</button>
+<button class="tab-btn" data-tab="statement">Account Statement</button>
+<button class="tab-btn" data-tab="update">Update Profile</button>
 </nav>
 
-<section id="personal" class="tab-content active">
-<div class="card">
-<h3>Personal Information</h3>
-<p>Name: John Doe</p>
-<p>Phone: +254700000000</p>
-<p>Email: user@example.com</p>
-<p>ID: 12345678</p>
-</div>
+<section id="monthly" class="tab-content active">
+<div class="card"><h3>Monthly Savings</h3>
+<form id="monthlyForm">
+<input type="number" placeholder="Amount" required>
+<button type="button" id="saveMonthly">Save</button>
+</form></div>
 </section>
 
-<section id="guarantor" class="tab-content">
-<div class="card">
-<h3>Guarantor Details</h3>
-<form id="guarantorForm">
-<input type="text" placeholder="Guarantor Name" required>
-<input type="text" placeholder="Guarantor Phone" required>
-<input type="text" placeholder="Guarantor Email" required>
-<button type="button" id="saveGuarantor">Save Guarantor</button>
-</form>
-</div>
+<section id="weekly" class="tab-content">
+<div class="card"><h3>Weekly Savings</h3>
+<form id="weeklyForm">
+<input type="number" placeholder="Amount" required>
+<button type="button" id="saveWeekly">Save</button>
+</form></div>
 </section>
 
-<section id="loan" class="tab-content">
-<div class="card">
-<h3>Loan Application</h3>
+<section id="loans" class="tab-content">
+<div class="card"><h3>Loans</h3>
+<div id="loanList">No loans yet.</div></div>
+</section>
+
+<section id="loanApp" class="tab-content">
+<div class="card"><h3>Loan Application</h3>
 <form id="loanForm">
 <input type="number" placeholder="Loan Amount" required>
 <input type="text" placeholder="Purpose" required>
 <input type="date" placeholder="Repayment Date" required>
 <button type="button" id="applyLoan">Apply Loan</button>
 </form>
-<div id="loanProgress" class="card">
-<h3>Loan Progress</h3>
-<p>No loans yet.</p>
+<div id="loanProgress" class="card"><h3>Loan Progress</h3><p>None yet</p></div>
 </div>
-</div>
+</section>
+
+<section id="personal" class="tab-content">
+<div class="card"><h3>Personal Information</h3>
+<form id="personalForm">
+<input type="text" placeholder="Full Name" required>
+<input type="email" placeholder="Email" required>
+<button type="button" id="updatePersonal">Update</button>
+</form></div>
+</section>
+
+<section id="residence" class="tab-content">
+<div class="card"><h3>Residence Info</h3>
+<form id="residenceForm">
+<input type="text" placeholder="County" required>
+<input type="text" placeholder="Town" required>
+<button type="button" id="updateResidence">Update</button>
+</form></div>
 </section>
 
 <section id="repayment" class="tab-content">
-<div class="card">
-<h3>Repayment</h3>
+<div class="card"><h3>Repayment</h3>
 <form id="repaymentForm">
-<input type="number" placeholder="Repayment Amount" required>
-<button type="button" id="repayBtn">Submit Repayment</button>
-</form>
-</div>
-</section>
-
-<section id="update" class="tab-content">
-<div class="card">
-<h3>Update Profile</h3>
-<form id="updateForm">
-<input type="text" placeholder="Full Name">
-<input type="text" placeholder="Phone Number">
-<input type="email" placeholder="Email">
-<button type="button" id="updateBtn">Update</button>
-</form>
-</div>
+<input type="number" placeholder="Amount" required>
+<button type="button" id="submitRepayment">Submit</button>
+</form></div>
 </section>
 
 <section id="shares" class="tab-content">
-<div class="card">
-<h3>Shares</h3>
-<p>Total Shares: 0</p>
+<div class="card"><h3>Shares</h3>
+<p>Total Shares: <span id="totalShares">0</span></p>
 <button class="download-btn" id="downloadShares">Download Statement</button>
 </div>
 </section>
 
-<script>
-// Tab functionality
-const tabBtns = document.querySelectorAll('.tab-btn');
-const tabs = document.querySelectorAll('.tab-content');
+<section id="dividends" class="tab-content">
+<div class="card"><h3>Dividends</h3>
+<p>Total Dividends: <span id="totalDividends">0</span></p>
+</div>
+</section>
 
-tabBtns.forEach(btn => {
-btn.addEventListener('click', () => {
-tabBtns.forEach(b => b.classList.remove('active'));
-btn.classList.add('active');
-const tab = btn.getAttribute('data-tab');
-tabs.forEach(t => t.classList.remove('active'));
-document.getElementById(tab).classList.add('active');
-});
+<section id="balances" class="tab-content">
+<div class="card"><h3>Unpaid Balances</h3>
+<p id="unpaidBalances">None</p></div>
+</section>
+
+<section id="statement" class="tab-content">
+<div class="card"><h3>Account Statement</h3>
+<button class="download-btn" id="downloadStatement">Download</button>
+</div>
+</section>
+
+<section id="update" class="tab-content">
+<div class="card"><h3>Update Profile</h3>
+<form id="updateForm">
+<input type="text" placeholder="Full Name" required>
+<input type="email" placeholder="Email" required>
+<input type="text" placeholder="Phone Number" required>
+<button type="button" id="updateProfileBtn">Update</button>
+</form></div>
+</section>
+
+<div class="success-popup" id="successPopup">Updated Successfully!</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getDatabase, ref, set, get, child, update } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
+  authDomain: "visionary-youth-grou-2024.firebaseapp.com",
+  databaseURL: "https://visionary-youth-grou-2024-default-rtdb.firebaseio.com",
+  projectId: "visionary-youth-grou-2024",
+  storageBucket: "visionary-youth-grou-2024.appspot.com",
+  messagingSenderId: "372978592717",
+  appId: "1:372978592717:web:1c15aec728ee5f854f3284"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+// Check user
+onAuthStateChanged(auth, user => {
+    if(user){
+        document.getElementById('userEmail').textContent = user.email;
+        document.getElementById('userStatus').textContent = "(Active)";
+    } else {
+        window.location.href="index.html";
+    }
 });
 
-// Logout button
-document.getElementById('logoutBtn').addEventListener('click', () => {
-alert('Logged out');
-window.location.href="index.html";
+// Logout
+document.getElementById('logoutBtn').addEventListener('click', async ()=>{
+    await signOut(auth);
+    window.location.href="index.html";
 });
 
-// Auto logout 3 minutes
+// Auto logout 3 mins
 let logoutTimer;
-function resetTimer() {
+function resetTimer(){
 clearTimeout(logoutTimer);
-logoutTimer = setTimeout(() => { 
-alert('Logged out due to inactivity'); 
-window.location.href="index.html"; 
-}, 180000);
+logoutTimer = setTimeout(async ()=>{
+    await signOut(auth);
+    alert('Logged out due to inactivity');
+    window.location.href="index.html";
+},180000);
 }
 document.addEventListener('mousemove', resetTimer);
 document.addEventListener('keypress', resetTimer);
 resetTimer();
 
-// Button placeholders
-document.getElementById('saveGuarantor').addEventListener('click', ()=> alert('Guarantor saved'));
-document.getElementById('applyLoan').addEventListener('click', ()=> alert('Loan Applied'));
-document.getElementById('repayBtn').addEventListener('click', ()=> alert('Repayment submitted'));
-document.getElementById('updateBtn').addEventListener('click', ()=> alert('Profile updated'));
-document.getElementById('downloadShares').addEventListener('click', ()=> alert('Shares downloaded'));
+// Tab functionality
+const tabBtns = document.querySelectorAll('.tab-btn');
+const tabs = document.querySelectorAll('.tab-content');
+tabBtns.forEach(btn => {
+btn.addEventListener('click', ()=>{
+    tabBtns.forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const tab = btn.getAttribute('data-tab');
+    tabs.forEach(t=>t.classList.remove('active'));
+    document.getElementById(tab).classList.add('active');
+});
+});
+
+// Success popup
+function showSuccess(msg){
+    const popup = document.getElementById('successPopup');
+    popup.textContent = msg;
+    popup.style.display="block";
+    setTimeout(()=> popup.style.display="none",3000);
+}
+
+// Example: Update Profile
+document.getElementById('updateProfileBtn').addEventListener('click', async ()=>{
+    const fullName = document.querySelector('#updateForm input[placeholder="Full Name"]').value;
+    const email = document.querySelector('#updateForm input[placeholder="Email"]').value;
+    const phone = document.querySelector('#updateForm input[placeholder="Phone Number"]').value;
+    const user = auth.currentUser;
+    if(!user) return;
+    try{
+        await update(ref(db,'members/'+user.uid),{fullName,email,phone});
+        showSuccess("Profile Updated!");
+    }catch(err){
+        alert(err.message);
+    }
+});
+
+// Placeholder handlers for savings, loans, repayments
+document.getElementById('saveMonthly').addEventListener('click',()=>showSuccess("Monthly Saved!"));
+document.getElementById('saveWeekly').addEventListener('click',()=>showSuccess("Weekly Saved!"));
+document.getElementById('applyLoan').addEventListener('click',()=>showSuccess("Loan Applied!"));
+document.getElementById('submitRepayment').addEventListener('click',()=>showSuccess("Repayment Submitted!"));
+document.getElementById('downloadStatement').addEventListener('click',()=>showSuccess("Statement Downloaded!"));
+document.getElementById('downloadShares').addEventListener('click',()=>showSuccess("Shares Downloaded!"));
+
 </script>
 
 </body>
