@@ -13,125 +13,27 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
 
 <style>
-body {
-    margin: 0;
-    font-family: 'Poppins', sans-serif;
-    background: #f0f2f5;
-    color: #333;
-}
-nav {
-    position: fixed;
-    top: 0;
-    width: 100%;
-    background: rgba(0,0,0,0.7);
-    display: flex;
-    justify-content: center;
-    padding: 12px;
-    z-index: 10;
-}
-nav a {
-    color: white;
-    margin: 0 15px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: 0.3s;
-}
+body { margin: 0; font-family: 'Poppins', sans-serif; background: #f0f2f5; color: #333; }
+nav { position: fixed; top: 0; width: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; padding: 12px; z-index: 10; }
+nav a { color: white; margin: 0 15px; text-decoration: none; font-weight: 600; transition: 0.3s; }
 nav a:hover { color: #ffcc00; }
 
 /* Slideshow */
-header {
-    position: relative;
-    height: 100vh;
-    overflow: hidden;
-}
-.slideshow {
-    position: absolute;
-    top:0;
-    left:0;
-    width: 100%;
-    height: 100%;
-}
-.slideshow img {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    opacity: 0;
-    transition: opacity 1.5s ease-in-out;
-}
+header { position: relative; height: 100vh; overflow: hidden; }
+.slideshow { position: absolute; top:0; left:0; width: 100%; height: 100%; }
+.slideshow img { position: absolute; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 1.5s ease-in-out; }
 .slideshow img.active { opacity:1; }
+header .content { position: relative; z-index:2; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: white; background: rgba(0,0,0,0.4); }
+header h1 { font-size: 3rem; margin: 0; color: #ffcc00; text-shadow: 2px2px6px #000; }
+header p { font-size: 1.2rem; margin-top: 15px; text-shadow: 1px1px3px #000; }
+.hero-btn { background: #333; color: #ffcc00; padding: 15px 25px; border: none; border-radius: 8px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: 0.3s; margin-top: 20px; }
+.hero-btn:hover { background: #555; color: #ff6600; transform: scale(1.05); }
 
-header .content {
-    position: relative;
-    z-index:2;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    color: white;
-    background: rgba(0,0,0,0.4);
-}
-header .content img {
-    border-radius:50%;
-    width:120px;
-    height:120px;
-    object-fit:cover;
-    margin-bottom:20px;
-    border:4px solid #ffcc00;
-}
-header h1 {
-    font-size: 3rem;
-    margin: 0;
-    color: #ffcc00;
-    text-shadow: 2px2px6px #000;
-}
-header p {
-    font-size: 1.2rem;
-    margin-top: 15px;
-    text-shadow: 1px1px3px #000;
-}
-.hero-btn {
-    background: #333;
-    color: #ffcc00;
-    padding: 15px 25px;
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: 0.3s;
-    margin-top: 20px;
-}
-.hero-btn:hover {
-    background: #555;
-    color: #ff6600;
-    transform: scale(1.05);
-}
-
-section {
-    padding: 60px 20px;
-    max-width: 1000px;
-    margin: 40px auto;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
+section { padding: 60px 20px; max-width: 1000px; margin: 40px auto; background: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
 h2 { color: #007bff; margin-bottom: 25px; text-align:center; }
 
-.benefits, .programs, .news {
-    display: grid;
-    grid-template-columns: repeat(auto-fit,minmax(200px,1fr));
-    gap: 25px;
-}
-.benefit, .card {
-    background: #f9f9f9;
-    padding: 25px;
-    border-radius: 12px;
-    text-align:center;
-    transition: transform 0.3s;
-}
+.benefits, .programs, .news { display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 25px; }
+.benefit, .card { background: #f9f9f9; padding: 25px; border-radius: 12px; text-align:center; transition: transform 0.3s; }
 .benefit:hover, .card:hover { transform: scale(1.05); }
 .benefit i, .card i { font-size: 40px; color:#ffcc00; margin-bottom:10px; }
 
@@ -139,40 +41,12 @@ h2 { color: #007bff; margin-bottom: 25px; text-align:center; }
 .social-icons a { margin:0 10px; font-size:24px; color:#007bff; transition:0.3s; }
 .social-icons a:hover { color:#ff6600; transform: rotate(15deg) scale(1.2); }
 
-form {
-    background: #f9f9f9;
-    padding: 25px;
-    border-radius:12px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
-    margin-top: 20px;
-}
-input {
-    display:block;
-    width:100%;
-    margin:10px 0;
-    padding:10px;
-    border-radius:8px;
-    border:1px solid #ccc;
-}
-button {
-    background: #333;
-    color: #ffcc00;
-    padding: 10px 20px;
-    border:none;
-    border-radius:8px;
-    cursor:pointer;
-    transition:0.3s;
-}
+form { background: #f9f9f9; padding: 25px; border-radius:12px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); margin-top: 20px; }
+input { display:block; width:100%; margin:10px 0; padding:10px; border-radius:8px; border:1px solid #ccc; }
+button { background: #333; color: #ffcc00; padding: 10px 20px; border:none; border-radius:8px; cursor:pointer; transition:0.3s; }
 button:hover { background: #555; color:#ff6600; transform: scale(1.05); }
 
-footer {
-    text-align:center;
-    padding:15px;
-    background:#333;
-    color:white;
-    margin-top:40px;
-    border-radius:12px;
-}
+footer { text-align:center; padding:15px; background:#333; color:white; margin-top:40px; border-radius:12px; }
 </style>
 </head>
 
@@ -189,27 +63,22 @@ footer {
 
 <header data-aos="fade-down">
 <div class="slideshow">
-    <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1600&q=80" class="active" alt="Slide 1">
-    <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1600&q=80" alt="Slide 2">
-    <img src="https://images.unsplash.com/photo-1531379410507-054f53a0a93f?auto=format&fit=crop&w=1600&q=80" alt="Slide 3">
-    <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1600&q=80" alt="Slide 4">
-    <img src="https://images.unsplash.com/photo-1542744095-fcf48d80b0fd?auto=format&fit=crop&w=1600&q=80" alt="Slide 5">
+    <img src="https://images.unsplash.com/photo-1592496001027-f03f348c2c7c?auto=format&fit=crop&w=1600&q=80" class="active" alt="Slide 1">
+    <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1600&q=80" alt="Slide 2">
+    <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=1600&q=80" alt="Slide 3">
 </div>
 <div class="content">
-  <img src="https://images.unsplash.com/photo-1607746882042-944635dfe10e?auto=format&fit=crop&w=120&q=80" alt="Visionary Youth Photo">
-  <h1>VISIONARY YOUTH GROUP 2024</h1>
-  <p>Empowering Youth Through Financial Literacy, Entrepreneurship & Community Impact</p>
-  <button class="hero-btn" onclick="document.getElementById('auth').scrollIntoView({behavior:'smooth'})">Join Us Today</button>
+<h1>VISIONARY YOUTH GROUP 2024</h1>
+<p>Empowering Youth Through Financial Literacy, Entrepreneurship & Community Impact</p>
+<button class="hero-btn" onclick="document.getElementById('auth').scrollIntoView({behavior:'smooth'})">Join Us Today</button>
 </div>
 </header>
 
-<!-- About -->
 <section id="about" data-aos="fade-up">
 <h2>About Us</h2>
 <p>VISIONARY YOUTH GROUP 2024 empowers young people through financial literacy, entrepreneurship, and community service. We foster leadership, accountability, and growth among youth to positively impact society.</p>
 </section>
 
-<!-- Benefits -->
 <section id="benefits" data-aos="fade-up">
 <h2>Benefits</h2>
 <div class="benefits">
@@ -221,7 +90,6 @@ footer {
 </div>
 </section>
 
-<!-- Programs -->
 <section id="programs" data-aos="fade-up">
 <h2>Programs</h2>
 <div class="programs">
@@ -231,7 +99,6 @@ footer {
 </div>
 </section>
 
-<!-- News -->
 <section id="news" data-aos="fade-up">
 <h2>News & Updates</h2>
 <div class="news">
@@ -240,12 +107,11 @@ footer {
 </div>
 </section>
 
-<!-- Contact -->
 <section id="contact" data-aos="fade-up">
 <h2>Contact Us</h2>
 <p><i class="fas fa-map-marker-alt"></i> Nairobi, Kenya</p>
 <p><i class="fas fa-phone"></i> +254 741453336</p>
-<p><i class="fas fa-envelope"></i> visionaryyouth32.gmail.con</p>
+<p><i class="fas fa-envelope"></i> visionaryyouth32.gmail.com</p>
 <div class="social-icons">
 <a href="#"><i class="fab fa-facebook"></i></a>
 <a href="#"><i class="fab fa-twitter"></i></a>
@@ -254,7 +120,6 @@ footer {
 </div>
 </section>
 
-<!-- Authentication -->
 <section id="auth" data-aos="fade-up">
 <h2>Join Our Community</h2>
 <p><strong>All fields are required. Sign up below.</strong></p>
@@ -284,7 +149,68 @@ footer {
 
 <!-- Firebase & Slideshow -->
 <script type="module">
-// Firebase authentication code remains the same
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+import { getFirestore, setDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
+  authDomain: "visionary-youth-grou-2024.firebaseapp.com",
+  projectId: "visionary-youth-grou-2024",
+  storageBucket: "visionary-youth-grou-2024.appspot.com",
+  messagingSenderId: "372978592717",
+  appId: "1:372978592717:web:1c15aec728ee5f854f3284",
+  measurementId: "G-QP1RBT2ZCP"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// SIGNUP
+document.getElementById('signupBtn').addEventListener('click', async () => {
+    const signupInfo = {
+        name: document.getElementById('signupName').value,
+        phone: document.getElementById('signupPhone').value,
+        id: document.getElementById('signupId').value,
+        origin: document.getElementById('signupOrigin').value,
+        email: document.getElementById('signupEmail').value,
+        password: document.getElementById('signupPassword').value
+    };
+    try {
+        const userCredential = await createUserWithEmailAndPassword(auth, signupInfo.email, signupInfo.password);
+        await setDoc(doc(db, "members", userCredential.user.uid), {
+            name: signupInfo.name,
+            phone: signupInfo.phone,
+            id: signupInfo.id,
+            origin: signupInfo.origin,
+            email: signupInfo.email,
+            createdAt: serverTimestamp()
+        });
+        alert("Signup successful! Please login.");
+        document.getElementById('signupForm').reset();
+    } catch(err) { alert("Signup failed: "+err.message); }
+});
+
+// LOGIN
+document.getElementById('loginBtn').addEventListener('click', async () => {
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    try {
+        await signInWithEmailAndPassword(auth,email,password);
+        window.location.href="dashboard.html"; // redirect after login
+    } catch(err){ alert("Login failed: "+err.message);}
+});
+
+// RESET PASSWORD
+document.getElementById('resetPasswordBtn').addEventListener('click', async () => {
+    const email = document.getElementById('loginEmail').value;
+    if(!email){ alert("Enter your email to reset password"); return; }
+    try { await sendPasswordResetEmail(auth,email); alert("Password reset email sent!"); }
+    catch(err){ alert("Error: "+err.message); }
+});
+
+// Slideshow
 document.addEventListener("DOMContentLoaded", () => {
     const slides = document.querySelectorAll('.slideshow img');
     let current = 0;
