@@ -10,171 +10,238 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
-body{
-    margin:0; font-family:'Poppins',sans-serif; background:#1a1a1a; color:#f0f0f0;
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: #121212;
+    color: #fff;
 }
-header{
-    background:#111; padding:15px 30px; display:flex; justify-content:space-between; align-items:center; color:#ffcc00;
-    position:sticky; top:0; z-index:10;
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #1f1f1f;
+    padding: 15px 20px;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
 }
-header h1{ margin:0; font-size:1.8rem; }
-header div{ display:flex; align-items:center; gap:15px; }
-header button{ background:#333; color:#ffcc00; border:none; padding:8px 15px; border-radius:6px; cursor:pointer; transition:0.3s; }
-header button:hover{ background:#555; color:#fff; }
-
-nav.tabs{
-    display:flex; flex-wrap:wrap; background:#222; justify-content:space-around; padding:10px 0; border-radius:8px;
+header h2 {
+    margin:0;
+    font-weight:600;
 }
-nav.tabs button{
-    background:transparent; border:none; color:#ccc; padding:10px 20px; cursor:pointer; font-weight:600; transition:0.3s;
+.hamburger {
+    font-size: 1.8rem;
+    cursor: pointer;
 }
-nav.tabs button.active{ color:#ffcc00; border-bottom:2px solid #ffcc00; }
-nav.tabs button:hover{ color:#fff; }
-
-section.tab-content{ display:none; background:#1f1f1f; margin:20px; padding:25px; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.3); }
-section.tab-content.active{ display:block; }
-
-.card{ background:#222; padding:20px; border-radius:10px; margin:10px 0; box-shadow:0 4px 12px rgba(0,0,0,0.4);}
-.card h3{ margin-top:0; color:#ffcc00; }
-
-form{ display:flex; flex-direction:column; }
-form input, form select{ margin:10px 0; padding:10px; border-radius:6px; border:1px solid #555; background:#222; color:#fff; }
-form button{ background:#333; color:#ffcc00; padding:10px; margin-top:15px; border:none; border-radius:6px; cursor:pointer; }
-form button:hover{ background:#555; color:#fff; }
-
-.download-btn{ background:#333; color:#ffcc00; padding:8px 15px; border:none; border-radius:6px; cursor:pointer; transition:0.3s; }
-.download-btn:hover{ background:#555; color:#fff; }
-
-.success-popup{
-    position:fixed; top:20px; right:20px; background:#28a745; color:white; padding:15px 20px; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.4); display:none; z-index:100;
+nav {
+    display: none;
+    flex-direction: column;
+    background: #1f1f1f;
+    position: fixed;
+    top: 60px;
+    left: 0;
+    width: 100%;
+}
+nav a {
+    padding: 15px 20px;
+    text-decoration: none;
+    color: #fff;
+    border-bottom: 1px solid #333;
+    display: flex;
+    align-items: center;
+}
+nav a i {
+    margin-right: 10px;
+    color: #ffcc00;
+}
+nav a:hover {
+    background: #333;
+}
+.container {
+    padding: 80px 20px 20px;
+    max-width: 1200px;
+    margin: auto;
+}
+.card {
+    background: #1e1e1e;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+}
+.card h3 {
+    margin:0 0 10px;
+    color: #ffcc00;
+}
+.card p {
+    margin:0;
+    font-size: 1.2rem;
+}
+.tabs {
+    display: flex;
+    margin-bottom: 20px;
+}
+.tab-btn {
+    flex:1;
+    padding:10px;
+    cursor:pointer;
+    text-align:center;
+    background:#1e1e1e;
+    border:1px solid #333;
+    color:#fff;
+    transition:0.3s;
+}
+.tab-btn.active {
+    background:#ffcc00;
+    color:#121212;
+}
+.tab-content {
+    display:none;
+}
+.tab-content.active {
+    display:block;
+}
+form input, form select {
+    display:block;
+    width:100%;
+    padding:10px;
+    margin:10px 0;
+    border-radius:8px;
+    border:none;
+}
+form button {
+    background:#ffcc00;
+    color:#121212;
+    padding:10px 20px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:600;
+    margin-top:10px;
+}
+form button:hover {
+    background:#ffa500;
+}
+.success-popup {
+    position: fixed;
+    top:10px;
+    right:10px;
+    background:#28a745;
+    color:#fff;
+    padding:10px 20px;
+    border-radius:8px;
+    display:none;
+    z-index: 2000;
 }
 </style>
 </head>
 <body>
 
 <header>
-<h1>Visionary Youth Dashboard</h1>
-<div>
-<span id="userEmail">user@example.com</span>
-<span id="userStatus">(Active)</span>
-<button id="logoutBtn">Logout</button>
-</div>
+<h2 id="userEmail">Dashboard</h2>
+<i class="fas fa-bars hamburger" id="hamburger"></i>
 </header>
 
-<nav class="tabs">
-<button class="tab-btn active" data-tab="monthly">Monthly Savings</button>
-<button class="tab-btn" data-tab="weekly">Weekly Savings</button>
-<button class="tab-btn" data-tab="loans">Loans</button>
-<button class="tab-btn" data-tab="loanApp">Loan Application</button>
-<button class="tab-btn" data-tab="personal">Personal Info</button>
-<button class="tab-btn" data-tab="residence">Residence</button>
-<button class="tab-btn" data-tab="repayment">Repayment</button>
-<button class="tab-btn" data-tab="shares">Shares</button>
-<button class="tab-btn" data-tab="dividends">Dividends</button>
-<button class="tab-btn" data-tab="balances">Unpaid Balances</button>
-<button class="tab-btn" data-tab="statement">Account Statement</button>
-<button class="tab-btn" data-tab="update">Update Profile</button>
+<nav id="menu">
+    <a href="#monthly"><i class="fas fa-calendar-alt"></i> Monthly Savings</a>
+    <a href="#weekly"><i class="fas fa-calendar-week"></i> Weekly Savings</a>
+    <a href="#loans"><i class="fas fa-money-check"></i> Loans</a>
+    <a href="#loanApplication"><i class="fas fa-file-invoice"></i> Loan Application</a>
+    <a href="#shares"><i class="fas fa-chart-line"></i> Shares & Dividends</a>
+    <a href="#repayment"><i class="fas fa-hand-holding-usd"></i> Repayments</a>
+    <a href="#accountStatement"><i class="fas fa-file-download"></i> Account Statement</a>
+    <a href="#updateProfile"><i class="fas fa-user-edit"></i> Update Profile</a>
+    <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Log Out</a>
 </nav>
 
-<section id="monthly" class="tab-content active">
-<div class="card"><h3>Monthly Savings</h3>
-<form id="monthlyForm">
-<input type="number" placeholder="Amount" required>
-<button type="button" id="saveMonthly">Save</button>
-</form></div>
-</section>
+<div class="container">
 
-<section id="weekly" class="tab-content">
-<div class="card"><h3>Weekly Savings</h3>
-<form id="weeklyForm">
-<input type="number" placeholder="Amount" required>
-<button type="button" id="saveWeekly">Save</button>
-</form></div>
-</section>
+    <div class="card" style="text-align:center;">
+        <h3>Status</h3>
+        <p id="userStatus">Active</p>
+    </div>
 
-<section id="loans" class="tab-content">
-<div class="card"><h3>Loans</h3>
-<div id="loanList">No loans yet.</div></div>
-</section>
+    <div class="tabs">
+        <div class="tab-btn active" data-tab="monthly">Monthly Savings</div>
+        <div class="tab-btn" data-tab="weekly">Weekly Savings</div>
+        <div class="tab-btn" data-tab="loans">Loans</div>
+        <div class="tab-btn" data-tab="loanApplication">Apply Loan</div>
+        <div class="tab-btn" data-tab="shares">Shares</div>
+    </div>
 
-<section id="loanApp" class="tab-content">
-<div class="card"><h3>Loan Application</h3>
-<form id="loanForm">
-<input type="number" placeholder="Loan Amount" required>
-<input type="text" placeholder="Purpose" required>
-<input type="date" placeholder="Repayment Date" required>
-<button type="button" id="applyLoan">Apply Loan</button>
-</form>
-<div id="loanProgress" class="card"><h3>Loan Progress</h3><p>None yet</p></div>
+    <div id="monthly" class="tab-content active">
+        <div class="card">
+            <h3><i class="fas fa-calendar-alt"></i> Total Monthly Savings (Ksh)</h3>
+            <p id="monthlyTotal">0</p>
+            <form id="monthlyForm">
+                <input type="number" placeholder="Enter Amount (Ksh)" required>
+                <button type="button" id="saveMonthly">Save</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="weekly" class="tab-content">
+        <div class="card">
+            <h3><i class="fas fa-calendar-week"></i> Total Weekly Savings (Ksh)</h3>
+            <p id="weeklyTotal">0</p>
+            <form id="weeklyForm">
+                <input type="number" placeholder="Enter Amount (Ksh)" required>
+                <button type="button" id="saveWeekly">Save</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="loans" class="tab-content">
+        <div class="card">
+            <h3><i class="fas fa-money-check"></i> Loans</h3>
+            <div id="loanList">No loans yet.</div>
+        </div>
+    </div>
+
+    <div id="loanApplication" class="tab-content">
+        <div class="card">
+            <h3><i class="fas fa-file-invoice"></i> Loan Application</h3>
+            <form id="loanForm">
+                <input type="number" placeholder="Loan Amount (Ksh)" required>
+                <input type="text" placeholder="Purpose" required>
+                <input type="date" placeholder="Repayment Date" required>
+                <button type="button" id="applyLoan">Apply</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="shares" class="tab-content">
+        <div class="card">
+            <h3><i class="fas fa-chart-line"></i> Shares & Dividends (Ksh)</h3>
+            <p>Total Shares: <span id="totalShares">0</span></p>
+            <p>Total Dividends: <span id="totalDividends">0</span></p>
+            <p>Unpaid Balances: <span id="unpaidBalances">0</span></p>
+            <button id="downloadShares">Download Shares CSV</button>
+            <button id="downloadStatement">Download Statement</button>
+        </div>
+    </div>
+
+    <div class="card" id="updateProfile">
+        <h3><i class="fas fa-user-edit"></i> Update Profile</h3>
+        <form id="updateForm">
+            <input type="text" placeholder="Full Name" required>
+            <input type="email" placeholder="Email" required>
+            <input type="text" placeholder="Phone Number" required>
+            <button type="button" id="updateProfileBtn">Update Profile</button>
+        </form>
+    </div>
+
 </div>
-</section>
 
-<section id="personal" class="tab-content">
-<div class="card"><h3>Personal Information</h3>
-<form id="personalForm">
-<input type="text" placeholder="Full Name" required>
-<input type="email" placeholder="Email" required>
-<button type="button" id="updatePersonal">Update</button>
-</form></div>
-</section>
+<div class="success-popup" id="successPopup"></div>
 
-<section id="residence" class="tab-content">
-<div class="card"><h3>Residence Info</h3>
-<form id="residenceForm">
-<input type="text" placeholder="County" required>
-<input type="text" placeholder="Town" required>
-<button type="button" id="updateResidence">Update</button>
-</form></div>
-</section>
-
-<section id="repayment" class="tab-content">
-<div class="card"><h3>Repayment</h3>
-<form id="repaymentForm">
-<input type="number" placeholder="Amount" required>
-<button type="button" id="submitRepayment">Submit</button>
-</form></div>
-</section>
-
-<section id="shares" class="tab-content">
-<div class="card"><h3>Shares</h3>
-<p>Total Shares: <span id="totalShares">0</span></p>
-<button class="download-btn" id="downloadShares">Download Statement</button>
-</div>
-</section>
-
-<section id="dividends" class="tab-content">
-<div class="card"><h3>Dividends</h3>
-<p>Total Dividends: <span id="totalDividends">0</span></p>
-</div>
-</section>
-
-<section id="balances" class="tab-content">
-<div class="card"><h3>Unpaid Balances</h3>
-<p id="unpaidBalances">None</p></div>
-</section>
-
-<section id="statement" class="tab-content">
-<div class="card"><h3>Account Statement</h3>
-<button class="download-btn" id="downloadStatement">Download</button>
-</div>
-</section>
-
-<section id="update" class="tab-content">
-<div class="card"><h3>Update Profile</h3>
-<form id="updateForm">
-<input type="text" placeholder="Full Name" required>
-<input type="email" placeholder="Email" required>
-<input type="text" placeholder="Phone Number" required>
-<button type="button" id="updateProfileBtn">Update</button>
-</form></div>
-</section>
-
-<div class="success-popup" id="successPopup">Updated Successfully!</div>
-
+<!-- Firebase -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getDatabase, ref, set, get, child, update } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+import { getDatabase, ref, get, child, push, update } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
@@ -185,52 +252,26 @@ const firebaseConfig = {
   messagingSenderId: "372978592717",
   appId: "1:372978592717:web:1c15aec728ee5f854f3284"
 };
-
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
 
-// Check user
-onAuthStateChanged(auth, user => {
-    if(user){
-        document.getElementById('userEmail').textContent = user.email;
-        document.getElementById('userStatus').textContent = "(Active)";
-    } else {
-        window.location.href="index.html";
-    }
-});
+// Hamburger menu
+const hamburger = document.getElementById('hamburger');
+const menu = document.getElementById('menu');
+hamburger.addEventListener('click', ()=> menu.style.display = menu.style.display==='flex'?'none':'flex');
 
-// Logout
-document.getElementById('logoutBtn').addEventListener('click', async ()=>{
-    await signOut(auth);
-    window.location.href="index.html";
-});
-
-// Auto logout 3 mins
-let logoutTimer;
-function resetTimer(){
-clearTimeout(logoutTimer);
-logoutTimer = setTimeout(async ()=>{
-    await signOut(auth);
-    alert('Logged out due to inactivity');
-    window.location.href="index.html";
-},180000);
-}
-document.addEventListener('mousemove', resetTimer);
-document.addEventListener('keypress', resetTimer);
-resetTimer();
-
-// Tab functionality
+// Tabs
 const tabBtns = document.querySelectorAll('.tab-btn');
 const tabs = document.querySelectorAll('.tab-content');
-tabBtns.forEach(btn => {
-btn.addEventListener('click', ()=>{
-    tabBtns.forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    const tab = btn.getAttribute('data-tab');
-    tabs.forEach(t=>t.classList.remove('active'));
-    document.getElementById(tab).classList.add('active');
-});
+tabBtns.forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+        tabBtns.forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        const tab = btn.getAttribute('data-tab');
+        tabs.forEach(t=>t.classList.remove('active'));
+        document.getElementById(tab).classList.add('active');
+    });
 });
 
 // Success popup
@@ -238,31 +279,149 @@ function showSuccess(msg){
     const popup = document.getElementById('successPopup');
     popup.textContent = msg;
     popup.style.display="block";
-    setTimeout(()=> popup.style.display="none",3000);
+    setTimeout(()=>popup.style.display="none",3000);
 }
 
-// Example: Update Profile
+// Auto logout 3 min
+let logoutTimer;
+function resetTimer(){
+    clearTimeout(logoutTimer);
+    logoutTimer = setTimeout(async ()=>{
+        await signOut(auth);
+        alert("Logged out due to inactivity");
+        window.location.href="index.html";
+    },180000);
+}
+document.addEventListener('mousemove', resetTimer);
+document.addEventListener('keypress', resetTimer);
+
+// Load user & data
+onAuthStateChanged(auth, user=>{
+    if(user){
+        document.getElementById('userEmail').textContent = user.email;
+        loadAllData(user.uid);
+    }else window.location.href="index.html";
+});
+
+async function loadAllData(uid){
+    const snapshot = await get(ref(db,'members/'+uid));
+    if(snapshot.exists()){
+        const data = snapshot.val();
+        document.querySelector('#updateForm input[placeholder="Full Name"]').value = data.fullName||"";
+        document.querySelector('#updateForm input[placeholder="Email"]').value = data.email||"";
+        document.querySelector('#updateForm input[placeholder="Phone Number"]').value = data.phone||"";
+        document.getElementById('totalShares').textContent = data.shares||0;
+        document.getElementById('totalDividends').textContent = data.dividends||0;
+        document.getElementById('unpaidBalances').textContent = data.unpaidBalances||0;
+        loadSavings(uid);
+        loadLoans(uid);
+    }
+}
+
+// Monthly Savings
+document.getElementById('saveMonthly').addEventListener('click', async ()=>{
+    const uid = auth.currentUser.uid;
+    const amount = parseFloat(document.querySelector('#monthlyForm input').value);
+    if(!amount) return alert("Enter amount");
+    await push(ref(db,'members/'+uid+'/monthlySavings'), {amount,date:Date.now()});
+    showSuccess("Monthly saved!");
+    loadSavings(uid);
+});
+
+// Weekly Savings
+document.getElementById('saveWeekly').addEventListener('click', async ()=>{
+    const uid = auth.currentUser.uid;
+    const amount = parseFloat(document.querySelector('#weeklyForm input').value);
+    if(!amount) return alert("Enter amount");
+    await push(ref(db,'members/'+uid+'/weeklySavings'), {amount,date:Date.now()});
+    showSuccess("Weekly saved!");
+    loadSavings(uid);
+});
+
+// Load Savings
+async function loadSavings(uid){
+    const msnap = await get(ref(db,'members/'+uid+'/monthlySavings'));
+    const wsnap = await get(ref(db,'members/'+uid+'/weeklySavings'));
+    document.getElementById('monthlyTotal').textContent = msnap.exists()? Object.values(msnap.val()).reduce((a,b)=>a+b.amount,0):0;
+    document.getElementById('weeklyTotal').textContent = wsnap.exists()? Object.values(wsnap.val()).reduce((a,b)=>a+b.amount,0):0;
+}
+
+// Loan Application
+document.getElementById('applyLoan').addEventListener('click', async ()=>{
+    const uid = auth.currentUser.uid;
+    const amount = parseFloat(document.querySelector('#loanForm input[placeholder="Loan Amount (Ksh)"]').value);
+    const purpose = document.querySelector('#loanForm input[placeholder="Purpose"]').value;
+    const repayDate = document.querySelector('#loanForm input[placeholder="Repayment Date"]').value;
+    if(!amount || !purpose || !repayDate) return alert("Fill all fields");
+    await push(ref(db,'members/'+uid+'/loans'), {loanAmount:amount,purpose,repayDate,status:"Pending",applied:Date.now()});
+    showSuccess("Loan applied!");
+    loadLoans(uid);
+});
+
+// Load Loans
+async function loadLoans(uid){
+    const snap = await get(ref(db,'members/'+uid+'/loans'));
+    const container = document.getElementById('loanList');
+    container.innerHTML="";
+    if(snap.exists()){
+        Object.values(snap.val()).forEach((l,i)=>{
+            const div = document.createElement('div');
+            div.className="card";
+            div.innerHTML=`<strong>Loan ${i+1}</strong>: Ksh ${l.loanAmount} | Purpose: ${l.purpose} | Status: ${l.status} | Repay: ${l.repayDate}`;
+            container.appendChild(div);
+        });
+    } else container.textContent="No loans yet.";
+}
+
+// Update Profile
 document.getElementById('updateProfileBtn').addEventListener('click', async ()=>{
+    const uid = auth.currentUser.uid;
     const fullName = document.querySelector('#updateForm input[placeholder="Full Name"]').value;
     const email = document.querySelector('#updateForm input[placeholder="Email"]').value;
     const phone = document.querySelector('#updateForm input[placeholder="Phone Number"]').value;
-    const user = auth.currentUser;
-    if(!user) return;
-    try{
-        await update(ref(db,'members/'+user.uid),{fullName,email,phone});
-        showSuccess("Profile Updated!");
-    }catch(err){
-        alert(err.message);
-    }
+    await update(ref(db,'members/'+uid), {fullName,email,phone});
+    showSuccess("Profile Updated!");
 });
 
-// Placeholder handlers for savings, loans, repayments
-document.getElementById('saveMonthly').addEventListener('click',()=>showSuccess("Monthly Saved!"));
-document.getElementById('saveWeekly').addEventListener('click',()=>showSuccess("Weekly Saved!"));
-document.getElementById('applyLoan').addEventListener('click',()=>showSuccess("Loan Applied!"));
-document.getElementById('submitRepayment').addEventListener('click',()=>showSuccess("Repayment Submitted!"));
-document.getElementById('downloadStatement').addEventListener('click',()=>showSuccess("Statement Downloaded!"));
-document.getElementById('downloadShares').addEventListener('click',()=>showSuccess("Shares Downloaded!"));
+// Download Statement
+document.getElementById('downloadStatement').addEventListener('click', async ()=>{
+    const uid = auth.currentUser.uid;
+    const snap = await get(ref(db,'members/'+uid));
+    if(!snap.exists()) return alert("No data");
+    const data = snap.val();
+    const csvContent = "data:text/csv;charset=utf-8,"
+        + Object.entries(data).map(e=>e.join(",")).join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href",encodedUri);
+    link.setAttribute("download","account_statement.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showSuccess("Statement Downloaded!");
+});
+
+// Download Shares
+document.getElementById('downloadShares').addEventListener('click', async ()=>{
+    const uid = auth.currentUser.uid;
+    const snap = await get(ref(db,'members/'+uid+'/shares'));
+    const val = snap.exists()? snap.val() : 0;
+    const csvContent = "data:text/csv;charset=utf-8,Share\n"+val;
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href",encodedUri);
+    link.setAttribute("download","shares.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showSuccess("Shares Downloaded!");
+});
+
+// Logout
+document.getElementById('logoutBtn').addEventListener('click', async ()=>{
+    await signOut(auth);
+    window.location.href="index.html";
+});
 
 </script>
 
