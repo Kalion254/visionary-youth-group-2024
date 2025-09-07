@@ -13,177 +13,191 @@
     body {
       margin: 0;
       font-family: 'Poppins', sans-serif;
-      background: #e6f7e6; /* Light green */
+      background: #e6f7e6; /* Light green background */
       color: #333;
     }
 
+    /* Navbar */
     nav {
-      background: #004d00;
+      background: #006400;
       color: white;
       padding: 15px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
     }
-
-    nav h1 {
-      margin: 0;
-      font-size: 1.4rem;
-      font-weight: 700;
-    }
-
-    #menuToggle {
-      cursor: pointer;
+    nav h1 { font-size: 1.4rem; margin: 0; }
+    nav .menu-btn {
       font-size: 24px;
+      cursor: pointer;
+      display: block;
     }
+    nav .user-info {
+      font-size: 0.9rem;
+      text-align: right;
+    }
+    nav button {
+      background: #ffcc00;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      margin-left: 10px;
+    }
+    nav button:hover { background: #ff6600; color: white; }
 
+    /* Sidebar */
     .sidebar {
       position: fixed;
       top: 0;
       left: -250px;
-      width: 220px;
+      width: 250px;
       height: 100%;
-      background: #fff;
-      box-shadow: 2px 0 8px rgba(0,0,0,0.2);
-      padding: 20px;
+      background: #111;
+      color: white;
       transition: 0.3s;
-      z-index: 1000;
+      padding-top: 60px;
+      z-index: 999;
     }
-
-    .sidebar.active {
-      left: 0;
-    }
-
+    .sidebar.active { left: 0; }
     .sidebar a {
       display: block;
-      margin: 12px 0;
-      padding: 10px;
-      color: #333;
-      border-radius: 6px;
+      padding: 15px;
+      color: white;
       text-decoration: none;
       transition: 0.3s;
     }
+    .sidebar a:hover { background: #006400; }
 
-    .sidebar a:hover {
-      background: #004d00;
-      color: white;
-    }
+    /* Main content */
+    .main { padding: 20px; }
+    section { display: none; }
+    section.active { display: block; }
 
-    .main {
-      padding: 25px;
-    }
-
-    .card-grid {
+    /* Cards */
+    .cards {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 20px;
     }
-
     .card {
       background: white;
       padding: 20px;
       border-radius: 12px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       text-align: center;
-      transition: 0.3s;
     }
+    .card i { font-size: 35px; color: #ffcc00; margin-bottom: 10px; }
 
-    .card:hover {
-      transform: scale(1.05);
-    }
-
-    .card i {
-      font-size: 36px;
-      color: #009933;
-      margin-bottom: 10px;
-    }
-
-    .hidden { display: none; }
-
-    .form-section {
-      background: #fff;
+    /* Forms */
+    form {
+      background: white;
       padding: 20px;
-      border-radius: 10px;
+      border-radius: 12px;
       margin-top: 20px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
     }
-
-    input, select, textarea {
+    input, select {
       width: 100%;
       padding: 10px;
-      margin: 8px 0;
-      border: 1px solid #ccc;
+      margin: 10px 0;
       border-radius: 6px;
+      border: 1px solid #ccc;
     }
-
-    button {
-      background: #009933;
+    button.submit-btn {
+      background: #006400;
       color: white;
+      padding: 10px 20px;
       border: none;
-      padding: 12px 20px;
       border-radius: 6px;
       cursor: pointer;
-      font-weight: 600;
-      transition: 0.3s;
     }
+    button.submit-btn:hover { background: #004d00; }
 
-    button:hover {
-      background: #004d00;
-    }
-
-    footer {
-      text-align: center;
-      padding: 12px;
-      margin-top: 20px;
-      background: #004d00;
+    /* Popup */
+    .popup {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #28a745;
       color: white;
+      padding: 15px;
+      border-radius: 8px;
+      display: none;
+      z-index: 2000;
     }
   </style>
 </head>
 <body>
+
+  <!-- Navbar -->
   <nav>
-    <span id="menuToggle"><i class="fas fa-bars"></i></span>
-    <h1>Dashboard</h1>
-    <button id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    <span class="menu-btn" onclick="toggleSidebar()">☰</span>
+    <h1>Visionary Youth Group</h1>
+    <div class="user-info">
+      <span id="userEmail">Loading...</span><br>
+      <small>Status: <span style="color:lightgreen;">Active</span></small>
+      <button id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
   </nav>
 
   <!-- Sidebar -->
-  <aside class="sidebar" id="sidebar">
+  <div class="sidebar" id="sidebar">
     <a href="#" onclick="showSection('overview')"><i class="fas fa-home"></i> Overview</a>
-    <a href="#" onclick="showSection('loans')"><i class="fas fa-hand-holding-usd"></i> Loan Application</a>
+    <a href="#" onclick="showSection('savings')"><i class="fas fa-piggy-bank"></i> Savings</a>
+    <a href="#" onclick="showSection('loans')"><i class="fas fa-hand-holding-usd"></i> Loans</a>
+    <a href="#" onclick="showSection('loanApp')"><i class="fas fa-file-signature"></i> Loan Application</a>
+    <a href="#" onclick="showSection('shares')"><i class="fas fa-chart-pie"></i> Shares & Dividends</a>
     <a href="#" onclick="showSection('statement')"><i class="fas fa-file-pdf"></i> Account Statement</a>
-    <a href="#" onclick="showSection('profile')"><i class="fas fa-user"></i> Update Profile</a>
-  </aside>
+    <a href="#" onclick="showSection('profile')"><i class="fas fa-user-cog"></i> Update Profile</a>
+  </div>
 
-  <main class="main">
+  <!-- Popup -->
+  <div class="popup" id="popupMsg">Profile Updated Successfully!</div>
+
+  <!-- Main -->
+  <div class="main">
+
     <!-- Overview -->
-    <section id="overview">
-      <h2>Welcome, <span id="userEmail"></span> (<span id="userStatus">Active</span>)</h2>
-      <div class="card-grid">
-        <div class="card"><i class="fas fa-piggy-bank"></i><h3>Weekly Savings</h3><p id="weeklyBalance">Ksh 0</p></div>
-        <div class="card"><i class="fas fa-calendar"></i><h3>Monthly Savings</h3><p id="monthlyBalance">Ksh 0</p></div>
-        <div class="card"><i class="fas fa-hand-holding-usd"></i><h3>Loans</h3><p id="loanBalance">Ksh 0</p></div>
-        <div class="card"><i class="fas fa-chart-line"></i><h3>Loan Progress</h3><p id="loanProgress">0%</p></div>
-        <div class="card"><i class="fas fa-share-alt"></i><h3>Shares</h3><p id="sharesBalance">Ksh 0</p></div>
-        <div class="card"><i class="fas fa-coins"></i><h3>Dividends</h3><p id="dividendsBalance">Ksh 0</p></div>
-        <div class="card"><i class="fas fa-exclamation-circle"></i><h3>Unpaid Balances</h3><p id="unpaidBalance">Ksh 0</p></div>
+    <section id="overview" class="active">
+      <h2>Dashboard Overview</h2>
+      <div class="cards">
+        <div class="card"><i class="fas fa-piggy-bank"></i><h3>Weekly Savings</h3><p>Ksh <span id="weeklySavings">0</span></p></div>
+        <div class="card"><i class="fas fa-calendar-alt"></i><h3>Monthly Savings</h3><p>Ksh <span id="monthlySavings">0</span></p></div>
+        <div class="card"><i class="fas fa-hand-holding-usd"></i><h3>Loans</h3><p>Ksh <span id="loanBalance">0</span></p></div>
+        <div class="card"><i class="fas fa-chart-pie"></i><h3>Shares</h3><p>Ksh <span id="shares">0</span></p></div>
+        <div class="card"><i class="fas fa-percentage"></i><h3>Dividends</h3><p>Ksh <span id="dividends">0</span></p></div>
+        <div class="card"><i class="fas fa-exclamation-circle"></i><h3>Unpaid Balances</h3><p>Ksh <span id="unpaid">0</span></p></div>
       </div>
     </section>
 
+    <!-- Savings -->
+    <section id="savings">
+      <h2>Your Savings</h2>
+      <p>Weekly Savings: Ksh <span id="weeklySavings2">0</span></p>
+      <p>Monthly Savings: Ksh <span id="monthlySavings2">0</span></p>
+    </section>
+
+    <!-- Loans -->
+    <section id="loans">
+      <h2>Your Loans</h2>
+      <p>Loan Balance: Ksh <span id="loanBalance2">0</span></p>
+      <p>Loan Progress: <span id="loanProgress">0%</span></p>
+    </section>
+
     <!-- Loan Application -->
-    <section id="loans" class="hidden">
+    <section id="loanApp">
       <h2>Loan Application</h2>
-      <form id="loanForm" class="form-section">
+      <form id="loanForm">
         <h3>Personal Details</h3>
         <input type="text" id="fullName" placeholder="Full Name" required>
-        <input type="text" id="idNumber" placeholder="National ID Number" required>
-        <input type="text" id="phone" placeholder="Phone Number" required>
-
-        <h3>Residence</h3>
+        <input type="text" id="idNumber" placeholder="ID Number" required>
         <input type="text" id="residence" placeholder="Residence" required>
-        <input type="text" id="employment" placeholder="Employment/Business" required>
 
-        <h3>Guarantor</h3>
+        <h3>Guarantor Details</h3>
         <input type="text" id="guarantorName" placeholder="Guarantor Name" required>
         <input type="text" id="guarantorPhone" placeholder="Guarantor Phone" required>
 
@@ -191,37 +205,41 @@
         <input type="number" id="loanAmount" placeholder="Loan Amount (Ksh)" required>
         <input type="number" id="repaymentPeriod" placeholder="Repayment Period (months)" required>
 
-        <button type="submit">Submit Loan Application</button>
+        <button type="submit" class="submit-btn">Submit Application</button>
       </form>
     </section>
 
-    <!-- Account Statement -->
-    <section id="statement" class="hidden">
-      <h2>Account Statement</h2>
-      <button onclick="downloadStatement()">Download PDF Statement</button>
+    <!-- Shares -->
+    <section id="shares">
+      <h2>Shares & Dividends</h2>
+      <p>Shares: Ksh <span id="shares2">0</span></p>
+      <p>Dividends: Ksh <span id="dividends2">0</span></p>
     </section>
 
-    <!-- Update Profile -->
-    <section id="profile" class="hidden">
+    <!-- Statement -->
+    <section id="statement">
+      <h2>Account Statement</h2>
+      <button class="submit-btn" id="downloadStatement"><i class="fas fa-download"></i> Download PDF</button>
+    </section>
+
+    <!-- Profile -->
+    <section id="profile">
       <h2>Update Profile</h2>
-      <form id="profileForm" class="form-section">
+      <form id="profileForm">
         <input type="text" id="profileName" placeholder="Full Name" required>
         <input type="text" id="profilePhone" placeholder="Phone Number" required>
-        <button type="submit">Update</button>
+        <input type="text" id="profileResidence" placeholder="Residence" required>
+        <button type="submit" class="submit-btn">Update</button>
       </form>
     </section>
-  </main>
 
-  <footer>
-    <p>© 2024 Visionary Youth Group</p>
-  </footer>
+  </div>
 
-  <!-- Firebase & jsPDF -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- Firebase + JS -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-    import { getDatabase, ref, get, set, push } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+    import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
@@ -237,119 +255,141 @@
     const auth = getAuth(app);
     const db = getDatabase(app);
 
-    let logoutTimer;
+    let currentUser;
+
+    // Sidebar toggle
+    window.toggleSidebar = () => document.getElementById("sidebar").classList.toggle("active");
 
     // Section toggle
     window.showSection = (id) => {
-      document.querySelectorAll("main section").forEach(s => s.classList.add("hidden"));
-      document.getElementById(id).classList.remove("hidden");
+      document.querySelectorAll(".main section").forEach(s => s.classList.remove("active"));
+      document.getElementById(id).classList.add("active");
+      document.getElementById("sidebar").classList.remove("active"); // Auto close
     };
-
-    // Sidebar toggle
-    document.getElementById("menuToggle").addEventListener("click", () => {
-      document.getElementById("sidebar").classList.toggle("active");
-    });
-
-    // Auto logout after 3 mins
-    function resetLogoutTimer() {
-      clearTimeout(logoutTimer);
-      logoutTimer = setTimeout(() => {
-        signOut(auth);
-      }, 3 * 60 * 1000);
-    }
-    document.addEventListener("mousemove", resetLogoutTimer);
-    document.addEventListener("keypress", resetLogoutTimer);
 
     // Auth state
     onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        window.location.href = "index.html";
-      } else {
+      if (user) {
+        currentUser = user;
         document.getElementById("userEmail").textContent = user.email;
 
-        const snapshot = await get(ref(db, "balances/" + user.uid));
+        const snapshot = await get(ref(db, "members/" + user.uid));
         if (snapshot.exists()) {
           const data = snapshot.val();
-          document.getElementById("weeklyBalance").textContent = "Ksh " + (data.weekly || 0);
-          document.getElementById("monthlyBalance").textContent = "Ksh " + (data.monthly || 0);
-          document.getElementById("loanBalance").textContent = "Ksh " + (data.loans || 0);
-          document.getElementById("loanProgress").textContent = (data.loanProgress || 0) + "%";
-          document.getElementById("sharesBalance").textContent = "Ksh " + (data.shares || 0);
-          document.getElementById("dividendsBalance").textContent = "Ksh " + (data.dividends || 0);
-          document.getElementById("unpaidBalance").textContent = "Ksh " + (data.unpaid || 0);
+          // Populate balances
+          document.getElementById("weeklySavings").textContent = data.weeklySavings || 0;
+          document.getElementById("monthlySavings").textContent = data.monthlySavings || 0;
+          document.getElementById("loanBalance").textContent = data.loanBalance || 0;
+          document.getElementById("shares").textContent = data.shares || 0;
+          document.getElementById("dividends").textContent = data.dividends || 0;
+          document.getElementById("unpaid").textContent = data.unpaid || 0;
+
+          // Mirror to sub-pages
+          document.getElementById("weeklySavings2").textContent = data.weeklySavings || 0;
+          document.getElementById("monthlySavings2").textContent = data.monthlySavings || 0;
+          document.getElementById("loanBalance2").textContent = data.loanBalance || 0;
+          document.getElementById("shares2").textContent = data.shares || 0;
+          document.getElementById("dividends2").textContent = data.dividends || 0;
+
+          const progress = data.loanBalance && data.loanTotal ? Math.round(((data.loanTotal - data.loanBalance) / data.loanTotal) * 100) : 0;
+          document.getElementById("loanProgress").textContent = progress + "%";
         }
+      } else {
+        window.location.href = "index.html";
       }
     });
 
     // Logout
     document.getElementById("logoutBtn").addEventListener("click", async () => {
       await signOut(auth);
+      window.location.href = "index.html";
     });
 
-    // Loan Application
+    // Auto logout after 3 min
+    let logoutTimer;
+    function resetTimer() {
+      clearTimeout(logoutTimer);
+      logoutTimer = setTimeout(() => signOut(auth), 180000);
+    }
+    ["click","mousemove","keypress"].forEach(evt => document.addEventListener(evt, resetTimer));
+    resetTimer();
+
+    // Loan application
     document.getElementById("loanForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-      const user = auth.currentUser;
-      if (!user) return;
-
+      if (!currentUser) return;
       const loanData = {
         fullName: document.getElementById("fullName").value,
         idNumber: document.getElementById("idNumber").value,
-        phone: document.getElementById("phone").value,
         residence: document.getElementById("residence").value,
-        employment: document.getElementById("employment").value,
         guarantorName: document.getElementById("guarantorName").value,
         guarantorPhone: document.getElementById("guarantorPhone").value,
         loanAmount: document.getElementById("loanAmount").value,
         repaymentPeriod: document.getElementById("repaymentPeriod").value,
         status: "Pending",
-        date: new Date().toISOString()
+        appliedAt: new Date().toISOString()
       };
-
-      await push(ref(db, "loans/" + user.uid), loanData);
-
-      // PDF Download
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      doc.text("Loan Application", 20, 20);
-      Object.keys(loanData).forEach((k, i) => {
-        doc.text(`${k}: ${loanData[k]}`, 20, 30 + i * 10);
-      });
-      doc.save("loan_application.pdf");
-
+      await set(ref(db, "loanApplications/" + currentUser.uid), loanData);
       alert("Loan Application Submitted!");
-      e.target.reset();
+
+      // PDF download
+      const pdfContent = `
+        Loan Application
+        ----------------------
+        Name: ${loanData.fullName}
+        ID: ${loanData.idNumber}
+        Residence: ${loanData.residence}
+        Guarantor: ${loanData.guarantorName} (${loanData.guarantorPhone})
+        Loan Amount: Ksh ${loanData.loanAmount}
+        Repayment Period: ${loanData.repaymentPeriod} months
+        Status: ${loanData.status}
+      `;
+      const blob = new Blob([pdfContent], { type: "application/pdf" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "Loan_Application.pdf";
+      link.click();
+    });
+
+    // Update Profile
+    let profileUpdated = false;
+    document.getElementById("profileForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!currentUser) return;
+      if (profileUpdated) return; // Only once
+      const profile = {
+        name: document.getElementById("profileName").value,
+        phone: document.getElementById("profilePhone").value,
+        residence: document.getElementById("profileResidence").value,
+      };
+      await set(ref(db, "profiles/" + currentUser.uid), profile);
+      profileUpdated = true;
+      const popup = document.getElementById("popupMsg");
+      popup.style.display = "block";
+      setTimeout(() => popup.style.display = "none", 3000);
     });
 
     // Account Statement PDF
-    window.downloadStatement = async () => {
-      const user = auth.currentUser;
-      if (!user) return;
-      const snapshot = await get(ref(db, "balances/" + user.uid));
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      doc.text("Account Statement", 20, 20);
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        let y = 30;
-        for (const [k, v] of Object.entries(data)) {
-          doc.text(`${k}: Ksh ${v}`, 20, y);
-          y += 10;
-        }
-      }
-      doc.save("account_statement.pdf");
-    };
-
-    // Profile update
-    document.getElementById("profileForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const user = auth.currentUser;
-      if (!user) return;
-      await set(ref(db, "profiles/" + user.uid), {
-        name: document.getElementById("profileName").value,
-        phone: document.getElementById("profilePhone").value
-      });
-      alert("Profile Updated Successfully!");
+    document.getElementById("downloadStatement").addEventListener("click", async () => {
+      if (!currentUser) return;
+      const snapshot = await get(ref(db, "members/" + currentUser.uid));
+      if (!snapshot.exists()) return alert("No data found!");
+      const d = snapshot.val();
+      const pdfContent = `
+        Account Statement
+        ------------------------
+        Weekly Savings: Ksh ${d.weeklySavings || 0}
+        Monthly Savings: Ksh ${d.monthlySavings || 0}
+        Loan Balance: Ksh ${d.loanBalance || 0}
+        Shares: Ksh ${d.shares || 0}
+        Dividends: Ksh ${d.dividends || 0}
+        Unpaid Balances: Ksh ${d.unpaid || 0}
+      `;
+      const blob = new Blob([pdfContent], { type: "application/pdf" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "Account_Statement.pdf";
+      link.click();
     });
   </script>
 </body>
