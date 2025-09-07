@@ -13,40 +13,31 @@
 body {
     margin: 0;
     font-family: 'Poppins', sans-serif;
-    background: #f4f6f8;
-    color: #333;
+    background: #121212;
+    color: #fff;
 }
 header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #1f2937;
-    color: #fff;
+    background: #1f1f1f;
     padding: 15px 20px;
     position: fixed;
     top: 0;
     width: 100%;
     z-index: 1000;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
-header h2 {
-    margin:0;
-    font-weight:600;
-    font-size:1.4rem;
-}
-.hamburger {
-    font-size: 1.8rem;
-    cursor: pointer;
-}
+header h2 { margin:0; font-weight:600; }
+.hamburger { font-size: 1.8rem; cursor: pointer; }
+
 nav {
     display: none;
     flex-direction: column;
-    background: #1f2937;
+    background: #1f1f1f;
     position: fixed;
     top: 60px;
     left: 0;
     width: 100%;
-    z-index: 999;
 }
 nav a {
     padding: 15px 20px;
@@ -56,201 +47,110 @@ nav a {
     display: flex;
     align-items: center;
 }
-nav a i {
-    margin-right: 10px;
-    color: #ffcc00;
-}
-nav a:hover {
-    background: #374151;
-}
-.container {
-    padding: 80px 20px 20px;
-    max-width: 1200px;
-    margin: auto;
-}
+nav a i { margin-right: 10px; color: #ffcc00; }
+nav a:hover { background: #333; }
+
+.container { padding: 80px 20px 20px; max-width: 1200px; margin: auto; }
 .card {
-    background: #fff;
+    background: #1e1e1e;
     border-radius: 12px;
     padding: 20px;
     margin-bottom: 20px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
 }
-.card h3 {
-    margin:0 0 10px;
-    color: #1f2937;
-}
-.card p {
-    margin:0;
-    font-size: 1.2rem;
-}
-.tabs {
-    display: flex;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-    gap:10px;
-}
-.tab-btn {
-    flex:1;
-    padding:10px;
-    cursor:pointer;
-    text-align:center;
-    background:#e5e7eb;
+.card h3 { margin:0 0 10px; color: #ffcc00; }
+.card p { margin:0; font-size: 1.2rem; }
+
+.success-popup {
+    position: fixed;
+    top:10px;
+    right:10px;
+    background:#28a745;
+    color:#fff;
+    padding:10px 20px;
     border-radius:8px;
-    color:#1f2937;
-    transition:0.3s;
-    font-weight:600;
-}
-.tab-btn.active {
-    background:#ffcc00;
-    color:#1f2937;
-}
-.tab-content {
     display:none;
+    z-index: 2000;
 }
-.tab-content.active {
-    display:block;
-}
-form input, form select {
-    display:block;
-    width:100%;
-    padding:10px;
-    margin:10px 0;
-    border-radius:8px;
-    border:1px solid #ccc;
-}
-form button {
+.btn {
     background:#ffcc00;
-    color:#1f2937;
+    color:#121212;
     padding:10px 20px;
     border:none;
     border-radius:8px;
     cursor:pointer;
     font-weight:600;
     margin-top:10px;
-    transition:0.3s;
 }
-form button:hover {
-    background:#f59e0b;
-}
-.success-popup {
-    position: fixed;
-    top:10px;
-    right:10px;
-    background:#22c55e;
-    color:#fff;
-    padding:10px 20px;
-    border-radius:8px;
-    display:none;
-    z-index: 2000;
-    box-shadow:0 4px 10px rgba(0,0,0,0.3);
-}
+.btn:hover { background:#ffa500; }
 </style>
 </head>
 <body>
 
 <header>
-<h2 id="userEmail">Dashboard</h2>
-<i class="fas fa-bars hamburger" id="hamburger"></i>
+  <h2 id="userEmail">Dashboard</h2>
+  <i class="fas fa-bars hamburger" id="hamburger"></i>
 </header>
 
 <nav id="menu">
-    <a href="#monthly"><i class="fas fa-calendar-alt"></i> Monthly Savings</a>
-    <a href="#weekly"><i class="fas fa-calendar-week"></i> Weekly Savings</a>
-    <a href="#loans"><i class="fas fa-money-check"></i> Loans</a>
-    <a href="#loanApplication"><i class="fas fa-file-invoice"></i> Loan Application</a>
-    <a href="#shares"><i class="fas fa-chart-line"></i> Shares & Dividends</a>
-    <a href="#repayment"><i class="fas fa-hand-holding-usd"></i> Repayments</a>
-    <a href="#accountStatement"><i class="fas fa-file-download"></i> Account Statement</a>
-    <a href="#updateProfile"><i class="fas fa-user-edit"></i> Update Profile</a>
-    <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Log Out</a>
+  <a href="#monthly"><i class="fas fa-calendar-alt"></i> Monthly Savings</a>
+  <a href="#weekly"><i class="fas fa-calendar-week"></i> Weekly Savings</a>
+  <a href="#loans"><i class="fas fa-money-check"></i> Loans</a>
+  <a href="#shares"><i class="fas fa-chart-line"></i> Shares & Dividends</a>
+  <a href="#updateProfile"><i class="fas fa-user-edit"></i> Update Profile</a>
+  <a href="#" id="downloadStatementBtn"><i class="fas fa-file-pdf"></i> Download Statement</a>
+  <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Log Out</a>
 </nav>
 
 <div class="container">
 
-    <div class="card" style="text-align:center;">
-        <h3>Status</h3>
-        <p id="userStatus">Active</p>
-    </div>
+  <div class="card" style="text-align:center;">
+      <h3>Status</h3>
+      <p id="userStatus">Active</p>
+  </div>
 
-    <div class="tabs">
-        <div class="tab-btn active" data-tab="monthly">Monthly Savings</div>
-        <div class="tab-btn" data-tab="weekly">Weekly Savings</div>
-        <div class="tab-btn" data-tab="loans">Loans</div>
-        <div class="tab-btn" data-tab="loanApplication">Apply Loan</div>
-        <div class="tab-btn" data-tab="shares">Shares</div>
-    </div>
+  <div class="card" id="monthly">
+      <h3><i class="fas fa-calendar-alt"></i> Total Monthly Savings (Ksh)</h3>
+      <p id="monthlyTotal">0</p>
+  </div>
 
-    <div id="monthly" class="tab-content active">
-        <div class="card">
-            <h3><i class="fas fa-calendar-alt"></i> Total Monthly Savings (Ksh)</h3>
-            <p id="monthlyTotal">0</p>
-            <form id="monthlyForm">
-                <input type="number" placeholder="Enter Amount (Ksh)" required>
-                <button type="button" id="saveMonthly">Save</button>
-            </form>
-        </div>
-    </div>
+  <div class="card" id="weekly">
+      <h3><i class="fas fa-calendar-week"></i> Total Weekly Savings (Ksh)</h3>
+      <p id="weeklyTotal">0</p>
+  </div>
 
-    <div id="weekly" class="tab-content">
-        <div class="card">
-            <h3><i class="fas fa-calendar-week"></i> Total Weekly Savings (Ksh)</h3>
-            <p id="weeklyTotal">0</p>
-            <form id="weeklyForm">
-                <input type="number" placeholder="Enter Amount (Ksh)" required>
-                <button type="button" id="saveWeekly">Save</button>
-            </form>
-        </div>
-    </div>
+  <div class="card" id="loans">
+      <h3><i class="fas fa-money-check"></i> Loans</h3>
+      <div id="loanList">Loading...</div>
+  </div>
 
-    <div id="loans" class="tab-content">
-        <div class="card">
-            <h3><i class="fas fa-money-check"></i> Loans</h3>
-            <div id="loanList">No loans yet.</div>
-        </div>
-    </div>
+  <div class="card" id="shares">
+      <h3><i class="fas fa-chart-line"></i> Shares & Dividends</h3>
+      <p>Total Shares: <span id="totalShares">0</span></p>
+      <p>Total Dividends: <span id="totalDividends">0</span></p>
+      <p>Unpaid Balances: <span id="unpaidBalances">0</span></p>
+  </div>
 
-    <div id="loanApplication" class="tab-content">
-        <div class="card">
-            <h3><i class="fas fa-file-invoice"></i> Loan Application</h3>
-            <form id="loanForm">
-                <input type="number" placeholder="Loan Amount (Ksh)" required>
-                <input type="text" placeholder="Purpose" required>
-                <input type="date" placeholder="Repayment Date" required>
-                <button type="button" id="applyLoan">Apply</button>
-            </form>
-        </div>
-    </div>
-
-    <div id="shares" class="tab-content">
-        <div class="card">
-            <h3><i class="fas fa-chart-line"></i> Shares & Dividends (Ksh)</h3>
-            <p>Total Shares: <span id="totalShares">0</span></p>
-            <p>Total Dividends: <span id="totalDividends">0</span></p>
-            <p>Unpaid Balances: <span id="unpaidBalances">0</span></p>
-            <button id="downloadShares">Download Shares CSV</button>
-            <button id="downloadStatement">Download Statement</button>
-        </div>
-    </div>
-
-    <div class="card" id="updateProfile">
-        <h3><i class="fas fa-user-edit"></i> Update Profile</h3>
-        <form id="updateForm">
-            <input type="text" placeholder="Full Name" required>
-            <input type="email" placeholder="Email" required>
-            <input type="text" placeholder="Phone Number" required>
-            <button type="button" id="updateProfileBtn">Update Profile</button>
-        </form>
-    </div>
+  <div class="card" id="updateProfile">
+      <h3><i class="fas fa-user-edit"></i> Update Profile</h3>
+      <form id="updateForm">
+          <input type="text" placeholder="Full Name" required>
+          <input type="email" placeholder="Email" required>
+          <input type="text" placeholder="Phone Number" required>
+          <button type="button" id="updateProfileBtn" class="btn">Update Profile</button>
+      </form>
+  </div>
 
 </div>
 
 <div class="success-popup" id="successPopup"></div>
 
-<!-- Firebase -->
+<!-- Firebase + jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-import { getDatabase, ref, get, child, push, update } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
@@ -266,173 +166,141 @@ const auth = getAuth(app);
 const db = getDatabase(app);
 
 // Hamburger menu
-const hamburger = document.getElementById('hamburger');
-const menu = document.getElementById('menu');
-hamburger.addEventListener('click', ()=> menu.style.display = menu.style.display==='flex'?'none':'flex');
-
-// Tabs
-const tabBtns = document.querySelectorAll('.tab-btn');
-const tabs = document.querySelectorAll('.tab-content');
-tabBtns.forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-        tabBtns.forEach(b=>b.classList.remove('active'));
-        btn.classList.add('active');
-        const tab = btn.getAttribute('data-tab');
-        tabs.forEach(t=>t.classList.remove('active'));
-        document.getElementById(tab).classList.add('active');
-    });
+document.getElementById('hamburger').addEventListener('click', ()=>{
+  const menu=document.getElementById('menu');
+  menu.style.display=menu.style.display==='flex'?'none':'flex';
 });
 
 // Success popup
 function showSuccess(msg){
-    const popup = document.getElementById('successPopup');
-    popup.textContent = msg;
-    popup.style.display="block";
-    setTimeout(()=>popup.style.display="none",3000);
+  const popup=document.getElementById('successPopup');
+  popup.textContent=msg;
+  popup.style.display="block";
+  setTimeout(()=>popup.style.display="none",3000);
 }
 
-// Auto logout 3 min
+// Auto logout after 3min
 let logoutTimer;
 function resetTimer(){
-    clearTimeout(logoutTimer);
-    logoutTimer = setTimeout(async ()=>{
-        await signOut(auth);
-        alert("Logged out due to inactivity");
-        window.location.href="index.html";
-    },180000);
+  clearTimeout(logoutTimer);
+  logoutTimer=setTimeout(async ()=>{
+    await signOut(auth);
+    alert("Logged out due to inactivity");
+    window.location.href="index.html";
+  },180000);
 }
 document.addEventListener('mousemove', resetTimer);
 document.addEventListener('keypress', resetTimer);
 
-// Load user & data
+// Load user
 onAuthStateChanged(auth, user=>{
-    if(user){
-        document.getElementById('userEmail').textContent = user.email;
-        loadAllData(user.uid);
-    }else window.location.href="index.html";
+  if(user){
+    document.getElementById('userEmail').textContent=user.email;
+    loadAllData(user.uid);
+  } else window.location.href="index.html";
 });
 
+// Load all data
 async function loadAllData(uid){
-    const snapshot = await get(ref(db,'members/'+uid));
-    if(snapshot.exists()){
-        const data = snapshot.val();
-        document.querySelector('#updateForm input[placeholder="Full Name"]').value = data.fullName||"";
-        document.querySelector('#updateForm input[placeholder="Email"]').value = data.email||"";
-        document.querySelector('#updateForm input[placeholder="Phone Number"]').value = data.phone||"";
-        document.getElementById('totalShares').textContent = data.shares||0;
-        document.getElementById('totalDividends').textContent = data.dividends||0;
-        document.getElementById('unpaidBalances').textContent = data.unpaidBalances||0;
-        loadSavings(uid);
-        loadLoans(uid);
-    }
-}
-
-// Monthly Savings
-document.getElementById('saveMonthly').addEventListener('click', async ()=>{
-    const uid = auth.currentUser.uid;
-    const amount = parseFloat(document.querySelector('#monthlyForm input').value);
-    if(!amount) return alert("Enter amount");
-    await push(ref(db,'members/'+uid+'/monthlySavings'), {amount,date:Date.now()});
-    showSuccess("Monthly saved!");
+  const snapshot = await get(ref(db,'members/'+uid));
+  if(snapshot.exists()){
+    const data=snapshot.val();
+    document.querySelector('#updateForm input[placeholder="Full Name"]').value=data.fullName||"";
+    document.querySelector('#updateForm input[placeholder="Email"]').value=data.email||"";
+    document.querySelector('#updateForm input[placeholder="Phone Number"]').value=data.phone||"";
+    document.getElementById('totalShares').textContent=data.shares||0;
+    document.getElementById('totalDividends').textContent=data.dividends||0;
+    document.getElementById('unpaidBalances').textContent=data.unpaidBalances||0;
     loadSavings(uid);
-});
-
-// Weekly Savings
-document.getElementById('saveWeekly').addEventListener('click', async ()=>{
-    const uid = auth.currentUser.uid;
-    const amount = parseFloat(document.querySelector('#weeklyForm input').value);
-    if(!amount) return alert("Enter amount");
-    await push(ref(db,'members/'+uid+'/weeklySavings'), {amount,date:Date.now()});
-    showSuccess("Weekly saved!");
-    loadSavings(uid);
-});
-
-// Load Savings
-async function loadSavings(uid){
-    const msnap = await get(ref(db,'members/'+uid+'/monthlySavings'));
-    const wsnap = await get(ref(db,'members/'+uid+'/weeklySavings'));
-    document.getElementById('monthlyTotal').textContent = msnap.exists()? Object.values(msnap.val()).reduce((a,b)=>a+b.amount,0):0;
-    document.getElementById('weeklyTotal').textContent = wsnap.exists()? Object.values(wsnap.val()).reduce((a,b)=>a+b.amount,0):0;
-}
-
-// Loan Application
-document.getElementById('applyLoan').addEventListener('click', async ()=>{
-    const uid = auth.currentUser.uid;
-    const amount = parseFloat(document.querySelector('#loanForm input[placeholder="Loan Amount (Ksh)"]').value);
-    const purpose = document.querySelector('#loanForm input[placeholder="Purpose"]').value;
-    const repayDate = document.querySelector('#loanForm input[placeholder="Repayment Date"]').value;
-    if(!amount || !purpose || !repayDate) return alert("Fill all fields");
-    await push(ref(db,'members/'+uid+'/loans'), {loanAmount:amount,purpose,repayDate,status:"Pending",applied:Date.now()});
-    showSuccess("Loan applied!");
     loadLoans(uid);
-});
-
-// Load Loans
-async function loadLoans(uid){
-    const snap = await get(ref(db,'members/'+uid+'/loans'));
-    const container = document.getElementById('loanList');
-    container.innerHTML="";
-    if(snap.exists()){
-        Object.values(snap.val()).forEach((l,i)=>{
-            const div = document.createElement('div');
-            div.className="card";
-            div.innerHTML=`<strong>Loan ${i+1}</strong>: Ksh ${l.loanAmount} | Purpose: ${l.purpose} | Status: ${l.status} | Repay: ${l.repayDate}`;
-            container.appendChild(div);
-        });
-    } else container.textContent="No loans yet.";
+  }
 }
 
-// Update Profile
+// Savings
+async function loadSavings(uid){
+  const msnap=await get(ref(db,'members/'+uid+'/monthlySavings'));
+  const wsnap=await get(ref(db,'members/'+uid+'/weeklySavings'));
+  document.getElementById('monthlyTotal').textContent = msnap.exists()? Object.values(msnap.val()).reduce((a,b)=>a+b.amount,0):0;
+  document.getElementById('weeklyTotal').textContent = wsnap.exists()? Object.values(wsnap.val()).reduce((a,b)=>a+b.amount,0):0;
+}
+
+// Loans
+async function loadLoans(uid){
+  const snap=await get(ref(db,'members/'+uid+'/loans'));
+  const container=document.getElementById('loanList');
+  container.innerHTML="";
+  if(snap.exists()){
+    Object.values(snap.val()).forEach((l,i)=>{
+      const div=document.createElement('div');
+      div.className="card";
+      div.innerHTML=`<strong>Loan ${i+1}</strong>: Ksh ${l.loanAmount} | Purpose: ${l.purpose} | Status: ${l.status} | Repay: ${l.repayDate}`;
+      container.appendChild(div);
+    });
+  } else container.textContent="No loans yet.";
+}
+
+// Update profile
 document.getElementById('updateProfileBtn').addEventListener('click', async ()=>{
-    const uid = auth.currentUser.uid;
-    const fullName = document.querySelector('#updateForm input[placeholder="Full Name"]').value;
-    const email = document.querySelector('#updateForm input[placeholder="Email"]').value;
-    const phone = document.querySelector('#updateForm input[placeholder="Phone Number"]').value;
-    await update(ref(db,'members/'+uid), {fullName,email,phone});
-    showSuccess("Profile Updated!");
+  const uid=auth.currentUser.uid;
+  const fullName=document.querySelector('#updateForm input[placeholder="Full Name"]').value;
+  const email=document.querySelector('#updateForm input[placeholder="Email"]').value;
+  const phone=document.querySelector('#updateForm input[placeholder="Phone Number"]').value;
+  await update(ref(db,'members/'+uid),{fullName,email,phone});
+  showSuccess("Profile Updated!");
 });
 
-// Download Statement
-document.getElementById('downloadStatement').addEventListener('click', async ()=>{
-    const uid = auth.currentUser.uid;
-    const snap = await get(ref(db,'members/'+uid));
-    if(!snap.exists()) return alert("No data");
-    const data = snap.val();
-    const csvContent = "data:text/csv;charset=utf-8,"
-        + Object.entries(data).map(e=>e.join(",")).join("\n");
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href",encodedUri);
-    link.setAttribute("download","account_statement.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    showSuccess("Statement Downloaded!");
-});
+// Download statement as PDF
+document.getElementById("downloadStatementBtn").addEventListener("click", async ()=>{
+  const uid=auth.currentUser.uid;
+  const snap=await get(ref(db,'members/'+uid));
+  if(!snap.exists()) return alert("No data");
+  const data=snap.val();
+  const { jsPDF }=window.jspdf;
+  const doc=new jsPDF();
 
-// Download Shares
-document.getElementById('downloadShares').addEventListener('click', async ()=>{
-    const uid = auth.currentUser.uid;
-    const snap = await get(ref(db,'members/'+uid+'/shares'));
-    const val = snap.exists()? snap.val() : 0;
-    const csvContent = "data:text/csv;charset=utf-8,Share\n"+val;
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href",encodedUri);
-    link.setAttribute("download","shares.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    showSuccess("Shares Downloaded!");
+  doc.setFont("helvetica","bold");
+  doc.setFontSize(16);
+  doc.text("VISIONARY YOUTH GROUP",105,20,{align:"center"});
+  doc.setFontSize(12);
+  doc.text("Account Statement",105,28,{align:"center"});
+  doc.line(20,32,190,32);
+
+  let y=45;
+  doc.setFont("helvetica","normal");
+  doc.text(`Member: ${data.fullName||"N/A"} (${data.status||"Active"})`,20,y); y+=8;
+  doc.text(`Email: ${auth.currentUser.email}`,20,y); y+=8;
+  doc.text(`Date: ${new Date().toLocaleDateString()}`,20,y); y+=12;
+
+  doc.setFont("helvetica","bold");
+  doc.text("Financial Summary:",20,y); y+=8;
+  doc.setFont("helvetica","normal");
+
+  const monthly = document.getElementById("monthlyTotal").textContent;
+  const weekly = document.getElementById("weeklyTotal").textContent;
+
+  doc.text(`Weekly Savings: Ksh ${weekly}`,25,y); y+=8;
+  doc.text(`Monthly Savings: Ksh ${monthly}`,25,y); y+=8;
+  doc.text(`Shares: Ksh ${data.shares||0}`,25,y); y+=8;
+  doc.text(`Dividends: Ksh ${data.dividends||0}`,25,y); y+=8;
+  doc.text(`Unpaid Balances: Ksh ${data.unpaidBalances||0}`,25,y); y+=8;
+
+  if(data.loans){
+    let totalLoans=0;
+    Object.values(data.loans).forEach(l=> totalLoans+=parseFloat(l.loanAmount||0));
+    doc.text(`Total Loans: Ksh ${totalLoans}`,25,y); y+=8;
+  }
+
+  doc.line(20,y,190,y); y+=15;
+  doc.text("Signature: ___________________________",20,y);
+
+  doc.save("Account_Statement.pdf");
 });
 
 // Logout
 document.getElementById('logoutBtn').addEventListener('click', async ()=>{
-    await signOut(auth);
-    window.location.href="index.html";
+  await signOut(auth);
+  window.location.href="index.html";
 });
-
 </script>
-
 </body>
 </html>
