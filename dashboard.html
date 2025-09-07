@@ -75,6 +75,7 @@
     <a href="#" data-target="shares"><i class="fas fa-chart-pie"></i> Shares & Dividends</a>
     <a href="#" data-target="statement"><i class="fas fa-file-pdf"></i> Account Statement</a>
     <a href="#" data-target="profile"><i class="fas fa-user-cog"></i> Update Profile</a>
+    <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
   </div>
 
   <!-- Main -->
@@ -86,11 +87,11 @@
         <div class="card"><i class="fas fa-piggy-bank"></i><h3>Weekly Savings</h3><p>Ksh <span id="weeklySavings">0</span></p></div>
         <div class="card"><i class="fas fa-calendar-alt"></i><h3>Monthly Savings</h3><p>Ksh <span id="monthlySavings">0</span></p></div>
         <div class="card"><i class="fas fa-hand-holding-usd"></i><h3>Loans</h3><p>Ksh <span id="loanBalance">0</span></p></div>
+        <div class="card"><i class="fas fa-chart-pie"></i><h3>Shares</h3><p>Ksh <span id="shares">0</span></p></div>
+        <div class="card"><i class="fas fa-coins"></i><h3>Dividends</h3><p>Ksh <span id="dividends">0</span></p></div>
+        <div class="card"><i class="fas fa-exclamation-circle"></i><h3>Unpaid Balances</h3><p>Ksh <span id="unpaidBalances">0</span></p></div>
       </div>
     </section>
-
-    <!-- Savings -->
-    <section id="savings"><h2>Your Savings</h2></section>
 
     <!-- Loans -->
     <section id="loans">
@@ -105,14 +106,44 @@
       </div>
     </section>
 
-    <!-- Other sections omitted for brevity (loanApp, shares, profile, etc.) -->
+    <!-- Loan Application -->
+    <section id="loanApp">
+      <h2>Loan Application</h2>
+      <form id="loanForm">
+        <input type="text" id="fullname" placeholder="Full Name" required>
+        <input type="text" id="residence" placeholder="Residence" required>
+        <input type="number" id="amount" placeholder="Loan Amount (Ksh)" required>
+        <input type="text" id="guarantor" placeholder="Guarantor Name" required>
+        <input type="text" id="repaymentPlan" placeholder="Repayment Plan" required>
+        <button type="submit">Submit Application</button>
+      </form>
+    </section>
+
+    <!-- Shares -->
+    <section id="shares"><h2>Your Shares & Dividends</h2></section>
+
+    <!-- Statement -->
+    <section id="statement">
+      <h2>Account Statement</h2>
+      <button onclick="downloadStatement()">Download PDF</button>
+    </section>
+
+    <!-- Profile -->
+    <section id="profile">
+      <h2>Update Profile</h2>
+      <form id="profileForm">
+        <input type="text" id="updateName" placeholder="Full Name" required>
+        <input type="text" id="updatePhone" placeholder="Phone" required>
+        <button type="submit">Update</button>
+      </form>
+    </section>
   </div>
 
   <!-- Firebase + JS -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import { getDatabase, ref, get, update, set } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
@@ -132,15 +163,18 @@
     window.toggleSidebar = () => document.getElementById("sidebar").classList.toggle("active");
 
     // Sidebar links -> switch sections
-    document.querySelectorAll(".sidebar a").forEach(link => {
+    document.querySelectorAll(".sidebar a[data-target]").forEach(link => {
       link.addEventListener("click", e => {
         e.preventDefault();
         const target = link.dataset.target;
         document.querySelectorAll(".main section").forEach(s => s.classList.remove("active"));
         document.getElementById(target).classList.add("active");
-        document.getElementById("sidebar").classList.remove("active"); // close sidebar
+        document.getElementById("sidebar").classList.remove("active");
       });
     });
+
+    // Logout
+    window.logout = () => signOut(auth).then(() => window.location.href="index.html");
 
     // Auth state
     onAuthStateChanged(auth, async (user) => {
@@ -148,28 +182,28 @@
         document.getElementById("userEmail").textContent = user.email;
         const snapshot = await get(ref(db, "members/" + user.uid));
         if (snapshot.exists()) {
-          const data = snapshot.val();
-          document.getElementById("weeklySavings").textContent = data.weeklySavings || 0;
-          document.getElementById("monthlySavings").textContent = data.monthlySavings || 0;
-          document.getElementById("loanBalance").textContent = data.loanBalance || 0;
-          document.getElementById("loanBalance2").textContent = data.loanBalance || 0;
-
-          // Loan stage logic (example: use data.loanStage from DB)
-          const stage = data.loanStage || "applied"; // fallback
-          highlightStage(stage);
+          const d = snapshot.val();
+          document.getElementById("weeklySavings").textContent = d.weeklySavings || 0;
+          document.getElementById("monthlySavings").textContent = d.monthlySavings || 0;
+          document.getElementById("loanBalance").textContent = d.loanBalance || 0;
+          document.getElementById("loanBalance2").textContent = d.loanBalance || 0;
+          document.getElementById("shares").textContent = d.shares || 0;
+          document.getElementById("dividends").textContent = d.dividends || 0;
+          document.getElementById("unpaidBalances").textContent = d.unpaidBalances || 0;
+          highlightStage(d.loanStage || "applied");
         }
       } else {
         window.location.href = "index.html";
       }
     });
 
+    // Loan stage UI
     function highlightStage(stage) {
       const stages = ["applied","approved","disbursed","repayment","completed"];
       stages.forEach(s => {
         const el = document.getElementById("stage-" + s);
         el.classList.remove("active","completed");
       });
-
       const currentIndex = stages.indexOf(stage);
       stages.forEach((s, i) => {
         const el = document.getElementById("stage-" + s);
@@ -177,6 +211,84 @@
         else if (i === currentIndex) el.classList.add("active");
       });
     }
+
+    // Loan Application -> save to Firebase + PDF
+    document.getElementById("loanForm").addEventListener("submit", async e => {
+      e.preventDefault();
+      const user = auth.currentUser;
+      if (!user) return;
+      const loanData = {
+        fullname: document.getElementById("fullname").value,
+        residence: document.getElementById("residence").value,
+        amount: document.getElementById("amount").value,
+        guarantor: document.getElementById("guarantor").value,
+        repaymentPlan: document.getElementById("repaymentPlan").value,
+        status: "applied",
+        date: new Date().toISOString()
+      };
+      await set(ref(db,"loans/"+user.uid), loanData);
+      alert("Loan Application Submitted Successfully!");
+
+      // PDF Download
+      const docContent = `
+        Loan Application
+        -----------------
+        Name: ${loanData.fullname}
+        Residence: ${loanData.residence}
+        Amount: Ksh ${loanData.amount}
+        Guarantor: ${loanData.guarantor}
+        Repayment Plan: ${loanData.repaymentPlan}
+        Status: Applied
+      `;
+      const blob = new Blob([docContent], { type: "application/pdf" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "Loan_Application.pdf";
+      link.click();
+    });
+
+    // Update profile (once with popup)
+    document.getElementById("profileForm").addEventListener("submit", async e => {
+      e.preventDefault();
+      const user = auth.currentUser;
+      if (!user) return;
+      await update(ref(db,"members/"+user.uid), {
+        name: document.getElementById("updateName").value,
+        phone: document.getElementById("updatePhone").value
+      });
+      alert("Profile updated successfully!");
+      document.getElementById("profileForm").reset();
+    });
+
+    // Account statement PDF
+    window.downloadStatement = () => {
+      const content = `
+        Account Statement
+        -----------------
+        Weekly Savings: Ksh ${document.getElementById("weeklySavings").textContent}
+        Monthly Savings: Ksh ${document.getElementById("monthlySavings").textContent}
+        Loan Balance: Ksh ${document.getElementById("loanBalance").textContent}
+        Shares: Ksh ${document.getElementById("shares").textContent}
+        Dividends: Ksh ${document.getElementById("dividends").textContent}
+        Unpaid Balances: Ksh ${document.getElementById("unpaidBalances").textContent}
+      `;
+      const blob = new Blob([content], { type: "application/pdf" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "Account_Statement.pdf";
+      link.click();
+    };
+
+    // Auto logout after 3 minutes inactivity
+    let timer;
+    function resetTimer() {
+      clearTimeout(timer);
+      timer = setTimeout(() => logout(), 180000);
+    }
+    ["click","keypress","mousemove","scroll"].forEach(evt =>
+      document.addEventListener(evt, resetTimer)
+    );
+    resetTimer();
   </script>
 </body>
 </html>
