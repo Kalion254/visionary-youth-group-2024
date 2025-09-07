@@ -1,294 +1,302 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Visionary Youth Group - Dashboard</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visionary Youth Group — Dashboard</title>
 
-  <!-- Fonts & Icons -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<!-- Fonts & Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-  <style>
-    body { margin: 0; font-family: 'Poppins', sans-serif; background: #e6f7e6; color: #333; }
-
-    nav {
-      background: #006400; color: white; padding: 15px 20px;
-      display: flex; justify-content: space-between; align-items: center;
-    }
-    nav h1 { font-size: 1.3rem; margin: 0; }
-    nav .menu-btn { font-size: 24px; cursor: pointer; }
-    nav .user-info { font-size: 0.9rem; text-align: right; }
-
-    .sidebar {
-      position: fixed; top: 0; left: -250px; width: 250px; height: 100%;
-      background: #111; color: white; transition: 0.3s; padding-top: 60px; z-index: 999;
-    }
-    .sidebar.active { left: 0; }
-    .sidebar a {
-      display: block; padding: 15px; color: white; text-decoration: none;
-    }
-    .sidebar a:hover { background: #006400; }
-
-    .main { padding: 20px; }
-    section { display: none; }
-    section.active { display: block; }
-
-    .cards {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 20px;
-    }
-    .card {
-      background: white; padding: 20px; border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center;
-    }
-    .card i { font-size: 35px; color: #ffcc00; margin-bottom: 10px; }
-
-    /* Loan progress stages */
-    .stages { display: flex; gap: 15px; justify-content: space-between; margin-top: 20px; }
-    .stage {
-      flex: 1; padding: 10px; border-radius: 8px; text-align: center; font-size: 0.85rem;
-      background: #f1f1f1; color: #555;
-    }
-    .stage.active { background: #006400; color: white; font-weight: 600; }
-    .stage.completed { background: #28a745; color: white; }
-  </style>
+<style>
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: #e6f9e6;
+  color: #333;
+}
+header {
+  background: #222;
+  color: #fff;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.menu-toggle {
+  font-size: 22px;
+  cursor: pointer;
+}
+nav {
+  display: none;
+  flex-direction: column;
+  background: #333;
+  position: absolute;
+  top: 60px;
+  right: 10px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+nav a {
+  color: #fff;
+  padding: 12px;
+  text-decoration: none;
+  border-bottom: 1px solid #444;
+}
+nav a:hover {
+  background: #444;
+  color: #ffcc00;
+}
+section {
+  padding: 25px;
+  margin: 20px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+h2 {
+  margin-bottom: 15px;
+  color: #007bff;
+}
+button {
+  background: #333;
+  color: #ffcc00;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+button:hover { background: #555; color: #ff6600; }
+input, textarea {
+  width: 100%;
+  padding: 8px;
+  margin: 8px 0;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+.success-popup {
+  display: none;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #28a745;
+  color: white;
+  padding: 12px 18px;
+  border-radius: 6px;
+  z-index: 100;
+}
+</style>
 </head>
 <body>
 
-  <!-- Navbar -->
-  <nav>
-    <span class="menu-btn" onclick="toggleSidebar()">☰</span>
-    <h1>Visionary Youth Group</h1>
-    <div class="user-info">
-      <span id="userEmail">Loading...</span><br>
-      <small>Status: <span style="color:lightgreen;">Active</span></small>
-    </div>
+<header>
+  <h3>Dashboard — <span id="userEmail"></span> (<span id="memberStatus">Active</span>)</h3>
+  <i class="fas fa-bars menu-toggle" onclick="toggleMenu()"></i>
+  <nav id="menu">
+    <a href="#balances">Balances</a>
+    <a href="#loans">Loan Application</a>
+    <a href="#statement">Account Statement</a>
+    <a href="#profile">Update Profile</a>
+    <a href="#" onclick="logout()">Logout</a>
   </nav>
+</header>
 
-  <!-- Sidebar -->
-  <div class="sidebar" id="sidebar">
-    <a href="#" data-target="overview"><i class="fas fa-home"></i> Overview</a>
-    <a href="#" data-target="savings"><i class="fas fa-piggy-bank"></i> Savings</a>
-    <a href="#" data-target="loans"><i class="fas fa-hand-holding-usd"></i> Loans</a>
-    <a href="#" data-target="loanApp"><i class="fas fa-file-signature"></i> Loan Application</a>
-    <a href="#" data-target="shares"><i class="fas fa-chart-pie"></i> Shares & Dividends</a>
-    <a href="#" data-target="statement"><i class="fas fa-file-pdf"></i> Account Statement</a>
-    <a href="#" data-target="profile"><i class="fas fa-user-cog"></i> Update Profile</a>
-    <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
-  </div>
+<div class="success-popup" id="successPopup">Profile Updated Successfully!</div>
 
-  <!-- Main -->
-  <div class="main">
-    <!-- Overview -->
-    <section id="overview" class="active">
-      <h2>Dashboard Overview</h2>
-      <div class="cards">
-        <div class="card"><i class="fas fa-piggy-bank"></i><h3>Weekly Savings</h3><p>Ksh <span id="weeklySavings">0</span></p></div>
-        <div class="card"><i class="fas fa-calendar-alt"></i><h3>Monthly Savings</h3><p>Ksh <span id="monthlySavings">0</span></p></div>
-        <div class="card"><i class="fas fa-hand-holding-usd"></i><h3>Loans</h3><p>Ksh <span id="loanBalance">0</span></p></div>
-        <div class="card"><i class="fas fa-chart-pie"></i><h3>Shares</h3><p>Ksh <span id="shares">0</span></p></div>
-        <div class="card"><i class="fas fa-coins"></i><h3>Dividends</h3><p>Ksh <span id="dividends">0</span></p></div>
-        <div class="card"><i class="fas fa-exclamation-circle"></i><h3>Unpaid Balances</h3><p>Ksh <span id="unpaidBalances">0</span></p></div>
-      </div>
-    </section>
+<!-- Balances -->
+<section id="balances">
+  <h2><i class="fas fa-wallet"></i> Financial Balances (Ksh)</h2>
+  <p>Weekly Savings: <strong id="weekly">0</strong></p>
+  <p>Monthly Savings: <strong id="monthly">0</strong></p>
+  <p>Loans: <strong id="loansBal">0</strong></p>
+  <p>Shares: <strong id="shares">0</strong></p>
+  <p>Dividends: <strong id="dividends">0</strong></p>
+  <p>Unpaid Balances: <strong id="unpaid">0</strong></p>
+</section>
 
-    <!-- Loans -->
-    <section id="loans">
-      <h2>Your Loans</h2>
-      <p>Loan Balance: Ksh <span id="loanBalance2">0</span></p>
-      <div class="stages">
-        <div id="stage-applied" class="stage">Applied</div>
-        <div id="stage-approved" class="stage">Approved</div>
-        <div id="stage-disbursed" class="stage">Disbursed</div>
-        <div id="stage-repayment" class="stage">Repayment</div>
-        <div id="stage-completed" class="stage">Completed</div>
-      </div>
-    </section>
+<!-- Loan Application -->
+<section id="loans">
+  <h2><i class="fas fa-file-signature"></i> Loan Application</h2>
+  <form id="loanForm">
+    <h3>Applicant Information</h3>
+    <input type="text" placeholder="Full Name" id="loanName" required>
+    <input type="text" placeholder="Membership Number" id="loanMemberNo" required>
+    <input type="text" placeholder="National ID/Passport" id="loanId" required>
+    <input type="text" placeholder="Marital Status" required>
+    <input type="date" placeholder="Date of Birth" required>
+    <input type="text" placeholder="Phone" required>
+    <input type="email" placeholder="Email" required>
+    <textarea placeholder="Current Address" required></textarea>
 
-    <!-- Loan Application -->
-    <section id="loanApp">
-      <h2>Loan Application</h2>
-      <form id="loanForm">
-        <input type="text" id="fullname" placeholder="Full Name" required>
-        <input type="text" id="residence" placeholder="Residence" required>
-        <input type="number" id="amount" placeholder="Loan Amount (Ksh)" required>
-        <input type="text" id="guarantor" placeholder="Guarantor Name" required>
-        <input type="text" id="repaymentPlan" placeholder="Repayment Plan" required>
-        <button type="submit">Submit Application</button>
-      </form>
-    </section>
+    <h3>Employment Information</h3>
+    <input type="text" placeholder="Employer" required>
+    <input type="text" placeholder="Position" required>
+    <input type="number" placeholder="Monthly Income" required>
 
-    <!-- Shares -->
-    <section id="shares"><h2>Your Shares & Dividends</h2></section>
+    <h3>Other Income Sources</h3>
+    <input type="text" placeholder="Income Source 1">
+    <input type="text" placeholder="Income Source 2">
 
-    <!-- Statement -->
-    <section id="statement">
-      <h2>Account Statement</h2>
-      <button onclick="downloadStatement()">Download PDF</button>
-    </section>
+    <h3>Loan Details</h3>
+    <input type="number" placeholder="Amount Requested (Ksh)" id="loanAmount" required>
+    <input type="text" placeholder="Purpose of Loan" required>
+    <input type="number" placeholder="Repayable in (months)" required>
 
-    <!-- Profile -->
-    <section id="profile">
-      <h2>Update Profile</h2>
-      <form id="profileForm">
-        <input type="text" id="updateName" placeholder="Full Name" required>
-        <input type="text" id="updatePhone" placeholder="Phone" required>
-        <button type="submit">Update</button>
-      </form>
-    </section>
-  </div>
+    <h3>Other Loans/Debts</h3>
+    <input type="text" placeholder="Institution / Amount">
+    
+    <button type="submit">Submit & Download PDF</button>
+  </form>
+</section>
 
-  <!-- Firebase + JS -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-    import { getDatabase, ref, get, update, set } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+<!-- Account Statement -->
+<section id="statement">
+  <h2><i class="fas fa-file-pdf"></i> Account Statement</h2>
+  <button onclick="downloadStatement()">Download Statement (PDF)</button>
+</section>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
-      authDomain: "visionary-youth-grou-2024.firebaseapp.com",
-      databaseURL: "https://visionary-youth-grou-2024-default-rtdb.firebaseio.com/",
-      projectId: "visionary-youth-grou-2024",
-      storageBucket: "visionary-youth-grou-2024.appspot.com",
-      messagingSenderId: "372978592717",
-      appId: "1:372978592717:web:1c15aec728ee5f854f3284"
-    };
+<!-- Update Profile -->
+<section id="profile">
+  <h2><i class="fas fa-user-edit"></i> Update Profile</h2>
+  <form id="profileForm">
+    <input type="text" placeholder="Full Name" required>
+    <input type="text" placeholder="Phone" required>
+    <button type="submit">Update</button>
+  </form>
+</section>
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getDatabase(app);
+<!-- Firebase + jsPDF -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+import { getDatabase, ref, get, set, push } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
-    // Sidebar toggle
-    window.toggleSidebar = () => document.getElementById("sidebar").classList.toggle("active");
+const firebaseConfig = {
+  apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
+  authDomain: "visionary-youth-grou-2024.firebaseapp.com",
+  projectId: "visionary-youth-grou-2024",
+  storageBucket: "visionary-youth-grou-2024.appspot.com",
+  messagingSenderId: "372978592717",
+  appId: "1:372978592717:web:1c15aec728ee5f854f3284",
+  databaseURL: "https://visionary-youth-grou-2024-default-rtdb.firebaseio.com/"
+};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
 
-    // Sidebar links -> switch sections
-    document.querySelectorAll(".sidebar a[data-target]").forEach(link => {
-      link.addEventListener("click", e => {
-        e.preventDefault();
-        const target = link.dataset.target;
-        document.querySelectorAll(".main section").forEach(s => s.classList.remove("active"));
-        document.getElementById(target).classList.add("active");
-        document.getElementById("sidebar").classList.remove("active");
-      });
-    });
+// Show user
+onAuthStateChanged(auth, user=>{
+  if(user){
+    document.getElementById('userEmail').innerText = user.email;
+    loadBalances(user.uid);
+    autoLogout();
+  } else {
+    window.location.href="index.html";
+  }
+});
 
-    // Logout
-    window.logout = () => signOut(auth).then(() => window.location.href="index.html");
-
-    // Auth state
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        document.getElementById("userEmail").textContent = user.email;
-        const snapshot = await get(ref(db, "members/" + user.uid));
-        if (snapshot.exists()) {
-          const d = snapshot.val();
-          document.getElementById("weeklySavings").textContent = d.weeklySavings || 0;
-          document.getElementById("monthlySavings").textContent = d.monthlySavings || 0;
-          document.getElementById("loanBalance").textContent = d.loanBalance || 0;
-          document.getElementById("loanBalance2").textContent = d.loanBalance || 0;
-          document.getElementById("shares").textContent = d.shares || 0;
-          document.getElementById("dividends").textContent = d.dividends || 0;
-          document.getElementById("unpaidBalances").textContent = d.unpaidBalances || 0;
-          highlightStage(d.loanStage || "applied");
-        }
-      } else {
-        window.location.href = "index.html";
-      }
-    });
-
-    // Loan stage UI
-    function highlightStage(stage) {
-      const stages = ["applied","approved","disbursed","repayment","completed"];
-      stages.forEach(s => {
-        const el = document.getElementById("stage-" + s);
-        el.classList.remove("active","completed");
-      });
-      const currentIndex = stages.indexOf(stage);
-      stages.forEach((s, i) => {
-        const el = document.getElementById("stage-" + s);
-        if (i < currentIndex) el.classList.add("completed");
-        else if (i === currentIndex) el.classList.add("active");
-      });
+// Load balances
+function loadBalances(uid){
+  get(ref(db,"members/"+uid+"/balances")).then(snap=>{
+    if(snap.exists()){
+      let data = snap.val();
+      document.getElementById("weekly").innerText=data.weekly||0;
+      document.getElementById("monthly").innerText=data.monthly||0;
+      document.getElementById("loansBal").innerText=data.loans||0;
+      document.getElementById("shares").innerText=data.shares||0;
+      document.getElementById("dividends").innerText=data.dividends||0;
+      document.getElementById("unpaid").innerText=data.unpaid||0;
     }
+  })
+}
 
-    // Loan Application -> save to Firebase + PDF
-    document.getElementById("loanForm").addEventListener("submit", async e => {
-      e.preventDefault();
-      const user = auth.currentUser;
-      if (!user) return;
-      const loanData = {
-        fullname: document.getElementById("fullname").value,
-        residence: document.getElementById("residence").value,
-        amount: document.getElementById("amount").value,
-        guarantor: document.getElementById("guarantor").value,
-        repaymentPlan: document.getElementById("repaymentPlan").value,
-        status: "applied",
-        date: new Date().toISOString()
-      };
-      await set(ref(db,"loans/"+user.uid), loanData);
-      alert("Loan Application Submitted Successfully!");
+// Loan form
+document.getElementById("loanForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  let uid = auth.currentUser.uid;
+  let loanData = {
+    name: document.getElementById("loanName").value,
+    memberNo: document.getElementById("loanMemberNo").value,
+    id: document.getElementById("loanId").value,
+    amount: document.getElementById("loanAmount").value,
+    purpose: e.target.querySelector("input[placeholder='Purpose of Loan']").value,
+    timestamp: Date.now()
+  };
+  push(ref(db,"members/"+uid+"/loans"),loanData);
+  generateLoanPDF(loanData);
+});
 
-      // PDF Download
-      const docContent = `
-        Loan Application
-        -----------------
-        Name: ${loanData.fullname}
-        Residence: ${loanData.residence}
-        Amount: Ksh ${loanData.amount}
-        Guarantor: ${loanData.guarantor}
-        Repayment Plan: ${loanData.repaymentPlan}
-        Status: Applied
-      `;
-      const blob = new Blob([docContent], { type: "application/pdf" });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "Loan_Application.pdf";
-      link.click();
-    });
+// PDF Loan Application
+function generateLoanPDF(loan){
+  const { jsPDF } = window.jspdf;
+  let doc = new jsPDF();
+  doc.setFontSize(14);
+  doc.text("ARCHDIOCESE OF NAIROBI",20,20);
+  doc.text("LOAN APPLICATION FORM",20,30);
+  doc.text("Name: "+loan.name,20,50);
+  doc.text("Member No: "+loan.memberNo,20,60);
+  doc.text("ID: "+loan.id,20,70);
+  doc.text("Amount: Ksh "+loan.amount,20,80);
+  doc.text("Purpose: "+loan.purpose,20,90);
+  doc.text("Signature: _____________   Date: ____________",20,110);
+  doc.save("Loan_Application.pdf");
+}
 
-    // Update profile (once with popup)
-    document.getElementById("profileForm").addEventListener("submit", async e => {
-      e.preventDefault();
-      const user = auth.currentUser;
-      if (!user) return;
-      await update(ref(db,"members/"+user.uid), {
-        name: document.getElementById("updateName").value,
-        phone: document.getElementById("updatePhone").value
-      });
-      alert("Profile updated successfully!");
-      document.getElementById("profileForm").reset();
-    });
+// Account statement PDF
+function downloadStatement(){
+  const { jsPDF } = window.jspdf;
+  let doc = new jsPDF();
+  doc.setFontSize(16);
+  doc.text("Account Statement", 20,20);
+  doc.text("Weekly: "+document.getElementById("weekly").innerText+" Ksh",20,40);
+  doc.text("Monthly: "+document.getElementById("monthly").innerText+" Ksh",20,50);
+  doc.text("Loans: "+document.getElementById("loansBal").innerText+" Ksh",20,60);
+  doc.text("Shares: "+document.getElementById("shares").innerText+" Ksh",20,70);
+  doc.text("Dividends: "+document.getElementById("dividends").innerText+" Ksh",20,80);
+  doc.text("Unpaid: "+document.getElementById("unpaid").innerText+" Ksh",20,90);
+  doc.save("Account_Statement.pdf");
+}
 
-    // Account statement PDF
-    window.downloadStatement = () => {
-      const content = `
-        Account Statement
-        -----------------
-        Weekly Savings: Ksh ${document.getElementById("weeklySavings").textContent}
-        Monthly Savings: Ksh ${document.getElementById("monthlySavings").textContent}
-        Loan Balance: Ksh ${document.getElementById("loanBalance").textContent}
-        Shares: Ksh ${document.getElementById("shares").textContent}
-        Dividends: Ksh ${document.getElementById("dividends").textContent}
-        Unpaid Balances: Ksh ${document.getElementById("unpaidBalances").textContent}
-      `;
-      const blob = new Blob([content], { type: "application/pdf" });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "Account_Statement.pdf";
-      link.click();
-    };
+// Profile Update
+document.getElementById("profileForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  let uid = auth.currentUser.uid;
+  set(ref(db,"members/"+uid+"/profile"),{
+    name: e.target[0].value,
+    phone: e.target[1].value
+  });
+  document.getElementById("successPopup").style.display="block";
+  setTimeout(()=>{document.getElementById("successPopup").style.display="none";},3000);
+});
 
-    // Auto logout after 3 minutes inactivity
-    let timer;
-    function resetTimer() {
-      clearTimeout(timer);
-      timer = setTimeout(() => logout(), 180000);
-    }
-    ["click","keypress","mousemove","scroll"].forEach(evt =>
-      document.addEventListener(evt, resetTimer)
-    );
-    resetTimer();
-  </script>
+// Menu toggle
+function toggleMenu(){
+  let menu = document.getElementById("menu");
+  menu.style.display = menu.style.display==="flex"?"none":"flex";
+}
+
+// Logout
+function logout(){
+  signOut(auth);
+}
+
+// Auto logout
+let timer;
+function autoLogout(){
+  resetTimer();
+  window.onmousemove=resetTimer;
+  window.onkeydown=resetTimer;
+}
+function resetTimer(){
+  clearTimeout(timer);
+  timer=setTimeout(()=>logout(),180000); // 3 mins
+}
+</script>
+
+<!-- jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 </body>
 </html>
