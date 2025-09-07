@@ -13,63 +13,87 @@
 body {
   margin: 0;
   font-family: 'Poppins', sans-serif;
-  background: #e6f9e6;
+  background: linear-gradient(120deg, #d6f5d6, #e6ffe6);
   color: #333;
 }
 header {
-  background: #222;
+  background: #1b4332;
   color: #fff;
-  padding: 15px;
+  padding: 15px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 .menu-toggle {
-  font-size: 22px;
+  font-size: 24px;
   cursor: pointer;
 }
 nav {
   display: none;
   flex-direction: column;
-  background: #333;
+  background: #2d6a4f;
   position: absolute;
   top: 60px;
-  right: 10px;
+  right: 15px;
   border-radius: 8px;
   overflow: hidden;
+  z-index: 10;
 }
 nav a {
   color: #fff;
   padding: 12px;
   text-decoration: none;
-  border-bottom: 1px solid #444;
+  border-bottom: 1px solid #3b7d61;
 }
 nav a:hover {
-  background: #444;
-  color: #ffcc00;
+  background: #40916c;
 }
-section {
-  padding: 25px;
-  margin: 20px;
+.container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+.card {
   background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
-h2 {
+.card h2 {
   margin-bottom: 15px;
-  color: #007bff;
+  font-size: 20px;
+  color: #1b4332;
+}
+.balance-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px,1fr));
+  gap: 15px;
+}
+.balance-card {
+  background: #e9f7ef;
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+  font-weight: 600;
+}
+.balance-card span {
+  display: block;
+  font-size: 18px;
+  margin-top: 5px;
+  color: #007200;
 }
 button {
-  background: #333;
-  color: #ffcc00;
+  background: #1b4332;
+  color: #fff;
   border: none;
   padding: 10px 18px;
   border-radius: 6px;
   cursor: pointer;
   transition: 0.3s;
 }
-button:hover { background: #555; color: #ff6600; }
-input, textarea {
+button:hover { background: #40916c; }
+input, select {
   width: 100%;
   padding: 8px;
   margin: 8px 0;
@@ -92,80 +116,62 @@ input, textarea {
 <body>
 
 <header>
-  <h3>Dashboard — <span id="userEmail"></span> (<span id="memberStatus">Active</span>)</h3>
+  <h3>Dashboard — <span id="userEmail"></span></h3>
   <i class="fas fa-bars menu-toggle" onclick="toggleMenu()"></i>
   <nav id="menu">
-    <a href="#balances">Balances</a>
-    <a href="#loans">Loan Application</a>
-    <a href="#statement">Account Statement</a>
-    <a href="#profile">Update Profile</a>
+    <a href="#balances" onclick="closeMenu()">Balances</a>
+    <a href="#loans" onclick="closeMenu()">Loan Application</a>
+    <a href="#profile" onclick="closeMenu()">Profile</a>
     <a href="#" onclick="logout()">Logout</a>
   </nav>
 </header>
 
 <div class="success-popup" id="successPopup">Profile Updated Successfully!</div>
 
-<!-- Balances -->
-<section id="balances">
-  <h2><i class="fas fa-wallet"></i> Financial Balances (Ksh)</h2>
-  <p>Weekly Savings: <strong id="weekly">0</strong></p>
-  <p>Monthly Savings: <strong id="monthly">0</strong></p>
-  <p>Loans: <strong id="loansBal">0</strong></p>
-  <p>Shares: <strong id="shares">0</strong></p>
-  <p>Dividends: <strong id="dividends">0</strong></p>
-  <p>Unpaid Balances: <strong id="unpaid">0</strong></p>
-</section>
+<div class="container">
 
-<!-- Loan Application -->
-<section id="loans">
-  <h2><i class="fas fa-file-signature"></i> Loan Application</h2>
-  <form id="loanForm">
-    <h3>Applicant Information</h3>
-    <input type="text" placeholder="Full Name" id="loanName" required>
-    <input type="text" placeholder="Membership Number" id="loanMemberNo" required>
-    <input type="text" placeholder="National ID/Passport" id="loanId" required>
-    <input type="text" placeholder="Marital Status" required>
-    <input type="date" placeholder="Date of Birth" required>
-    <input type="text" placeholder="Phone" required>
-    <input type="email" placeholder="Email" required>
-    <textarea placeholder="Current Address" required></textarea>
+  <!-- Balances -->
+  <div class="card" id="balances">
+    <h2><i class="fas fa-wallet"></i> Financial Balances</h2>
+    <div class="balance-grid">
+      <div class="balance-card">Weekly <span id="weekly">0</span></div>
+      <div class="balance-card">Monthly <span id="monthly">0</span></div>
+      <div class="balance-card">Loans <span id="loansBal">0</span></div>
+      <div class="balance-card">Shares <span id="shares">0</span></div>
+      <div class="balance-card">Dividends <span id="dividends">0</span></div>
+      <div class="balance-card">Unpaid <span id="unpaid">0</span></div>
+    </div>
+  </div>
 
-    <h3>Employment Information</h3>
-    <input type="text" placeholder="Employer" required>
-    <input type="text" placeholder="Position" required>
-    <input type="number" placeholder="Monthly Income" required>
+  <!-- Loan Application -->
+  <div class="card" id="loans">
+    <h2><i class="fas fa-file-signature"></i> Loan Application</h2>
+    <form id="loanForm">
+      <input type="text" placeholder="Full Name" id="loanName" required>
+      <input type="text" placeholder="Membership Number" id="loanMemberNo" required>
+      <input type="text" placeholder="National ID/Passport" id="loanId" required>
+      <input type="number" placeholder="Amount Requested (Ksh)" id="loanAmount" required>
+      <input type="text" placeholder="Purpose of Loan" id="loanPurpose" required>
+      <input type="number" placeholder="Repayable in (months)" id="loanPeriod" required>
+      <button type="submit">Submit & Download PDF</button>
+    </form>
+  </div>
 
-    <h3>Other Income Sources</h3>
-    <input type="text" placeholder="Income Source 1">
-    <input type="text" placeholder="Income Source 2">
-
-    <h3>Loan Details</h3>
-    <input type="number" placeholder="Amount Requested (Ksh)" id="loanAmount" required>
-    <input type="text" placeholder="Purpose of Loan" required>
-    <input type="number" placeholder="Repayable in (months)" required>
-
-    <h3>Other Loans/Debts</h3>
-    <input type="text" placeholder="Institution / Amount">
-    
-    <button type="submit">Submit & Download PDF</button>
-  </form>
-</section>
-
-<!-- Account Statement -->
-<section id="statement">
-  <h2><i class="fas fa-file-pdf"></i> Account Statement</h2>
-  <button onclick="downloadStatement()">Download Statement (PDF)</button>
-</section>
-
-<!-- Update Profile -->
-<section id="profile">
-  <h2><i class="fas fa-user-edit"></i> Update Profile</h2>
-  <form id="profileForm">
-    <input type="text" placeholder="Full Name" required>
-    <input type="text" placeholder="Phone" required>
-    <button type="submit">Update</button>
-  </form>
-</section>
+  <!-- Update Profile -->
+  <div class="card" id="profile">
+    <h2><i class="fas fa-user-edit"></i> Update Profile</h2>
+    <form id="profileForm">
+      <input type="text" placeholder="Full Name" id="pname" required>
+      <input type="text" placeholder="Phone" id="pphone" required>
+      <input type="text" placeholder="ID Number" id="pid" required>
+      <input type="number" placeholder="Year Joined" id="pyear" required>
+      <input type="date" placeholder="Date of Birth" id="pdob" required>
+      <button type="submit">Update</button>
+    </form>
+    <br>
+    <button onclick="downloadStatement()"><i class="fas fa-file-pdf"></i> Account Statement</button>
+  </div>
+</div>
 
 <!-- Firebase + jsPDF -->
 <script type="module">
@@ -201,13 +207,13 @@ onAuthStateChanged(auth, user=>{
 function loadBalances(uid){
   get(ref(db,"members/"+uid+"/balances")).then(snap=>{
     if(snap.exists()){
-      let data = snap.val();
-      document.getElementById("weekly").innerText=data.weekly||0;
-      document.getElementById("monthly").innerText=data.monthly||0;
-      document.getElementById("loansBal").innerText=data.loans||0;
-      document.getElementById("shares").innerText=data.shares||0;
-      document.getElementById("dividends").innerText=data.dividends||0;
-      document.getElementById("unpaid").innerText=data.unpaid||0;
+      let d = snap.val();
+      document.getElementById("weekly").innerText=d.weekly||0;
+      document.getElementById("monthly").innerText=d.monthly||0;
+      document.getElementById("loansBal").innerText=d.loans||0;
+      document.getElementById("shares").innerText=d.shares||0;
+      document.getElementById("dividends").innerText=d.dividends||0;
+      document.getElementById("unpaid").innerText=d.unpaid||0;
     }
   })
 }
@@ -217,30 +223,30 @@ document.getElementById("loanForm").addEventListener("submit",e=>{
   e.preventDefault();
   let uid = auth.currentUser.uid;
   let loanData = {
-    name: document.getElementById("loanName").value,
-    memberNo: document.getElementById("loanMemberNo").value,
-    id: document.getElementById("loanId").value,
-    amount: document.getElementById("loanAmount").value,
-    purpose: e.target.querySelector("input[placeholder='Purpose of Loan']").value,
+    name: loanName.value,
+    memberNo: loanMemberNo.value,
+    id: loanId.value,
+    amount: loanAmount.value,
+    purpose: loanPurpose.value,
+    period: loanPeriod.value,
     timestamp: Date.now()
   };
   push(ref(db,"members/"+uid+"/loans"),loanData);
   generateLoanPDF(loanData);
 });
 
-// PDF Loan Application
+// Loan PDF
 function generateLoanPDF(loan){
   const { jsPDF } = window.jspdf;
   let doc = new jsPDF();
   doc.setFontSize(14);
-  doc.text("ARCHDIOCESE OF NAIROBI",20,20);
-  doc.text("LOAN APPLICATION FORM",20,30);
-  doc.text("Name: "+loan.name,20,50);
-  doc.text("Member No: "+loan.memberNo,20,60);
-  doc.text("ID: "+loan.id,20,70);
-  doc.text("Amount: Ksh "+loan.amount,20,80);
-  doc.text("Purpose: "+loan.purpose,20,90);
-  doc.text("Signature: _____________   Date: ____________",20,110);
+  doc.text("LOAN APPLICATION FORM",20,20);
+  doc.text("Name: "+loan.name,20,40);
+  doc.text("Member No: "+loan.memberNo,20,50);
+  doc.text("ID: "+loan.id,20,60);
+  doc.text("Amount: Ksh "+loan.amount,20,70);
+  doc.text("Purpose: "+loan.purpose,20,80);
+  doc.text("Period: "+loan.period+" months",20,90);
   doc.save("Loan_Application.pdf");
 }
 
@@ -250,12 +256,12 @@ function downloadStatement(){
   let doc = new jsPDF();
   doc.setFontSize(16);
   doc.text("Account Statement", 20,20);
-  doc.text("Weekly: "+document.getElementById("weekly").innerText+" Ksh",20,40);
-  doc.text("Monthly: "+document.getElementById("monthly").innerText+" Ksh",20,50);
-  doc.text("Loans: "+document.getElementById("loansBal").innerText+" Ksh",20,60);
-  doc.text("Shares: "+document.getElementById("shares").innerText+" Ksh",20,70);
-  doc.text("Dividends: "+document.getElementById("dividends").innerText+" Ksh",20,80);
-  doc.text("Unpaid: "+document.getElementById("unpaid").innerText+" Ksh",20,90);
+  doc.text("Weekly: "+weekly.innerText+" Ksh",20,40);
+  doc.text("Monthly: "+monthly.innerText+" Ksh",20,50);
+  doc.text("Loans: "+loansBal.innerText+" Ksh",20,60);
+  doc.text("Shares: "+shares.innerText+" Ksh",20,70);
+  doc.text("Dividends: "+dividends.innerText+" Ksh",20,80);
+  doc.text("Unpaid: "+unpaid.innerText+" Ksh",20,90);
   doc.save("Account_Statement.pdf");
 }
 
@@ -264,11 +270,14 @@ document.getElementById("profileForm").addEventListener("submit",e=>{
   e.preventDefault();
   let uid = auth.currentUser.uid;
   set(ref(db,"members/"+uid+"/profile"),{
-    name: e.target[0].value,
-    phone: e.target[1].value
+    name: pname.value,
+    phone: pphone.value,
+    id: pid.value,
+    year: pyear.value,
+    dob: pdob.value
   });
-  document.getElementById("successPopup").style.display="block";
-  setTimeout(()=>{document.getElementById("successPopup").style.display="none";},3000);
+  successPopup.style.display="block";
+  setTimeout(()=>{successPopup.style.display="none";},3000);
 });
 
 // Menu toggle
@@ -276,11 +285,10 @@ function toggleMenu(){
   let menu = document.getElementById("menu");
   menu.style.display = menu.style.display==="flex"?"none":"flex";
 }
+function closeMenu(){ document.getElementById("menu").style.display="none"; }
 
 // Logout
-function logout(){
-  signOut(auth);
-}
+function logout(){ signOut(auth); }
 
 // Auto logout
 let timer;
