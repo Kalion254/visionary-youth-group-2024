@@ -264,7 +264,7 @@
         <!-- TERMS -->
         <h3>TERMS &amp; CONDITIONS — Applicant Commitment</h3>
         <textarea name="terms" readonly>
-Please read the full terms on the system: you must have 6 consecutive months savings, savings cover a third of guarantorship, loans above Ksh 1,000,000 require bank statements, school fees loan evidence required, cancellations fee may apply, CRB checks permitted.
+Please read the full terms on the system: you must have 6 consecutive months savings, savings cover a third of guarantorship, loans above Ksh 10,000 require bank statements, school fees loan evidence required, cancellations fee may apply, CRB checks permitted.
         </textarea>
 
         <div style="margin-top:12px;display:flex;gap:10px;align-items:center">
@@ -404,7 +404,7 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     const sharesRef = ref(db, `members/${currentUid}/shares/total`);
     const dividendsRef = ref(db, `members/${currentUid}/shares/dividends`);
     const unpaidRef = ref(db, `members/${currentUid}/unpaidBalances`);
-    const loansRef = ref(db, `members/${currentUid}/loans/summary`);
+    const loansRef = ref(db, `members/${currentUid}/loans/totals`);
 
     // helper to display either single number or sum of child amounts
     async function snapToAmount(snap){
