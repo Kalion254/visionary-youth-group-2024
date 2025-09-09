@@ -1,420 +1,250 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Visionary Youth Group — Landing</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VISIONARY YOUTH GROUP 2024</title>
 
-  <!-- Fonts & Icons -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+<!-- Fonts & Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-  <style>
-    :root{
-      --brand:#002147; /* deep blue */
-      --accent:#ffcc00; /* golden */
-      --muted:#f4f6f9;
-      --card:#ffffff;
-      --glass: rgba(255,255,255,0.06);
-    }
-    *{box-sizing:border-box}
-    body{font-family:'Poppins',system-ui,Arial,sans-serif;margin:0;background:linear-gradient(180deg,#f5f7fb 0%, #eef2f7 100%);color:#222}
+<!-- AOS Animations -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
 
-    /* NAVBAR */
-    nav{position:fixed;top:0;left:0;right:0;height:64px;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 20px;z-index:1200;box-shadow:0 4px 18px rgba(2,17,34,0.25)}
-    nav .brand{display:flex;align-items:center;gap:12px}
-    nav .brand img{height:40px;width:40px;border-radius:8px;object-fit:cover}
-    nav .brand h1{font-size:18px;margin:0;font-weight:700}
-    nav .links{display:flex;gap:18px;align-items:center}
-    nav .links a{color:#fff;text-decoration:none;font-weight:600;opacity:0.95}
-    nav .cta{background:var(--accent);color:#000;padding:8px 12px;border-radius:8px;font-weight:700;text-decoration:none}
+<style>
+body { margin: 0; font-family: 'Poppins', sans-serif; background: #f0f2f5; color: #333; }
+nav { position: fixed; top: 0; width: 100%; background: rgba(0,0,0,0.75); display: flex; justify-content: center; padding: 12px; z-index: 10; backdrop-filter: blur(8px); }
+nav a { color: white; margin: 0 15px; text-decoration: none; font-weight: 600; transition: 0.3s; }
+nav a:hover { color: #ffcc00; }
 
-    /* LAYOUT */
-    .layout{display:grid;grid-template-columns:260px 1fr;gap:20px;padding:90px 30px 40px}
+/* Slideshow */
+header { position: relative; height: 100vh; overflow: hidden; }
+.slideshow { position: absolute; top:0; left:0; width: 100%; height: 100%; }
+.slideshow img { position: absolute; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 1.5s ease-in-out; }
+.slideshow img.active { opacity:1; }
+header .content { position: relative; z-index:2; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: white; background: rgba(0,0,0,0.45); padding: 0 20px; }
+header h1 { font-size: 3rem; margin: 0; color: #ffcc00; text-shadow: 2px 2px 6px #000; }
+header p { font-size: 1.2rem; margin-top: 15px; text-shadow: 1px 1px 3px #000; }
+.hero-btn { background: #333; color: #ffcc00; padding: 15px 25px; border: none; border-radius: 8px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: 0.3s; margin-top: 20px; }
+.hero-btn:hover { background: #555; color: #ff6600; transform: scale(1.05); }
 
-    /* SIDEBAR */
-    .sidebar{background:var(--card);border-radius:12px;padding:18px;box-shadow:0 6px 20px rgba(16,24,40,0.06);min-height:300px}
-    .sidebar h3{margin:0 0 12px;color:var(--brand)}
-    .sidebar a{display:flex;gap:10px;align-items:center;padding:10px;border-radius:8px;text-decoration:none;color:#222;margin-bottom:8px}
-    .sidebar a:hover{background:linear-gradient(90deg,var(--muted),#fff)}
-    .sidebar .dashBtn{display:block;margin-top:14px;background:var(--brand);color:#fff;padding:10px;text-align:center;border-radius:8px;text-decoration:none;font-weight:700}
+section { padding: 60px 20px; max-width: 1100px; margin: 40px auto; background: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+h2 { color: #007bff; margin-bottom: 25px; text-align:center; }
 
-    /* MAIN */
-    .main{min-height:100vh}
-    .hero{position:relative;border-radius:14px;overflow:hidden;display:flex;align-items:center;justify-content:center;min-height:420px}
-    .hero .slides{position:absolute;inset:0}
-    .hero img{width:100%;height:420px;object-fit:cover;display:block;filter:brightness(.55);transition:opacity 1s ease}
-    .hero .heroInner{position:relative;z-index:5;color:#fff;text-align:center;padding:80px 20px}
-    .hero h2{font-size:34px;margin:0;color:var(--accent);text-shadow:0 4px 18px rgba(0,0,0,0.45)}
-    .hero p{margin-top:12px;font-size:16px;max-width:760px;margin-left:auto;margin-right:auto}
-    .hero .heroActions{margin-top:22px;display:flex;gap:12px;justify-content:center}
-    .btn{display:inline-block;padding:10px 16px;border-radius:8px;text-decoration:none;font-weight:700}
-    .btn-primary{background:var(--accent);color:#000}
-    .btn-outline{background:transparent;border:2px solid rgba(255,255,255,0.18);color:#fff}
+.benefits, .programs, .news, .objectives, .gallery, .partners, .testimonials { display: grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap: 25px; }
+.benefit, .card, .objective, .gallery-item, .testimonial { background: #f9f9f9; padding: 25px; border-radius: 12px; text-align:center; transition: transform 0.3s, box-shadow 0.3s; }
+.benefit:hover, .card:hover, .objective:hover, .gallery-item:hover, .testimonial:hover { transform: scale(1.05); box-shadow: 0 4px 14px rgba(0,0,0,0.15); }
+.benefit i, .card i, .objective i { font-size: 40px; color:#ffcc00; margin-bottom:10px; }
 
-    /* TILES */
-    .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-top:20px}
-    .tile{background:var(--card);padding:18px;border-radius:12px;box-shadow:0 6px 16px rgba(6,24,44,0.06);display:flex;flex-direction:column;gap:10px}
-    .tile i{font-size:28px;color:var(--brand)}
-    .metrics{display:flex;gap:10px;align-items:center}
-    .metricBox{flex:1;padding:12px;border-radius:10px;background:linear-gradient(180deg,var(--muted),#fff);text-align:center}
+#contact p i { margin-right:8px; color:#007bff; }
+.social-icons a { margin:0 10px; font-size:24px; color:#007bff; transition:0.3s; }
+.social-icons a:hover { color:#ff6600; transform: rotate(15deg) scale(1.2); }
 
-    /* SECTIONS */
-    section{margin-top:26px}
-    section .cardGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
-    .card{background:var(--card);padding:18px;border-radius:12px;box-shadow:0 8px 20px rgba(6,24,44,0.06)}
+form { background: #f9f9f9; padding: 25px; border-radius:12px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); margin-top: 20px; }
+form input { display:block; width:100%; margin:10px 0; padding:10px; border-radius:8px; border:1px solid #ccc; }
+form button { background: #333; color: #ffcc00; padding: 10px 20px; border:none; border-radius:8px; cursor:pointer; transition:0.3s; }
+form button:hover { background: #555; color:#ff6600; transform: scale(1.05); }
 
-    /* NEWS */
-    .news .item{display:flex;flex-direction:column;gap:8px}
-    .news img{width:100%;height:140px;object-fit:cover;border-radius:8px}
-
-    /* GALLERY */
-    .gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-    .gallery img{width:100%;height:120px;object-fit:cover;border-radius:8px}
-
-    /* TESTIMONIALS */
-    .testimonials{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
-    .testimonial{padding:16px;border-radius:10px;background:linear-gradient(180deg,#fff,var(--muted));}
-
-    /* FORMS */
-    form{display:flex;flex-direction:column;gap:8px}
-    input,textarea{padding:10px;border-radius:8px;border:1px solid #d6dbe6}
-    .formRow{display:flex;gap:8px}
-    .formRow input{flex:1}
-
-    /* FOOTER */
-    footer{margin-top:40px;padding:26px;text-align:center;background:linear-gradient(180deg,var(--brand),#003a6b);color:#fff;border-radius:10px;margin:30px}
-
-    /* small screens */
-    @media (max-width:980px){
-      .layout{grid-template-columns:1fr;padding:100px 18px 20px}
-      .sidebar{display:flex;gap:10px;overflow:auto;min-height:auto;padding:12px}
-      .gallery{grid-template-columns:repeat(2,1fr)}
-    }
-
-    /* Subtle animations */
-    .fadeInUp{animation:fadeUp .8s ease both}
-    @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-
-  </style>
+footer { text-align:center; padding:20px; background:#333; color:white; margin-top:40px; border-radius:12px; font-size: 0.9rem; }
+</style>
 </head>
+
 <body>
 
-<nav data-aos="fade-down">
-  <div class="brand"><img src="https://images.unsplash.com/photo-1520975919743-5b3c9c5aeb0d?q=80&w=200&auto=format&fit=crop&crop=faces" alt="logo"><h1>Visionary Youth Group</h1></div>
-  <div class="links">
-    <a href="#about">About</a>
-    <a href="#programs">Programs</a>
-    <a href="#news">News</a>
-    <a href="#gallery">Gallery</a>
-    <a href="#contact">Contact</a>
-    <a class="cta" href="#auth">Join / Login</a>
-  </div>
+<nav>
+<a href="#about"><i class="fas fa-info-circle"></i> About</a>
+<a href="#benefits"><i class="fas fa-gift"></i> Benefits</a>
+<a href="#programs"><i class="fas fa-tasks"></i> Programs</a>
+<a href="#objectives"><i class="fas fa-bullseye"></i> Objectives</a>
+<a href="#news"><i class="fas fa-newspaper"></i> News</a>
+<a href="#gallery"><i class="fas fa-image"></i> Gallery</a>
+<a href="#contact"><i class="fas fa-envelope"></i> Contact</a>
+<a href="#auth"><i class="fas fa-user-plus"></i> Join</a>
 </nav>
 
-<div class="layout">
-  <!-- SIDEBAR -->
-  <aside class="sidebar" data-aos="fade-right">
-    <h3>Quick Links</h3>
-    <a href="#about"><i class="fas fa-info-circle"></i> About Us</a>
-    <a href="#mission"><i class="fas fa-bullseye"></i> Mission & Vision</a>
-    <a href="#benefits"><i class="fas fa-gift"></i> Benefits</a>
-    <a href="#programs"><i class="fas fa-briefcase"></i> Programs</a>
-    <a href="#news"><i class="fas fa-newspaper"></i> News</a>
-    <a href="#gallery"><i class="fas fa-images"></i> Gallery</a>
-    <hr style="margin:12px 0;border:none;border-top:1px solid #eef2f7">
-    <a class="dashBtn" href="dashboard.html">Member Dashboard</a>
-    <div style="margin-top:14px;font-size:13px;color:#667085">Contact: +254 741 453336<br>Email: info@visionaryyouth.org</div>
-  </aside>
-
-  <!-- MAIN -->
-  <main class="main">
-    <!-- HERO -->
-    <div class="hero" id="top">
-      <div class="slides" aria-hidden="true">
-        <img src="https://images.unsplash.com/photo-1592496001027-f03f348c2c7c?auto=format&fit=crop&w=1600&q=80" class="slide" style="opacity:1">
-        <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=1600&q=80" class="slide" style="opacity:0">
-        <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1600&q=80" class="slide" style="opacity:0">
-      </div>
-
-      <div class="heroInner" data-aos="zoom-in">
-        <h2>Empowering Youth Through Financial Literacy & Collective Growth</h2>
-        <p>Join a community that saves, lends, invests and uplifts — transparent, accountable and member-driven.</p>
-        <div class="heroActions">
-          <a class="btn btn-primary" href="#auth">Get Started</a>
-          <a class="btn btn-outline" href="#news">Latest News</a>
-        </div>
-
-        <div class="tiles" style="margin-top:28px;max-width:1000px;margin-left:auto;margin-right:auto">
-          <div class="tile" data-aos="fade-up"><i class="fas fa-users"></i><div><strong>Members</strong><div style="font-size:14px;color:#6b7280;margin-top:6px">200+ active</div></div></div>
-          <div class="tile" data-aos="fade-up" data-aos-delay="80"><i class="fas fa-piggy-bank"></i><div><strong>Total Savings</strong><div style="font-size:14px;color:#6b7280;margin-top:6px">KES 1,500,000+</div></div></div>
-          <div class="tile" data-aos="fade-up" data-aos-delay="160"><i class="fas fa-hand-holding-usd"></i><div><strong>Loans Disbursed</strong><div style="font-size:14px;color:#6b7280;margin-top:6px">KES 800,000+</div></div></div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- ABOUT -->
-    <section id="about" data-aos="fade-up" class="fadeInUp">
-      <h2>About Visionary Youth Group</h2>
-      <p style="text-align:center;max-width:920px;margin:0 auto;color:#475569">Visionary Youth Group is a member-driven financial community that provides savings plans, access to affordable loans, group investments and financial literacy programs for young people. We prioritize transparency, governance and measurable impact.</p>
-
-      <div style="margin-top:18px;display:grid;grid-template-columns:1fr 1fr;gap:18px">
-        <div class="card" data-aos="fade-right">
-          <h3>Our Mission</h3>
-          <p>To empower youth economically through consistent savings, access to fair credit, and group investments that build generational wealth.</p>
-        </div>
-        <div class="card" data-aos="fade-left">
-          <h3>Our Vision</h3>
-          <p>To be a leading youth-owned financial cooperative renowned for trust, growth and social impact.</p>
-        </div>
-      </div>
-
-    </section>
-
-    <!-- BENEFITS -->
-    <section id="benefits" data-aos="fade-up">
-      <h2>Why Join Us</h2>
-      <div class="cardGrid benefits">
-        <div class="card"><i class="fas fa-wallet"></i><h3>Savings Plans</h3><p>Weekly and monthly buckets that suit your cashflow.</p></div>
-        <div class="card"><i class="fas fa-hand-holding-usd"></i><h3>Affordable Loans</h3><p>Short-term loans to help members in emergencies and small business needs.</p></div>
-        <div class="card"><i class="fas fa-chart-line"></i><h3>Group Investments</h3><p>Collective projects to grow member funds and share profits.</p></div>
-        <div class="card"><i class="fas fa-graduation-cap"></i><h3>Training & Workshops</h3><p>Financial literacy courses and entrepreneurship workshops.</p></div>
-      </div>
-    </section>
-
-    <!-- PROGRAMS -->
-    <section id="programs" data-aos="fade-up">
-      <h2>Programs & Activities</h2>
-      <div class="cardGrid">
-        <div class="card"><h3>Savings Groups</h3><p>Peer-led savings circles with transparent bookkeeping and regular audits.</p></div>
-        <div class="card"><h3>Business Incubator</h3><p>Support for member-led businesses with mentorship and seed funding.</p></div>
-        <div class="card"><h3>Community Outreach</h3><p>Projects that reinvest in local communities for social good.</p></div>
-      </div>
-    </section>
-
-    <!-- NEWS -->
-    <section id="news" data-aos="fade-up">
-      <h2>News & Announcements</h2>
-      <div class="cardGrid news">
-        <div class="card item">
-          <img src="https://images.unsplash.com/photo-1520975919743-5b3c9c5aeb0d?auto=format&fit=crop&w=800&q=60" alt="news">
-          <h4>AGM 2025 Date Announced</h4>
-          <p>Annual General Meeting scheduled for March 20, 2025. All members invited to attend and vote.</p>
-        </div>
-        <div class="card item">
-          <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=800&q=60" alt="news">
-          <h4>Dividend Payouts</h4>
-          <p>Dividends for FY2024 have been calculated and will be credited to member accounts next week.</p>
-        </div>
-        <div class="card item">
-          <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=800&q=60" alt="news">
-          <h4>Financial Literacy Bootcamp</h4>
-          <p>Free workshop for members: budgeting, digital payments and micro-investing.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- GALLERY -->
-    <section id="gallery" data-aos="fade-up">
-      <h2>Gallery</h2>
-      <div class="gallery">
-        <img src="https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?auto=format&fit=crop&w=800&q=60" alt="pic">
-        <img src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=60" alt="pic">
-        <img src="https://images.unsplash.com/photo-1515165562835-c7b4a2b3d5d6?auto=format&fit=crop&w=800&q=60" alt="pic">
-        <img src="https://images.unsplash.com/photo-1542223616-2f6d2b3a0f14?auto=format&fit=crop&w=800&q=60" alt="pic">
-        <img src="https://images.unsplash.com/photo-1531058020387-3be344556be6?auto=format&fit=crop&w=800&q=60" alt="pic">
-        <img src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=800&q=60" alt="pic">
-      </div>
-    </section>
-
-    <!-- TESTIMONIALS -->
-    <section id="testimonials" data-aos="fade-up">
-      <h2>Member Stories</h2>
-      <div class="testimonials">
-        <div class="testimonial card">
-          <p>“Joining Visionary Youth changed how I save. I accessed a small loan that helped grow my kiosk — the support is real.”</p>
-          <strong>— Mary W.</strong>
-        </div>
-        <div class="testimonial card">
-          <p>“The mentorship program helped my startup find customers and manage cash. Highly recommended.”</p>
-          <strong>— Kevin O.</strong>
-        </div>
-        <div class="testimonial card">
-          <p>“Transparent accounting and regular reports keep us confident with our contributions.”</p>
-          <strong>— James K.</strong>
-        </div>
-      </div>
-    </section>
-
-    <!-- PARTNERS -->
-    <section id="partners" data-aos="fade-up">
-      <h2>Partners & Supporters</h2>
-      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
-        <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=300&q=60" alt="p1" style="height:56px;object-fit:contain">
-        <img src="https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=300&q=60" alt="p2" style="height:56px;object-fit:contain">
-        <img src="https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=300&q=60" alt="p3" style="height:56px;object-fit:contain">
-      </div>
-    </section>
-
-    <!-- CONTACT -->
-    <section id="contact" data-aos="fade-up">
-      <h2>Contact Us</h2>
-      <div style="display:flex;gap:20px;flex-wrap:wrap">
-        <div style="flex:1;min-width:260px" class="card">
-          <h4>Office</h4>
-          <p>Nairobi, Kenya<br>PO Box 12345 — 00100</p>
-          <p><i class="fas fa-phone"></i> +254 741 453336</p>
-          <p><i class="fas fa-envelope"></i> info@visionaryyouth.org</p>
-        </div>
-        <div style="flex:1;min-width:260px" class="card">
-          <h4>Send us a message</h4>
-          <form id="contactForm">
-            <input id="msgName" placeholder="Full name" required />
-            <input id="msgEmail" placeholder="Email" required />
-            <textarea id="msgText" rows="4" placeholder="Message" required></textarea>
-            <button type="button" id="sendMsg">Send</button>
-          </form>
-        </div>
-      </div>
-    </section>
-
-    <!-- AUTH -->
-    <section id="auth" data-aos="fade-up">
-      <h2>Join / Login</h2>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
-        <!-- signup -->
-        <div class="card">
-          <h3>Create an account</h3>
-          <form id="signupForm">
-            <input type="text" id="signupName" placeholder="Full Name" required />
-            <div class="formRow">
-              <input type="text" id="signupPhone" placeholder="Phone Number" required />
-              <input type="text" id="signupId" placeholder="ID Number" required />
-            </div>
-            <input type="text" id="signupOrigin" placeholder="Place of Origin" required />
-            <input type="email" id="signupEmail" placeholder="Email" required />
-            <input type="password" id="signupPassword" placeholder="Password (min 6 chars)" required />
-            <button type="button" id="signupBtn">Sign Up</button>
-          </form>
-        </div>
-
-        <!-- login -->
-        <div class="card">
-          <h3>Member Login</h3>
-          <form id="loginForm">
-            <input type="email" id="loginEmail" placeholder="Email" required />
-            <input type="password" id="loginPassword" placeholder="Password" required />
-            <button type="button" id="loginBtn">Login</button>
-            <button type="button" id="resetPasswordBtn" style="margin-top:8px;background:transparent;border:1px dashed #d1d5db;color:var(--brand)">Forgot Password?</button>
-          </form>
-        </div>
-      </div>
-    </section>
-
-    <footer data-aos="fade-up">
-      <div style="max-width:980px;margin:0 auto">
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
-          <div>
-            <strong>Visionary Youth Group</strong><div style="font-size:13px;margin-top:6px">P.O Box 12345 • Nairobi, Kenya</div>
-          </div>
-          <div style="font-size:13px">Email: info@visionaryyouth.org • Phone: +254 741 453336</div>
-        </div>
-        <div style="margin-top:12px;color:rgba(255,255,255,0.9);font-size:13px">© 2024 Visionary Youth Group. All rights reserved.</div>
-      </div>
-    </footer>
-
-  </main>
+<header data-aos="fade-down">
+<div class="slideshow">
+    <img src="https://images.unsplash.com/photo-1556155092-490a1ba16284?auto=format&fit=crop&w=1600&q=80" class="active" alt="Empowerment 1">
+    <img src="https://images.unsplash.com/photo-1551836022-4c4c79ecde51?auto=format&fit=crop&w=1600&q=80" alt="Empowerment 2">
+    <img src="https://images.unsplash.com/photo-1581092334394-8f19f1a7a3c8?auto=format&fit=crop&w=1600&q=80" alt="Empowerment 3">
 </div>
+<div class="content">
+<h1>VISIONARY YOUTH GROUP 2024</h1>
+<p>Empowering Youth Through Financial Literacy, Entrepreneurship & Community Impact</p>
+<button class="hero-btn" onclick="document.getElementById('auth').scrollIntoView({behavior:'smooth'})">Join Us Today</button>
+</div>
+</header>
 
-<!-- SCRIPTS: Firebase + behaviour -->
+<section id="about" data-aos="fade-up">
+<h2>About Us</h2>
+<p>VISIONARY YOUTH GROUP 2024 empowers young people through financial literacy, entrepreneurship, and community service. We foster leadership, accountability, and growth among youth to positively impact society.</p>
+</section>
+
+<section id="benefits" data-aos="fade-up">
+<h2>Benefits</h2>
+<div class="benefits">
+<div class="benefit"><i class="fas fa-wallet"></i><h3>Savings</h3><p>Secure and track your savings easily.</p></div>
+<div class="benefit"><i class="fas fa-hand-holding-usd"></i><h3>Loans</h3><p>Apply and manage loans transparently.</p></div>
+<div class="benefit"><i class="fas fa-users"></i><h3>Networking</h3><p>Connect with youth members and leaders.</p></div>
+<div class="benefit"><i class="fas fa-chart-line"></i><h3>Reports</h3><p>Monitor your financial progress and statements.</p></div>
+<div class="benefit"><i class="fas fa-share-alt"></i><h3>Shares</h3><p>Participate in group shares and investments.</p></div>
+</div>
+</section>
+
+<section id="programs" data-aos="fade-up">
+<h2>Programs</h2>
+<div class="programs">
+<div class="card"><i class="fas fa-graduation-cap"></i><h3>Workshops</h3><p>Financial literacy and entrepreneurship workshops for youth growth.</p></div>
+<div class="card"><i class="fas fa-briefcase"></i><h3>Mentorship</h3><p>One-on-one mentoring sessions with experienced professionals.</p></div>
+<div class="card"><i class="fas fa-hands-helping"></i><h3>Community Service</h3><p>Engage in meaningful community impact projects.</p></div>
+</div>
+</section>
+
+<section id="objectives" data-aos="fade-up">
+<h2>Our Mission & Objectives</h2>
+<div class="objectives">
+<div class="objective"><i class="fas fa-lightbulb"></i><h3>Mission</h3><p>To nurture financially empowered youth who lead positive change in society.</p></div>
+<div class="objective"><i class="fas fa-eye"></i><h3>Vision</h3><p>A future where youth drive sustainable economic and social development.</p></div>
+<div class="objective"><i class="fas fa-bullseye"></i><h3>Objectives</h3><p>Encourage saving culture, provide loans, promote financial education, and support entrepreneurship.</p></div>
+</div>
+</section>
+
+<section id="news" data-aos="fade-up">
+<h2>News & Updates</h2>
+<div class="news">
+<div class="card"><i class="fas fa-newspaper"></i><h3>Monthly Newsletter</h3><p>Stay informed with latest events, achievements, and news.</p></div>
+<div class="card"><i class="fas fa-bullhorn"></i><h3>Announcements</h3><p>Important updates and notifications for members.</p></div>
+</div>
+</section>
+
+<section id="gallery" data-aos="fade-up">
+<h2>Gallery</h2>
+<div class="gallery">
+<div class="gallery-item"><img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=600&q=80" alt="Gallery 1" style="width:100%; border-radius:8px;"></div>
+<div class="gallery-item"><img src="https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=600&q=80" alt="Gallery 2" style="width:100%; border-radius:8px;"></div>
+<div class="gallery-item"><img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=600&q=80" alt="Gallery 3" style="width:100%; border-radius:8px;"></div>
+</div>
+</section>
+
+<section id="contact" data-aos="fade-up">
+<h2>Contact Us</h2>
+<p><i class="fas fa-map-marker-alt"></i> Nairobi, Kenya</p>
+<p><i class="fas fa-phone"></i> +254 741453336</p>
+<p><i class="fas fa-envelope"></i> visionaryyouth32@gmail.com</p>
+<div class="social-icons">
+<a href="#"><i class="fab fa-facebook"></i></a>
+<a href="#"><i class="fab fa-twitter"></i></a>
+<a href="#"><i class="fab fa-instagram"></i></a>
+<a href="#"><i class="fab fa-linkedin"></i></a>
+</div>
+</section>
+
+<section id="auth" data-aos="fade-up">
+<h2>Join Our Community</h2>
+<p><strong>All fields are required. Sign up below.</strong></p>
+
+<form id="signupForm">
+<input type="text" id="signupName" placeholder="Full Name" required>
+<input type="text" id="signupPhone" placeholder="Phone Number" required>
+<input type="text" id="signupId" placeholder="ID Number" required>
+<input type="text" id="signupOrigin" placeholder="Place of Origin" required>
+<input type="email" id="signupEmail" placeholder="Email" required>
+<input type="password" id="signupPassword" placeholder="Password" required>
+<button type="button" id="signupBtn">Sign Up</button>
+</form>
+
+<h3>Already a member?</h3>
+<form id="loginForm">
+<input type="email" id="loginEmail" placeholder="Email" required>
+<input type="password" id="loginPassword" placeholder="Password" required>
+<button type="button" id="loginBtn">Login</button>
+<button type="button" id="resetPasswordBtn">Forgot Password?</button>
+</form>
+</section>
+
+<footer data-aos="fade-up">
+<p><strong>Visionary Youth Group</strong> | P.O Box 254-00100 – Nairobi, Kenya</p>
+<p>Email: visionaryyouthgroup32.gmail.com | Phone: +254 741 453336</p>
+<p>© 2024 VISIONARY YOUTH GROUP. All Rights Reserved.</p>
+</footer>
+
+<!-- Firebase & Slideshow -->
 <script type="module">
-  // Firebase web v9 (modular) imports
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-  import { getFirestore, setDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+import { getFirestore, setDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
-    authDomain: "visionary-youth-grou-2024.firebaseapp.com",
-    projectId: "visionary-youth-grou-2024",
-    storageBucket: "visionary-youth-grou-2024.appspot.com",
-    messagingSenderId: "372978592717",
-    appId: "1:372978592717:web:1c15aec728ee5f854f3284",
-    measurementId: "G-QP1RBT2ZCP"
-  };
+const firebaseConfig = {
+  apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
+  authDomain: "visionary-youth-grou-2024.firebaseapp.com",
+  projectId: "visionary-youth-grou-2024",
+  storageBucket: "visionary-youth-grou-2024.appspot.com",
+  messagingSenderId: "372978592717",
+  appId: "1:372978592717:web:1c15aec728ee5f854f3284",
+  measurementId: "G-QP1RBT2ZCP"
+};
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-  // SIGNUP
-  document.getElementById('signupBtn').addEventListener('click', async () => {
+// SIGNUP
+const signupBtn = document.getElementById('signupBtn');
+signupBtn.addEventListener('click', async () => {
     const signupInfo = {
-      name: document.getElementById('signupName').value.trim(),
-      phone: document.getElementById('signupPhone').value.trim(),
-      id: document.getElementById('signupId').value.trim(),
-      origin: document.getElementById('signupOrigin').value.trim(),
-      email: document.getElementById('signupEmail').value.trim(),
-      password: document.getElementById('signupPassword').value
+        name: document.getElementById('signupName').value,
+        phone: document.getElementById('signupPhone').value,
+        id: document.getElementById('signupId').value,
+        origin: document.getElementById('signupOrigin').value,
+        email: document.getElementById('signupEmail').value,
+        password: document.getElementById('signupPassword').value
     };
-    if(!signupInfo.name || !signupInfo.email || signupInfo.password.length < 6){ alert('Complete required fields and ensure password is at least 6 characters'); return; }
-    try{
-      const userCredential = await createUserWithEmailAndPassword(auth, signupInfo.email, signupInfo.password);
-      await setDoc(doc(db, 'members', userCredential.user.uid), {
-        name: signupInfo.name,
-        phone: signupInfo.phone,
-        id: signupInfo.id,
-        origin: signupInfo.origin,
-        email: signupInfo.email,
-        createdAt: serverTimestamp()
-      });
-      alert('Signup successful — please login');
-      document.getElementById('signupForm').reset();
-    } catch(err){ console.error(err); alert('Signup failed: '+err.message); }
-  });
+    try {
+        const userCredential = await createUserWithEmailAndPassword(auth, signupInfo.email, signupInfo.password);
+        await setDoc(doc(db, "members", userCredential.user.uid), {
+            name: signupInfo.name,
+            phone: signupInfo.phone,
+            id: signupInfo.id,
+            origin: signupInfo.origin,
+            email: signupInfo.email,
+            createdAt: serverTimestamp()
+        });
+        alert("Signup successful! Please login.");
+        document.getElementById('signupForm').reset();
+    } catch(err) { alert("Signup failed: "+err.message); }
+});
 
-  // LOGIN
-  document.getElementById('loginBtn').addEventListener('click', async () => {
-    const email = document.getElementById('loginEmail').value.trim();
+// LOGIN
+const loginBtn = document.getElementById('loginBtn');
+loginBtn.addEventListener('click', async () => {
+    const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
-    try{
-      await signInWithEmailAndPassword(auth, email, password);
-      // on success redirect
-      window.location.href = 'dashboard.html';
-    } catch(err){ console.error(err); alert('Login failed: '+err.message); }
-  });
+    try {
+        await signInWithEmailAndPassword(auth,email,password);
+        window.location.href="dashboard.html"; // redirect after login
+    } catch(err){ alert("Login failed: "+err.message);}
+});
 
-  // RESET PASSWORD
-  document.getElementById('resetPasswordBtn').addEventListener('click', async () => {
-    const email = document.getElementById('loginEmail').value.trim();
-    if(!email){ alert('Enter your email to reset password'); return; }
-    try{ await sendPasswordResetEmail(auth, email); alert('Password reset email sent'); }
-    catch(err){ console.error(err); alert('Error: '+err.message); }
-  });
+// RESET PASSWORD
+const resetPasswordBtn = document.getElementById('resetPasswordBtn');
+resetPasswordBtn.addEventListener('click', async () => {
+    const email = document.getElementById('loginEmail').value;
+    if(!email){ alert("Enter your email to reset password"); return; }
+    try { await sendPasswordResetEmail(auth,email); alert("Password reset email sent!"); }
+    catch(err){ alert("Error: "+err.message); }
+});
 
-  // Contact message (no backend) — simple local experience
-  document.getElementById('sendMsg').addEventListener('click', ()=>{
-    const n=document.getElementById('msgName').value.trim();
-    const e=document.getElementById('msgEmail').value.trim();
-    const t=document.getElementById('msgText').value.trim();
-    if(!n||!e||!t){ alert('Please complete the contact form'); return; }
-    alert('Thanks '+n+' — your message was received (this demo does not send emails).');
-    document.getElementById('contactForm').reset();
-  });
-
-  // HERO SLIDES simple rotation
-  window.addEventListener('load', ()=>{
-    const slides = Array.from(document.querySelectorAll('.hero .slide'));
-    let idx=0; setInterval(()=>{
-      slides[idx].style.opacity='0'; idx=(idx+1)%slides.length; slides[idx].style.opacity='1';
-    },5000);
-  });
-
+// Slideshow
+const slides = document.querySelectorAll('.slideshow img');
+let current = 0;
+setInterval(() => {
+    slides[current].classList.remove('active');
+    current = (current + 1) % slides.length;
+    slides[current].classList.add('active');
+}, 5000);
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
-<script>AOS.init({duration:900,once:true});</script>
-</body>
-</html>
+<script>
+AOS.init
