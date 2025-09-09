@@ -15,30 +15,71 @@
 
   <style>
     body {margin:0;font-family:'Poppins',sans-serif;background:#f0f2f5;color:#333;}
-    nav {position:fixed;top:0;left:0;width:100%;background:#004d26;color:white;display:flex;justify-content:space-between;align-items:center;padding:12px 30px;z-index:1000;}
-    nav img{height:45px;}
-    nav ul{display:flex;gap:20px;list-style:none;margin:0;padding:0;}
-    nav ul li a{color:white;text-decoration:none;font-weight:600;transition:0.3s;}
-    nav ul li a:hover{color:#ffcc00;}
-    .slideshow{margin-top:70px;position:relative;height:500px;overflow:hidden;}
-    .slides{display:flex;width:300%;animation:slide 15s infinite;}
-    .slides img{width:100%;object-fit:cover;}
-    @keyframes slide{0%{transform:translateX(0);}33%{transform:translateX(-100%);}66%{transform:translateX(-200%);}100%{transform:translateX(0);}}
-    section{background:#fff;border-radius:12px;margin:40px auto;padding:40px;width:90%;max-width:1200px;box-shadow:0 2px 12px rgba(0,0,0,0.1);}
-    h2{text-align:center;color:#004d26;margin-bottom:20px;}
-    .grid{display:grid;gap:20px;}
-    .grid-3{grid-template-columns:repeat(auto-fit,minmax(280px,1fr));}
-    .card{background:#f9f9f9;padding:20px;text-align:center;border-radius:12px;transition:transform 0.3s;}
-    .card:hover{transform:scale(1.05);}
-    .card i{font-size:36px;color:#ffcc00;margin-bottom:10px;}
-    .auth-box{display:flex;gap:40px;flex-wrap:wrap;justify-content:center;}
-    .form-box{background:white;padding:30px;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.2);width:100%;max-width:400px;text-align:center;}
-    .form-box img{height:60px;margin-bottom:15px;}
-    .form-box input{width:100%;padding:12px;margin:8px 0;border:1px solid #ccc;border-radius:8px;}
-    .form-box button{width:100%;padding:12px;background:#004d26;color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;transition:0.3s;}
-    .form-box button:hover{background:#007a3d;}
-    footer{background:#004d26;color:white;padding:30px;text-align:center;margin-top:50px;}
-    footer img{height:40px;display:block;margin:0 auto 10px;}
+
+    /* Navbar */
+    nav {
+      position:fixed;top:0;left:0;width:100%;
+      background:#004d26;color:white;
+      display:flex;justify-content:space-between;align-items:center;
+      padding:12px 30px;z-index:1000;
+    }
+    nav img {height:45px;}
+    nav ul {display:flex;gap:20px;list-style:none;margin:0;padding:0;}
+    nav ul li a {color:white;text-decoration:none;font-weight:600;transition:.3s;}
+    nav ul li a:hover {color:#ffcc00;}
+
+    /* Hero Slideshow */
+    .slideshow {margin-top:70px;position:relative;height:500px;overflow:hidden;}
+    .slideshow img {
+      position:absolute;top:0;left:0;width:100%;height:500px;
+      object-fit:cover;opacity:0;animation:fade 15s infinite;
+    }
+    .slideshow img:nth-child(1){animation-delay:0s;}
+    .slideshow img:nth-child(2){animation-delay:5s;}
+    .slideshow img:nth-child(3){animation-delay:10s;}
+    @keyframes fade {
+      0%{opacity:0;}10%{opacity:1;}30%{opacity:1;}40%{opacity:0;}100%{opacity:0;}
+    }
+
+    /* Sections */
+    section {
+      background:#fff;border-radius:12px;margin:40px auto;padding:40px;
+      width:90%;max-width:1200px;box-shadow:0 2px 12px rgba(0,0,0,0.1);
+    }
+    h2 {text-align:center;color:#004d26;margin-bottom:20px;}
+    .grid {display:grid;gap:20px;}
+    .grid-3 {grid-template-columns:repeat(auto-fit,minmax(280px,1fr));}
+    .card {
+      background:#f9f9f9;padding:20px;text-align:center;
+      border-radius:12px;transition:.3s;
+    }
+    .card:hover {transform:scale(1.05);}
+    .card i {font-size:36px;color:#ffcc00;margin-bottom:10px;}
+
+    /* Auth Section */
+    #auth {display:grid;grid-template-columns:1fr 1fr;gap:40px;}
+    #auth h3 {text-align:center;}
+    #auth input, #auth button {
+      width:100%;padding:12px;margin:8px 0;border:1px solid #ccc;
+      border-radius:8px;font-size:16px;
+    }
+    #auth button {
+      background:#004d26;color:white;font-weight:600;cursor:pointer;border:none;transition:.3s;
+    }
+    #auth button:hover {background:#ffcc00;color:#333;}
+    #auth .box {background:#f9f9f9;padding:20px;border-radius:12px;}
+
+    /* Contact form */
+    textarea {resize:none;}
+    #contact input, #contact textarea, #contact button {
+      width:100%;padding:12px;margin:8px 0;border:1px solid #ccc;border-radius:8px;
+    }
+    #contact button {background:#004d26;color:white;font-weight:600;cursor:pointer;}
+    #contact button:hover {background:#ffcc00;color:#333;}
+
+    /* Footer */
+    footer {background:#004d26;color:white;padding:30px;text-align:center;margin-top:50px;}
+    footer img {height:40px;display:block;margin:0 auto 10px;}
   </style>
 </head>
 <body>
@@ -52,45 +93,42 @@
     <li><a href="#benefits">Benefits</a></li>
     <li><a href="#news">News</a></li>
     <li><a href="#faq">FAQ</a></li>
-    <li><a href="#auth">Join / Login</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="#auth">Join</a></li>
   </ul>
 </nav>
 
 <!-- Hero Slideshow -->
 <div class="slideshow">
-  <div class="slides">
-    <img src="PHOTO_URL_1" alt="Empowering Youth">
-    <img src="PHOTO_URL_2" alt="Networking">
-    <img src="PHOTO_URL_3" alt="Community Finance">
-  </div>
+  <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0" alt="Youth Empowerment">
+  <img src="https://images.unsplash.com/photo-1507679799987-c73779587ccf" alt="Networking">
+  <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f" alt="Finance Growth">
 </div>
 
 <!-- About -->
 <section id="about" data-aos="fade-up">
   <h2>About Us</h2>
-  <p>
-    Visionary Youth Group is a financial empowerment movement driven by young people
-    with a vision for savings, investment, and community development.
-  </p>
+  <p>Visionary Youth Group is a financial empowerment movement driven by young people
+     with a vision for savings, investment, and community development.</p>
 </section>
 
 <!-- Programs -->
 <section id="programs" data-aos="fade-up">
   <h2>Our Programs</h2>
   <div class="grid grid-3">
-    <div class="card"><i class="fas fa-wallet"></i><h3>Savings Plans</h3><p>Flexible savings for education, emergencies, and investments.</p></div>
-    <div class="card"><i class="fas fa-hand-holding-usd"></i><h3>Loans</h3><p>Access affordable loans to boost your projects and businesses.</p></div>
-    <div class="card"><i class="fas fa-users"></i><h3>Mentorship</h3><p>Learn from peers and professionals through mentorship.</p></div>
+    <div class="card"><i class="fas fa-wallet"></i><h3>Savings Plans</h3><p>Flexible savings for education, emergencies, and future investments.</p></div>
+    <div class="card"><i class="fas fa-hand-holding-usd"></i><h3>Loans</h3><p>Affordable loans to boost your businesses and projects.</p></div>
+    <div class="card"><i class="fas fa-users"></i><h3>Mentorship</h3><p>Learn from peers and professionals through structured mentorship.</p></div>
   </div>
 </section>
 
 <!-- Benefits -->
 <section id="benefits" data-aos="fade-up">
-  <h2>Benefits</h2>
+  <h2>Member Benefits</h2>
   <div class="grid grid-3">
-    <div class="card"><i class="fas fa-chart-line"></i><h3>Financial Growth</h3><p>Grow your wealth through structured savings and investments.</p></div>
-    <div class="card"><i class="fas fa-handshake"></i><h3>Networking</h3><p>Connect with like-minded youth, entrepreneurs, and leaders.</p></div>
-    <div class="card"><i class="fas fa-lightbulb"></i><h3>Empowerment</h3><p>Gain skills, knowledge, and mentorship to unlock your potential.</p></div>
+    <div class="card"><i class="fas fa-piggy-bank"></i><h3>Financial Security</h3><p>Enjoy guaranteed savings growth and investment returns.</p></div>
+    <div class="card"><i class="fas fa-briefcase"></i><h3>Business Support</h3><p>Low-interest loans and financial training to scale ventures.</p></div>
+    <div class="card"><i class="fas fa-graduation-cap"></i><h3>Education</h3><p>Scholarships and bursaries for needy but bright students.</p></div>
   </div>
 </section>
 
@@ -100,25 +138,24 @@
   <div class="grid grid-3">
     <div class="card"><i class="fas fa-newspaper"></i><h3>Annual Report 2024</h3><p>Our annual financial performance and impact review.</p></div>
     <div class="card"><i class="fas fa-calendar-alt"></i><h3>Upcoming AGM</h3><p>Members will gather to elect new officials and review strategies.</p></div>
-    <div class="card"><i class="fas fa-bullhorn"></i><h3>Scholarship Program</h3><p>Bursaries for needy but bright students have been launched.</p></div>
+    <div class="card"><i class="fas fa-bullhorn"></i><h3>Scholarship Program</h3><p>We launched bursaries for needy but bright students.</p></div>
   </div>
 </section>
 
 <!-- FAQ -->
 <section id="faq" data-aos="fade-up">
-  <h2>FAQ</h2>
-  <p><b>How do I join?</b> Sign up via our member portal below.</p>
+  <h2>Frequently Asked Questions</h2>
+  <p><b>How do I join?</b> Sign up via our member portal and complete your registration.</p>
   <p><b>What is the minimum contribution?</b> Each member contributes a monthly minimum of Ksh 500.</p>
-  <p><b>How can I track balances?</b> Through your personal dashboard after login.</p>
+  <p><b>How can I track my balances?</b> Access your personal dashboard with real-time balances.</p>
 </section>
 
-<!-- Authentication -->
+<!-- Auth -->
 <section id="auth" data-aos="fade-up">
-  <h2>Join or Login</h2>
-  <div class="auth-box">
-    <!-- Sign Up -->
-    <div class="form-box">
-      <img src="LOGO_URL" alt="Logo">
+  <h2>Join Our Community</h2>
+  <div id="auth">
+    <!-- Signup -->
+    <div class="box">
       <h3>Sign Up</h3>
       <input type="text" id="signupName" placeholder="Full Name" required>
       <input type="text" id="signupPhone" placeholder="Phone Number" required>
@@ -130,14 +167,24 @@
     </div>
 
     <!-- Login -->
-    <div class="form-box">
-      <img src="LOGO_URL" alt="Logo">
+    <div class="box">
       <h3>Login</h3>
       <input type="email" id="loginEmail" placeholder="Email" required>
       <input type="password" id="loginPassword" placeholder="Password" required>
       <button id="loginBtn">Login</button>
-      <p><a href="#" id="resetPasswordBtn">Forgot Password?</a></p>
+      <button id="resetPasswordBtn">Forgot Password?</button>
+      <p id="loginStatus"></p>
     </div>
+  </div>
+</section>
+
+<!-- Contact -->
+<section id="contact" data-aos="fade-up">
+  <h2>Contact Us</h2>
+  <div class="grid grid-3">
+    <div class="card"><i class="fas fa-map-marker-alt"></i><h3>Our Location</h3><p>Nairobi, Kenya</p></div>
+    <div class="card"><i class="fas fa-envelope"></i><h3>Email</h3><p>visionaryyouth32@gmail.com</p></div>
+    <div class="card"><i class="fas fa-phone"></i><h3>Phone</h3><p>+254 741 453336</p></div>
   </div>
 </section>
 
@@ -145,15 +192,15 @@
 <footer>
   <img src="LOGO_URL" alt="Visionary Youth Group Logo">
   <p>© 2024 Visionary Youth Group. All Rights Reserved.</p>
-  <p>Email: visionaryyouth32@gmail.com | Phone: +254 741 453336</p>
 </footer>
 
-<!-- Firebase -->
+<!-- Firebase SDK -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
   import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
   import { getFirestore, setDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
+  // Your Firebase Config
   const firebaseConfig = {
     apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
     authDomain: "visionary-youth-grou-2024.firebaseapp.com",
@@ -170,23 +217,16 @@
 
   // Signup
   document.getElementById('signupBtn').addEventListener('click', async () => {
-    const signupInfo = {
-      name: document.getElementById('signupName').value,
-      phone: document.getElementById('signupPhone').value,
-      id: document.getElementById('signupId').value,
-      origin: document.getElementById('signupOrigin').value,
-      email: document.getElementById('signupEmail').value,
-      password: document.getElementById('signupPassword').value
-    };
+    const name = document.getElementById('signupName').value;
+    const phone = document.getElementById('signupPhone').value;
+    const id = document.getElementById('signupId').value;
+    const origin = document.getElementById('signupOrigin').value;
+    const email = document.getElementById('signupEmail').value;
+    const password = document.getElementById('signupPassword').value;
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, signupInfo.email, signupInfo.password);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       await setDoc(doc(db, "members", userCredential.user.uid), {
-        name: signupInfo.name,
-        phone: signupInfo.phone,
-        id: signupInfo.id,
-        origin: signupInfo.origin,
-        email: signupInfo.email,
-        createdAt: serverTimestamp()
+        name, phone, id, origin, email, createdAt: serverTimestamp()
       });
       alert("Signup successful! Please login.");
     } catch (err) {
@@ -200,16 +240,17 @@
     const password = document.getElementById('loginPassword').value;
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      window.location.href = "dashboard.html"; // redirect after login
+      document.getElementById("loginStatus").textContent = "Login successful! Redirecting...";
+      setTimeout(()=>{ window.location.href="dashboard.html"; }, 1500);
     } catch (err) {
-      alert("Login failed: " + err.message);
+      document.getElementById("loginStatus").textContent = "Login failed: " + err.message;
     }
   });
 
   // Reset Password
   document.getElementById('resetPasswordBtn').addEventListener('click', async () => {
     const email = document.getElementById('loginEmail').value;
-    if (!email) { alert("Enter your email first"); return; }
+    if (!email) { alert("Enter your email to reset password"); return; }
     try {
       await sendPasswordResetEmail(auth, email);
       alert("Password reset email sent!");
@@ -220,6 +261,6 @@
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
-<script>AOS.init({ duration: 1000, once: true });</script>
+<script>AOS.init({duration:1000,once:true});</script>
 </body>
 </html>
