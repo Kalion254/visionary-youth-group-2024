@@ -297,221 +297,180 @@
     <div>© 2024 Visionary Youth Group — All rights reserved.</div>
     <div style="margin-top:8px"><a href="#">Privacy</a> | <a href="#">Terms</a></div>
   </footer>
-
   <!-- Firebase + App logic -->
-  <script type="module">
-    // Firebase v9 modular imports
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-    import {
-      getAuth, createUserWithEmailAndPassword,
-      signInWithEmailAndPassword, sendPasswordResetEmail,
-      onAuthStateChanged, signOut
-    } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-    import {
-      getFirestore, setDoc, doc, serverTimestamp, getDoc,
-      collection, getDocs, query, orderBy
-    } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+     <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import {
+    getAuth, createUserWithEmailAndPassword,
+    signInWithEmailAndPassword, sendPasswordResetEmail,
+    onAuthStateChanged, signOut
+  } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+  import {
+    getFirestore, setDoc, doc, serverTimestamp, getDoc,
+    collection, getDocs, query, orderBy
+  } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-    // --- YOUR FIREBASE CONFIG (unchanged) ---
-    const firebaseConfig = {
-      apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
-      authDomain: "visionary-youth-grou-2024.firebaseapp.com",
-      projectId: "visionary-youth-grou-2024",
-      storageBucket: "visionary-youth-grou-2024.appspot.com",
-      messagingSenderId: "372978592717",
-      appId: "1:372978592717:web:1c15aec728ee5f854f3284",
-      measurementId: "G-QP1RBT2ZCP"
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
+    authDomain: "visionary-youth-grou-2024.firebaseapp.com",
+    projectId: "visionary-youth-grou-2024",
+    storageBucket: "visionary-youth-grou-2024.appspot.com",
+    messagingSenderId: "372978592717",
+    appId: "1:372978592717:web:1c15aec728ee5f854f3284",
+    measurementId: "G-QP1RBT2ZCP"
+  };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
 
-    // UI elements
-    const signupBtn = document.getElementById('signupBtn');
-    const loginBtn = document.getElementById('loginBtn');
-    const resetBtn = document.getElementById('resetPasswordBtn');
-    const loginStatus = document.getElementById('loginStatus');
-    const memberArea = document.getElementById('memberArea');
-    const memberNameEl = document.getElementById('memberName');
-    const memberBalanceEl = document.getElementById('memberBalance');
-    const downloadBtn = document.getElementById('downloadStatementBtn');
-    const goDashboardBtn = document.getElementById('goDashboardBtn');
+  // Elements
+  const signupBtn = document.getElementById('signupBtn');
+  const loginBtn = document.getElementById('loginBtn');
+  const resetBtn = document.getElementById('resetPasswordBtn');
+  const loginStatus = document.getElementById('loginStatus');
+  const memberArea = document.getElementById('memberArea');
+  const memberNameEl = document.getElementById('memberName');
+  const memberBalanceEl = document.getElementById('memberBalance');
 
-    // Helper: fill demo signup (for quick testing)
-    window.fillDemoSignup = () => {
-      document.getElementById('signupName').value = "Test User";
-      document.getElementById('signupPhone').value = "+254700000000";
-      document.getElementById('signupId').value = "12345678";
-      document.getElementById('signupOrigin').value = "Nairobi";
-      document.getElementById('signupEmail').value = `testuser${Date.now()%10000}@example.com`;
-      document.getElementById('signupPassword').value = "Password123!";
-    };
+  // DEMO autofill
+  window.fillDemoSignup = () => {
+    document.getElementById('signupName').value = "Test User";
+    document.getElementById('signupPhone').value = "+254700000000";
+    document.getElementById('signupId').value = "12345678";
+    document.getElementById('signupOrigin').value = "Nairobi";
+    document.getElementById('signupEmail').value = `test${Date.now()%1000}@mail.com`;
+    document.getElementById('signupPassword').value = "Password123!";
+  };
 
-    // SIGNUP
-    signupBtn.addEventListener('click', async () => {
-      const name = document.getElementById('signupName').value.trim();
-      const phone = document.getElementById('signupPhone').value.trim();
-      const id = document.getElementById('signupId').value.trim();
-      const origin = document.getElementById('signupOrigin').value.trim();
-      const email = document.getElementById('signupEmail').value.trim();
-      const password = document.getElementById('signupPassword').value;
-      if (!name || !phone || !id || !email || !password) return alert("Please fill all signup fields");
-      try {
-        const userCred = await createUserWithEmailAndPassword(auth, email, password);
-        // create member doc
-        await setDoc(doc(db, "members", userCred.user.uid), {
-          name, phone, id, origin, email, balance: 0, createdAt: serverTimestamp()
-        });
-        alert("Signup successful — please login using your credentials.");
-      } catch (err) {
-        console.error(err);
-        alert("Signup failed: " + err.message);
-      }
-    });
+  // SIGNUP
+  signupBtn.addEventListener('click', async () => {
+    const name = document.getElementById('signupName').value.trim();
+    const phone = document.getElementById('signupPhone').value.trim();
+    const id = document.getElementById('signupId').value.trim();
+    const origin = document.getElementById('signupOrigin').value.trim();
+    const email = document.getElementById('signupEmail').value.trim();
+    const password = document.getElementById('signupPassword').value;
+    if (!name || !phone || !id || !email || !password) return alert("Fill all signup fields");
 
-    // LOGIN
-    loginBtn.addEventListener('click', async () => {
-      const email = document.getElementById('loginEmail').value.trim();
-      const password = document.getElementById('loginPassword').value;
-      if (!email || !password) return alert("Enter email and password");
-      try {
-        await signInWithEmailAndPassword(auth, email, password);
-        loginStatus.textContent = "Login successful.";
-        // UI will update through onAuthStateChanged
-      } catch (err) {
-        console.error(err);
-        loginStatus.textContent = "Login failed: " + err.message;
-      }
-    });
-
-    // RESET PASSWORD
-    resetBtn.addEventListener('click', async () => {
-      const email = document.getElementById('loginEmail').value.trim();
-      if (!email) return alert("Enter your email to reset password");
-      try {
-        await sendPasswordResetEmail(auth, email);
-        alert("Password reset email sent.");
-      } catch (err) {
-        console.error(err);
-        alert("Error: " + err.message);
-      }
-    });
-
-    // AUTH state listener: update member area
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        try {
-          const docRef = doc(db, "members", user.uid);
-          const snap = await getDoc(docRef);
-          const data = snap.exists() ? snap.data() : null;
-          memberArea.style.display = 'block';
-          memberNameEl.textContent = data?.name || user.email || "Member";
-          memberBalanceEl.textContent = `Balance: Ksh ${data?.balance ?? 0}`;
-          loginStatus.textContent = `Signed in as ${user.email}`;
-        } catch (err) {
-          console.error("Auth state fetch error:", err);
-          loginStatus.textContent = "Signed in (failed to load profile data)";
-        }
-      } else {
-        memberArea.style.display = 'none';
-        memberNameEl.textContent = '';
-        memberBalanceEl.textContent = '';
-        loginStatus.textContent = '';
-      }
-    });
-
-    // SIGN OUT
-    window.signOutUser = async () => {
-      try {
-        await signOut(auth);
-        alert("Signed out");
-        location.hash = "#auth";
-      } catch (err) {
-        console.error(err);
-        alert("Sign out failed: " + err.message);
-      }
-    };
-
-    // GO DASHBOARD
-    window.goDashboard = () => {
-      // open dashboard only if logged in
-      if (!auth.currentUser) { alert("Please login first"); location.hash = "#auth"; return; }
+    try {
+      const userCred = await createUserWithEmailAndPassword(auth, email, password);
+      await setDoc(doc(db, "members", userCred.user.uid), {
+        name, phone, id, origin, email, balance: 0, createdAt: serverTimestamp()
+      });
+      alert("Signup successful! Redirecting...");
       window.location.href = "dashboard.html";
-    };
+    } catch (err) {
+      alert("Signup failed: " + err.message);
+    }
+  });
 
-    // COPY PAYBILL
-    window.copyPaybill = async () => {
-      const text = "Paybill: 247247 ; Account: 1290186343975";
-      try {
-        await navigator.clipboard.writeText(text);
-        alert("Paybill details copied to clipboard");
-      } catch (err) {
-        alert("Copy failed — Paybill: 247247 Account: 1290186343975");
-      }
-    };
+  // LOGIN
+  loginBtn.addEventListener('click', async () => {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    if (!email || !password) return alert("Enter email and password");
 
-    // DOWNLOAD STATEMENT (attempt: fetch transactions under members/{uid}/transactions)
-    window.downloadStatement = async () => {
-      const user = auth.currentUser;
-      if (!user) { alert("Please login to download your statement"); location.hash = "#auth"; return; }
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      loginStatus.textContent = "Login successful. Redirecting...";
+      setTimeout(() => { window.location.href = "dashboard.html"; }, 800);
+    } catch (err) {
+      loginStatus.textContent = "Login failed: " + err.message;
+    }
+  });
 
-      try {
-        // try to fetch subcollection 'transactions' under member doc
-        const memberDocRef = doc(db, "members", user.uid);
-        const txCol = collection(memberDocRef, "transactions");
-        // order by date if possible
-        let q = query(txCol, orderBy("date", "asc"));
-        const snap = await getDocs(q);
-        let rows = [];
-        if (!snap.empty) {
-          snap.forEach(docSnap => {
-            const d = docSnap.data();
-            rows.push({
-              date: d.date?.toDate ? d.date.toDate().toISOString().split('T')[0] : (d.date || ""),
-              description: d.description || "",
-              debit: d.debit ?? 0,
-              credit: d.credit ?? 0,
-              balance: d.balance ?? ""
-            });
-          });
-        } else {
-          // Fallback sample if no transactions in Firestore
-          rows = [
-            { date: "2024-01-01", description: "Opening balance", debit: 0, credit: 0, balance: 1000 },
-            { date: "2024-02-01", description: "Monthly contribution", debit: 0, credit: 500, balance: 1500 },
-            { date: "2024-03-10", description: "Loan disbursed", debit: 2000, credit: 0, balance: -500 }
-          ];
-        }
+  // RESET PASSWORD
+  resetBtn.addEventListener('click', async () => {
+    const email = document.getElementById('loginEmail').value.trim();
+    if (!email) return alert("Enter your email first");
+    try {
+      await sendPasswordResetEmail(auth, email);
+      alert("Password reset email sent!");
+    } catch (err) {
+      alert("Error: " + err.message);
+    }
+  });
 
-        // convert to CSV
-        const header = ["Date","Description","Debit","Credit","Balance"];
-        const csvRows = [header.join(",")];
-        for (const r of rows) {
-          const row = [r.date, r.description.replace(/,/g," "), r.debit, r.credit, r.balance];
-          csvRows.push(row.join(","));
-        }
-        const csvContent = csvRows.join("\n");
-        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        const fname = `statement_${user.uid}_${(new Date()).toISOString().slice(0,10)}.csv`;
-        a.download = fname;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(url);
-      } catch (err) {
-        console.error("Statement download error:", err);
-        alert("Failed to download statement: " + err.message);
-      }
-    };
+  // AUTH STATE
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      const snap = await getDoc(doc(db, "members", user.uid));
+      const data = snap.exists() ? snap.data() : {};
+      memberArea.style.display = 'block';
+      memberNameEl.textContent = data?.name || user.email;
+      memberBalanceEl.textContent = `Balance: Ksh ${data?.balance ?? 0}`;
+    } else {
+      memberArea.style.display = 'none';
+    }
+  });
 
-  </script>
+  // SIGN OUT
+  window.signOutUser = async () => {
+    try {
+      await signOut(auth);
+      alert("Signed out");
+      location.hash = "#auth";
+    } catch (err) {
+      alert("Error signing out: " + err.message);
+    }
+  };
 
+  // GO DASHBOARD
+  window.goDashboard = () => {
+    if (!auth.currentUser) {
+      alert("Login first");
+      location.hash = "#auth";
+      return;
+    }
+    window.location.href = "dashboard.html";
+  };
+
+  // COPY PAYBILL
+  window.copyPaybill = async () => {
+    const text = "Paybill: 247247 ; Account: 1290186343975";
+    try {
+      await navigator.clipboard.writeText(text);
+      alert("Copied: " + text);
+    } catch {
+      alert(text);
+    }
+  };
+
+  // DOWNLOAD STATEMENT
+  window.downloadStatement = async () => {
+    const user = auth.currentUser;
+    if (!user) return alert("Login first");
+    try {
+      const q = query(collection(doc(db, "members", user.uid), "transactions"), orderBy("date", "asc"));
+      const snap = await getDocs(q);
+      let rows = [["Date","Description","Debit","Credit","Balance"]];
+      snap.forEach(d => {
+        const data = d.data();
+        rows.push([
+          data.date?.toDate ? data.date.toDate().toISOString().slice(0,10) : "",
+          data.description || "",
+          data.debit ?? 0,
+          data.credit ?? 0,
+          data.balance ?? ""
+        ]);
+      });
+      if (rows.length === 1) rows.push(["2024-01-01","Opening Balance",0,0,1000]);
+      const csv = rows.map(r => r.join(",")).join("\n");
+      const url = URL.createObjectURL(new Blob([csv], {type:"text/csv"}));
+      const a = document.createElement("a");
+      a.href = url; a.download = "statement.csv"; a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      alert("Failed: " + err.message);
+    }
+  };
+</script>
+ 
+  
   <!-- AOS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
   <script>AOS.init({duration:800, once:true});</script>
 </body>
 </html>
+
