@@ -9,11 +9,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-<!-- jsPDF -->
+<!-- jsPDF (single include only) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  !-- jsPDF -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  
 
 <style>
   :root{
@@ -79,28 +76,7 @@
   .btn{background:var(--accent);color:white;padding:10px 14px;border:none;border-radius:8px;cursor:pointer;font-weight:700}
   .btn.secondary{background:#fff;color:var(--accent);border:1px solid #e3f1e3}
 
-   /* Voluntary Withdrawal Application */
-  .big{grid-column:span 8}
-  .side{grid-column:span 4}
-
-/* form */
-  
-  :root{
-    --dark:#164e2a;
-    --accent:#2e7d32;
-    --gold:#ffcc00;
-    --bg1:#e9ffec;
-    --card:#ffffff;
-    --muted:#6b7280;
-  }
-  body{margin:0;font-family:'Poppins',sans-serif;background:linear-gradient(120deg,var(--bg1),#f6fff6);}
-  .card{background:#fff;border-radius:12px;padding:14px;box-shadow:0 8px 20px rgba(6,50,20,0.05);}
-  .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-  .form-grid .full{grid-column:1/-1}
-  input,select{width:100%;padding:10px;border-radius:8px;border:1px solid #d1d5db;font-size:0.95rem}
-  .btn{background:var(--accent);color:white;padding:10px 14px;border:none;border-radius:8px;cursor:pointer;font-weight:700}
-  .btn.secondary{background:#fff;color:var(--accent);border:1px solid #e3f1e3
-
+  /* Voluntary Withdrawal Application specifics - kept styles */
   /* loan stages */
   .stages{display:flex;gap:10px;align-items:center;justify-content:space-between}
   .stage{flex:1;padding:10px;border-radius:8px;background:#f5faf5;text-align:center}
@@ -171,7 +147,7 @@
         <div class="balance"><div class="label">Dividends</div><div class="value" id="dividendsVal">Ksh 0</div></div>
         <div class="balance"><div class="label">Total Loans</div><div class="value" id="totalLoansVal">Ksh 0</div></div>
         <div class="balance"><div class="label">Unpaid Balances</div><div class="value" id="unpaidVal">Ksh 0</div></div>
-        <div class="balance"><div class="label">Outstanding Loans</div><div class="value" id="otstandingLoansVal">Ksh 0</div></div
+        <div class="balance"><div class="label">Outstanding Loans</div><div class="value" id="outstandingLoansVal">Ksh 0</div></div>
       </div>
     </div>
 
@@ -303,8 +279,6 @@ Please read the full terms on the system: you must have 6 consecutive months sav
       </form>
     </section>
 
-    <!-- Voluntary Withdrawal Application... -->
-
     <!-- New Withdrawable Form -->
     <section class="card big" id="withdraw-section">
       <h2><i class="fas fa-hand-holding-usd"></i> Voluntary Withdrawable Savings Form</h2>
@@ -326,67 +300,7 @@ Please read the full terms on the system: you must have 6 consecutive months sav
         </div>
       </form>
     </section>
-  </main>
 
-<script type="module">
-  const { jsPDF } = window.jspdf;
-
-  // Withdrawal Form Handlers
-  const withdrawForm = document.getElementById('withdrawForm');
-
-  document.getElementById('previewWithdrawPdf').addEventListener('click', (e)=>{
-    e.preventDefault();
-    const formData = new FormData(withdrawForm);
-    const data = Object.fromEntries(formData.entries());
-    const doc = buildWithdrawPdfDoc(data, {preview:true});
-    doc.save(`Withdrawal_PREVIEW.pdf`);
-  });
-
-  withdrawForm.addEventListener('submit', (e)=>{
-    e.preventDefault();
-    const formData = new FormData(withdrawForm);
-    const data = Object.fromEntries(formData.entries());
-    const doc = buildWithdrawPdfDoc(data, {submitted:true});
-    doc.save(`Withdrawal_${(data.memberName||'Member').replace(/\s+/g,'_')}.pdf`);
-  });
-
-  function buildWithdrawPdfDoc(data, opts={}){
-    const doc = new jsPDF({unit:'pt',format:'a4'});
-    let y = 50, left = 40;
-
-    doc.setFontSize(16).setFont('helvetica','bold');
-    doc.text('VISIONARY YOUTH GROUP 2024', 300, y, {align:'center'}); y+=18;
-    doc.setFontSize(14).text('VOLUNTARY WITHDRAWABLE SAVINGS FORM', 300, y, {align:'center'}); y+=20;
-    doc.setFontSize(10).line(left,y,555,y); y+=20;
-
-    doc.setFont('helvetica','bold').text('Member Information', left, y); y+=14;
-    doc.setFont('helvetica','normal');
-    const lines = [
-      `Name: ${data.memberName||''}`,
-      `Membership Number: ${data.membershipNumber||''}`,
-      `ID/Passport: ${data.idNumber||''}`,
-      `Phone: ${data.phone||''}`,
-      `Amount in figures: Ksh ${data.amountFigures||''}`,
-      `Amount in words: ${data.amountWords||''}`,
-      `Reason: ${data.reason||''}`,
-    ];
-    lines.forEach(line=>{
-      const wrap = doc.splitTextToSize(line, 520);
-      doc.text(wrap, left, y);
-      y += wrap.length*14;
-    });
-
-    y+=20;
-    doc.setFont('helvetica','bold').text('Member Signature: ________________________   Date: ____________', left, y); y+=30;
-    doc.setFont('helvetica','bold').text('For Official Use Only', left, y); y+=16;
-    doc.setFont('helvetica','normal').text('Checked & Approved by: ________________________', left, y);
-
-    return doc;
-  }
-</script>
-</body>
-</html>
-    
     <!-- side panel: loans summary & account statement -->
     <aside class="card side" id="sidePanel">
       <h2>Loans & Status</h2>
@@ -461,9 +375,11 @@ Please read the full terms on the system: you must have 6 consecutive months sav
   }
 
   // menu toggles
-  hamburger.addEventListener('click', ()=> {
-    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-  });
+  if (hamburger) {
+    hamburger.addEventListener('click', ()=> {
+      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    });
+  }
 
   // menu links close and scroll
   menu.querySelectorAll('a[data-target]').forEach(a=>{
@@ -482,14 +398,25 @@ Please read the full terms on the system: you must have 6 consecutive months sav
 
   // Auto logout (3 minutes)
   let logoutTimer;
-  function resetLogoutTimer(){ clearTimeout(logoutTimer); logoutTimer = setTimeout(()=>{ signOut(auth); alert('Logged out due to inactivity'); location.href='index.html'; }, 3*60*1000); }
+  function resetLogoutTimer(){ 
+    clearTimeout(logoutTimer); 
+    logoutTimer = setTimeout(()=>{ 
+      try { signOut(auth); } catch(e){} 
+      alert('Logged out due to inactivity'); 
+      location.href='index.html'; 
+    }, 3*60*1000); 
+  }
   ['mousemove','keydown','click','touchstart'].forEach(ev=> window.addEventListener(ev, resetLogoutTimer));
+
+  // Defensive element getters for elements that might not exist
+  const loanBalanceEl = document.getElementById('loanBalance');
+  const loanBalance2El = document.getElementById('loanBalance2');
 
   // AUTH state: load data
   onAuthStateChanged(auth, async user => {
     if(!user) { location.href='index.html'; return; }
     currentUid = user.uid;
-    topEmail.textContent = user.email;
+    topEmail.textContent = user.email || '—';
     welcomeName.textContent = (user.email || 'Member').split('@')[0];
     resetLogoutTimer();
 
@@ -508,28 +435,26 @@ Please read the full terms on the system: you must have 6 consecutive months sav
       }
     });
 
-    // Balances (handle both number and object transactions)
+    // Balances references
     const monthlyRef = ref(db, `members/${currentUid}/savings/monthly`);
     const weeklyRef = ref(db, `members/${currentUid}/savings/weekly`);
     const sharesRef = ref(db, `members/${currentUid}/shares/total`);
     const dividendsRef = ref(db, `members/${currentUid}/shares/dividends`);
     const unpaidRef = ref(db, `members/${currentUid}/unpaidBalances`);
-    const loansRef = ref(db, `members/${currentUid}/loans/totals loans`);
-    const loansRef = ref(db, `members/${currentUid}/outstandingLoans`);
-
+    // avoid duplicate var names: use two refs
+    const loansTotalsRef = ref(db, `members/${currentUid}/loans/totals loans`);
+    const outstandingLoansRef = ref(db, `members/${currentUid}/outstandingLoans`);
 
     // helper to display either single number or sum of child amounts
     async function snapToAmount(snap){
       if(!snap.exists()) return 0;
       const val = snap.val();
       if(typeof val === 'number' || typeof val === 'string') return Number(val) || 0;
-      // object: attempt to sum .amount children or values
       let total = 0;
       Object.values(val).forEach(child=>{
         if(child && typeof child === 'object' && ('amount' in child)) total += Number(child.amount||0);
         else if(typeof child === 'number') total += child;
         else if(typeof child === 'object' && !('amount' in child)){
-          // maybe nested: try sum of nested .amount
           Object.values(child).forEach(c2=>{
             if(c2 && typeof c2 === 'object' && ('amount' in c2)) total += Number(c2.amount||0);
           });
@@ -538,25 +463,34 @@ Please read the full terms on the system: you must have 6 consecutive months sav
       return total;
     }
 
-    // attach onValue listeners
-    onValue(monthlyRef, async s=>{ const v = await snapToAmount(s); document.getElementById('monthlyVal').textContent = formatKsh(v); });
-    onValue(weeklyRef, async s=>{ const v = await snapToAmount(s); document.getElementById('weeklyVal').textContent = formatKsh(v); });
-    onValue(sharesRef, s=>{ const v = s.exists()? Number(s.val()||0) : 0; document.getElementById('sharesVal').textContent = formatKsh(v); });
-    onValue(dividendsRef, s=>{ const v = s.exists()? Number(s.val()||0) : 0; document.getElementById('dividendsVal').textContent = formatKsh(v); });
-    onValue(unpaidRef, s=>{ const v = s.exists()? Number(s.val()||0) : 0; document.getElementById('unpaidVal').textContent = formatKsh(v); });
-    onValue(loansRef, s=>{
+    // attach onValue listeners (with checks)
+    onValue(monthlyRef, async s=>{ const v = await snapToAmount(s); const el = document.getElementById('monthlyVal'); if(el) el.textContent = formatKsh(v); });
+    onValue(weeklyRef, async s=>{ const v = await snapToAmount(s); const el = document.getElementById('weeklyVal'); if(el) el.textContent = formatKsh(v); });
+    onValue(sharesRef, s=>{ const v = s.exists()? Number(s.val()||0) : 0; const el = document.getElementById('sharesVal'); if(el) el.textContent = formatKsh(v); });
+    onValue(dividendsRef, s=>{ const v = s.exists()? Number(s.val()||0) : 0; const el = document.getElementById('dividendsVal'); if(el) el.textContent = formatKsh(v); });
+    onValue(unpaidRef, s=>{ const v = s.exists()? Number(s.val()||0) : 0; const el = document.getElementById('unpaidVal'); if(el) el.textContent = formatKsh(v); });
+
+    onValue(loansTotalsRef, s=>{
       const obj = s.exists()? s.val() : {total:0,unpaid:0};
-      let total = obj.total||0; let unpaid = obj.unpaid||0;
-      document.getElementById('totalLoansVal').textContent = formatKsh(total);
-      // also show in other places
-      document.getElementById('loanBalance').textContent = formatKsh(unpaid);
-      document.getElementById('loanBalance2') && (document.getElementById('loanBalance2').textContent = formatKsh(unpaid));
+      const total = obj.total || 0;
+      const unpaid = obj.unpaid || 0;
+      const totalEl = document.getElementById('totalLoansVal');
+      if(totalEl) totalEl.textContent = formatKsh(total);
+      if(loanBalanceEl) loanBalanceEl.textContent = formatKsh(unpaid);
+      if(loanBalance2El) loanBalance2El.textContent = formatKsh(unpaid);
+    });
+
+    onValue(outstandingLoansRef, s=>{
+      const v = s.exists() ? (typeof s.val() === 'number' ? s.val() : 0) : 0;
+      const outEl = document.getElementById('outstandingLoansVal');
+      if(outEl) outEl.textContent = formatKsh(v);
     });
 
     // Loans list (applications)
     const appsRef = ref(db, `members/${currentUid}/loans/applications`);
     onValue(appsRef, snap=>{
       const area = document.getElementById('loansListArea');
+      if(!area) return;
       area.innerHTML = '';
       if(!snap.exists()){ area.innerHTML = '<div class="muted">No applications yet</div>'; return; }
       const apps = snap.val();
@@ -578,49 +512,57 @@ Please read the full terms on the system: you must have 6 consecutive months sav
 
   // ------------------ Loan Application logic ------------------
   const loanForm = document.getElementById('fullLoanForm');
-  document.getElementById('previewLoanPdf').addEventListener('click', (e)=>{
-    e.preventDefault();
-    const formData = new FormData(loanForm);
-    const data = Object.fromEntries(formData.entries());
-    // preview only: generate pdf but not save
-    const doc = buildLoanPdfDoc(data, {preview:true});
-    doc.save(`Loan_Application_PREVIEW.pdf`);
-  });
+  if (document.getElementById('previewLoanPdf')) {
+    document.getElementById('previewLoanPdf').addEventListener('click', (e)=>{
+      e.preventDefault();
+      if(!loanForm) return;
+      const formData = new FormData(loanForm);
+      const data = Object.fromEntries(formData.entries());
+      const doc = buildLoanPdfDoc(data, {preview:true});
+      doc.save(`Loan_Application_PREVIEW.pdf`);
+    });
+  }
 
-  loanForm.addEventListener('submit', async (e)=>{
-    e.preventDefault();
-    if(!currentUid) return alert('Not authenticated');
-    if(!document.getElementById('agreeTerms').checked) return alert('Please agree to the terms');
+  if (loanForm) {
+    loanForm.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      if(!currentUid) return alert('Not authenticated');
+      const agree = document.getElementById('agreeTerms');
+      if(!agree || !agree.checked) return alert('Please agree to the terms');
 
-    const formData = new FormData(loanForm);
-    const data = Object.fromEntries(formData.entries());
-    // add guarantors
-    const guarantors = [];
-    for(let i=1;i<=3;i++){
-      guarantors.push({
-        mno: data[`g_mno_${i}`] || '',
-        name: data[`g_name_${i}`] || '',
-        phone: data[`g_phone_${i}`] || '',
-        id: data[`g_id_${i}`] || '',
-        group: data[`g_group_${i}`] || '',
-        amount: data[`g_amount_${i}`] || ''
-      });
-    }
-    data.guarantors = guarantors;
-    // metadata
-    const appRef = push(ref(db, `members/${currentUid}/loans/applications`));
-    const appId = appRef.key;
-    data.appliedAt = Date.now();
-    data.status = 'Pending';
-    // write to DB
-    await set(appRef, data);
-    showToast('Application saved — downloading PDF');
-
-    // generate PDF (professional)
-    const doc = buildLoanPdfDoc(data, {id:appId});
-    doc.save(`Loan_Application_${(data.memberName || data.name || currentUid).replace(/\s+/g,'_')}_${appId}.pdf`);
-    // end
-  });
+      const formData = new FormData(loanForm);
+      const data = Object.fromEntries(formData.entries());
+      // add guarantors
+      const guarantors = [];
+      for(let i=1;i<=3;i++){
+        guarantors.push({
+          mno: data[`g_mno_${i}`] || '',
+          name: data[`g_name_${i}`] || '',
+          phone: data[`g_phone_${i}`] || '',
+          id: data[`g_id_${i}`] || '',
+          group: data[`g_group_${i}`] || '',
+          amount: data[`g_amount_${i}`] || ''
+        });
+      }
+      data.guarantors = guarantors;
+      // metadata + write to DB if available
+      try {
+        const appRef = push(ref(db, `members/${currentUid}/loans/applications`));
+        const appId = appRef.key;
+        data.appliedAt = Date.now();
+        data.status = 'Pending';
+        await set(appRef, data);
+        showToast('Application saved — downloading PDF');
+        const doc = buildLoanPdfDoc(data, {id:appId});
+        doc.save(`Loan_Application_${(data.memberName || data.name || currentUid).replace(/\s+/g,'_')}_${appId}.pdf`);
+      } catch(err){
+        console.error(err);
+        alert('Failed to save application to the database. PDF will still be generated locally.');
+        const doc = buildLoanPdfDoc(data, {});
+        doc.save(`Loan_Application_${(data.memberName || data.name || currentUid).replace(/\s+/g,'_')}.pdf`);
+      }
+    });
+  }
 
   // Build loan PDF function (returns jsPDF doc)
   function buildLoanPdfDoc(data, opts={}){
@@ -693,7 +635,6 @@ Please read the full terms on the system: you must have 6 consecutive months sav
 
     // Guarantors table
     doc.setFont('helvetica','bold'); doc.text('GUARANTORS', left, y); y+=12;
-    // table header
     const colX = [left, 90, 260, 360, 440, 520];
     doc.setFont('helvetica','bold'); doc.setFontSize(9);
     doc.text('M No', colX[0], y); doc.text('Name', colX[1], y); doc.text('Phone', colX[2], y); doc.text('ID No', colX[3], y); doc.text('Group', colX[4], y); doc.text('Amount', colX[5], y); y+=8;
@@ -701,7 +642,6 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     const guars = data.guarantors || [];
     guars.forEach(g=>{
       const row = [g.mno||'', g.name||'', g.phone||'', g.id||'', g.group||'', g.amount||''];
-      // check page break
       if(y > 720){ doc.addPage(); y=40; }
       for(let i=0;i<row.length;i++) doc.text(String(row[i]), colX[i], y);
       y+=12;
@@ -719,6 +659,62 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     doc.text('Applicant Signature: ______________________   Date: ___________', left, y); y+=20;
     doc.text('Guarantor Signatures:', left, y); y+=14;
     for(let i=0;i<3;i++){ if(y>740){ doc.addPage(); y=40; } doc.text(`${i+1}. _________________________   ID: ___________   M/No: ______`, left, y); y+=14; }
+
+    return doc;
+  }
+
+  // ------------------ Withdrawal form handlers (client-side PDF) ------------------
+  const withdrawForm = document.getElementById('withdrawForm');
+  if (document.getElementById('previewWithdrawPdf')) {
+    document.getElementById('previewWithdrawPdf').addEventListener('click',(e)=>{
+      e.preventDefault();
+      if(!withdrawForm) return;
+      const formData = new FormData(withdrawForm);
+      const data = Object.fromEntries(formData.entries());
+      const doc = buildWithdrawPdfDoc(data, {preview:true});
+      doc.save(`Withdrawal_PREVIEW.pdf`);
+    });
+  }
+  if (withdrawForm) {
+    withdrawForm.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const formData = new FormData(withdrawForm);
+      const data = Object.fromEntries(formData.entries());
+      const doc = buildWithdrawPdfDoc(data, {submitted:true});
+      doc.save(`Withdrawal_${(data.memberName||'Member').replace(/\s+/g,'_')}.pdf`);
+    });
+  }
+
+  function buildWithdrawPdfDoc(data, opts={}){
+    const doc = new jsPDF({unit:'pt',format:'a4'});
+    let y = 50, left = 40;
+
+    doc.setFontSize(16).setFont('helvetica','bold');
+    doc.text('VISIONARY YOUTH GROUP 2024', 300, y, {align:'center'}); y+=18;
+    doc.setFontSize(14).text('VOLUNTARY WITHDRAWABLE SAVINGS FORM', 300, y, {align:'center'}); y+=20;
+    doc.setFontSize(10).line(left,y,555,y); y+=20;
+
+    doc.setFont('helvetica','bold').text('Member Information', left, y); y+=14;
+    doc.setFont('helvetica','normal');
+    const lines = [
+      `Name: ${data.memberName||''}`,
+      `Membership Number: ${data.membershipNumber||''}`,
+      `ID/Passport: ${data.idNumber||''}`,
+      `Phone: ${data.phone||''}`,
+      `Amount in figures: Ksh ${data.amountFigures||''}`,
+      `Amount in words: ${data.amountWords||''}`,
+      `Reason: ${data.reason||''}`,
+    ];
+    lines.forEach(line=>{
+      const wrap = doc.splitTextToSize(line, 520);
+      doc.text(wrap, left, y);
+      y += wrap.length*14;
+    });
+
+    y+=20;
+    doc.setFont('helvetica','bold').text('Member Signature: ________________________   Date: ____________', left, y); y+=30;
+    doc.setFont('helvetica','bold').text('For Official Use Only', left, y); y+=16;
+    doc.setFont('helvetica','normal').text('Checked & Approved by: ________________________', left, y);
 
     return doc;
   }
@@ -749,18 +745,16 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     // Totals
     const monthly = await snapToPrintableAmount(snapshotMonthly);
     const weekly = await snapToPrintableAmount(snapshotWeekly);
-    const shares = sharesSnap.exists() ? sharesSnap.val().total || sharesSnap.val() || 0 : 0;
-    const dividends = sharesSnap.exists() ? sharesSnap.val().dividends || 0 : 0;
+    const shares = sharesSnap.exists() ? (sharesSnap.val().total || sharesSnap.val() || 0) : 0;
+    const dividends = sharesSnap.exists() ? (sharesSnap.val().dividends || 0) : 0;
 
     let totalLoans = 0; let unpaid = 0; let appsList = [];
     if(loansSnap.exists()){
       const loansObj = loansSnap.val();
-      // summary
       if(loansObj.summary){
         totalLoans = loansObj.summary.total || 0;
         unpaid = loansObj.summary.unpaid || 0;
       } else {
-        // try sum of applications or loan entries
         Object.values(loansObj).forEach(v=>{
           if(v && typeof v === 'object' && v.amountFigures) { totalLoans += Number(v.amountFigures||0); if((v.status||'').toLowerCase() !== 'paid') unpaid += Number(v.amountFigures||0); appsList.push(v); }
           else if(v && typeof v === 'object' && v.app_amount) { totalLoans += Number(v.app_amount||0); if((v.status||'').toLowerCase() !== 'paid') unpaid += Number(v.app_amount||0); appsList.push(v); }
@@ -813,26 +807,31 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     return total;
   }
 
-  // account statement download handlers
-  document.getElementById('downloadStatementTop').addEventListener('click', async ()=>{
+  // account statement download handlers (guarded)
+  const downloadStatementTopBtn = document.getElementById('downloadStatementTop');
+  if(downloadStatementTopBtn) downloadStatementTopBtn.addEventListener('click', async ()=>{
     const doc = await buildAccountStatementPdf();
-    doc.save(`Account_Statement_${topEmail.textContent.replace(/[^\w@.-]/g,'')}.pdf`);
+    doc.save(`Account_Statement_${(topEmail.textContent||'member').replace(/[^\w@.-]/g,'')}.pdf`);
   });
-  document.getElementById('downloadStatement').addEventListener('click', async ()=>{
+  const downloadStatementBtn = document.getElementById('downloadStatement');
+  if(downloadStatementBtn) downloadStatementBtn.addEventListener('click', async ()=>{
     const doc = await buildAccountStatementPdf();
-    doc.save(`Account_Statement_${topEmail.textContent.replace(/[^\w@.-]/g,'')}.pdf`);
+    doc.save(`Account_Statement_${(topEmail.textContent||'member').replace(/[^\w@.-]/g,'')}.pdf`);
   });
-  document.getElementById('profileStatement').addEventListener('click', async ()=>{
+  const profileStatementBtn = document.getElementById('profileStatement');
+  if(profileStatementBtn) profileStatementBtn.addEventListener('click', async ()=>{
     const doc = await buildAccountStatementPdf();
-    doc.save(`Account_Statement_${topEmail.textContent.replace(/[^\w@.-]/g,'')}.pdf`);
+    doc.save(`Account_Statement_${(topEmail.textContent||'member').replace(/[^\w@.-]/g,'')}.pdf`);
   });
-  document.getElementById('quickStatement').addEventListener('click', async ()=>{
+  const quickStatementBtn = document.getElementById('quickStatement');
+  if(quickStatementBtn) quickStatementBtn.addEventListener('click', async ()=>{
     const doc = await buildAccountStatementPdf();
-    doc.save(`Account_Statement_${topEmail.textContent.replace(/[^\w@.-]/g,'')}.pdf`);
+    doc.save(`Account_Statement_${(topEmail.textContent||'member').replace(/[^\w@.-]/g,'')}.pdf`);
   });
 
   // downloadApplications: compile all user's loan applications to a single pdf
-  document.getElementById('downloadApplications').addEventListener('click', async ()=>{
+  const downloadAppsBtn = document.getElementById('downloadApplications');
+  if(downloadAppsBtn) downloadAppsBtn.addEventListener('click', async ()=>{
     if(!currentUid) return alert('Not signed in');
     const snap = await get(ref(db, `members/${currentUid}/loans/applications`));
     if(!snap.exists()) return alert('No applications found');
@@ -853,14 +852,16 @@ Please read the full terms on the system: you must have 6 consecutive months sav
       y += 8;
       if(y > 720){ doc.addPage(); y=40; }
     }
-    doc.save(`Loan_Applications_${topEmail.textContent.replace(/[^\w@.-]/g,'')}.pdf`);
+    doc.save(`Loan_Applications_${(topEmail.textContent||'member').replace(/[^\w@.-]/g,'')}.pdf`);
   });
 
   // preview / quick apply handlers
-  document.getElementById('quickApply').addEventListener('click', ()=> document.getElementById('loan-section').scrollIntoView({behavior:'smooth'}));
+  const quickApplyBtn = document.getElementById('quickApply');
+  if(quickApplyBtn) quickApplyBtn.addEventListener('click', ()=> document.getElementById('loan-section').scrollIntoView({behavior:'smooth'}));
 
   // Profile save
-  document.getElementById('saveProfile').addEventListener('click', async ()=>{
+  const saveProfileBtn = document.getElementById('saveProfile');
+  if(saveProfileBtn) saveProfileBtn.addEventListener('click', async ()=>{
     if(!currentUid) return alert('Not authenticated');
     if(profileSavedOnce) { showToast('Profile already updated in this session'); return; }
     const payload = {
@@ -877,7 +878,8 @@ Please read the full terms on the system: you must have 6 consecutive months sav
   });
 
   // logout via menu
-  document.getElementById('menuLogout').addEventListener('click', ()=> { signOut(auth); window.location.href='index.html'; });
+  const menuLogout = document.getElementById('menuLogout');
+  if(menuLogout) menuLogout.addEventListener('click', ()=> { try{ signOut(auth); }catch(e){} window.location.href='index.html'; });
 
 </script>
 
