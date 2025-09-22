@@ -442,8 +442,8 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     const dividendsRef = ref(db, `members/${currentUid}/shares/dividends`);
     const unpaidRef = ref(db, `members/${currentUid}/unpaidBalances`);
     // avoid duplicate var names: use two refs
-    const loansTotalsRef = ref(db, `members/${currentUid}/loans/totals loans`);
-    const outstandingLoansRef = ref(db, `members/${currentUid}/outstandingLoans`);
+    const loansTotalsRef = ref(db, `members/${currentUid}/shares/totals loans`);
+    const outstandingLoansRef = ref(db, `members/${currentUid}/unpaidBalances/outstandingLoans`);
 
     // helper to display either single number or sum of child amounts
     async function snapToAmount(snap){
