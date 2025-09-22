@@ -11,6 +11,9 @@
 
 <!-- jsPDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  !-- jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  
 
 <style>
   :root{
@@ -75,6 +78,28 @@
   textarea{min-height:100px;resize:vertical}
   .btn{background:var(--accent);color:white;padding:10px 14px;border:none;border-radius:8px;cursor:pointer;font-weight:700}
   .btn.secondary{background:#fff;color:var(--accent);border:1px solid #e3f1e3}
+
+   /* Voluntary Withdrawal Application */
+  .big{grid-column:span 8}
+  .side{grid-column:span 4}
+
+/* form */
+  
+  :root{
+    --dark:#164e2a;
+    --accent:#2e7d32;
+    --gold:#ffcc00;
+    --bg1:#e9ffec;
+    --card:#ffffff;
+    --muted:#6b7280;
+  }
+  body{margin:0;font-family:'Poppins',sans-serif;background:linear-gradient(120deg,var(--bg1),#f6fff6);}
+  .card{background:#fff;border-radius:12px;padding:14px;box-shadow:0 8px 20px rgba(6,50,20,0.05);}
+  .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .form-grid .full{grid-column:1/-1}
+  input,select{width:100%;padding:10px;border-radius:8px;border:1px solid #d1d5db;font-size:0.95rem}
+  .btn{background:var(--accent);color:white;padding:10px 14px;border:none;border-radius:8px;cursor:pointer;font-weight:700}
+  .btn.secondary{background:#fff;color:var(--accent);border:1px solid #e3f1e3
 
   /* loan stages */
   .stages{display:flex;gap:10px;align-items:center;justify-content:space-between}
@@ -146,6 +171,7 @@
         <div class="balance"><div class="label">Dividends</div><div class="value" id="dividendsVal">Ksh 0</div></div>
         <div class="balance"><div class="label">Total Loans</div><div class="value" id="totalLoansVal">Ksh 0</div></div>
         <div class="balance"><div class="label">Unpaid Balances</div><div class="value" id="unpaidVal">Ksh 0</div></div>
+        <div class="balance"><div class="label">Outstanding Loans</div><div class="value" id="otstandingLoansVal">Ksh 0</div></div
       </div>
     </div>
 
@@ -277,6 +303,90 @@ Please read the full terms on the system: you must have 6 consecutive months sav
       </form>
     </section>
 
+    <!-- Voluntary Withdrawal Application... -->
+
+    <!-- New Withdrawable Form -->
+    <section class="card big" id="withdraw-section">
+      <h2><i class="fas fa-hand-holding-usd"></i> Voluntary Withdrawable Savings Form</h2>
+      
+      <form id="withdrawForm">
+        <div class="form-grid">
+          <input class="full" name="memberName" placeholder="Member Name" required>
+          <input name="membershipNumber" placeholder="Membership Number" required>
+          <input name="idNumber" placeholder="ID / Passport Number" required>
+          <input name="phone" placeholder="Phone Number" required>
+          <input name="amountFigures" placeholder="Amount Requested (Figures, Ksh)" required>
+          <input name="amountWords" placeholder="Amount in Words" required>
+          <input class="full" name="reason" placeholder="Reason for Withdrawal" required>
+        </div>
+
+        <div style="margin-top:12px;display:flex;gap:10px;align-items:center">
+          <button class="btn" type="button" id="previewWithdrawPdf">Preview PDF</button>
+          <button class="btn" type="submit" id="submitWithdrawBtn">Submit & Download PDF</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+<script type="module">
+  const { jsPDF } = window.jspdf;
+
+  // Withdrawal Form Handlers
+  const withdrawForm = document.getElementById('withdrawForm');
+
+  document.getElementById('previewWithdrawPdf').addEventListener('click', (e)=>{
+    e.preventDefault();
+    const formData = new FormData(withdrawForm);
+    const data = Object.fromEntries(formData.entries());
+    const doc = buildWithdrawPdfDoc(data, {preview:true});
+    doc.save(`Withdrawal_PREVIEW.pdf`);
+  });
+
+  withdrawForm.addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const formData = new FormData(withdrawForm);
+    const data = Object.fromEntries(formData.entries());
+    const doc = buildWithdrawPdfDoc(data, {submitted:true});
+    doc.save(`Withdrawal_${(data.memberName||'Member').replace(/\s+/g,'_')}.pdf`);
+  });
+
+  function buildWithdrawPdfDoc(data, opts={}){
+    const doc = new jsPDF({unit:'pt',format:'a4'});
+    let y = 50, left = 40;
+
+    doc.setFontSize(16).setFont('helvetica','bold');
+    doc.text('VISIONARY YOUTH GROUP 2024', 300, y, {align:'center'}); y+=18;
+    doc.setFontSize(14).text('VOLUNTARY WITHDRAWABLE SAVINGS FORM', 300, y, {align:'center'}); y+=20;
+    doc.setFontSize(10).line(left,y,555,y); y+=20;
+
+    doc.setFont('helvetica','bold').text('Member Information', left, y); y+=14;
+    doc.setFont('helvetica','normal');
+    const lines = [
+      `Name: ${data.memberName||''}`,
+      `Membership Number: ${data.membershipNumber||''}`,
+      `ID/Passport: ${data.idNumber||''}`,
+      `Phone: ${data.phone||''}`,
+      `Amount in figures: Ksh ${data.amountFigures||''}`,
+      `Amount in words: ${data.amountWords||''}`,
+      `Reason: ${data.reason||''}`,
+    ];
+    lines.forEach(line=>{
+      const wrap = doc.splitTextToSize(line, 520);
+      doc.text(wrap, left, y);
+      y += wrap.length*14;
+    });
+
+    y+=20;
+    doc.setFont('helvetica','bold').text('Member Signature: ________________________   Date: ____________', left, y); y+=30;
+    doc.setFont('helvetica','bold').text('For Official Use Only', left, y); y+=16;
+    doc.setFont('helvetica','normal').text('Checked & Approved by: ________________________', left, y);
+
+    return doc;
+  }
+</script>
+</body>
+</html>
+    
     <!-- side panel: loans summary & account statement -->
     <aside class="card side" id="sidePanel">
       <h2>Loans & Status</h2>
@@ -405,6 +515,8 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     const dividendsRef = ref(db, `members/${currentUid}/shares/dividends`);
     const unpaidRef = ref(db, `members/${currentUid}/unpaidBalances`);
     const loansRef = ref(db, `members/${currentUid}/loans/totals loans`);
+    const loansRef = ref(db, `members/${currentUid}/outstandingLoans`);
+
 
     // helper to display either single number or sum of child amounts
     async function snapToAmount(snap){
