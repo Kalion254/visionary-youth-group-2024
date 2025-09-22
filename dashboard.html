@@ -22,9 +22,12 @@
     --muted:#6b7280;
   }
   *{box-sizing:border-box}
+  html,body{height:100%}
   body{
     margin:0;font-family:'Poppins',sans-serif;background:linear-gradient(120deg,var(--bg1),#f6fff6);color:#123;
+    -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
   }
+
   /* Top bar */
   .topbar{
     position:fixed;left:0;right:0;top:0;height:64px;background:linear-gradient(90deg,var(--dark),#26734d);color:#fff;
@@ -32,17 +35,19 @@
     box-shadow:0 6px 20px rgba(6,50,20,0.12);
   }
   .brand{display:flex;align-items:center;gap:12px}
-  .brand h1{font-size:1.05rem;margin:0;font-weight:700; color: #fff}
+  .brand h1{font-size:1.05rem;margin:0;font-weight:700}
   .hamburger{font-size:1.6rem;cursor:pointer}
-  .user-info{text-align:right;font-size:0.95rem; display:flex; flex-direction:column; align-items:flex-end}
+  .user-area{display:flex;align-items:center;gap:12px}
+  .avatar-wrap{width:44px;height:44px;border-radius:8px;overflow:hidden;background:#fff;display:flex;align-items:center;justify-content:center}
+  .avatar-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+  .user-info{text-align:right;font-size:0.95rem}
   .user-info small{display:block;color:rgba(255,255,255,0.85)}
-  .top-avatar-small{width:44px;height:44px;border-radius:50%;overflow:hidden;background:#fff;display:flex;align-items:center;justify-content:center}
-  .top-avatar-small img{width:100%;height:100%;object-fit:cover;display:block}
 
-  /* Menu overlay */
+  /* Menu overlay (slightly offset from left for mobile) */
   .menu{
-    position:fixed;top:64px;left:18px;background:rgba(255,255,255,0.98);max-width:320px;border-radius:8px;padding:8px;
+    position:fixed;top:64px;left:12px;background:rgba(255,255,255,0.98);max-width:320px;border-radius:8px;padding:8px;
     box-shadow:0 8px 30px rgba(0,0,0,0.12);display:none;z-index:1199;
+    transform-origin:top left;
   }
   .menu a{display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;color:#123;text-decoration:none}
   .menu a:hover{background:#f1fff1}
@@ -54,13 +59,13 @@
   }
 
   /* Hero / summary */
-  .hero{grid-column:span 12;background:var(--card);border-radius:12px;padding:16px;display:flex;justify-content:space-between;align-items:center;gap:16px}
-  .welcome{display:flex;flex-direction:column;gap:6px}
+  .hero{grid-column:span 12;background:var(--card);border-radius:12px;padding:16px;display:flex;justify-content:space-between;align-items:center;gap:16px;box-shadow:0 8px 20px rgba(6,50,20,0.03)}
+  .welcome{display:flex;flex-direction:column}
   .welcome h2{margin:0;color:var(--dark)}
   .quick-actions{display:flex;gap:10px}
 
   /* cards */
-  .card{background:var(--card);border-radius:12px;padding:14px;box-shadow:0 8px 20px rgba(6,50,20,0.05);overflow:auto}
+  .card{background:var(--card);border-radius:12px;padding:14px;box-shadow:0 8px 20px rgba(6,50,20,0.05);}
   .balances-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
   .balance{background:linear-gradient(180deg,#f3fff3,#ffffff);padding:12px;border-radius:10px;text-align:center}
   .balance .label{color:var(--muted);font-size:0.95rem}
@@ -78,9 +83,6 @@
   .btn{background:var(--accent);color:white;padding:10px 14px;border:none;border-radius:8px;cursor:pointer;font-weight:700}
   .btn.secondary{background:#fff;color:var(--accent);border:1px solid #e3f1e3}
 
-  /* hidden sections (forms shown only when chosen in menu) */
-  .hidden-by-default{display:none}
-
   /* Voluntary Withdrawal Application specifics - kept styles */
   /* loan stages */
   .stages{display:flex;gap:10px;align-items:center;justify-content:space-between}
@@ -92,34 +94,41 @@
   table{width:100%;border-collapse:collapse;margin-top:10px}
   th,td{padding:8px;border:1px solid #e6f0ea;font-size:0.9rem;text-align:left}
 
-  /* side avatar */
-  .side-avatar{width:84px;height:84px;border-radius:8px;overflow:hidden;background:#f4f4f4;margin-bottom:12px}
-  .side-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+  /* sidebar small tweaks */
+  .side h2{margin-top:0}
+  .muted{color:var(--muted)}
 
+  /* profile area fix: ensure it can grow and isn't cut on small screens */
+  #profile-area{overflow:visible}
+  .profile-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+
+  /* small screens adjustments */
   @media (max-width:1000px){
     .big{grid-column:span 12}
     .side{grid-column:span 12}
     .form-grid{grid-template-columns:1fr}
-    .menu{left:12px;}
-    .user-info{align-items:flex-end}
+    .menu{left:8px;right:8px;max-width:unset}
   }
+
+  /* PDF watermark (visual only in page if needed) */
+  .watermark{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);opacity:0.06;font-size:72px;color:#2e7d32;pointer-events:none;white-space:nowrap}
 </style>
 </head>
 <body>
 
   <div class="topbar">
-    <div class="brand" style="display:flex;align-items:center;">
-      <div id="topAvatarSmall" class="top-avatar-small" title="Your photo">
-        <i class="fas fa-user" style="color:var(--dark)"></i>
-      </div>
+    <div class="brand">
+      <i class="fas fa-seedling" style="font-size:1.25rem;color:var(--gold)"></i>
       <h1>Visionary Youth Group</h1>
     </div>
 
-    <div style="display:flex;gap:12px;align-items:center">
-      <div class="user-info" style="margin-right:8px">
+    <div class="user-area">
+      <div class="avatar-wrap" id="topAvatar" title="Profile photo">
+        <!-- avatar inserted by JS -->
+      </div>
+      <div class="user-info">
         <div id="topEmail">—</div>
         <small id="topStatus">Status: <strong style="color:#9ff2b8">Active</strong></small>
-        <div style="font-size:0.85rem;margin-top:4px;color:#fff"><i class="fas fa-star"></i> Points: <span id="pointsDisplay">0</span></div>
       </div>
 
       <div style="display:flex;align-items:center;gap:10px">
@@ -129,12 +138,13 @@
     </div>
   </div>
 
+  <!-- Menu: hidden by default and offset a bit for mobile finger tap -->
   <div class="menu" id="menu" aria-hidden="true">
     <a href="#" data-target="overview"><i class="fas fa-home"></i> Overview</a>
     <a href="#" data-target="balancesCard"><i class="fas fa-wallet"></i> Balances</a>
-    <a href="#" data-target="loan-section"><i class="fas fa-file-signature"></i> Apply Loan (Form)</a>
-    <a href="#" data-target="withdraw-section"><i class="fas fa-hand-holding-usd"></i> Withdrawable Savings (Form)</a>
-    <a href="#" data-target="loansListFull"><i class="fas fa-money-bill-wave"></i> Loans (Full List)</a>
+    <a href="#" data-target="loan-section"><i class="fas fa-file-signature"></i> Loan Application</a>
+    <a href="#" data-target="loansListFull"><i class="fas fa-money-bill-wave"></i> Loans (Manage)</a>
+    <a href="#" data-target="withdraw-section"><i class="fas fa-hand-holding-usd"></i> Withdrawals</a>
     <a href="#" data-target="profile-area"><i class="fas fa-user-edit"></i> Update Profile</a>
     <a href="#" id="menuLogout"><i class="fas fa-sign-out-alt"></i> Logout</a>
   </div>
@@ -145,7 +155,7 @@
       <div class="welcome">
         <h2 id="welcomeName">Welcome, Member</h2>
         <div style="color:var(--muted);margin-top:6px">Quick snapshot — all amounts shown in <strong>Ksh</strong></div>
-        <div style="color:var(--muted);font-size:0.9rem;margin-top:6px">Your email and status appear to the right — click the menu (≡) to open forms.</div>
+        <div style="margin-top:6px;font-size:0.9rem">Points: <strong id="pointsDisplay">0</strong></div>
       </div>
       <div class="quick-actions">
         <button id="quickApply" class="btn"><i class="fas fa-file-signature"></i>&nbsp;Apply Loan</button>
@@ -167,16 +177,17 @@
       </div>
     </div>
 
-    <!-- loan application big form (hidden by default; opened from menu) -->
-    <section class="card big hidden-by-default" id="loan-section" aria-labelledby="loanHeading">
+    <!-- loan application big form -->
+    <section class="card big" id="loan-section" aria-labelledby="loanHeading">
       <h2 id="loanHeading"><i class="fas fa-file-signature"></i> Loan Application (Official Form)</h2>
 
       <form id="fullLoanForm">
         <!-- header -->
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
           <div>
             <div style="font-weight:800">VISIONARY YOUTH GROUP 2024</div>
             <div style="font-weight:700;color:var(--muted)">SOCIAL PROMOTION REGISTERED TRUSTEES</div>
+            <div style="font-size:0.9rem;color:var(--muted)">Group: <strong id="groupNameDisplay">Visionary Youth Group</strong></div>
           </div>
           <div style="text-align:right;font-size:0.9rem">
             <div>Loan Number: <span id="loanNoDisplay">—</span></div>
@@ -295,8 +306,8 @@ Please read the full terms on the system: you must have 6 consecutive months sav
       </form>
     </section>
 
-    <!-- New Withdrawable Form (hidden by default) -->
-    <section class="card big hidden-by-default" id="withdraw-section">
+    <!-- New Withdrawable Form -->
+    <section class="card big" id="withdraw-section">
       <h2><i class="fas fa-hand-holding-usd"></i> Voluntary Withdrawable Savings Form</h2>
 
       <form id="withdrawForm">
@@ -317,41 +328,23 @@ Please read the full terms on the system: you must have 6 consecutive months sav
       </form>
     </section>
 
-    <!-- side panel: loans summary & account statement -->
-    <aside class="card side" id="sidePanel">
-      <div style="display:flex;gap:12px;align-items:center">
-        <div id="topAvatar" class="side-avatar">
-          <i class="fas fa-user" style="font-size:28px;color:var(--muted);display:block;margin:auto"></i>
-        </div>
-        <div>
-          <div id="welcomeNameSidebar" style="font-weight:700">Member</div>
-          <div id="topEmailSidebar" style="font-size:0.9rem;color:var(--muted)">—</div>
-        </div>
-      </div>
-
-      <hr style="margin:12px 0">
-      <h2 style="margin-top:6px">Loans & Status</h2>
+    <!-- loans management full list (with status update selects) -->
+    <section class="card side" id="loansListFull">
+      <h2>Loans — Manage Applications</h2>
       <div id="loansListArea">Loading loans…</div>
-
-      <div id="loansListFull" style="margin-top:12px; display:none"></div>
+      <div id="loansListFull" style="margin-top:12px"></div>
 
       <hr style="margin:12px 0">
       <div style="display:flex;gap:8px">
         <button id="downloadStatement" class="btn secondary"><i class="fas fa-file-pdf"></i>&nbsp;Download Statement</button>
-        <button id="downloadApplications" class="btn" title="Download all applications as PDF"><i class="fas fa-download"></i>&nbsp;My Applications</button>
+        <button id="downloadApplications" class="btn" title="Download all my applications"><i class="fas fa-download"></i>&nbsp;My Applications</button>
       </div>
+    </section>
 
-      <hr style="margin:12px 0">
-      <div style="margin-top:10px">
-        <div style="font-weight:700">Points</div>
-        <div style="margin-top:6px">You have <strong id="pointsDisplaySide">0</strong> points</div>
-      </div>
-    </aside>
-
-    <!-- profile area (hidden by default) -->
-    <section class="card hidden-by-default" id="profile-area">
+    <!-- profile area -->
+    <section class="card" id="profile-area">
       <h2><i class="fas fa-user-edit"></i> Update Profile</h2>
-      <div class="form-grid" style="margin-top:10px">
+      <div class="profile-grid" style="margin-top:10px">
         <input class="full" id="profile_fullName" placeholder="Full name">
         <input id="profile_phone" placeholder="Phone">
         <input id="profile_id" placeholder="ID Number">
@@ -359,31 +352,33 @@ Please read the full terms on the system: you must have 6 consecutive months sav
         <input id="profile_dob" type="date" placeholder="Date of Birth">
       </div>
 
-      <div style="margin-top:12px; display:flex; gap:8px; align-items:center;">
-        <div>
-          <label style="font-weight:700">Upload Pass Photo</label><br>
-          <input id="photoUploadInput" type="file" accept="image/*">
-        </div>
-        <div style="margin-left:auto;display:flex;gap:8px">
-          <button id="saveProfile" class="btn">Save Profile</button>
-          <button id="profileStatement" class="btn secondary">Account Statement</button>
-        </div>
+      <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+        <input type="file" id="photoUploadInput" accept="image/*" style="display:none">
+        <button id="choosePhotoBtn" class="btn secondary"><i class="fas fa-camera"></i>&nbsp;Upload Photo</button>
+        <button id="saveProfile" class="btn">Save Profile</button>
+        <button id="profileStatement" class="btn secondary">Account Statement</button>
+      </div>
+
+      <div style="margin-top:12px;font-size:0.9rem;color:var(--muted)">
+        <strong>Note:</strong> Your photo will be visible at the top when uploaded. Profile changes are saved to the server.
       </div>
     </section>
   </main>
 
   <div id="toast" style="position:fixed;right:18px;bottom:18px;background:#28a745;color:#fff;padding:10px 14px;border-radius:8px;display:none;z-index:2000"></div>
 
+<!-- Firebase & App logic -->
 <script type="module">
-  // imports
+  // Imports
   import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
   import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
   import { getDatabase, ref, onValue, get, push, set, update } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
   import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
 
+  // jsPDF
   const { jsPDF } = window.jspdf;
 
-  // CONFIG: keep your firebase config (unchanged)
+  // Firebase config (kept as provided)
   const firebaseConfig = {
     apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
     authDomain: "visionary-youth-grou-2024.firebaseapp.com",
@@ -393,6 +388,7 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     messagingSenderId: "372978592717",
     appId: "1:372978592717:web:1c15aec728ee5f854f3284"
   };
+
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getDatabase(app);
@@ -404,12 +400,10 @@ Please read the full terms on the system: you must have 6 consecutive months sav
   const toast = document.getElementById('toast');
   const topEmail = document.getElementById('topEmail');
   const welcomeName = document.getElementById('welcomeName');
-  const topAvatarSmall = document.getElementById('topAvatarSmall');
-  const topAvatar = document.getElementById('topAvatar');
-  const welcomeNameSidebar = document.getElementById('welcomeNameSidebar');
-  const topEmailSidebar = document.getElementById('topEmailSidebar');
   const pointsDisplay = document.getElementById('pointsDisplay');
-  const pointsDisplaySide = document.getElementById('pointsDisplaySide');
+  const topAvatar = document.getElementById('topAvatar');
+  const welcomeNameSidebar = document.getElementById('welcomeNameSidebar'); // may not exist
+  const topEmailSidebar = document.getElementById('topEmailSidebar'); // may not exist
 
   // helpers
   function showToast(msg, timeout=3000){
@@ -422,43 +416,21 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     return 'Ksh ' + num.toLocaleString('en-KE');
   }
 
-  // menu toggles
+  // menu toggles (offset is already in CSS via left)
   if (hamburger) {
     hamburger.addEventListener('click', ()=> {
       menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
     });
   }
 
-  // show/hide sections (forms are hidden by default)
-  const hiddenSections = ['loan-section','withdraw-section','profile-area','loansListFull'];
-  function hideAllHiddenSections(){
-    hiddenSections.forEach(id=>{
-      const el = document.getElementById(id);
-      if(el) el.classList.add('hidden-by-default');
-      // if loansListFull exists, hide by default
-      if(id === 'loansListFull' && el) el.style.display = 'none';
-    });
-  }
-  hideAllHiddenSections();
-
-  function showSection(id){
-    hideAllHiddenSections();
-    const el = document.getElementById(id);
-    if(!el) return;
-    el.classList.remove('hidden-by-default');
-    if(id === 'loansListFull') el.style.display = 'block';
-    // scroll into view
-    setTimeout(()=> el.scrollIntoView({behavior:'smooth', block:'start'}), 50);
-    menu.style.display = 'none';
-  }
-
-  // menu links close and open sections
+  // menu links close and scroll
   menu.querySelectorAll('a[data-target]').forEach(a=>{
     a.addEventListener('click', (e)=>{
       e.preventDefault();
       const target = a.dataset.target;
-      // show the section on demand
-      showSection(target);
+      const el = document.getElementById(target);
+      if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+      menu.style.display = 'none';
     });
   });
 
@@ -471,24 +443,30 @@ Please read the full terms on the system: you must have 6 consecutive months sav
   function resetLogoutTimer(){
     clearTimeout(logoutTimer);
     logoutTimer = setTimeout(()=>{
-      try{ signOut(auth); } catch(e){}
+      try { signOut(auth); } catch(e) {}
       alert('Logged out due to inactivity');
       location.href='index.html';
     }, 3*60*1000);
   }
   ['mousemove','keydown','click','touchstart'].forEach(ev=> window.addEventListener(ev, resetLogoutTimer));
 
-  // points helpers
+  // ----- Points functions -----
   async function getPoints(){
     if(!currentUid) return 0;
     try{
       const snap = await get(ref(db, `members/${currentUid}/points`));
-      return snap.exists() ? Number(snap.val()||0) : 0;
-    }catch(e){ return 0; }
+      return snap.exists()? Number(snap.val()||0) : 0;
+    }catch(e){ console.error(e); return 0; }
   }
   async function setPoints(n){
     if(!currentUid) return;
-    try{ await set(ref(db, `members/${currentUid}/points`), Number(n)||0); if(pointsDisplay) pointsDisplay.textContent = String(Number(n)||0); if(pointsDisplaySide) pointsDisplaySide.textContent = String(Number(n)||0);}catch(e){console.error(e)}
+    await set(ref(db, `members/${currentUid}/points`), Number(n||0));
+    if(pointsDisplay) pointsDisplay.textContent = String(Number(n||0));
+  }
+  async function logActivity(msg){
+    if(!currentUid) return;
+    const entryRef = push(ref(db, `members/${currentUid}/activityLog`));
+    await set(entryRef, {text: msg, ts: Date.now()});
   }
   async function awardPoints(n, reason){
     if(!currentUid || !n) return;
@@ -498,44 +476,21 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     showToast(`+${n} points`);
     logActivity(`Points +${n} (${reason})`);
   }
-  async function logActivity(text){
-    if(!currentUid) return;
-    try{ const node = push(ref(db, `members/${currentUid}/activityLog`)); await set(node, {text, at: Date.now()}); }catch(e){ console.error(e) }
-  }
 
-  // small activity
-  function logLocal(msg){ console.log('[dashboard]', msg); }
-
-  // Set avatar helper
-  function setAvatar(url){
-    if(!url) return;
-    const smallHtml = `<img src="${url}" alt="avatar">`;
-    const sideHtml = `<img src="${url}" alt="avatar">`;
-    if(topAvatarSmall) topAvatarSmall.innerHTML = smallHtml;
-    if(topAvatar) topAvatar.innerHTML = sideHtml;
-    if(welcomeNameSidebar) welcomeNameSidebar.style.marginTop = '0';
-  }
-
-  // fallback avatars
-  if(topAvatar) topAvatar.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--muted)"><i class="fas fa-user"></i></div>';
-  if(topAvatarSmall) topAvatarSmall.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--dark)"><i class="fas fa-user"></i></div>';
-
-  // AUTH state: load data
+  // ----- AUTH STATE -----
   onAuthStateChanged(auth, async user => {
-    if(!user) { location.href='index.html'; return; }
+    if(!user){ location.href='index.html'; return; }
     currentUid = user.uid;
     topEmail.textContent = user.email || '—';
     welcomeName.textContent = (user.email || 'Member').split('@')[0];
-    welcomeNameSidebar.textContent = welcomeName.textContent;
-    topEmailSidebar.textContent = user.email || '—';
     resetLogoutTimer();
-    awardPoints(10, 'Logged in'); // login bonus
+    awardPoints(10, 'Logged in'); // small login bonus
 
-    // load profile (real-time)
+    // load profile
     onValue(ref(db, `members/${currentUid}/profile`), snap=>{
       if(snap.exists()){
         const p = snap.val();
-        if(p.name){ if(document.getElementById('welcomeName')) document.getElementById('welcomeName').textContent = p.name; if(document.getElementById('welcomeNameSidebar')) document.getElementById('welcomeNameSidebar').textContent = p.name; }
+        if(p.name){ document.getElementById('welcomeName').textContent = p.name; if(document.getElementById('welcomeNameSidebar')) document.getElementById('welcomeNameSidebar').textContent = p.name; }
         if(p.name) document.getElementById('profile_fullName').value = p.name;
         if(p.phone) document.getElementById('profile_phone').value = p.phone;
         if(p.id) document.getElementById('profile_id').value = p.id;
@@ -545,13 +500,19 @@ Please read the full terms on the system: you must have 6 consecutive months sav
       }
     });
 
-    // get photo if exists
-    const photoSnap = await get(ref(db, `members/${currentUid}/photoURL`));
-    if(photoSnap && photoSnap.exists()){
-      setAvatar(photoSnap.val());
-    }
+    // profile photo: get url if exists
+    try{
+      const photoSnap = await get(ref(db, `members/${currentUid}/photoURL`));
+      if(photoSnap && photoSnap.exists()){
+        const url = photoSnap.val();
+        setAvatar(url);
+      } else {
+        // placeholder avatar
+        if(topAvatar) topAvatar.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--dark)"><i class="fas fa-user"></i></div>';
+      }
+    }catch(e){ console.error(e); }
 
-    // Balances listeners
+    // balances listeners (preserve original reading semantics)
     const monthlyRef = ref(db, `members/${currentUid}/savings/monthly`);
     const weeklyRef = ref(db, `members/${currentUid}/savings/weekly`);
     const sharesRef = ref(db, `members/${currentUid}/shares/total`);
@@ -666,15 +627,13 @@ Please read the full terms on the system: you must have 6 consecutive months sav
 
     // display points
     const ptsSnap = await get(ref(db, `members/${currentUid}/points`));
-    const pts = ptsSnap.exists() ? Number(ptsSnap.val()||0) : 0;
-    if(pointsDisplay) pointsDisplay.textContent = String(pts);
-    if(pointsDisplaySide) pointsDisplaySide.textContent = String(pts);
+    pointsDisplay.textContent = ptsSnap.exists()? String(ptsSnap.val()||0) : '0';
   }); // end onAuthStateChanged
 
   // ------------------ Loan Application logic & PDF ------------------
   const loanForm = document.getElementById('fullLoanForm');
   if (document.getElementById('previewLoanPdf')) {
-    document.getElementById('previewLoanPdf').addEventListener('click', async (e)=>{
+    document.getElementById('previewLoanPdf').addEventListener('click', (e)=>{
       e.preventDefault();
       if(!loanForm) return;
       const formData = new FormData(loanForm);
@@ -726,57 +685,58 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     });
   }
 
-  // Build loan PDF (modern header, watermark, group name)
+  // Build loan PDF with a modern header + watermark + group name
   function buildLoanPdfDoc(data, opts={}){
     const doc = new jsPDF({unit:'pt',format:'a4'});
-    const left = 36; let y = 40;
+    let y = 40; const left = 36;
 
-    // header accent bar
-    doc.setFillColor(46,125,50); // accent
-    doc.rect(0,0,595,64,'F');
-    doc.setFont('helvetica','bold'); doc.setTextColor(255,255,255); doc.setFontSize(18);
-    doc.text('VISIONARY YOUTH GROUP — 2024', 300, 38, {align:'center'});
+    // header block with accent bar
+    doc.setFillColor(46,125,50); // --accent
+    doc.rect(0,0,595,60,'F');
+    doc.setFont('helvetica','bold'); doc.setTextColor(255,255,255); doc.setFontSize(16);
+    doc.text('VISIONARY YOUTH GROUP', 300, 36, {align:'center'});
     doc.setTextColor(0,0,0);
-    y = 90;
 
-    // watermark (light)
+    // watermark text faint (repeat lightly)
+    doc.setTextColor(200,230,200);
     doc.setFontSize(48);
-    doc.setTextColor(200,200,200);
-    // angle watermark
-    try { doc.text('VISIONARY', 170, 420, {angle:40}); } catch(e) { /* ignore if unsupported */ }
+    doc.text('VISIONARY YOUTH GROUP', 300, 320, {align:'center', angle:0, baseline: 'middle' });
     doc.setTextColor(0,0,0);
-    doc.setFontSize(12);
+
+    y = 80;
+    doc.setFontSize(12); doc.setFont('helvetica','bold');
+    doc.text('LOAN APPLICATION FORM', 300, y, {align:'center'}); y += 16;
+    doc.setLineWidth(0.5); doc.line(left, y, 555, y); y += 14;
 
     // meta
-    doc.setFont('helvetica','bold'); doc.text('LOAN APPLICATION FORM', left, y); y+=16;
-    doc.setDrawColor(200); doc.setLineWidth(0.5); doc.line(left, y, 555, y); y+=14;
-
-    // Applicant info
-    doc.setFont('helvetica','bold'); doc.text('APPLICANT INFORMATION', left, y); y+=12;
-    doc.setFont('helvetica','normal');
-    const lines = [
-      `Self-help group: ${data.selfHelpGroup || ''}`,
-      `Name: ${data.memberName || data.name || ''}`,
-      `Membership No: ${data.membershipNumber || ''}`,
-      `National ID/Passport: ${data.nationalId || ''}`,
-      `Marital Status: ${data.maritalStatus || ''} • DOB: ${data.dob || ''}`,
-      `County/Town: ${data.county || ''} / ${data.town || ''}`,
-      `Address: ${data.currentAddress || ''}`,
-      `Phone: ${data.phone || ''} • Email: ${data.email || ''}`
+    doc.setFontSize(10); doc.setFont('helvetica','bold');
+    doc.text('APPLICANT INFORMATION', left, y); y+=12;
+    doc.setFont('helvetica','normal'); const info = [
+      `Self-help group: ${data.selfHelpGroup||document.getElementById('groupNameDisplay').textContent||''}`,
+      `Name: ${data.memberName||''}`,
+      `Membership No: ${data.membershipNumber||''}`,
+      `National ID/Passport: ${data.nationalId||''}`,
+      `Marital Status: ${data.maritalStatus||''} • DOB: ${data.dob||''}`,
+      `County/Town: ${data.county||''} / ${data.town||''}`,
+      `Address: ${data.currentAddress||''}`,
+      `Phone: ${data.phone||''} • Email: ${data.email||''}`
     ];
-    lines.forEach(line=>{ const wrap = doc.splitTextToSize(line,520); doc.text(wrap,left,y); y += wrap.length * 12; });
+    info.forEach(line=>{
+      const wrap = doc.splitTextToSize(line, 520);
+      doc.text(wrap, left, y); y += wrap.length * 12;
+    });
 
     y += 6;
     doc.setFont('helvetica','bold'); doc.text('LOAN DETAILS', left, y); y+=12;
     doc.setFont('helvetica','normal');
     const loanLines = [
-      `Amount: Ksh ${data.amountFigures || ''} (${data.amountWords || ''})`,
-      `Purpose: ${data.purpose || ''}`,
-      `Repayable (months): ${data.repayableMonths || ''}`
+      `Amount: Ksh ${data.amountFigures||''} (${data.amountWords||''})`,
+      `Purpose: ${data.purpose||''}`,
+      `Repayable (months): ${data.repayableMonths||''}`
     ];
     loanLines.forEach(line=>{ const wr = doc.splitTextToSize(line,520); doc.text(wr,left,y); y += wr.length*12; });
 
-    y += 8;
+    y+=8;
     doc.setFont('helvetica','bold'); doc.text('GUARANTORS', left, y); y+=10;
     doc.setFont('helvetica','normal'); doc.setFontSize(9);
     const guars = data.guarantors || [];
@@ -792,20 +752,15 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     const tw = doc.splitTextToSize(terms, 520);
     doc.text(tw, left, y); y += tw.length*12;
 
-    if(y > 700){ doc.addPage(); y = 40; }
+    if(y > 700){ doc.addPage(); y=40; }
     doc.setFont('helvetica','bold'); doc.text('Applicant Signature: ______________________   Date: ___________', left, y);
-
-    // add footer contact details on last page
-    const pageCount = doc.internal.getNumberOfPages();
-    for(let i=1;i<=pageCount;i++){
+    // footer with page number
+    const pageCount = doc.getNumberOfPages();
+    for (let i=1;i<=pageCount;i++){
       doc.setPage(i);
-      doc.setFontSize(9);
-      doc.setTextColor(120);
-      doc.text('Visionary Youth Group • Social Promotion Registered Trustees • Contact: info@visionaryyouth.org', 36, 770);
-      doc.text(`Page ${i} of ${pageCount}`, 530, 770, {align:'right'});
-      doc.setTextColor(0);
+      doc.setFontSize(8); doc.setTextColor(120);
+      doc.text(`Visionary Youth Group • Official Loan Application • Page ${i} of ${pageCount}`, 300, 820, {align:'center'});
     }
-
     return doc;
   }
 
@@ -834,15 +789,12 @@ Please read the full terms on the system: you must have 6 consecutive months sav
   }
   function buildWithdrawPdfDoc(data, opts={}){
     const doc = new jsPDF({unit:'pt',format:'a4'});
-    let y = 40; const left = 36;
-
-    // header
+    let y = 50, left = 40;
     doc.setFillColor(46,125,50); doc.rect(0,0,595,56,'F');
     doc.setFont('helvetica','bold'); doc.setTextColor(255,255,255); doc.setFontSize(14);
-    doc.text('VOLUNTARY WITHDRAWABLE SAVINGS FORM — Visionary Youth Group', 300, 36, {align:'center'});
+    doc.text('VOLUNTARY WITHDRAWABLE SAVINGS FORM', 300, 36, {align:'center'});
     doc.setTextColor(0,0,0);
     y = 80;
-
     doc.setFont('helvetica','bold'); doc.text('Member Information', left, y); y+=14;
     doc.setFont('helvetica','normal'); const lines = [
       `Name: ${data.memberName||''}`,
@@ -856,15 +808,15 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     lines.forEach(line=>{ const wrap = doc.splitTextToSize(line,520); doc.text(wrap,left,y); y += wrap.length*14; });
     y+=18;
     doc.setFont('helvetica','bold'); doc.text('Member Signature: ________________________   Date: ____________', left, y);
-    doc.setFontSize(9); doc.setTextColor(120); doc.text('Generated by Visionary Youth Group platform', left, 780);
-    doc.setTextColor(0);
+    // footer
+    doc.setFontSize(8); doc.setTextColor(120);
+    doc.text(`Visionary Youth Group • Voluntary Withdrawal Form`, 300, 820, {align:'center'});
     return doc;
   }
 
   // ------------------ Account Statement PDF ------------------
   async function buildAccountStatementPdf(){
     if(!currentUid) return alert('Not signed in');
-    // read relevant nodes
     const snapMember = await get(ref(db, `members/${currentUid}`));
     const snapshotMonthly = await get(ref(db, `members/${currentUid}/savings/monthly`));
     const snapshotWeekly = await get(ref(db, `members/${currentUid}/savings/weekly`));
@@ -875,17 +827,16 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     let left = 36, y = 40;
     doc.setFillColor(46,125,50); doc.rect(0,0,595,56,'F');
     doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(16);
-    doc.text('ACCOUNT STATEMENT — Visionary Youth Group', 300, 36, {align:'center'});
+    doc.text('ACCOUNT STATEMENT', 300, 36, {align:'center'});
     doc.setTextColor(0,0,0);
     y = 80;
-
     const profile = snapMember.exists() && snapMember.val().profile ? snapMember.val().profile : {};
     doc.setFontSize(10); doc.setFont('helvetica','normal');
     doc.text(`Member: ${profile.name || profile.fullName || topEmail.textContent}`, left, y); y+=12;
     doc.text(`Email: ${topEmail.textContent}`, left, y); y+=12;
     doc.text(`Date: ${new Date().toLocaleDateString()}`, left, y); y+=18;
 
-    // Totals
+    // Totals:
     function calcSnap(snap){
       if(!snap.exists()) return 0;
       const val = snap.val();
@@ -931,21 +882,10 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     }
     if(y > 700){ doc.addPage(); y=40; }
     doc.line(left, y+20, left+240, y+20); doc.text('Prepared by / Signature', left, y+34);
-
-    // footer
-    const pageCount = doc.internal.getNumberOfPages();
-    for(let i=1;i<=pageCount;i++){
-      doc.setPage(i);
-      doc.setFontSize(9); doc.setTextColor(120);
-      doc.text('Visionary Youth Group • Contact: info@visionaryyouth.org', 36, 780);
-      doc.text(`Page ${i} of ${pageCount}`, 530, 780, {align:'right'});
-      doc.setTextColor(0);
-    }
-
     return doc;
   }
 
-  // account statement download handlers (guarded)
+  // account statement button handlers
   const downloadStatementTopBtn = document.getElementById('downloadStatementTop');
   if(downloadStatementTopBtn) downloadStatementTopBtn.addEventListener('click', async ()=>{
     const doc = await buildAccountStatementPdf();
@@ -979,9 +919,7 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     if(!snap.exists()) return alert('No applications found');
     const apps = snap.val();
     const doc = new jsPDF({unit:'pt',format:'a4'}); let y=40; const left=36;
-    doc.setFillColor(46,125,50); doc.rect(0,0,595,56,'F');
-    doc.setFontSize(16); doc.setTextColor(255,255,255); doc.text('Loan Applications — Visionary Youth Group',300,y+8,{align:'center'}); doc.setTextColor(0);
-    y+=40;
+    doc.setFontSize(16); doc.text('Loan Applications',300,y,{align:'center'}); y+=20;
     doc.setFontSize(10);
     for(const [id,app] of Object.entries(apps)){
       const title = `${app.memberName || app.name || ''} — ${formatKsh(app.amountFigures || 0)} — ${app.status||''}`;
@@ -1002,9 +940,9 @@ Please read the full terms on the system: you must have 6 consecutive months sav
 
   // preview / quick apply handlers
   const quickApplyBtn = document.getElementById('quickApply');
-  if(quickApplyBtn) quickApplyBtn.addEventListener('click', ()=> showSection('loan-section'));
+  if(quickApplyBtn) quickApplyBtn.addEventListener('click', ()=> document.getElementById('loan-section').scrollIntoView({behavior:'smooth'}));
 
-  // Profile save + award points
+  // Save profile (and optionally upload photo)
   const saveProfileBtn = document.getElementById('saveProfile');
   if(saveProfileBtn) saveProfileBtn.addEventListener('click', async ()=>{
     if(!currentUid) return alert('Not authenticated');
@@ -1023,8 +961,14 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     awardPoints(5, 'Updated profile');
   });
 
-  // Photo upload handling
+  // choose photo button
+  const choosePhotoBtn = document.getElementById('choosePhotoBtn');
   const photoInput = document.getElementById('photoUploadInput');
+  if(choosePhotoBtn && photoInput){
+    choosePhotoBtn.addEventListener('click', ()=> photoInput.click());
+  }
+
+  // Photo upload handling
   if(photoInput){
     photoInput.addEventListener('change', async (e)=>{
       const file = e.target.files && e.target.files[0];
@@ -1046,19 +990,28 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     });
   }
 
+  function setAvatar(url){
+    const html = `<img src="${url}" alt="avatar">`;
+    if(topAvatar) topAvatar.innerHTML = html;
+  }
+
+  // initial placeholder
+  if(!topAvatar || !topAvatar.innerHTML) {
+    if(topAvatar) topAvatar.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--dark)"><i class="fas fa-user"></i></div>';
+  }
+
   // logout via menu
   const menuLogout = document.getElementById('menuLogout');
   if(menuLogout) menuLogout.addEventListener('click', ()=> { try{ signOut(auth); }catch(e){} window.location.href='index.html'; });
 
-  // award points when visiting pages via menu
-  document.querySelectorAll('.menu a[data-target]').forEach(a=>{
-    a.addEventListener('click', ()=> {
-      awardPoints(1, `Visited ${a.dataset.target}`);
-    });
+  // award some points on page actions (e.g., opening loan or withdrawal)
+  document.querySelectorAll('[data-target]').forEach(a=>{
+    a.addEventListener('click', ()=> awardPoints(1, `Visited ${a.dataset.target}`));
   });
 
-  // small initial log
-  logActivity('Dashboard loaded');
+  // small listener to award points for downloads via buttons in header (already attached above)
+  // initial small activity
+  (async()=>{ try{ await logActivity('Dashboard loaded'); }catch(e){} })();
 
 </script>
 
