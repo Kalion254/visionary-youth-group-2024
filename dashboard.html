@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-<!-- jsPDF (single include only) -->
+<!-- jsPDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
@@ -25,7 +25,6 @@
   body{
     margin:0;font-family:'Poppins',sans-serif;background:linear-gradient(120deg,var(--bg1),#f6fff6);color:#123;
   }
-
   /* Top bar */
   .topbar{
     position:fixed;left:0;right:0;top:0;height:64px;background:linear-gradient(90deg,var(--dark),#26734d);color:#fff;
@@ -33,30 +32,20 @@
     box-shadow:0 6px 20px rgba(6,50,20,0.12);
   }
   .brand{display:flex;align-items:center;gap:12px}
-  .brand h1{font-size:1.05rem;margin:0;font-weight:700}
+  .brand h1{font-size:1.05rem;margin:0;font-weight:700; color: #fff}
   .hamburger{font-size:1.6rem;cursor:pointer}
-  .user-info{text-align:right;font-size:0.95rem;display:flex;flex-direction:column;align-items:flex-end}
+  .user-info{text-align:right;font-size:0.95rem; display:flex; flex-direction:column; align-items:flex-end}
   .user-info small{display:block;color:rgba(255,255,255,0.85)}
-  .top-controls{display:flex;gap:12px;align-items:center}
-  .avatar {
-    width:40px;height:40px;border-radius:8px;background:rgba(255,255,255,0.08);overflow:hidden;border:1px solid rgba(255,255,255,0.06);
-    display:flex;align-items:center;justify-content:center;
-  }
-  .avatar img{width:100%;height:100%;object-fit:cover}
+  .top-avatar-small{width:44px;height:44px;border-radius:50%;overflow:hidden;background:#fff;display:flex;align-items:center;justify-content:center}
+  .top-avatar-small img{width:100%;height:100%;object-fit:cover;display:block}
 
-  .points-badge {
-    background:rgba(255,255,255,0.12);
-    padding:6px 10px;border-radius:999px;font-weight:700;color:#fff;font-size:0.9rem;border:1px solid rgba(255,255,255,0.06)
-  }
-
-  /* Menu overlay (compact) */
+  /* Menu overlay */
   .menu{
-    position:fixed;top:64px;left:18px;background:rgba(255,255,255,0.98);width:260px;border-radius:8px;padding:8px;
+    position:fixed;top:64px;left:18px;background:rgba(255,255,255,0.98);max-width:320px;border-radius:8px;padding:8px;
     box-shadow:0 8px 30px rgba(0,0,0,0.12);display:none;z-index:1199;
   }
   .menu a{display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;color:#123;text-decoration:none}
   .menu a:hover{background:#f1fff1}
-  .menu hr{border:0;border-top:1px solid #eef7ee;margin:8px 0}
 
   /* Layout */
   .page{
@@ -66,12 +55,12 @@
 
   /* Hero / summary */
   .hero{grid-column:span 12;background:var(--card);border-radius:12px;padding:16px;display:flex;justify-content:space-between;align-items:center;gap:16px}
-  .welcome{display:flex;flex-direction:column}
+  .welcome{display:flex;flex-direction:column;gap:6px}
   .welcome h2{margin:0;color:var(--dark)}
   .quick-actions{display:flex;gap:10px}
 
   /* cards */
-  .card{background:var(--card);border-radius:12px;padding:14px;box-shadow:0 8px 20px rgba(6,50,20,0.05);overflow:hidden;}
+  .card{background:var(--card);border-radius:12px;padding:14px;box-shadow:0 8px 20px rgba(6,50,20,0.05);overflow:auto}
   .balances-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
   .balance{background:linear-gradient(180deg,#f3fff3,#ffffff);padding:12px;border-radius:10px;text-align:center}
   .balance .label{color:var(--muted);font-size:0.95rem}
@@ -89,10 +78,11 @@
   .btn{background:var(--accent);color:white;padding:10px 14px;border:none;border-radius:8px;cursor:pointer;font-weight:700}
   .btn.secondary{background:#fff;color:var(--accent);border:1px solid #e3f1e3}
 
-  /* hidden sections by default — will be opened from menu */
-  .hidden-section{display:none}
+  /* hidden sections (forms shown only when chosen in menu) */
+  .hidden-by-default{display:none}
 
-  /* Loan stages */
+  /* Voluntary Withdrawal Application specifics - kept styles */
+  /* loan stages */
   .stages{display:flex;gap:10px;align-items:center;justify-content:space-between}
   .stage{flex:1;padding:10px;border-radius:8px;background:#f5faf5;text-align:center}
   .stage.active{background:var(--dark);color:white;font-weight:700}
@@ -102,55 +92,50 @@
   table{width:100%;border-collapse:collapse;margin-top:10px}
   th,td{padding:8px;border:1px solid #e6f0ea;font-size:0.9rem;text-align:left}
 
-  /* responsive */
+  /* side avatar */
+  .side-avatar{width:84px;height:84px;border-radius:8px;overflow:hidden;background:#f4f4f4;margin-bottom:12px}
+  .side-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+
   @media (max-width:1000px){
     .big{grid-column:span 12}
     .side{grid-column:span 12}
     .form-grid{grid-template-columns:1fr}
-    .menu{left:10px;width:calc(100% - 20px)}
+    .menu{left:12px;}
+    .user-info{align-items:flex-end}
   }
-
-  /* small helper styles */
-  .muted{color:var(--muted)}
-  .status-select{padding:6px;border-radius:6px;border:1px solid #d1d5db}
-  .activity-log{max-height:260px;overflow:auto;padding:6px;background:#fbfff9;border-radius:8px}
-  .hidden-file{display:none}
 </style>
 </head>
 <body>
 
   <div class="topbar">
-    <div class="brand">
-      <i class="fas fa-seedling" style="font-size:1.25rem;color:var(--gold)"></i>
+    <div class="brand" style="display:flex;align-items:center;">
+      <div id="topAvatarSmall" class="top-avatar-small" title="Your photo">
+        <i class="fas fa-user" style="color:var(--dark)"></i>
+      </div>
       <h1>Visionary Youth Group</h1>
     </div>
 
     <div style="display:flex;gap:12px;align-items:center">
-      <div class="user-info" style="align-items:flex-end">
+      <div class="user-info" style="margin-right:8px">
         <div id="topEmail">—</div>
         <small id="topStatus">Status: <strong style="color:#9ff2b8">Active</strong></small>
+        <div style="font-size:0.85rem;margin-top:4px;color:#fff"><i class="fas fa-star"></i> Points: <span id="pointsDisplay">0</span></div>
       </div>
 
-      <div class="top-controls" style="margin-left:12px">
-        <div class="points-badge" id="pointsDisplay">0 pts</div>
-        <div class="avatar" id="topAvatarSmall" title="Your photo / profile">
-          <i class="fas fa-user" style="color:#fff"></i>
-        </div>
+      <div style="display:flex;align-items:center;gap:10px">
         <button id="downloadStatementTop" title="Download Account Statement" class="btn secondary"><i class="fas fa-file-pdf"></i>&nbsp;Statement</button>
         <i class="fas fa-bars hamburger hamburgerAction" role="button" aria-label="Menu" style="font-size:20px;color:#fff;margin-left:6px"></i>
       </div>
     </div>
   </div>
 
-  <!-- menu (click to open) -->
   <div class="menu" id="menu" aria-hidden="true">
     <a href="#" data-target="overview"><i class="fas fa-home"></i> Overview</a>
     <a href="#" data-target="balancesCard"><i class="fas fa-wallet"></i> Balances</a>
-    <a href="#" data-target="loan-section"><i class="fas fa-file-signature"></i> Loan Application</a>
-    <a href="#" data-target="withdraw-section"><i class="fas fa-hand-holding-usd"></i> Withdrawable Form</a>
-    <a href="#" data-target="loansListFull"><i class="fas fa-money-bill-wave"></i> Loans (Manage)</a>
+    <a href="#" data-target="loan-section"><i class="fas fa-file-signature"></i> Apply Loan (Form)</a>
+    <a href="#" data-target="withdraw-section"><i class="fas fa-hand-holding-usd"></i> Withdrawable Savings (Form)</a>
+    <a href="#" data-target="loansListFull"><i class="fas fa-money-bill-wave"></i> Loans (Full List)</a>
     <a href="#" data-target="profile-area"><i class="fas fa-user-edit"></i> Update Profile</a>
-    <hr />
     <a href="#" id="menuLogout"><i class="fas fa-sign-out-alt"></i> Logout</a>
   </div>
 
@@ -160,6 +145,7 @@
       <div class="welcome">
         <h2 id="welcomeName">Welcome, Member</h2>
         <div style="color:var(--muted);margin-top:6px">Quick snapshot — all amounts shown in <strong>Ksh</strong></div>
+        <div style="color:var(--muted);font-size:0.9rem;margin-top:6px">Your email and status appear to the right — click the menu (≡) to open forms.</div>
       </div>
       <div class="quick-actions">
         <button id="quickApply" class="btn"><i class="fas fa-file-signature"></i>&nbsp;Apply Loan</button>
@@ -181,13 +167,13 @@
       </div>
     </div>
 
-    <!-- loan application big form (hidden until menu click or quickApply) -->
-    <section class="card big hidden-section" id="loan-section" aria-labelledby="loanHeading">
+    <!-- loan application big form (hidden by default; opened from menu) -->
+    <section class="card big hidden-by-default" id="loan-section" aria-labelledby="loanHeading">
       <h2 id="loanHeading"><i class="fas fa-file-signature"></i> Loan Application (Official Form)</h2>
 
       <form id="fullLoanForm">
         <!-- header -->
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap">
           <div>
             <div style="font-weight:800">VISIONARY YOUTH GROUP 2024</div>
             <div style="font-weight:700;color:var(--muted)">SOCIAL PROMOTION REGISTERED TRUSTEES</div>
@@ -309,8 +295,8 @@ Please read the full terms on the system: you must have 6 consecutive months sav
       </form>
     </section>
 
-    <!-- New Withdrawable Form (hidden) -->
-    <section class="card big hidden-section" id="withdraw-section">
+    <!-- New Withdrawable Form (hidden by default) -->
+    <section class="card big hidden-by-default" id="withdraw-section">
       <h2><i class="fas fa-hand-holding-usd"></i> Voluntary Withdrawable Savings Form</h2>
 
       <form id="withdrawForm">
@@ -331,49 +317,39 @@ Please read the full terms on the system: you must have 6 consecutive months sav
       </form>
     </section>
 
-    <!-- loans list full (manage) — hidden by menu -->
-    <section class="card side hidden-section" id="loansListFull">
-      <h2>Loans & Manage Applications</h2>
-      <div id="loansListArea">Loading loans…</div>
-      <div id="loansListFullContainer" style="margin-top:12px"></div>
-      <hr style="margin:12px 0">
-      <div style="display:flex;gap:8px">
-        <button id="downloadApplications" class="btn"><i class="fas fa-download"></i>&nbsp;My Applications</button>
-        <button id="downloadStatement" class="btn secondary"><i class="fas fa-file-pdf"></i>&nbsp;Download Statement</button>
-      </div>
-    </section>
-
-    <!-- side quick panel (keeps original content) -->
+    <!-- side panel: loans summary & account statement -->
     <aside class="card side" id="sidePanel">
-      <h2>Overview — Quick Actions</h2>
-
-      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
-        <div class="avatar" id="topAvatar" style="width:72px;height:72px;border-radius:10px">
-          <i class="fas fa-user" style="color:var(--dark)"></i>
+      <div style="display:flex;gap:12px;align-items:center">
+        <div id="topAvatar" class="side-avatar">
+          <i class="fas fa-user" style="font-size:28px;color:var(--muted);display:block;margin:auto"></i>
         </div>
-        <div style="flex:1">
+        <div>
           <div id="welcomeNameSidebar" style="font-weight:700">Member</div>
-          <div id="topEmailSidebar" class="muted" style="font-size:0.9rem">—</div>
-        </div>
-      </div>
-
-      <div style="margin-top:10px">
-        <div style="font-weight:700;margin-bottom:6px">Points</div>
-        <div class="activity-log" id="activityLogArea">
-          <div id="pointsDetails" style="margin-bottom:8px">Total points: <strong id="pointsTotal">0</strong></div>
+          <div id="topEmailSidebar" style="font-size:0.9rem;color:var(--muted)">—</div>
         </div>
       </div>
 
       <hr style="margin:12px 0">
+      <h2 style="margin-top:6px">Loans & Status</h2>
+      <div id="loansListArea">Loading loans…</div>
+
+      <div id="loansListFull" style="margin-top:12px; display:none"></div>
+
+      <hr style="margin:12px 0">
       <div style="display:flex;gap:8px">
-        <button id="openProfilePhotoUpload" class="btn secondary"><i class="fas fa-camera"></i>&nbsp;Upload Photo</button>
-        <input id="photoUploadInput" type="file" accept="image/*" class="hidden-file">
-        <button id="saveProfile" class="btn"><i class="fas fa-save"></i>&nbsp;Save Profile</button>
+        <button id="downloadStatement" class="btn secondary"><i class="fas fa-file-pdf"></i>&nbsp;Download Statement</button>
+        <button id="downloadApplications" class="btn" title="Download all applications as PDF"><i class="fas fa-download"></i>&nbsp;My Applications</button>
+      </div>
+
+      <hr style="margin:12px 0">
+      <div style="margin-top:10px">
+        <div style="font-weight:700">Points</div>
+        <div style="margin-top:6px">You have <strong id="pointsDisplaySide">0</strong> points</div>
       </div>
     </aside>
 
-    <!-- profile area (hidden until menu click) -->
-    <section class="card hidden-section" id="profile-area">
+    <!-- profile area (hidden by default) -->
+    <section class="card hidden-by-default" id="profile-area">
       <h2><i class="fas fa-user-edit"></i> Update Profile</h2>
       <div class="form-grid" style="margin-top:10px">
         <input class="full" id="profile_fullName" placeholder="Full name">
@@ -382,27 +358,32 @@ Please read the full terms on the system: you must have 6 consecutive months sav
         <input id="profile_yearJoined" placeholder="Year Joined (e.g. 2021)">
         <input id="profile_dob" type="date" placeholder="Date of Birth">
       </div>
-      <div style="margin-top:12px;display:flex;gap:8px">
-        <button id="saveProfileBtn" class="btn">Save Profile</button>
-        <button id="profileStatement" class="btn secondary">Account Statement</button>
+
+      <div style="margin-top:12px; display:flex; gap:8px; align-items:center;">
+        <div>
+          <label style="font-weight:700">Upload Pass Photo</label><br>
+          <input id="photoUploadInput" type="file" accept="image/*">
+        </div>
+        <div style="margin-left:auto;display:flex;gap:8px">
+          <button id="saveProfile" class="btn">Save Profile</button>
+          <button id="profileStatement" class="btn secondary">Account Statement</button>
+        </div>
       </div>
     </section>
-
   </main>
 
   <div id="toast" style="position:fixed;right:18px;bottom:18px;background:#28a745;color:#fff;padding:10px 14px;border-radius:8px;display:none;z-index:2000"></div>
 
 <script type="module">
-  // Firebase imports (modular)
+  // imports
   import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
   import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-  import { getDatabase, ref, onValue, get, push, set } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+  import { getDatabase, ref, onValue, get, push, set, update } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
   import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
 
-  // jsPDF available via window.jspdf (loaded in head)
   const { jsPDF } = window.jspdf;
 
-  // CONFIG: use your firebase config or existing one
+  // CONFIG: keep your firebase config (unchanged)
   const firebaseConfig = {
     apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
     authDomain: "visionary-youth-grou-2024.firebaseapp.com",
@@ -423,13 +404,12 @@ Please read the full terms on the system: you must have 6 consecutive months sav
   const toast = document.getElementById('toast');
   const topEmail = document.getElementById('topEmail');
   const welcomeName = document.getElementById('welcomeName');
-  const topAvatar = document.getElementById('topAvatar');
   const topAvatarSmall = document.getElementById('topAvatarSmall');
-  const pointsDisplay = document.getElementById('pointsDisplay');
-  const pointsTotalEl = document.getElementById('pointsTotal');
+  const topAvatar = document.getElementById('topAvatar');
   const welcomeNameSidebar = document.getElementById('welcomeNameSidebar');
   const topEmailSidebar = document.getElementById('topEmailSidebar');
-  const activityLogArea = document.getElementById('activityLogArea');
+  const pointsDisplay = document.getElementById('pointsDisplay');
+  const pointsDisplaySide = document.getElementById('pointsDisplaySide');
 
   // helpers
   function showToast(msg, timeout=3000){
@@ -449,67 +429,68 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     });
   }
 
-  // Hide all sections that should be hidden initially
-  function hideAllManagedSections(){
-    document.querySelectorAll('.hidden-section').forEach(el=> el.style.display = 'none');
+  // show/hide sections (forms are hidden by default)
+  const hiddenSections = ['loan-section','withdraw-section','profile-area','loansListFull'];
+  function hideAllHiddenSections(){
+    hiddenSections.forEach(id=>{
+      const el = document.getElementById(id);
+      if(el) el.classList.add('hidden-by-default');
+      // if loansListFull exists, hide by default
+      if(id === 'loansListFull' && el) el.style.display = 'none';
+    });
   }
-  hideAllManagedSections(); // keep the hidden sections hidden by default
+  hideAllHiddenSections();
 
-  // menu links: reveal section and scroll into view
+  function showSection(id){
+    hideAllHiddenSections();
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.classList.remove('hidden-by-default');
+    if(id === 'loansListFull') el.style.display = 'block';
+    // scroll into view
+    setTimeout(()=> el.scrollIntoView({behavior:'smooth', block:'start'}), 50);
+    menu.style.display = 'none';
+  }
+
+  // menu links close and open sections
   menu.querySelectorAll('a[data-target]').forEach(a=>{
     a.addEventListener('click', (e)=>{
       e.preventDefault();
       const target = a.dataset.target;
-      const el = document.getElementById(target);
-      if(el){
-        // hide previous managed ones, show the chosen one
-        hideAllManagedSections();
-        el.style.display = (el.classList.contains('side') ? 'block' : 'block');
-        // close menu on small screens too
-        menu.style.display = 'none';
-        // scroll to element
-        setTimeout(()=> el.scrollIntoView({behavior:'smooth', block:'start'}), 80);
-      }
+      // show the section on demand
+      showSection(target);
     });
   });
 
-  // Quick apply behavior: reveal loan section if hidden
-  const quickApplyBtn = document.getElementById('quickApply');
-  if(quickApplyBtn) quickApplyBtn.addEventListener('click', ()=>{
-    const loanSection = document.getElementById('loan-section');
-    if(loanSection){
-      hideAllManagedSections();
-      loanSection.style.display = 'block';
-      loanSection.scrollIntoView({behavior:'smooth', block:'start'});
-    }
-  });
+  // global auth variables
+  let currentUid = null;
+  let profileSavedOnce = false;
 
   // Auto logout (3 minutes)
   let logoutTimer;
-  function resetLogoutTimer(){ 
-    clearTimeout(logoutTimer); 
-    logoutTimer = setTimeout(()=>{ 
-      try { signOut(auth); } catch(e){} 
-      alert('Logged out due to inactivity'); 
-      location.href='index.html'; 
-    }, 3*60*1000); 
+  function resetLogoutTimer(){
+    clearTimeout(logoutTimer);
+    logoutTimer = setTimeout(()=>{
+      try{ signOut(auth); } catch(e){}
+      alert('Logged out due to inactivity');
+      location.href='index.html';
+    }, 3*60*1000);
   }
   ['mousemove','keydown','click','touchstart'].forEach(ev=> window.addEventListener(ev, resetLogoutTimer));
 
-  // Points helpers (store per-member under members/{uid}/points)
+  // points helpers
   async function getPoints(){
     if(!currentUid) return 0;
-    const snap = await get(ref(db, `members/${currentUid}/points`));
-    return snap.exists()? Number(snap.val()||0) : 0;
+    try{
+      const snap = await get(ref(db, `members/${currentUid}/points`));
+      return snap.exists() ? Number(snap.val()||0) : 0;
+    }catch(e){ return 0; }
   }
   async function setPoints(n){
     if(!currentUid) return;
-    await set(ref(db, `members/${currentUid}/points`), Number(n) || 0);
-    const p = Number(n) || 0;
-    if(pointsDisplay) pointsDisplay.textContent = `${p} pts`;
-    if(pointsTotalEl) pointsTotalEl.textContent = String(p);
+    try{ await set(ref(db, `members/${currentUid}/points`), Number(n)||0); if(pointsDisplay) pointsDisplay.textContent = String(Number(n)||0); if(pointsDisplaySide) pointsDisplaySide.textContent = String(Number(n)||0);}catch(e){console.error(e)}
   }
-  async function awardPoints(n, reason=''){
+  async function awardPoints(n, reason){
     if(!currentUid || !n) return;
     const current = await getPoints();
     const updated = (Number(current)||0) + Number(n);
@@ -517,39 +498,29 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     showToast(`+${n} points`);
     logActivity(`Points +${n} (${reason})`);
   }
-
-  // log activity in RTDB and show in activity panel
-  async function logActivity(msg){
+  async function logActivity(text){
     if(!currentUid) return;
-    const t = Date.now();
-    const item = { ts: t, text: msg };
-    // push an activity entry (keeps short)
-    try{
-      const aRef = push(ref(db, `members/${currentUid}/activity`));
-      await set(aRef, item);
-    }catch(e){ console.warn('Activity push failed', e) }
-    // also show locally in activity area
-    appendActivityLocal(item);
-  }
-  function appendActivityLocal(item){
-    try{
-      if(!activityLogArea) return;
-      const el = document.createElement('div');
-      el.style.marginBottom = '6px';
-      el.innerHTML = `<div style="font-size:0.85rem">${new Date(item.ts).toLocaleString()}</div><div style="font-size:0.95rem">${item.text}</div>`;
-      activityLogArea.prepend(el);
-    }catch(e){}
+    try{ const node = push(ref(db, `members/${currentUid}/activityLog`)); await set(node, {text, at: Date.now()}); }catch(e){ console.error(e) }
   }
 
-  // Defensive element getters for elements that might not exist
-  const loanBalanceEl = document.getElementById('loanBalance');
-  const loanBalance2El = document.getElementById('loanBalance2');
+  // small activity
+  function logLocal(msg){ console.log('[dashboard]', msg); }
 
-  // Global auth variable
-  let currentUid = null;
-  let profileSavedOnce = false;
+  // Set avatar helper
+  function setAvatar(url){
+    if(!url) return;
+    const smallHtml = `<img src="${url}" alt="avatar">`;
+    const sideHtml = `<img src="${url}" alt="avatar">`;
+    if(topAvatarSmall) topAvatarSmall.innerHTML = smallHtml;
+    if(topAvatar) topAvatar.innerHTML = sideHtml;
+    if(welcomeNameSidebar) welcomeNameSidebar.style.marginTop = '0';
+  }
 
-  // AUTH state: load data and wire listeners
+  // fallback avatars
+  if(topAvatar) topAvatar.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--muted)"><i class="fas fa-user"></i></div>';
+  if(topAvatarSmall) topAvatarSmall.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--dark)"><i class="fas fa-user"></i></div>';
+
+  // AUTH state: load data
   onAuthStateChanged(auth, async user => {
     if(!user) { location.href='index.html'; return; }
     currentUid = user.uid;
@@ -558,13 +529,13 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     welcomeNameSidebar.textContent = welcomeName.textContent;
     topEmailSidebar.textContent = user.email || '—';
     resetLogoutTimer();
-    awardPoints(10, 'Logged in'); // small login bonus
+    awardPoints(10, 'Logged in'); // login bonus
 
-    // load profile
+    // load profile (real-time)
     onValue(ref(db, `members/${currentUid}/profile`), snap=>{
       if(snap.exists()){
         const p = snap.val();
-        if(p.name){ document.getElementById('welcomeName').textContent = p.name; if(welcomeNameSidebar) welcomeNameSidebar.textContent = p.name; }
+        if(p.name){ if(document.getElementById('welcomeName')) document.getElementById('welcomeName').textContent = p.name; if(document.getElementById('welcomeNameSidebar')) document.getElementById('welcomeNameSidebar').textContent = p.name; }
         if(p.name) document.getElementById('profile_fullName').value = p.name;
         if(p.phone) document.getElementById('profile_phone').value = p.phone;
         if(p.id) document.getElementById('profile_id').value = p.id;
@@ -574,14 +545,13 @@ Please read the full terms on the system: you must have 6 consecutive months sav
       }
     });
 
-    // profile photo: get url if exists
+    // get photo if exists
     const photoSnap = await get(ref(db, `members/${currentUid}/photoURL`));
     if(photoSnap && photoSnap.exists()){
-      const url = photoSnap.val();
-      setAvatar(url);
+      setAvatar(photoSnap.val());
     }
 
-    // Balances references (preserve original reading semantics)
+    // Balances listeners
     const monthlyRef = ref(db, `members/${currentUid}/savings/monthly`);
     const weeklyRef = ref(db, `members/${currentUid}/savings/weekly`);
     const sharesRef = ref(db, `members/${currentUid}/shares/total`);
@@ -615,8 +585,7 @@ Please read the full terms on the system: you must have 6 consecutive months sav
       const obj = s.exists()? s.val() : {total:0,unpaid:0};
       const total = obj.total || 0; const unpaid = obj.unpaid || 0;
       const totalEl = document.getElementById('totalLoansVal'); if(totalEl) totalEl.textContent = formatKsh(total);
-      if(loanBalanceEl) loanBalanceEl.textContent = formatKsh(unpaid);
-      if(loanBalance2El) loanBalance2El.textContent = formatKsh(unpaid);
+      const unpaidEl = document.getElementById('unpaidVal'); if(unpaidEl) unpaidEl.textContent = formatKsh(unpaid);
     });
 
     onValue(outstandingLoansRef, s=>{
@@ -628,7 +597,7 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     const appsRef = ref(db, `members/${currentUid}/loans/applications`);
     onValue(appsRef, snap=>{
       const area = document.getElementById('loansListArea');
-      const areaFull = document.getElementById('loansListFullContainer');
+      const areaFull = document.getElementById('loansListFull');
       if(area) area.innerHTML = '';
       if(areaFull) areaFull.innerHTML = '';
       if(!snap.exists()){
@@ -697,24 +666,15 @@ Please read the full terms on the system: you must have 6 consecutive months sav
 
     // display points
     const ptsSnap = await get(ref(db, `members/${currentUid}/points`));
-    const pts = ptsSnap.exists()? Number(ptsSnap.val()||0) : 0;
-    if(pointsDisplay) pointsDisplay.textContent = `${pts} pts`;
-    if(pointsTotalEl) pointsTotalEl.textContent = String(pts);
-
-    // load recent activity entries (show top 10)
-    const aSnap = await get(ref(db, `members/${currentUid}/activity`));
-    if(aSnap && aSnap.exists()){
-      const activities = aSnap.val();
-      const entries = Object.values(activities).sort((a,b)=>b.ts - a.ts).slice(0,10);
-      entries.forEach(e => appendActivityLocal(e));
-    }
-
+    const pts = ptsSnap.exists() ? Number(ptsSnap.val()||0) : 0;
+    if(pointsDisplay) pointsDisplay.textContent = String(pts);
+    if(pointsDisplaySide) pointsDisplaySide.textContent = String(pts);
   }); // end onAuthStateChanged
 
   // ------------------ Loan Application logic & PDF ------------------
   const loanForm = document.getElementById('fullLoanForm');
   if (document.getElementById('previewLoanPdf')) {
-    document.getElementById('previewLoanPdf').addEventListener('click', (e)=>{
+    document.getElementById('previewLoanPdf').addEventListener('click', async (e)=>{
       e.preventDefault();
       if(!loanForm) return;
       const formData = new FormData(loanForm);
@@ -766,52 +726,57 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     });
   }
 
-  // Build loan PDF with a modern header
+  // Build loan PDF (modern header, watermark, group name)
   function buildLoanPdfDoc(data, opts={}){
     const doc = new jsPDF({unit:'pt',format:'a4'});
-    let y = 40; const left = 36;
+    const left = 36; let y = 40;
 
-    // header block with accent bar
-    doc.setFillColor(46,125,50); // --accent
-    doc.rect(0,0,595,60,'F');
-    doc.setFont('helvetica','bold'); doc.setTextColor(255,255,255); doc.setFontSize(16);
-    doc.text('VISIONARY YOUTH GROUP', 300, 36, {align:'center'});
+    // header accent bar
+    doc.setFillColor(46,125,50); // accent
+    doc.rect(0,0,595,64,'F');
+    doc.setFont('helvetica','bold'); doc.setTextColor(255,255,255); doc.setFontSize(18);
+    doc.text('VISIONARY YOUTH GROUP — 2024', 300, 38, {align:'center'});
     doc.setTextColor(0,0,0);
+    y = 90;
 
-    y = 80;
-    doc.setFontSize(12); doc.setFont('helvetica','bold');
-    doc.text('LOAN APPLICATION FORM', 300, y, {align:'center'}); y += 16;
-    doc.setLineWidth(0.5); doc.line(left, y, 555, y); y += 14;
+    // watermark (light)
+    doc.setFontSize(48);
+    doc.setTextColor(200,200,200);
+    // angle watermark
+    try { doc.text('VISIONARY', 170, 420, {angle:40}); } catch(e) { /* ignore if unsupported */ }
+    doc.setTextColor(0,0,0);
+    doc.setFontSize(12);
 
     // meta
-    doc.setFontSize(10); doc.setFont('helvetica','bold');
-    doc.text('APPLICANT INFORMATION', left, y); y+=12;
-    doc.setFont('helvetica','normal'); const info = [
-      `Self-help group: ${data.selfHelpGroup||''}`,
-      `Name: ${data.memberName||''}`,
-      `Membership No: ${data.membershipNumber||''}`,
-      `National ID/Passport: ${data.nationalId||''}`,
-      `Marital Status: ${data.maritalStatus||''} • DOB: ${data.dob||''}`,
-      `County/Town: ${data.county||''} / ${data.town||''}`,
-      `Address: ${data.currentAddress||''}`,
-      `Phone: ${data.phone||''} • Email: ${data.email||''}`
+    doc.setFont('helvetica','bold'); doc.text('LOAN APPLICATION FORM', left, y); y+=16;
+    doc.setDrawColor(200); doc.setLineWidth(0.5); doc.line(left, y, 555, y); y+=14;
+
+    // Applicant info
+    doc.setFont('helvetica','bold'); doc.text('APPLICANT INFORMATION', left, y); y+=12;
+    doc.setFont('helvetica','normal');
+    const lines = [
+      `Self-help group: ${data.selfHelpGroup || ''}`,
+      `Name: ${data.memberName || data.name || ''}`,
+      `Membership No: ${data.membershipNumber || ''}`,
+      `National ID/Passport: ${data.nationalId || ''}`,
+      `Marital Status: ${data.maritalStatus || ''} • DOB: ${data.dob || ''}`,
+      `County/Town: ${data.county || ''} / ${data.town || ''}`,
+      `Address: ${data.currentAddress || ''}`,
+      `Phone: ${data.phone || ''} • Email: ${data.email || ''}`
     ];
-    info.forEach(line=>{
-      const wrap = doc.splitTextToSize(line, 520);
-      doc.text(wrap, left, y); y += wrap.length * 12;
-    });
+    lines.forEach(line=>{ const wrap = doc.splitTextToSize(line,520); doc.text(wrap,left,y); y += wrap.length * 12; });
 
     y += 6;
     doc.setFont('helvetica','bold'); doc.text('LOAN DETAILS', left, y); y+=12;
     doc.setFont('helvetica','normal');
     const loanLines = [
-      `Amount: Ksh ${data.amountFigures||''} (${data.amountWords||''})`,
-      `Purpose: ${data.purpose||''}`,
-      `Repayable (months): ${data.repayableMonths||''}`
+      `Amount: Ksh ${data.amountFigures || ''} (${data.amountWords || ''})`,
+      `Purpose: ${data.purpose || ''}`,
+      `Repayable (months): ${data.repayableMonths || ''}`
     ];
     loanLines.forEach(line=>{ const wr = doc.splitTextToSize(line,520); doc.text(wr,left,y); y += wr.length*12; });
 
-    y+=8;
+    y += 8;
     doc.setFont('helvetica','bold'); doc.text('GUARANTORS', left, y); y+=10;
     doc.setFont('helvetica','normal'); doc.setFontSize(9);
     const guars = data.guarantors || [];
@@ -827,8 +792,20 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     const tw = doc.splitTextToSize(terms, 520);
     doc.text(tw, left, y); y += tw.length*12;
 
-    if(y > 700){ doc.addPage(); y=40; }
+    if(y > 700){ doc.addPage(); y = 40; }
     doc.setFont('helvetica','bold'); doc.text('Applicant Signature: ______________________   Date: ___________', left, y);
+
+    // add footer contact details on last page
+    const pageCount = doc.internal.getNumberOfPages();
+    for(let i=1;i<=pageCount;i++){
+      doc.setPage(i);
+      doc.setFontSize(9);
+      doc.setTextColor(120);
+      doc.text('Visionary Youth Group • Social Promotion Registered Trustees • Contact: info@visionaryyouth.org', 36, 770);
+      doc.text(`Page ${i} of ${pageCount}`, 530, 770, {align:'right'});
+      doc.setTextColor(0);
+    }
+
     return doc;
   }
 
@@ -857,12 +834,15 @@ Please read the full terms on the system: you must have 6 consecutive months sav
   }
   function buildWithdrawPdfDoc(data, opts={}){
     const doc = new jsPDF({unit:'pt',format:'a4'});
-    let y = 50, left = 40;
+    let y = 40; const left = 36;
+
+    // header
     doc.setFillColor(46,125,50); doc.rect(0,0,595,56,'F');
     doc.setFont('helvetica','bold'); doc.setTextColor(255,255,255); doc.setFontSize(14);
-    doc.text('VOLUNTARY WITHDRAWABLE SAVINGS FORM', 300, 36, {align:'center'});
+    doc.text('VOLUNTARY WITHDRAWABLE SAVINGS FORM — Visionary Youth Group', 300, 36, {align:'center'});
     doc.setTextColor(0,0,0);
     y = 80;
+
     doc.setFont('helvetica','bold'); doc.text('Member Information', left, y); y+=14;
     doc.setFont('helvetica','normal'); const lines = [
       `Name: ${data.memberName||''}`,
@@ -876,12 +856,15 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     lines.forEach(line=>{ const wrap = doc.splitTextToSize(line,520); doc.text(wrap,left,y); y += wrap.length*14; });
     y+=18;
     doc.setFont('helvetica','bold'); doc.text('Member Signature: ________________________   Date: ____________', left, y);
+    doc.setFontSize(9); doc.setTextColor(120); doc.text('Generated by Visionary Youth Group platform', left, 780);
+    doc.setTextColor(0);
     return doc;
   }
 
   // ------------------ Account Statement PDF ------------------
   async function buildAccountStatementPdf(){
     if(!currentUid) return alert('Not signed in');
+    // read relevant nodes
     const snapMember = await get(ref(db, `members/${currentUid}`));
     const snapshotMonthly = await get(ref(db, `members/${currentUid}/savings/monthly`));
     const snapshotWeekly = await get(ref(db, `members/${currentUid}/savings/weekly`));
@@ -892,16 +875,17 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     let left = 36, y = 40;
     doc.setFillColor(46,125,50); doc.rect(0,0,595,56,'F');
     doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(16);
-    doc.text('ACCOUNT STATEMENT', 300, 36, {align:'center'});
+    doc.text('ACCOUNT STATEMENT — Visionary Youth Group', 300, 36, {align:'center'});
     doc.setTextColor(0,0,0);
     y = 80;
+
     const profile = snapMember.exists() && snapMember.val().profile ? snapMember.val().profile : {};
     doc.setFontSize(10); doc.setFont('helvetica','normal');
     doc.text(`Member: ${profile.name || profile.fullName || topEmail.textContent}`, left, y); y+=12;
     doc.text(`Email: ${topEmail.textContent}`, left, y); y+=12;
     doc.text(`Date: ${new Date().toLocaleDateString()}`, left, y); y+=18;
 
-    // Totals:
+    // Totals
     function calcSnap(snap){
       if(!snap.exists()) return 0;
       const val = snap.val();
@@ -947,10 +931,21 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     }
     if(y > 700){ doc.addPage(); y=40; }
     doc.line(left, y+20, left+240, y+20); doc.text('Prepared by / Signature', left, y+34);
+
+    // footer
+    const pageCount = doc.internal.getNumberOfPages();
+    for(let i=1;i<=pageCount;i++){
+      doc.setPage(i);
+      doc.setFontSize(9); doc.setTextColor(120);
+      doc.text('Visionary Youth Group • Contact: info@visionaryyouth.org', 36, 780);
+      doc.text(`Page ${i} of ${pageCount}`, 530, 780, {align:'right'});
+      doc.setTextColor(0);
+    }
+
     return doc;
   }
 
-  // account statement button handlers
+  // account statement download handlers (guarded)
   const downloadStatementTopBtn = document.getElementById('downloadStatementTop');
   if(downloadStatementTopBtn) downloadStatementTopBtn.addEventListener('click', async ()=>{
     const doc = await buildAccountStatementPdf();
@@ -984,7 +979,9 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     if(!snap.exists()) return alert('No applications found');
     const apps = snap.val();
     const doc = new jsPDF({unit:'pt',format:'a4'}); let y=40; const left=36;
-    doc.setFontSize(16); doc.text('Loan Applications',300,y,{align:'center'}); y+=20;
+    doc.setFillColor(46,125,50); doc.rect(0,0,595,56,'F');
+    doc.setFontSize(16); doc.setTextColor(255,255,255); doc.text('Loan Applications — Visionary Youth Group',300,y+8,{align:'center'}); doc.setTextColor(0);
+    y+=40;
     doc.setFontSize(10);
     for(const [id,app] of Object.entries(apps)){
       const title = `${app.memberName || app.name || ''} — ${formatKsh(app.amountFigures || 0)} — ${app.status||''}`;
@@ -1003,8 +1000,12 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     awardPoints(6, 'Downloaded applications PDF');
   });
 
-  // Save profile (and optionally upload photo) — from side panel
-  const saveProfileBtn = document.getElementById('saveProfileBtn');
+  // preview / quick apply handlers
+  const quickApplyBtn = document.getElementById('quickApply');
+  if(quickApplyBtn) quickApplyBtn.addEventListener('click', ()=> showSection('loan-section'));
+
+  // Profile save + award points
+  const saveProfileBtn = document.getElementById('saveProfile');
   if(saveProfileBtn) saveProfileBtn.addEventListener('click', async ()=>{
     if(!currentUid) return alert('Not authenticated');
     if(profileSavedOnce) { showToast('Profile already updated in this session'); return; }
@@ -1022,31 +1023,8 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     awardPoints(5, 'Updated profile');
   });
 
-  // The saveProfile button in side panel (keeps older id)
-  const saveProfileBtnLegacy = document.getElementById('saveProfile');
-  if(saveProfileBtnLegacy) saveProfileBtnLegacy.addEventListener('click', async ()=>{
-    if(!currentUid) return alert('Not authenticated');
-    if(profileSavedOnce) { showToast('Profile already updated in this session'); return; }
-    const payload = {
-      name: document.getElementById('profile_fullName').value,
-      phone: document.getElementById('profile_phone').value,
-      id: document.getElementById('profile_id').value,
-      yearJoined: document.getElementById('profile_yearJoined').value,
-      dob: document.getElementById('profile_dob').value,
-      status: 'Active'
-    };
-    await set(ref(db, `members/${currentUid}/profile`), payload);
-    profileSavedOnce = true;
-    showToast('Profile updated');
-    awardPoints(5, 'Updated profile');
-  });
-
-  // Photo upload handling (storage)
+  // Photo upload handling
   const photoInput = document.getElementById('photoUploadInput');
-  const openPhotoUploadBtn = document.getElementById('openProfilePhotoUpload');
-  if(openPhotoUploadBtn && photoInput){
-    openPhotoUploadBtn.addEventListener('click', ()=> photoInput.click());
-  }
   if(photoInput){
     photoInput.addEventListener('change', async (e)=>{
       const file = e.target.files && e.target.files[0];
@@ -1068,26 +1046,18 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     });
   }
 
-  function setAvatar(url){
-    const html = `<img src="${url}" alt="avatar">`;
-    if(topAvatar) topAvatar.innerHTML = html;
-    if(topAvatarSmall) topAvatarSmall.innerHTML = html;
-  }
-
-  // small utility: set initial avatar (blank)
-  if(topAvatar) topAvatar.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--dark)"> <i class="fas fa-user"></i> </div>';
-  if(topAvatarSmall) topAvatarSmall.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#fff"> <i class="fas fa-user"></i> </div>';
-
-  // award some points on page actions (e.g., opening loan or withdrawal)
-  document.querySelectorAll('[data-target]').forEach(a=>{
-    a.addEventListener('click', ()=> awardPoints(1, `Visited ${a.dataset.target}`));
-  });
-
-  // Logout via menu
+  // logout via menu
   const menuLogout = document.getElementById('menuLogout');
   if(menuLogout) menuLogout.addEventListener('click', ()=> { try{ signOut(auth); }catch(e){} window.location.href='index.html'; });
 
-  // initial small activity
+  // award points when visiting pages via menu
+  document.querySelectorAll('.menu a[data-target]').forEach(a=>{
+    a.addEventListener('click', ()=> {
+      awardPoints(1, `Visited ${a.dataset.target}`);
+    });
+  });
+
+  // small initial log
   logActivity('Dashboard loaded');
 
 </script>
