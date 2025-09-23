@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Visionary Youth Group — Dashboard</title>
+<title>Visionary Youth Group 2024 — Dashboard</title>
 
 <!-- Fonts & Icons -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
@@ -174,6 +174,9 @@
         <div class="balance"><div class="label">Total Loans</div><div class="value" id="totalLoansVal">Ksh 0</div></div>
         <div class="balance"><div class="label">Unpaid Balances</div><div class="value" id="unpaidVal">Ksh 0</div></div>
         <div class="balance"><div class="label">Outstanding Loans</div><div class="value" id="outstandingLoansVal">Ksh 0</div></div>
+        <div class="balance"><div class="label">Loan Stage</div><div class="value" id="loanstageVal">No Application</div></div>
+        <div class="balance"><div class="label">Loan Status</div><div class="value" id="loanstatusVal">No Application</div></div>
+
       </div>
     </div>
 
@@ -520,6 +523,10 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     const unpaidRef = ref(db, `members/${currentUid}/unpaidBalances`);
     const loansTotalsRef = ref(db, `members/${currentUid}/loans/summary`);
     const outstandingLoansRef = ref(db, `members/${currentUid}/outstandingLoans`);
+    const outstandingLoansRef = ref(db, `members/${currentUid}/loanstage`);
+    const outstandingLoansRef = ref(db, `members/${currentUid}/loanstatus`);
+
+
 
     async function snapToAmount(snap){
       if(!snap.exists()) return 0;
