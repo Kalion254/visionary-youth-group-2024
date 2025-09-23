@@ -170,7 +170,7 @@
         <div class="balance"><div class="label">Monthly Savings</div><div class="value" id="monthlyVal">Ksh 0</div></div>
         <div class="balance"><div class="label">Weekly Savings</div><div class="value" id="weeklyVal">Ksh 0</div></div>
         <div class="balance"><div class="label">Shares</div><div class="value" id="sharesVal">Ksh 0</div></div>
-        <div class="balance"><div class="label">Loan Status</div><div class="value" id="loanststatusVal">Loading..</div></div>
+        <div class="balance"><div class="label">Dividends</div><div class="value" id="dividendsVal">Ksh 0</div></div>
         <div class="balance"><div class="label">Total Loans</div><div class="value" id="totalLoansVal">Ksh 0</div></div>
         <div class="balance"><div class="label">Unpaid Balances</div><div class="value" id="unpaidVal">Ksh 0</div></div>
         <div class="balance"><div class="label">Outstanding Loans</div><div class="value" id="outstandingLoansVal">Ksh 0</div></div>
@@ -484,7 +484,7 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     topEmail.textContent = user.email || '—';
     welcomeName.textContent = (user.email || 'Member').split('@')[0];
     resetLogoutTimer();
-    awardPoints(3, 'Logged in'); // small login bonus
+    awardPoints(10, 'Logged in'); // small login bonus
 
     // load profile
     onValue(ref(db, `members/${currentUid}/profile`), snap=>{
@@ -516,7 +516,7 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     const monthlyRef = ref(db, `members/${currentUid}/savings/monthly`);
     const weeklyRef = ref(db, `members/${currentUid}/savings/weekly`);
     const sharesRef = ref(db, `members/${currentUid}/shares/total`);
-    const dividendsRef = ref(db, `members/${currentUid}/shares/loanstatus`);
+    const dividendsRef = ref(db, `members/${currentUid}/shares/dividends`);
     const unpaidRef = ref(db, `members/${currentUid}/unpaidBalances`);
     const loansTotalsRef = ref(db, `members/${currentUid}/loans/summary`);
     const outstandingLoansRef = ref(db, `members/${currentUid}/outstandingLoans`);
@@ -539,7 +539,7 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     onValue(monthlyRef, async s=>{ const v = await snapToAmount(s); const el = document.getElementById('monthlyVal'); if(el) el.textContent = formatKsh(v); });
     onValue(weeklyRef, async s=>{ const v = await snapToAmount(s); const el = document.getElementById('weeklyVal'); if(el) el.textContent = formatKsh(v); });
     onValue(sharesRef, s=>{ const v = s.exists()? Number(s.val()||0) : 0; const el = document.getElementById('sharesVal'); if(el) el.textContent = formatKsh(v); });
-    onValue(loanstatuRef, s=>{ const v = s.exists()? Number(s.val()||0) : 0; const el = document.getElementById('loanstatusVal'); if(el) el.textContent = formatKsh(v); });
+    onValue(dividendsRef, s=>{ const v = s.exists()? Number(s.val()||0) : 0; const el = document.getElementById('dividendsVal'); if(el) el.textContent = formatKsh(v); });
     onValue(unpaidRef, s=>{ const v = s.exists()? Number(s.val()||0) : 0; const el = document.getElementById('unpaidVal'); if(el) el.textContent = formatKsh(v); });
 
     onValue(loansTotalsRef, s=>{
