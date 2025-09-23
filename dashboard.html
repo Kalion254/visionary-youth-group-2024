@@ -484,7 +484,7 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     topEmail.textContent = user.email || '—';
     welcomeName.textContent = (user.email || 'Member').split('@')[0];
     resetLogoutTimer();
-    awardPoints(10, 'Logged in'); // small login bonus
+    awardPoints(3, 'Logged in'); // small login bonus
 
     // load profile
     onValue(ref(db, `members/${currentUid}/profile`), snap=>{
@@ -539,7 +539,7 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     onValue(monthlyRef, async s=>{ const v = await snapToAmount(s); const el = document.getElementById('monthlyVal'); if(el) el.textContent = formatKsh(v); });
     onValue(weeklyRef, async s=>{ const v = await snapToAmount(s); const el = document.getElementById('weeklyVal'); if(el) el.textContent = formatKsh(v); });
     onValue(sharesRef, s=>{ const v = s.exists()? Number(s.val()||0) : 0; const el = document.getElementById('sharesVal'); if(el) el.textContent = formatKsh(v); });
-    onValue(dividendsRef, s=>{ const v = s.exists()? Number(s.val()||0) : 0; const el = document.getElementById('dividendsVal'); if(el) el.textContent = formatKsh(v); });
+    onValue(loanstatuRef, s=>{ const v = s.exists()? Number(s.val()||0) : 0; const el = document.getElementById('loanstatusVal'); if(el) el.textContent = formatKsh(v); });
     onValue(unpaidRef, s=>{ const v = s.exists()? Number(s.val()||0) : 0; const el = document.getElementById('unpaidVal'); if(el) el.textContent = formatKsh(v); });
 
     onValue(loansTotalsRef, s=>{
