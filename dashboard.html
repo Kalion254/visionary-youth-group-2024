@@ -170,7 +170,7 @@
         <div class="balance"><div class="label">Monthly Savings</div><div class="value" id="monthlyVal">Ksh 0</div></div>
         <div class="balance"><div class="label">Weekly Savings</div><div class="value" id="weeklyVal">Ksh 0</div></div>
         <div class="balance"><div class="label">Shares</div><div class="value" id="sharesVal">Ksh 0</div></div>
-        <div class="balance"><div class="label">Dividends</div><div class="value" id="dividendsVal">Ksh 0</div></div>
+        <div class="balance"><div class="label">Loan Status</div><div class="value" id="loanststatusVal">Loading..</div></div>
         <div class="balance"><div class="label">Total Loans</div><div class="value" id="totalLoansVal">Ksh 0</div></div>
         <div class="balance"><div class="label">Unpaid Balances</div><div class="value" id="unpaidVal">Ksh 0</div></div>
         <div class="balance"><div class="label">Outstanding Loans</div><div class="value" id="outstandingLoansVal">Ksh 0</div></div>
@@ -516,7 +516,7 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     const monthlyRef = ref(db, `members/${currentUid}/savings/monthly`);
     const weeklyRef = ref(db, `members/${currentUid}/savings/weekly`);
     const sharesRef = ref(db, `members/${currentUid}/shares/total`);
-    const dividendsRef = ref(db, `members/${currentUid}/shares/dividends`);
+    const dividendsRef = ref(db, `members/${currentUid}/shares/loanstatus`);
     const unpaidRef = ref(db, `members/${currentUid}/unpaidBalances`);
     const loansTotalsRef = ref(db, `members/${currentUid}/loans/summary`);
     const outstandingLoansRef = ref(db, `members/${currentUid}/outstandingLoans`);
