@@ -22,7 +22,7 @@
 
     /* Navbar */
     nav{background:#fff;padding:14px 28px;position:sticky;top:0;z-index:30;box-shadow:0 2px 6px rgba(0,0,0,.08);display:flex;justify-content:space-between;align-items:center}
-    nav h1{color:#004d26;font-size:22px}
+    nav h1{color:#004d26;font-size:22px;font-weight:700}
     nav ul{list-style:none;display:flex;gap:18px;align-items:center}
     nav a{color:#222;text-decoration:none;font-weight:600}
     nav li{position:relative}
@@ -58,10 +58,10 @@
     .card i{font-size:34px;color:#ffcc00;margin-bottom:12px}
     .muted{color:#666;font-size:15px}
 
-    /* Bank banner / notice */
+    /* Highlight banner */
     .banner{background:#004d26;color:#fff;padding:14px;border-radius:8px;text-align:center;font-weight:700;margin:12px auto}
 
-    /* Join / Auth area */
+    /* Auth forms */
     #auth .intro{text-align:center;margin-bottom:18px}
     .forms{display:grid;grid-template-columns:1fr 1fr;gap:22px}
     .form-box{background:#fbfbfb;padding:18px;border-radius:10px}
@@ -71,7 +71,7 @@
     .btn.ghost{background:transparent;border:1px solid #004d26;color:#004d26}
     .member-preview{background:#f7fff7;border-left:4px solid #009a44;padding:14px;border-radius:8px;margin-top:10px}
 
-    /* Downloads / small UI */
+    /* Small UI / downloads */
     .small-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:12px}
     .small-row button{padding:8px 12px;border-radius:8px;border:1px solid #ccc;background:#fff;cursor:pointer}
     .small-note{font-size:13px;color:#666}
@@ -84,7 +84,7 @@
     footer{background:#004d26;color:#fff;padding:24px;text-align:center}
     footer a{color:#ffcc00;text-decoration:none;margin:0 10px}
 
-    /* Responsive tweaks */
+    /* Responsive */
     @media (max-width:880px){
       .forms{grid-template-columns:1fr}
       .hero h1{font-size:30px}
@@ -105,7 +105,7 @@
     </div>
   </div>
 
-  <!-- Navbar (no Member Login button here per your instruction) -->
+  <!-- Navbar -->
   <nav>
     <h1>Visionary Youth Group</h1>
     <ul>
@@ -121,13 +121,16 @@
         </ul>
       </li>
       <li><a href="#news">News</a></li>
+      <li><a href="#success-stories">Success</a></li>
+      <li><a href="#announcements">Announcements</a></li>
+      <li><a href="#events">Events</a></li>
       <li><a href="#faq">FAQ</a></li>
       <li><a href="#contact">Contact</a></li>
-      <li><a href="#auth">Join</a></li> <!-- join kept here -->
+      <li><a href="#auth">Join</a></li>
     </ul>
   </nav>
 
-  <!-- Hero (Join button remains; removed header member-login) -->
+  <!-- Hero Slider -->
   <div class="hero">
     <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=1600&auto=format&fit=crop" alt="youth1">
     <img src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=1600&auto=format&fit=crop" alt="youth2">
@@ -136,7 +139,6 @@
       <h1>Empowering youth through savings, investments & skills</h1>
       <p>Join Visionary Youth Group — build financial independence with peers</p>
       <a class="cta" href="#auth">Join Community</a>
-      <!-- secondary CTA to dashboard placed inside member preview after login -->
     </div>
   </div>
 
@@ -168,7 +170,7 @@
       </div>
     </section>
 
-    <!-- Benefits -->
+    <!-- Member Benefits -->
     <section id="benefits" data-aos="fade-up">
       <h2>Member Benefits</h2>
       <div class="grid grid-3">
@@ -178,7 +180,7 @@
       </div>
     </section>
 
-    <!-- Equity Bank Paybill banner -->
+    <!-- Paybill Banner -->
     <div class="banner" data-aos="fade-up">
       <i class="fas fa-university"></i> Paybill <strong>247247</strong> — Account: <strong>1290186343975</strong>
       <div style="margin-top:8px">
@@ -192,8 +194,38 @@
       <h2>Latest News & Events</h2>
       <div class="grid grid-3">
         <div class="card"><i class="fas fa-newspaper"></i><h3>Annual Report 2024</h3><p>Read our impact and financial report for the year 2024.</p></div>
-        <div class="card"><i class="fas fa-calendar"></i><h3>Upcoming AGM</h3><p>Members meet to review strategies — attendance is encouraged.Date 14 Dec 2025</p></div>
+        <div class="card"><i class="fas fa-calendar"></i><h3>Upcoming AGM</h3><p>Members meet to review strategies — attendance encouraged. Date: 14 Dec 2025</p></div>
         <div class="card"><i class="fas fa-bullhorn"></i><h3>Share Issue</h3><p>New share issuance for members — payout expected in March 2026.</p></div>
+      </div>
+    </section>
+
+    <!-- Success Stories -->
+    <section id="success-stories" data-aos="fade-up">
+      <h2>Success Stories</h2>
+      <div class="grid grid-3">
+        <div class="card"><i class="fas fa-award"></i><h3>Joy's Microbusiness</h3><p>With a small loan, Joy started her tailoring business and now employs 3 youth in the community.</p></div>
+        <div class="card"><i class="fas fa-award"></i><h3>Shadrack's Education</h3><p>Through our savings plan, Shadrack completed his diploma in ICT without financial stress.</p></div>
+        <div class="card"><i class="fas fa-award"></i><h3>Francis' Startup</h3><p>Francis launched an online shop with mentorship guidance, now generating steady income.</p></div>
+      </div>
+    </section>
+
+    <!-- Announcements -->
+    <section id="announcements" data-aos="fade-up">
+      <h2>Announcements</h2>
+      <div class="grid grid-1" style="gap:12px;">
+        <div class="card"><p><b>Dec 1, 2025:</b> Annual General Meeting scheduled for Dec 14. All members are encouraged to attend.</p></div>
+        <div class="card"><p><b>Nov 20, 2025:</b> New savings plan launched: “Education Boost” for school fees contributions.</p></div>
+        <div class="card"><p><b>Oct 15, 2025:</b> Group share payouts to be processed on Nov 1, 2025.</p></div>
+      </div>
+    </section>
+
+    <!-- Upcoming Events -->
+    <section id="events" data-aos="fade-up">
+      <h2>Upcoming Events</h2>
+      <div class="grid grid-3">
+        <div class="card"><i class="fas fa-calendar-check"></i><h3>Youth Workshop</h3><p>Date: Dec 10, 2025 — Entrepreneurship and digital skills training for all members.</p></div>
+        <div class="card"><i class="fas fa-calendar-check"></i><h3>Financial Literacy Bootcamp</h3><p>Date: Jan 15, 2026 — Learn budgeting, saving, and investment strategies.</p></div>
+        <div class="card"><i class="fas fa-calendar-check"></i><h3>Community Service Day</h3><p>Date: Feb 5, 2026 — Volunteer and give back to the community.</p></div>
       </div>
     </section>
 
@@ -206,15 +238,13 @@
       <p><b>Loans?</b> Yes — subject to approval and repayment terms.</p>
     </section>
 
-    <!-- Join / Auth (enhanced) -->
+    <!-- Join / Auth -->
     <section id="auth" data-aos="fade-up">
       <div class="intro">
         <h2>Join Our Community</h2>
         <p class="muted">Membership gives access to savings plans, loans, mentorship programs, and exclusive member opportunities.</p>
       </div>
-
       <div class="forms">
-        <!-- Sign up -->
         <div class="form-box">
           <h3>Sign Up</h3>
           <input id="signupName" placeholder="Full name" />
@@ -229,8 +259,6 @@
           </div>
           <p class="small-note" style="margin-top:10px">By signing up you agree to our <a href="#" style="color:#004d26;text-decoration:underline">Terms</a>.</p>
         </div>
-
-        <!-- Login & Member preview -->
         <div class="form-box">
           <h3>Member Login</h3>
           <input id="loginEmail" placeholder="Email address" />
@@ -239,13 +267,10 @@
             <button id="loginBtn" class="btn">Login</button>
             <button id="resetPasswordBtn" class="btn ghost">Forgot Password?</button>
           </div>
-
-          <!-- Live member preview (updated from onAuthStateChanged) -->
           <div id="memberArea" style="margin-top:16px;display:none">
             <div class="member-preview">
               <div id="memberName" style="font-weight:700"></div>
               <div id="memberBalance" style="margin-top:6px;color:#333"></div>
-
               <div class="small-row" style="margin-top:10px">
                 <button id="goDashboardBtn" class="btn ghost" onclick="goDashboard()">Open Dashboard</button>
                 <button id="downloadStatementBtn" class="btn" onclick="downloadStatement()">Download Statement (CSV)</button>
@@ -253,7 +278,6 @@
               </div>
             </div>
           </div>
-
           <p id="loginStatus" class="small-note" style="margin-top:12px;color:#666"></p>
         </div>
       </div>
@@ -264,7 +288,7 @@
       <h2>Testimonials</h2>
       <div class="grid grid-3">
         <div class="testimonial"><p>“Affordable loan helped me kickstart my small project.”</p><strong>- Joy</strong></div>
-        <div class="testimonial"><p>“Savings plan paid for my course fees.”</p><strong>- </strong>Shadrack</div>
+        <div class="testimonial"><p>“Savings plan paid for my course fees.”</p><strong>- Shadrack</strong></div>
         <div class="testimonial"><p>“Mentorship sessions changed my business outlook.”</p><strong>- Francis</strong></div>
       </div>
     </section>
@@ -287,193 +311,43 @@
         <div class="card"><i class="fas fa-envelope"></i><h3>Email</h3><p class="muted">visionaryyouthgroup32@gmail.com</p></div>
         <div class="card"><i class="fas fa-phone"></i><h3>Phone</h3><p class="muted">+254 741 453336</p></div>
       </div>
-
-      <iframe loading="lazy" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.858787143972!2d36.82194631475346!3d-1.292065035999988!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f173fd1f12345%3A0xabcdef1234567890!2sNairobi%2C%20Kenya!5e0!3m2!1sen!2ske!4v1694103256789!5m2!1sen!2ske" style="width:100%;height:300px;border:0;margin-top:14px;border-radius:8px"></iframe>
+      <iframe loading="lazy" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.858787143972!2d36.82194631475346!3d-1.292065035999988!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f173fd1f12345%3A0xabcdef1234567890!2sNairobi%2C%20Kenya!5e0!3m2!1sen!2ske!4v1694103256789!5m2!1sen!2ske" width="100%" height="220" style="border:0;border-radius:8px;margin-top:12px" allowfullscreen="" loading="lazy"></iframe>
     </section>
 
   </main>
 
-  <footer>
-    <div>© 2024 Visionary Youth Group — All rights reserved.</div>
-    <div style="margin-top:8px"><a href="#">Privacy</a> | <a href="#">Terms</a></div>
+  <!-- Footer -->
+  <footer data-aos="fade-up">
+    <p>&copy; 2025 Visionary Youth Group. All rights reserved.</p>
+    <p>Follow us: 
+      <a href="#">Facebook</a> | 
+      <a href="#">Twitter</a> | 
+      <a href="#">Instagram</a>
+    </p>
   </footer>
-  <!-- Firebase + App logic -->
-     <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-  import {
-    getAuth, createUserWithEmailAndPassword,
-    signInWithEmailAndPassword, sendPasswordResetEmail,
-    onAuthStateChanged, signOut
-  } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-  import {
-    getFirestore, setDoc, doc, serverTimestamp, getDoc,
-    collection, getDocs, query, orderBy
-  } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
-    authDomain: "visionary-youth-grou-2024.firebaseapp.com",
-    projectId: "visionary-youth-grou-2024",
-    storageBucket: "visionary-youth-grou-2024.appspot.com",
-    messagingSenderId: "372978592717",
-    appId: "1:372978592717:web:1c15aec728ee5f854f3284",
-    measurementId: "G-QP1RBT2ZCP"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-
-  // Elements
-  const signupBtn = document.getElementById('signupBtn');
-  const loginBtn = document.getElementById('loginBtn');
-  const resetBtn = document.getElementById('resetPasswordBtn');
-  const loginStatus = document.getElementById('loginStatus');
-  const memberArea = document.getElementById('memberArea');
-  const memberNameEl = document.getElementById('memberName');
-  const memberBalanceEl = document.getElementById('memberBalance');
-
-  // DEMO autofill
-  window.fillDemoSignup = () => {
-    document.getElementById('signupName').value = "Test User";
-    document.getElementById('signupPhone').value = "+254700000000";
-    document.getElementById('signupId').value = "12345678";
-    document.getElementById('signupOrigin').value = "Nairobi";
-    document.getElementById('signupEmail').value = `test${Date.now()%1000}@mail.com`;
-    document.getElementById('signupPassword').value = "Password123!";
-  };
-
-  // SIGNUP
-  signupBtn.addEventListener('click', async () => {
-    const name = document.getElementById('signupName').value.trim();
-    const phone = document.getElementById('signupPhone').value.trim();
-    const id = document.getElementById('signupId').value.trim();
-    const origin = document.getElementById('signupOrigin').value.trim();
-    const email = document.getElementById('signupEmail').value.trim();
-    const password = document.getElementById('signupPassword').value;
-    if (!name || !phone || !id || !email || !password) return alert("Fill all signup fields");
-
-    try {
-      const userCred = await createUserWithEmailAndPassword(auth, email, password);
-      await setDoc(doc(db, "members", userCred.user.uid), {
-        name, phone, id, origin, email, balance: 0, createdAt: serverTimestamp()
-      });
-      alert("Signup successful! Redirecting...");
-      window.location.href = "dashboard.html";
-    } catch (err) {
-      alert("Account Created: " + err.message);
-    }
-  });
-
-  // LOGIN
-  loginBtn.addEventListener('click', async () => {
-    const email = document.getElementById('loginEmail').value.trim();
-    const password = document.getElementById('loginPassword').value;
-    if (!email || !password) return alert("Enter email and password");
-
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      loginStatus.textContent = "Login successful. Redirecting...";
-      setTimeout(() => { window.location.href = "dashboard.html"; }, 800);
-    } catch (err) {
-      loginStatus.textContent = "Login failed: " + err.message;
-    }
-  });
-
-  // RESET PASSWORD
-  resetBtn.addEventListener('click', async () => {
-    const email = document.getElementById('loginEmail').value.trim();
-    if (!email) return alert("Enter your email first");
-    try {
-      await sendPasswordResetEmail(auth, email);
-      alert("Password reset email sent!");
-    } catch (err) {
-      alert("Error: " + err.message);
-    }
-  });
-
-  // AUTH STATE
-  onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      const snap = await getDoc(doc(db, "members", user.uid));
-      const data = snap.exists() ? snap.data() : {};
-      memberArea.style.display = 'block';
-      memberNameEl.textContent = data?.name || user.email;
-      memberBalanceEl.textContent = `Balance: Ksh ${data?.balance ?? 0}`;
-    } else {
-      memberArea.style.display = 'none';
-    }
-  });
-
-  // SIGN OUT
-  window.signOutUser = async () => {
-    try {
-      await signOut(auth);
-      alert("Signed out");
-      location.hash = "#auth";
-    } catch (err) {
-      alert("Error signing out: " + err.message);
-    }
-  };
-
-  // GO DASHBOARD
-  window.goDashboard = () => {
-    if (!auth.currentUser) {
-      alert("Login first");
-      location.hash = "#auth";
-      return;
-    }
-    window.location.href = "dashboard.html";
-  };
-
-  // COPY PAYBILL
-  window.copyPaybill = async () => {
-    const text = "Paybill: 247247 ; Account: 1290186343975";
-    try {
-      await navigator.clipboard.writeText(text);
-      alert("Copied: " + text);
-    } catch {
-      alert(text);
-    }
-  };
-
-  // DOWNLOAD STATEMENT
-  window.downloadStatement = async () => {
-    const user = auth.currentUser;
-    if (!user) return alert("Login first");
-    try {
-      const q = query(collection(doc(db, "members", user.uid), "transactions"), orderBy("date", "asc"));
-      const snap = await getDocs(q);
-      let rows = [["Date","Description","Debit","Credit","Balance"]];
-      snap.forEach(d => {
-        const data = d.data();
-        rows.push([
-          data.date?.toDate ? data.date.toDate().toISOString().slice(0,10) : "",
-          data.description || "",
-          data.debit ?? 0,
-          data.credit ?? 0,
-          data.balance ?? ""
-        ]);
-      });
-      if (rows.length === 1) rows.push(["2024-01-01","Opening Balance",0,0,1000]);
-      const csv = rows.map(r => r.join(",")).join("\n");
-      const url = URL.createObjectURL(new Blob([csv], {type:"text/csv"}));
-      const a = document.createElement("a");
-      a.href = url; a.download = "statement.csv"; a.click();
-      URL.revokeObjectURL(url);
-    } catch (err) {
-      alert("Failed: " + err.message);
-    }
-  };
-</script>
- 
-  
-  <!-- AOS -->
+  <!-- Scripts -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
-  <script>AOS.init({duration:800, once:true});</script>
+  <script>
+    AOS.init();
+
+    function copyPaybill(){
+      navigator.clipboard.writeText("247247-1290186343975").then(()=>alert("Paybill copied!"));
+    }
+
+    function fillDemoSignup(){
+      document.getElementById("signupName").value="Demo User";
+      document.getElementById("signupPhone").value="+254700000000";
+      document.getElementById("signupId").value="12345678";
+      document.getElementById("signupOrigin").value="Nairobi";
+      document.getElementById("signupEmail").value="demo@visionaryyouth.org";
+      document.getElementById("signupPassword").value="Demo1234";
+    }
+
+    function goDashboard(){alert("Dashboard opens (placeholder)");}
+    function downloadStatement(){alert("Downloading CSV (placeholder)");}
+    function signOutUser(){alert("Signed out (placeholder)");document.getElementById("memberArea").style.display="none";}
+  </script>
+
 </body>
 </html>
-
-
-
-
