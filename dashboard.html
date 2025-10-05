@@ -3,710 +3,517 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Visionary Youth Group — Dashboard</title>
-  <meta name="description" content="Member portal dashboard for Visionary Youth Group — balances, loan wizard, withdrawals, statements"/>
+  <title>Visionary Youth Group — Modern Dashboard</title>
+  <meta name="description" content="Modern, interactive member portal for Visionary Youth Group — balances, loan wizard, withdrawals, statements, realtime Firebase updates"/>
 
-  <!-- Tailwind (CDN - for quick prototype) -->
+  <!-- Tailwind CDN (quick prototype) -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Heroicons (for inline SVG icons) -->
+  <!-- Heroicons (inline SVG helper) -->
   <script src="https://unpkg.com/feather-icons"></script>
-
-  <!-- Firebase (compat) -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
-
-  <!-- jsPDF for PDF generation -->
+  <!-- jsPDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <style>
-    body {font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial}
-    .card {background: white; border-radius: 12px; padding: 1rem; box-shadow: 0 6px 18px rgba(15,23,42,0.06)}
+    :root{
+      --accent: #2563eb; /* blue-600 */
+      --muted: #6b7280;   /* gray-500 */
+    }
+    body{font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial}
+    .glass { background: linear-gradient(180deg, rgba(255,255,255,0.72), rgba(255,255,255,0.6)); backdrop-filter: blur(6px); }
+    .card { border-radius: 12px; background: white; box-shadow: 0 6px 20px rgba(2,6,23,0.08); }
+    .badge { padding: .25rem .5rem; border-radius: 9999px; font-weight:600; font-size: .75rem; }
+    .status-pending{ background:#fff7ed; color:#92400e; }
+    .status-approved{ background:#ecfdf5; color:#065f46; }
+    .status-rejected{ background:#fff1f2; color:#9f1239; }
+    /* small animation for cards */
+    .card:hover{ transform: translateY(-4px); transition: transform .18s ease; }
+    /* toast */
+    .toast{ position: fixed; right: 20px; bottom: 20px; min-width: 260px; z-index:9999; }
   </style>
 </head>
-<body class="bg-gray-100 min-h-screen p-6">
-  <div class="max-w-7xl mx-auto">
-    <header class="flex items-center justify-between mb-6">
-      <div>
-        <h1 class="text-2xl font-bold">Visionary Youth Group</h1>
-        <p class="text-sm text-gray-600">Member Portal — dashboard, loans, withdrawals & statements</p>
+<body class="bg-gray-50 min-h-screen">
+  <div class="min-h-screen flex">
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="w-72 bg-gradient-to-b from-slate-900 to-slate-800 text-white p-5 flex-shrink-0">
+      <div class="flex items-center space-x-3 mb-6">
+        <div class="w-10 h-10 bg-white/10 rounded flex items-center justify-center">VY</div>
+        <div>
+          <div class="text-lg font-bold">Visionary</div>
+          <div class="text-xs text-slate-300">Youth Group Portal</div>
+        </div>
       </div>
-      <div id="authArea" class="space-x-3 text-right"></div>
-    </header>
 
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-      <aside class="md:col-span-1 space-y-4">
-        <div class="card">
-          <div class="flex items-center justify-between mb-3">
+      <nav class="space-y-1 text-sm">
+        <button class="w-full text-left px-3 py-2 rounded flex items-center gap-3 hover:bg-white/5 active:bg-white/10" data-tab="dashboard"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18" stroke-linecap="round" stroke-linejoin="round"/></svg> Dashboard</button>
+        <button class="w-full text-left px-3 py-2 rounded flex items-center gap-3 hover:bg-white/5" data-tab="loan"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8v8m4-4H8" stroke-linecap="round" stroke-linejoin="round"/></svg> Loan Application</button>
+        <button class="w-full text-left px-3 py-2 rounded flex items-center gap-3 hover:bg-white/5" data-tab="withdraw"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8v8m4-4H8" stroke-linecap="round" stroke-linejoin="round"/></svg> Withdrawal</button>
+        <button class="w-full text-left px-3 py-2 rounded flex items-center gap-3 hover:bg-white/5" data-tab="profile"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4S14.21 4 12 4 8 5.79 8 8s1.79 4 4 4zM6 20c0-2 4-3 6-3s6 1 6 3" stroke-linecap="round" stroke-linejoin="round"/></svg> Profile</button>
+        <button class="w-full text-left px-3 py-2 rounded flex items-center gap-3 hover:bg-white/5" data-tab="statements"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 17v-6a2 2 0 012-2h2a2 2 0 012 2v6" stroke-linecap="round" stroke-linejoin="round"/></svg> Statements</button>
+      </nav>
+
+      <div class="mt-6 text-xs text-slate-300">Quick actions</div>
+      <div class="mt-2 flex flex-col gap-2">
+        <button id="claimPts" class="px-3 py-2 bg-white/10 rounded text-sm">Claim +5 pts</button>
+        <button id="downloadStmt" class="px-3 py-2 bg-white/10 rounded text-sm">Download Statement</button>
+      </div>
+
+      <div class="mt-auto text-xs text-slate-400 pt-6">Powered by Visionary • Prototype</div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="flex-1 p-6">
+      <header class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-2xl font-semibold">Member Dashboard</h2>
+          <p class="text-sm text-slate-500">Real-time balances, loan progress and quick actions</p>
+        </div>
+        <div class="flex items-center gap-4">
+          <div class="text-right">
+            <div id="memberName" class="font-medium">Guest</div>
+            <div id="memberStatus" class="text-xs text-slate-500">Not signed in</div>
+          </div>
+          <div id="authArea"></div>
+        </div>
+      </header>
+
+      <!-- DASHBOARD TAB -->
+      <section id="tab-dashboard" class="tab-content">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          <div class="card p-5 flex items-center gap-4">
+            <div class="rounded-full p-3 bg-blue-50 text-blue-600"><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 8c-3 0-5 2-5 5v3h10v-3c0-3-2-5-5-5z"/></svg></div>
             <div>
-              <div id="memberName" class="font-semibold">Not signed in</div>
-              <div id="memberStatus" class="text-xs text-gray-500">Status: -</div>
-            </div>
-            <div class="text-right text-sm">
-              <div>Points</div>
-              <div id="points" class="font-bold">0</div>
+              <div class="text-sm text-slate-500">Monthly saving</div>
+              <div id="monthlyVal" class="text-2xl font-semibold">Ksh 0</div>
             </div>
           </div>
 
-          <div class="mt-2 text-sm text-gray-600">Quick actions</div>
-          <div class="mt-3 space-y-2">
-            <button id="claimPointsBtn" class="w-full px-3 py-2 bg-blue-600 text-white rounded">Claim 5 pts</button>
-            <button id="downloadStatementBtn" class="w-full px-3 py-2 border rounded">Download Statement</button>
+          <div class="card p-5 flex items-center gap-4">
+            <div class="rounded-full p-3 bg-green-50 text-green-600"><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 10h18v11H3z"/></svg></div>
+            <div>
+              <div class="text-sm text-slate-500">Weekly saving</div>
+              <div id="weeklyVal" class="text-2xl font-semibold">Ksh 0</div>
+            </div>
+          </div>
+
+          <div class="card p-5 flex items-center gap-4">
+            <div class="rounded-full p-3 bg-yellow-50 text-yellow-600"><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 1v22"/></svg></div>
+            <div>
+              <div class="text-sm text-slate-500">Total loans</div>
+              <div id="totalLoansVal" class="text-2xl font-semibold">Ksh 0</div>
+            </div>
+          </div>
+
+          <div class="card p-5 flex items-center gap-4">
+            <div class="rounded-full p-3 bg-red-50 text-red-600"><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 6h18"/></svg></div>
+            <div>
+              <div class="text-sm text-slate-500">Outstanding</div>
+              <div id="outstandingVal" class="text-2xl font-semibold">Ksh 0</div>
+            </div>
+          </div>
+
+          <div class="card p-5 flex items-center gap-4">
+            <div class="rounded-full p-3 bg-indigo-50 text-indigo-600"><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2l4 7-4 7-4-7z"/></svg></div>
+            <div>
+              <div class="text-sm text-slate-500">Paid balances</div>
+              <div id="paidVal" class="text-2xl font-semibold">Ksh 0</div>
+            </div>
+          </div>
+
+          <div class="card p-5 col-span-full lg:col-span-3">
+            <div class="flex items-center justify-between mb-3">
+              <div><div class="text-sm text-slate-500">Loan status</div><div id="loanStatus" class="mt-1"><span class="badge status-pending">No Loans</span></div></div>
+              <div><button id="viewLoansBtn" class="px-3 py-2 bg-white/10 rounded text-sm">View loans</button></div>
+            </div>
+
+            <div class="w-full bg-slate-100 rounded p-3">
+              <div class="flex items-center gap-3">
+                <div class="w-full">
+                  <div class="flex items-center justify-between mb-2 text-xs text-slate-500"><div>Progress</div><div id="progressPercent">0%</div></div>
+                  <div class="h-3 bg-white rounded overflow-hidden"><div id="progressBar" class="h-full bg-gradient-to-r from-blue-500 to-indigo-500" style="width:0%"></div></div>
+                </div>
+                <div class="w-40 text-right text-sm text-slate-600">Repayment progress</div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="card">
-          <div class="font-medium mb-2">Menu</div>
-          <nav class="space-y-2 text-sm">
-            <button class="w-full text-left px-3 py-2 rounded hover:bg-gray-50" data-tab="dashboard">Dashboard</button>
-            <button class="w-full text-left px-3 py-2 rounded hover:bg-gray-50" data-tab="loan">Loan Application</button>
-            <button class="w-full text-left px-3 py-2 rounded hover:bg-gray-50" data-tab="withdraw">Withdrawal Form</button>
-            <button class="w-full text-left px-3 py-2 rounded hover:bg-gray-50" data-tab="profile">Profile</button>
-            <button class="w-full text-left px-3 py-2 rounded hover:bg-gray-50" data-tab="admin">Admin</button>
-          </nav>
+        <div class="card p-4">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-semibold">Active Loans</h3>
+            <div class="text-sm text-slate-500">Real-time updates from Firebase</div>
+          </div>
+          <div id="loansTable" class="overflow-auto">
+            <table class="w-full text-sm">
+              <thead class="text-slate-500 text-left"><tr><th>Loan</th><th>Amount</th><th>Status</th><th>Due</th><th>Progress</th></tr></thead>
+              <tbody id="loansBody"></tbody>
+            </table>
+          </div>
         </div>
+      </section>
 
-        <div class="card text-xs text-gray-600">
-          <div class="font-medium mb-2">Notes</div>
-          All actions in this demo write/read from Firebase Realtime Database paths. Replace the firebaseConfig block below with your project credentials.
-        </div>
-      </aside>
-
-      <main class="md:col-span-3">
-        <!-- Dashboard -->
-        <section id="tab-dashboard" class="tab">
-          <div class="card mb-4">
-            <h2 class="text-lg font-semibold mb-3">Overview</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div class="p-4 border rounded">
-                <div class="text-sm text-gray-500">Monthly Saving</div>
-                <div id="monthlySaving" class="text-xl font-bold">Ksh 0</div>
-              </div>
-              <div class="p-4 border rounded">
-                <div class="text-sm text-gray-500">Weekly Saving</div>
-                <div id="weeklySaving" class="text-xl font-bold">Ksh 0</div>
-              </div>
-              <div class="p-4 border rounded">
-                <div class="text-sm text-gray-500">Total Loans</div>
-                <div id="totalLoans" class="text-xl font-bold">Ksh 0</div>
-              </div>
-              <div class="p-4 border rounded">
-                <div class="text-sm text-gray-500">Outstanding</div>
-                <div id="outstanding" class="text-xl font-bold">Ksh 0</div>
-              </div>
-              <div class="p-4 border rounded">
-                <div class="text-sm text-gray-500">Paid Balances</div>
-                <div id="paidBalances" class="text-xl font-bold">Ksh 0</div>
-              </div>
-              <div class="p-4 border rounded">
-                <div class="text-sm text-gray-500">Loan Status</div>
-                <div id="loanStatusBar" class="text-xl font-bold">-</div>
-              </div>
-            </div>
+      <!-- LOAN WIZARD TAB -->
+      <section id="tab-loan" class="tab-content hidden">
+        <div class="card p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold">Loan Application Wizard</h3>
+            <div class="text-sm text-slate-500">Complete all steps and submit</div>
           </div>
 
-          <div class="card">
-            <h3 class="font-semibold mb-2">Loans</h3>
-            <div id="loansList" class="space-y-2 text-sm text-gray-700">No loans yet.</div>
+          <!-- progress/indicator -->
+          <div class="mb-4">
+            <div class="flex items-center gap-3 text-xs text-slate-500 mb-2"><div id="wizardStepLabel">Step 1 of 6</div><div class="flex-1"><div class="h-2 bg-slate-100 rounded overflow-hidden"><div id="wizardBar" class="h-full bg-gradient-to-r from-blue-500 to-indigo-500" style="width:10%"></div></div></div></div>
           </div>
-        </section>
 
-        <!-- Loan wizard -->
-        <section id="tab-loan" class="tab hidden">
-          <div class="card">
-            <h2 class="text-lg font-semibold mb-3">Loan Application (Wizard)</h2>
-
-            <div id="wizardSteps" class="space-y-4">
-              <!-- step indicators -->
-              <div class="flex items-center text-xs space-x-2 mb-2">
-                <div class="px-2 py-1 bg-blue-600 text-white rounded">1 Personal</div>
-                <div class="px-2 py-1 bg-gray-100 rounded">2 Residence</div>
-                <div class="px-2 py-1 bg-gray-100 rounded">3 Education</div>
-                <div class="px-2 py-1 bg-gray-100 rounded">4 Guarantors</div>
-                <div class="px-2 py-1 bg-gray-100 rounded">5 Parents</div>
-                <div class="px-2 py-1 bg-gray-100 rounded">6 Amount & Disbursement</div>
-              </div>
-
-              <!-- forms -->
-              <form id="loanForm" class="space-y-4">
-                <div id="step-1">
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label class="text-sm">Full Name</label>
-                      <input name="fullName" required class="w-full p-2 border rounded" />
-                    </div>
-                    <div>
-                      <label class="text-sm">ID / National ID</label>
-                      <input name="idNumber" required class="w-full p-2 border rounded" />
-                    </div>
-                    <div>
-                      <label class="text-sm">Phone</label>
-                      <input name="phone" required class="w-full p-2 border rounded" />
-                    </div>
-                    <div>
-                      <label class="text-sm">Email</label>
-                      <input name="email" type="email" required class="w-full p-2 border rounded" />
-                    </div>
-                    <div class="sm:col-span-2">
-                      <label class="text-sm">Upload ID (optional)</label>
-                      <input name="idFile" type="file" class="w-full" />
-                    </div>
-                  </div>
-                </div>
-
-                <div id="step-2" class="hidden">
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label class="text-sm">County</label>
-                      <select id="county" name="county" class="w-full p-2 border rounded"></select>
-                    </div>
-                    <div>
-                      <label class="text-sm">Ward / Village</label>
-                      <input name="ward" class="w-full p-2 border rounded" />
-                    </div>
-                    <div>
-                      <label class="text-sm">Constituency</label>
-                      <input name="constituency" class="w-full p-2 border rounded" />
-                    </div>
-                    <div>
-                      <label class="text-sm">Residence (house/plot)</label>
-                      <input name="residence" class="w-full p-2 border rounded" />
-                    </div>
-                  </div>
-                </div>
-
-                <div id="step-3" class="hidden">
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label class="text-sm">Highest education level</label>
-                      <select name="educationLevel" class="w-full p-2 border rounded">
-                        <option value="">Select</option>
-                        <option>Primary</option>
-                        <option>Secondary</option>
-                        <option>Certificate</option>
-                        <option>Diploma</option>
-                        <option>Undergraduate</option>
-                        <option>Postgraduate</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label class="text-sm">Institution / School</label>
-                      <input name="institution" class="w-full p-2 border rounded" />
-                    </div>
-                    <div>
-                      <label class="text-sm">Year completed / index</label>
-                      <input name="educationYear" class="w-full p-2 border rounded" />
-                    </div>
-                  </div>
-                </div>
-
-                <div id="step-4" class="hidden">
-                  <div class="space-y-2">
-                    <p class="text-sm text-gray-600">Provide up to 3 guarantors. All fields required.</p>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                      <div>
-                        <label class="text-sm">Guarantor 1 (Name)</label>
-                        <input name="g1name" class="w-full p-2 border rounded" required />
-                      </div>
-                      <div>
-                        <label class="text-sm">Guarantor 1 (Phone)</label>
-                        <input name="g1phone" class="w-full p-2 border rounded" required />
-                      </div>
-                      <div>
-                        <label class="text-sm">Guarantor 1 (Amount they guarantee)</label>
-                        <input name="g1amount" type="number" class="w-full p-2 border rounded" required />
-                      </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                      <div>
-                        <label class="text-sm">Guarantor 2 (Name)</label>
-                        <input name="g2name" class="w-full p-2 border rounded" required />
-                      </div>
-                      <div>
-                        <label class="text-sm">Guarantor 2 (Phone)</label>
-                        <input name="g2phone" class="w-full p-2 border rounded" required />
-                      </div>
-                      <div>
-                        <label class="text-sm">Guarantor 2 (Amount they guarantee)</label>
-                        <input name="g2amount" type="number" class="w-full p-2 border rounded" required />
-                      </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                      <div>
-                        <label class="text-sm">Guarantor 3 (Name)</label>
-                        <input name="g3name" class="w-full p-2 border rounded" required />
-                      </div>
-                      <div>
-                        <label class="text-sm">Guarantor 3 (Phone)</label>
-                        <input name="g3phone" class="w-full p-2 border rounded" required />
-                      </div>
-                      <div>
-                        <label class="text-sm">Guarantor 3 (Amount they guarantee)</label>
-                        <input name="g3amount" type="number" class="w-full p-2 border rounded" required />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div id="step-5" class="hidden">
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label class="text-sm">Parent / Guardian Relation</label>
-                      <select name="parentRelation" class="w-full p-2 border rounded">
-                        <option value="">Select</option>
-                        <option>Father</option>
-                        <option>Mother</option>
-                        <option>Brother</option>
-                        <option>Sister</option>
-                        <option>Other</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label class="text-sm">Parent Name</label>
-                      <input name="parentName" class="w-full p-2 border rounded" />
-                    </div>
-                    <div>
-                      <label class="text-sm">Parent Phone</label>
-                      <input name="parentPhone" class="w-full p-2 border rounded" />
-                    </div>
-                    <div>
-                      <label class="text-sm">Parent ID</label>
-                      <input name="parentId" class="w-full p-2 border rounded" />
-                    </div>
-                  </div>
-                </div>
-
-                <div id="step-6" class="hidden">
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label class="text-sm">Amount applying (Ksh)</label>
-                      <input name="amount" type="number" class="w-full p-2 border rounded" required />
-                    </div>
-                    <div>
-                      <label class="text-sm">Disbursement Mode</label>
-                      <select name="disbursementMode" class="w-full p-2 border rounded">
-                        <option value="">Select</option>
-                        <option value="mpesa">M-Pesa</option>
-                        <option value="bank">Bank Transfer</option>
-                        <option value="cash">Cash (Office)</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label class="text-sm">Account / Till Number</label>
-                      <input name="accountNumber" class="w-full p-2 border rounded" />
-                    </div>
-                    <div class="sm:col-span-2">
-                      <label class="text-sm">Purpose / Reason</label>
-                      <textarea name="purpose" rows="4" class="w-full p-2 border rounded"></textarea>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="flex justify-between">
-                  <div>
-                    <button type="button" id="prevStep" class="px-3 py-2 border rounded">Back</button>
-                  </div>
-                  <div>
-                    <button type="button" id="nextStep" class="px-3 py-2 bg-blue-600 text-white rounded">Next</button>
-                    <button type="button" id="submitLoan" class="px-3 py-2 bg-green-600 text-white rounded hidden">Submit & Download PDF</button>
-                  </div>
-                </div>
-              </form>
-            </div>
-          </div>
-        </section>
-
-        <!-- Withdrawal -->
-        <section id="tab-withdraw" class="tab hidden">
-          <div class="card">
-            <h2 class="text-lg font-semibold mb-3">Withdrawal Form</h2>
-            <form id="withdrawForm" class="space-y-3">
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label class="text-sm">Member No</label>
-                  <input name="memberNo" class="w-full p-2 border rounded" />
-                </div>
-                <div>
-                  <label class="text-sm">Amount (Ksh)</label>
-                  <input name="amount" type="number" class="w-full p-2 border rounded" />
-                </div>
-              </div>
-              <div>
-                <label class="text-sm">Reason (min 200 characters)</label>
-                <textarea name="reason" rows="6" class="w-full p-2 border rounded"></textarea>
-              </div>
-              <div class="flex justify-end">
-                <button type="button" id="submitWithdraw" class="px-3 py-2 bg-blue-600 text-white rounded">Submit & Download PDF</button>
-              </div>
-            </form>
-          </div>
-        </section>
-
-        <!-- Profile -->
-        <section id="tab-profile" class="tab hidden">
-          <div class="card">
-            <h2 class="text-lg font-semibold mb-3">Profile</h2>
-            <form id="profileForm" class="space-y-3">
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <form id="loanWizardForm" class="space-y-6">
+            <!-- step containers -->
+            <div id="wiz-1" class="wiz-step">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label class="text-sm">Full name</label>
-                  <input name="fullName" class="w-full p-2 border rounded" />
+                  <input name="fullName" required class="w-full p-2 border rounded" />
+                </div>
+                <div>
+                  <label class="text-sm">National ID</label>
+                  <input name="idNumber" required class="w-full p-2 border rounded" />
                 </div>
                 <div>
                   <label class="text-sm">Phone</label>
                   <input name="phone" class="w-full p-2 border rounded" />
                 </div>
                 <div>
-                  <label class="text-sm">Member No</label>
-                  <input name="memberNo" class="w-full p-2 border rounded" />
+                  <label class="text-sm">Email</label>
+                  <input name="email" type="email" class="w-full p-2 border rounded" />
+                </div>
+                <div class="sm:col-span-2">
+                  <label class="text-sm">Upload ID (optional)</label>
+                  <input name="idFile" type="file" class="w-full" />
+                </div>
+              </div>
+            </div>
+
+            <div id="wiz-2" class="wiz-step hidden">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="text-sm">County</label>
+                  <select name="county" id="countySelect" class="w-full p-2 border rounded"></select>
                 </div>
                 <div>
-                  <label class="text-sm">Residence</label>
+                  <label class="text-sm">Constituency</label>
+                  <input name="constituency" class="w-full p-2 border rounded" />
+                </div>
+                <div>
+                  <label class="text-sm">Ward / Village</label>
+                  <input name="ward" class="w-full p-2 border rounded" />
+                </div>
+                <div>
+                  <label class="text-sm">Residence / House</label>
                   <input name="residence" class="w-full p-2 border rounded" />
                 </div>
               </div>
-              <div class="flex justify-end">
-                <button type="button" id="saveProfile" class="px-3 py-2 bg-green-600 text-white rounded">Save Profile</button>
+            </div>
+
+            <div id="wiz-3" class="wiz-step hidden">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="text-sm">Education level</label>
+                  <select name="educationLevel" class="w-full p-2 border rounded"><option>Primary</option><option>Secondary</option><option>Diploma</option><option>Undergraduate</option><option>Postgraduate</option></select>
+                </div>
+                <div>
+                  <label class="text-sm">Institution</label>
+                  <input name="institution" class="w-full p-2 border rounded" />
+                </div>
+                <div>
+                  <label class="text-sm">Year / Index</label>
+                  <input name="educationYear" class="w-full p-2 border rounded" />
+                </div>
               </div>
-            </form>
-          </div>
-        </section>
+            </div>
 
-        <!-- Admin (simple view) -->
-        <section id="tab-admin" class="tab hidden">
-          <div class="card">
-            <h2 class="text-lg font-semibold mb-3">Admin — Loan Applications</h2>
-            <div id="adminApps" class="space-y-3 text-sm text-gray-700">No data</div>
-          </div>
-        </section>
+            <div id="wiz-4" class="wiz-step hidden">
+              <div class="text-sm text-slate-600">Provide 3 guarantors (all required)</div>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-3">
+                <div><input name="g1name" placeholder="Guarantor 1 name" class="w-full p-2 border rounded" required /></div>
+                <div><input name="g1phone" placeholder="Phone" class="w-full p-2 border rounded" required /></div>
+                <div><input name="g1amount" placeholder="Amount" type="number" class="w-full p-2 border rounded" required /></div>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-3">
+                <div><input name="g2name" placeholder="Guarantor 2 name" class="w-full p-2 border rounded" required /></div>
+                <div><input name="g2phone" placeholder="Phone" class="w-full p-2 border rounded" required /></div>
+                <div><input name="g2amount" placeholder="Amount" type="number" class="w-full p-2 border rounded" required /></div>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-3">
+                <div><input name="g3name" placeholder="Guarantor 3 name" class="w-full p-2 border rounded" required /></div>
+                <div><input name="g3phone" placeholder="Phone" class="w-full p-2 border rounded" required /></div>
+                <div><input name="g3amount" placeholder="Amount" type="number" class="w-full p-2 border rounded" required /></div>
+              </div>
+            </div>
 
-      </main>
-    </div>
+            <div id="wiz-5" class="wiz-step hidden">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="text-sm">Guardian relation</label>
+                  <select name="parentRelation" class="w-full p-2 border rounded"><option>Father</option><option>Mother</option><option>Brother</option><option>Sister</option><option>Other</option></select>
+                </div>
+                <div>
+                  <label class="text-sm">Parent/Guardian Name</label>
+                  <input name="parentName" class="w-full p-2 border rounded" />
+                </div>
+                <div>
+                  <label class="text-sm">Parent Phone</label>
+                  <input name="parentPhone" class="w-full p-2 border rounded" />
+                </div>
+                <div>
+                  <label class="text-sm">Parent ID</label>
+                  <input name="parentId" class="w-full p-2 border rounded" />
+                </div>
+              </div>
+            </div>
+
+            <div id="wiz-6" class="wiz-step hidden">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="text-sm">Amount applying (Ksh)</label>
+                  <input name="amount" type="number" class="w-full p-2 border rounded" required />
+                </div>
+                <div>
+                  <label class="text-sm">Disbursement</label>
+                  <select name="disbursementMode" class="w-full p-2 border rounded"><option value="mpesa">M-Pesa</option><option value="bank">Bank</option><option value="cash">Cash</option></select>
+                </div>
+                <div>
+                  <label class="text-sm">Account / Till</label>
+                  <input name="accountNumber" class="w-full p-2 border rounded" />
+                </div>
+                <div class="sm:col-span-2">
+                  <label class="text-sm">Purpose</label>
+                  <textarea name="purpose" rows="4" class="w-full p-2 border rounded"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex justify-between">
+              <div><button type="button" id="wizPrev" class="px-4 py-2 border rounded">Back</button></div>
+              <div class="flex gap-2">
+                <button type="button" id="wizNext" class="px-4 py-2 bg-indigo-600 text-white rounded">Next</button>
+                <button type="button" id="wizSubmit" class="px-4 py-2 bg-green-600 text-white rounded hidden">Submit & Download PDF</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- WITHDRAWAL TAB -->
+      <section id="tab-withdraw" class="tab-content hidden">
+        <div class="card p-6">
+          <h3 class="text-lg font-semibold mb-3">Withdrawal Form</h3>
+          <form id="withdrawForm" class="space-y-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div><label class="text-sm">Member No</label><input name="memberNo" class="w-full p-2 border rounded" /></div>
+              <div><label class="text-sm">Amount (Ksh)</label><input name="amount" type="number" class="w-full p-2 border rounded" /></div>
+            </div>
+            <div>
+              <label class="text-sm">Reason (min 200 characters)</label>
+              <textarea name="reason" rows="6" class="w-full p-2 border rounded"></textarea>
+            </div>
+            <div class="flex justify-end">
+              <button type="button" id="withdrawSubmit" class="px-4 py-2 bg-blue-600 text-white rounded">Submit & Download PDF</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- PROFILE TAB -->
+      <section id="tab-profile" class="tab-content hidden">
+        <div class="card p-6">
+          <h3 class="text-lg font-semibold mb-4">Profile</h3>
+          <form id="profileForm" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div><label class="text-sm">Full name</label><input name="fullName" class="w-full p-2 border rounded" /></div>
+              <div><label class="text-sm">Phone</label><input name="phone" class="w-full p-2 border rounded" /></div>
+              <div><label class="text-sm">Member No</label><input name="memberNo" class="w-full p-2 border rounded" /></div>
+              <div><label class="text-sm">Residence</label><input name="residence" class="w-full p-2 border rounded" /></div>
+            </div>
+            <div class="flex justify-end"><button type="button" id="saveProfileBtn" class="px-4 py-2 bg-green-600 text-white rounded">Save Profile</button></div>
+          </form>
+        </div>
+      </section>
+
+      <!-- STATEMENTS TAB -->
+      <section id="tab-statements" class="tab-content hidden">
+        <div class="card p-6">
+          <h3 class="text-lg font-semibold mb-3">Statements</h3>
+          <p class="text-sm text-slate-500 mb-4">Download account statements including balances, transactions and loan history.</p>
+          <div class="flex gap-3">
+            <button id="dlStmtBtn" class="px-4 py-2 bg-indigo-600 text-white rounded">Download PDF Statement</button>
+            <button id="dlLoanAppBtn" class="px-4 py-2 border rounded">Download Latest Loan Application</button>
+          </div>
+        </div>
+      </section>
+
+    </main>
   </div>
 
-  <script>
-    // ------------------ FIREBASE CONFIG - REPLACE WITH YOUR CREDENTIALS ------------------
+  <!-- Toast container -->
+  <div id="toast" class="toast"></div>
+
+  <!-- FIREBASE + APP LOGIC (module) -->
+  <script type="module">
+    // --------- IMPORT FIREBASE MODULAR SDK (CDN) ---------
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
+    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
+    import { getDatabase, ref, onValue, push, set, update, get, child } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js';
+    import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js';
+    const { jsPDF } = window.jspdf;
+
+    // --------- CONFIG - Replace with your Firebase credentials ---------
     const firebaseConfig = {
-  apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
-  authDomain: "visionary-youth-grou-2024.firebaseapp.com",
-  databaseURL: "https://visionary-youth-grou-2024-default-rtdb.firebaseio.com",
-  projectId: "visionary-youth-grou-2024",
-  storageBucket: "visionary-youth-grou-2024.appspot.com",
-  messagingSenderId: "372978592717",
-  appId: "1:372978592717:web:1c15aec728ee5f854f3284"
+      apiKey: 'REPLACE_API_KEY',
+      authDomain: 'REPLACE_AUTH_DOMAIN',
+      databaseURL: 'REPLACE_DATABASE_URL',
+      projectId: 'REPLACE_PROJECT_ID',
+      storageBucket: 'REPLACE_STORAGE_BUCKET',
+      messagingSenderId: 'REPLACE_MESSAGING_SENDER_ID',
+      appId: 'REPLACE_APP_ID'
     };
-    // ----------------------------------------------------------------------------------
 
-    // Initialize Firebase (compat)
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.database();
-    const storage = firebase.storage();
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+    const storage = getStorage(app);
 
-    // DOM refs
-    const authArea = document.getElementById('authArea');
-    const memberNameEl = document.getElementById('memberName');
-    const memberStatusEl = document.getElementById('memberStatus');
-    const pointsEl = document.getElementById('points');
+    // ---------- Utilities ----------
+    function qs(sel){ return document.querySelector(sel); }
+    function qsa(sel){ return Array.from(document.querySelectorAll(sel)); }
+    function toast(msg, time=3000){ const t = document.createElement('div'); t.className='px-4 py-3 mb-2 bg-white rounded shadow'; t.textContent = msg; qs('#toast').appendChild(t); setTimeout(()=> t.remove(), time); }
+    function fmt(v){ return 'Ksh ' + Number(v||0).toLocaleString(); }
 
-    // simple counties list (Kenya)
+    // ---------- Counties (Kenya) ----------
     const counties = ["Mombasa","Kwale","Kilifi","Tana River","Lamu","Taita-Taveta","Garissa","Wajir","Mandera","Marsabit","Isiolo","Meru","Tharaka-Nithi","Embu","Kitui","Machakos","Makueni","Nyandarua","Nyeri","Kirinyaga","Murang'a","Kiambu","Turkana","West Pokot","Samburu","Trans-Nzoia","Uasin Gishu","Elgeyo-Marakwet","Nandi","Baringo","Laikipia","Nakuru","Narok","Kajiado","Kericho","Bomet","Kakamega","Vihiga","Bungoma","Busia","Siaya","Kisumu","Homa Bay","Migori","Kisii","Nyamira","Nairobi"];
+    const countySelect = qs('#countySelect'); counties.forEach(c=>{ const o = document.createElement('option'); o.value=c; o.textContent=c; countySelect.appendChild(o); });
 
-    const countySelect = document.getElementById('county');
-    counties.forEach(c => {
-      const opt = document.createElement('option'); opt.value=c; opt.textContent=c; countySelect.appendChild(opt);
-    });
-
-    // Tabs
-    document.querySelectorAll('[data-tab]').forEach(btn => btn.addEventListener('click', () => {
-      const t = btn.getAttribute('data-tab');
-      document.querySelectorAll('.tab').forEach(s => s.classList.add('hidden'));
-      document.getElementById('tab-' + t).classList.remove('hidden');
+    // ---------- Tab switching ----------
+    qsa('[data-tab]').forEach(btn=> btn.addEventListener('click', ()=>{
+      qsa('[data-tab]').forEach(b=> b.classList.remove('active'));
+      btn.classList.add('active');
+      const tab = btn.dataset.tab;
+      qsa('.tab-content').forEach(s=> s.classList.add('hidden'));
+      qs('#tab-'+tab).classList.remove('hidden');
     }));
 
-    // Simple auth UI (email/password) for demo
-    function renderAuthUI(user) {
-      authArea.innerHTML = '';
-      if (user) {
-        const email = document.createElement('div'); email.className='text-sm'; email.textContent = user.email || user.uid;
-        const signout = document.createElement('button'); signout.className = 'px-3 py-2 border rounded'; signout.textContent='Sign out';
-        signout.addEventListener('click', () => auth.signOut());
-        authArea.appendChild(email); authArea.appendChild(signout);
-      } else {
-        // login form
-        const form = document.createElement('form'); form.className = 'flex items-center space-x-2';
-        const e = document.createElement('input'); e.placeholder='email'; e.type='email'; e.required=true; e.className='p-2 border rounded';
-        const p = document.createElement('input'); p.placeholder='password'; p.type='password'; p.required=true; p.className='p-2 border rounded';
-        const btn = document.createElement('button'); btn.className='px-3 py-2 bg-blue-600 text-white rounded'; btn.textContent='Sign in';
+    // ---------- Auth UI (inline sign in) ----------
+    const authArea = qs('#authArea');
+    function renderAuth(user){ authArea.innerHTML=''; if(user){ const n = document.createElement('div'); n.className='text-sm'; n.textContent = user.email || user.uid; const out = document.createElement('button'); out.className='px-3 py-2 border rounded text-sm'; out.textContent='Sign out'; out.addEventListener('click', ()=>signOut(auth)); authArea.appendChild(n); authArea.appendChild(out); } else {
+        const form = document.createElement('form'); form.className='flex items-center gap-2';
+        const e = document.createElement('input'); e.placeholder='email'; e.type='email'; e.required=true; e.className='p-2 border rounded text-sm';
+        const p = document.createElement('input'); p.placeholder='password'; p.type='password'; p.required=true; p.className='p-2 border rounded text-sm';
+        const btn = document.createElement('button'); btn.className='px-3 py-2 bg-white/10 rounded text-sm'; btn.textContent='Sign in';
         form.appendChild(e); form.appendChild(p); form.appendChild(btn);
-        form.addEventListener('submit', async (ev)=>{
-          ev.preventDefault();
-          try { await auth.signInWithEmailAndPassword(e.value, p.value); }
-          catch(err){ alert('Login failed: '+err.message); }
-        });
+        form.addEventListener('submit', async (ev)=>{ ev.preventDefault(); try{ await signInWithEmailAndPassword(auth, e.value, p.value); toast('Signed in'); } catch(err){ alert('Auth error: '+err.message); }});
         authArea.appendChild(form);
-      }
-    }
+      }}
 
-    // auth listener
+    // ---------- Real-time listeners & UI binding ----------
     let currentUser = null;
-    auth.onAuthStateChanged(async user => {
+    onAuthStateChanged(auth, async user => {
       currentUser = user;
-      renderAuthUI(user);
-      if (user) {
-        memberNameEl.textContent = user.displayName || user.email || user.uid;
-        memberStatusEl.textContent = 'Status: Active';
-        // award login points
-        awardPoints(user.uid, 1);
-        subscribeUserData(user.uid);
-        subscribeAdminApps();
-      } else {
-        memberNameEl.textContent = 'Not signed in';
-        memberStatusEl.textContent = 'Status: -';
-        pointsEl.textContent = '0';
-        document.getElementById('monthlySaving').textContent = 'Ksh 0';
-        document.getElementById('weeklySaving').textContent = 'Ksh 0';
-        document.getElementById('totalLoans').textContent = 'Ksh 0';
-        document.getElementById('outstanding').textContent = 'Ksh 0';
-        document.getElementById('paidBalances').textContent = 'Ksh 0';
-        document.getElementById('loanStatusBar').textContent = '-';
-      }
+      renderAuth(user);
+      if(user){ qs('#memberName').textContent = user.displayName || user.email || user.uid; qs('#memberStatus').textContent = 'Status: Active';
+        subscribeUser(user.uid); subscribeAdmin(); awardPoints(user.uid,1);
+      } else { qs('#memberName').textContent='Guest'; qs('#memberStatus').textContent='Not signed in'; clearDashboard(); }
     });
 
-    // Points
-    async function awardPoints(uid, n=1){
-      if(!uid) return;
-      const pRef = db.ref('points/'+uid);
-      const snap = await pRef.once('value');
-      const curr = snap.exists()? (snap.val().score||0):0;
-      await pRef.set({score: curr + n});
-      pointsEl.textContent = curr + n;
-    }
-    document.getElementById('claimPointsBtn').addEventListener('click', ()=>{ if(currentUser) awardPoints(currentUser.uid,5); else alert('Sign in to claim'); });
+    function clearDashboard(){ qs('#monthlyVal').textContent='Ksh 0'; qs('#weeklyVal').textContent='Ksh 0'; qs('#totalLoansVal').textContent='Ksh 0'; qs('#outstandingVal').textContent='Ksh 0'; qs('#paidVal').textContent='Ksh 0'; qs('#loanStatus').innerHTML = '<span class="badge status-pending">No Loans</span>'; updateProgress(0); qs('#loansBody').innerHTML=''; }
 
-    // Subscribe user data (balances, loans, profile)
-    function subscribeUserData(uid){
-      db.ref('balances/'+uid).on('value', snap=>{
-        const v = snap.exists()? snap.val(): {};
-        document.getElementById('monthlySaving').textContent = 'Ksh ' + (v.monthly||0).toLocaleString();
-        document.getElementById('weeklySaving').textContent = 'Ksh ' + (v.weekly||0).toLocaleString();
-        document.getElementById('totalLoans').textContent = 'Ksh ' + (v.totalLoans||0).toLocaleString();
-        document.getElementById('outstanding').textContent = 'Ksh ' + (v.outstanding||0).toLocaleString();
-        document.getElementById('paidBalances').textContent = 'Ksh ' + (v.paid||0).toLocaleString();
+    function subscribeUser(uid){
+      onValue(ref(db, 'balances/'+uid), snap=>{ const v = snap.exists()? snap.val() : {}; qs('#monthlyVal').textContent = fmt(v.monthly); qs('#weeklyVal').textContent = fmt(v.weekly); qs('#totalLoansVal').textContent = fmt(v.totalLoans); qs('#outstandingVal').textContent = fmt(v.outstanding); qs('#paidVal').textContent = fmt(v.paid); });
+
+      onValue(ref(db, 'loans/'+uid), snap=>{
+        const body = qs('#loansBody'); body.innerHTML=''; let totalProgress=0, count=0;
+        if(!snap.exists()){ body.innerHTML = '<tr><td colspan="5" class="text-slate-500 text-sm">No active loans</td></tr>'; qs('#loanStatus').innerHTML = '<span class="badge status-pending">No Loans</span>'; updateProgress(0); return; }
+        snap.forEach(ch=>{ const l = ch.val(); const tr = document.createElement('tr'); const progress = Number(l.progress||0); totalProgress+=progress; count++; tr.innerHTML = `<td class="py-2">${l.product||'Loan'}</td><td>${fmt(l.amount)}</td><td><span class="badge ${l.status==='approved'?'status-approved': l.status==='rejected'?'status-rejected':'status-pending'}">${l.status||'pending'}</span></td><td>${new Date(l.due||l.dueDate||Date.now()).toLocaleDateString()}</td><td>${progress}%</td>`; body.appendChild(tr); });
+        const avg = count? Math.round(totalProgress/count) : 0; updateProgress(avg);
+        // set a top-level status
+        const anyPending = Object.values(snap.val() || {}).some(L => L.status === 'pending');
+        if(Object.keys(snap.val()||{}).length===0) qs('#loanStatus').innerHTML = '<span class="badge status-pending">No Loans</span>';
+        else if(anyPending) qs('#loanStatus').innerHTML = '<span class="badge status-pending">Pending</span>';
+        else qs('#loanStatus').innerHTML = '<span class="badge status-approved">All good</span>';
       });
 
-      db.ref('loans/'+uid).on('value', snap=>{
-        const list = document.getElementById('loansList'); list.innerHTML='';
-        if(!snap.exists()) { list.textContent='No loans yet.'; return; }
-        snap.forEach(ch => {
-          const d = ch.val();
-          const el = document.createElement('div'); el.className='p-2 border rounded flex justify-between items-center';
-          el.innerHTML = `<div><div class=\"font-medium\">${d.product||'Loan'} — Ksh ${Number(d.amount||0).toLocaleString()}</div><div class=\"text-xs text-gray-600\">Status: ${d.status||'pending'}</div></div>`;
-          list.appendChild(el);
-        });
-      });
+      onValue(ref(db, 'points/'+uid), snap => { qs('#claimPts').textContent = 'Claim +5 pts'; qs('#claimPts').disabled=false; qs('#downloadStmt').disabled=false; qs('#pointsDisplay')?.remove(); let p = snap.exists()? snap.val().score || 0 : 0; if(!qs('#pointsBadge')){ const b = document.createElement('div'); b.id='pointsBadge'; b.className='text-sm text-slate-300'; b.textContent = 'Points: '+p; authArea.prepend(b);} else qs('#pointsBadge').textContent='Points: '+p; });
 
-      db.ref('points/'+uid).on('value', snap=>{ pointsEl.textContent = snap.exists()? (snap.val().score||0) : 0; });
-
-      db.ref('profiles/'+uid).on('value', snap=>{
-        if(snap.exists()){ const p = snap.val(); document.getElementById('memberName').textContent = p.fullName || (currentUser && (currentUser.email||currentUser.uid)); }
-      });
+      // profile listener
+      onValue(ref(db, 'profiles/'+uid), snap=>{ if(snap.exists()){ const p = snap.val(); qs('#memberName').textContent = p.fullName || (currentUser && (currentUser.email||currentUser.uid)); } });
     }
 
-    // Admin applications
-    function subscribeAdminApps(){
-      db.ref('loanApplications').on('value', snap=>{
-        const adminApps = document.getElementById('adminApps'); adminApps.innerHTML='';
-        if(!snap.exists()){ adminApps.textContent = 'No applications.'; return; }
-        snap.forEach(c=>{
-          const a = c.val();
-          const el = document.createElement('div'); el.className='p-2 border rounded';
-          el.innerHTML = `<div class=\"font-medium\">${a.applicantProfile?.fullName||a.applicantEmail} — Ksh ${Number(a.amount||0).toLocaleString()}</div><div class=\"text-xs text-gray-600\">Status: ${a.status||'pending'} • ${new Date(a.createdAt||0).toLocaleString()}</div>`;
-          const btns = document.createElement('div'); btns.className='mt-2 flex space-x-2';
-          const approve = document.createElement('button'); approve.className='px-2 py-1 bg-green-600 text-white rounded text-xs'; approve.textContent='Approve';
-          approve.addEventListener('click', ()=> db.ref('loanApplications/'+c.key).update({status:'approved', reviewedAt:Date.now(), reviewedBy: currentUser? currentUser.email:'admin'}));
-          const reject = document.createElement('button'); reject.className='px-2 py-1 bg-red-600 text-white rounded text-xs'; reject.textContent='Reject';
-          reject.addEventListener('click', ()=> db.ref('loanApplications/'+c.key).update({status:'rejected', reviewedAt:Date.now(), reviewedBy: currentUser? currentUser.email:'admin'}));
-          btns.appendChild(approve); btns.appendChild(reject); el.appendChild(btns); adminApps.appendChild(el);
-        });
-      });
-    }
+    // ---------- Admin subscriptions (loanApplications) ----------
+    function subscribeAdmin(){ onValue(ref(db, 'loanApplications'), snap=>{ /* we could populate admin UI here */ }); }
 
-    // Loan wizard navigation
-    let currentStep = 1; const totalSteps = 6;
-    function showStep(n){
-      for(let i=1;i<=totalSteps;i++){ document.getElementById('step-'+i).classList.toggle('hidden', i!==n); }
-      document.getElementById('nextStep').classList.toggle('hidden', n===totalSteps);
-      document.getElementById('submitLoan').classList.toggle('hidden', n!==totalSteps);
-      document.getElementById('prevStep').disabled = (n===1);
-    }
-    showStep(currentStep);
-    document.getElementById('nextStep').addEventListener('click', ()=>{ if(currentStep<totalSteps){ currentStep++; showStep(currentStep); window.scrollTo({top:0,behavior:'smooth'}); }});
-    document.getElementById('prevStep').addEventListener('click', ()=>{ if(currentStep>1){ currentStep--; showStep(currentStep); window.scrollTo({top:0,behavior:'smooth'}); }});
+    // ---------- Progress UI ----------
+    function updateProgress(pct){ qs('#progressPercent').textContent = pct + '%'; qs('#progressBar').style.width = pct + '%'; qs('#wizardBar').style.width = Math.max(5, pct/2) + '%'; qs('#loanStatus') && (qs('#loanStatus').dataset.progress = pct); }
 
-    // Submit loan: gather data, push to firebase, generate PDF
-    document.getElementById('submitLoan').addEventListener('click', async ()=>{
+    // ---------- Award points ----------
+    async function awardPoints(uid, n=1){ if(!uid) return; const pRef = ref(db, 'points/'+uid); const snap = await get(pRef); const curr = snap.exists()? (snap.val().score||0) : 0; await set(pRef, { score: curr + n }); toast('Points awarded: '+n); }
+    qs('#claimPts').addEventListener('click', ()=>{ if(!currentUser) return alert('Sign in'); awardPoints(currentUser.uid,5); });
+
+    // ---------- Loan wizard logic ----------
+    let wizStep = 1, wizTotal = 6;
+    function showWiz(){ for(let i=1;i<=wizTotal;i++){ const el = qs('#wiz-'+i); if(!el) continue; el.classList.toggle('hidden', i!==wizStep); } qs('#wizardStepLabel').textContent = `Step ${wizStep} of ${wizTotal}`; qs('#wizNext').classList.toggle('hidden', wizStep===wizTotal); qs('#wizSubmit').classList.toggle('hidden', wizStep!==wizTotal); const pct = Math.round((wizStep-1)/(wizTotal-1)*100); qs('#wizardBar').style.width = pct + '%'; }
+    qs('#wizNext').addEventListener('click', ()=>{ if(wizStep<wizTotal){ wizStep++; showWiz(); window.scrollTo({top:0,behavior:'smooth'}); }});
+    qs('#wizPrev').addEventListener('click', ()=>{ if(wizStep>1){ wizStep--; showWiz(); window.scrollTo({top:0,behavior:'smooth'}); }});
+    showWiz();
+
+    // submit loan app
+    qs('#wizSubmit').addEventListener('click', async ()=>{
       if(!currentUser) return alert('Sign in to apply');
-      const form = document.getElementById('loanForm');
-      const fd = new FormData(form);
-      // basic validation
-      const required = ['fullName','idNumber','phone','email','amount'];
-      for(const r of required) if(!fd.get(r)) return alert('Please complete required fields: '+r);
-
+      const form = qs('#loanWizardForm'); const fd = new FormData(form);
+      // Basic validate required fields
+      const required = ['fullName','idNumber','amount'];
+      for(const r of required) if(!fd.get(r)) return alert('Complete required: '+r);
       const appObj = {
         applicantUid: currentUser.uid,
         applicantEmail: fd.get('email'),
-        applicantProfile: {
-          fullName: fd.get('fullName'), idNumber: fd.get('idNumber'), phone: fd.get('phone')
-        },
-        residence: { county: fd.get('county'), ward: fd.get('ward'), constituency: fd.get('constituency'), residence: fd.get('residence') },
+        applicantProfile: { fullName: fd.get('fullName'), idNumber: fd.get('idNumber'), phone: fd.get('phone') },
+        residence: { county: fd.get('county'), constituency: fd.get('constituency'), ward: fd.get('ward'), residence: fd.get('residence') },
         education: { level: fd.get('educationLevel'), institution: fd.get('institution'), year: fd.get('educationYear') },
-        guarantors: [
-          {name:fd.get('g1name'), phone: fd.get('g1phone'), amount: fd.get('g1amount')},
-          {name:fd.get('g2name'), phone: fd.get('g2phone'), amount: fd.get('g2amount')},
-          {name:fd.get('g3name'), phone: fd.get('g3phone'), amount: fd.get('g3amount')}
-        ],
+        guarantors: [ {name:fd.get('g1name'), phone:fd.get('g1phone'), amount:fd.get('g1amount')}, {name:fd.get('g2name'), phone:fd.get('g2phone'), amount:fd.get('g2amount')}, {name:fd.get('g3name'), phone:fd.get('g3phone'), amount:fd.get('g3amount')} ],
         parents: { relation: fd.get('parentRelation'), name: fd.get('parentName'), phone: fd.get('parentPhone'), id: fd.get('parentId') },
-        amount: Number(fd.get('amount')||0), purpose: fd.get('purpose'), disbursementMode: fd.get('disbursementMode'), accountNumber: fd.get('accountNumber'), status: 'pending', createdAt: Date.now()
+        amount: Number(fd.get('amount')||0), purpose: fd.get('purpose'), disbursementMode: fd.get('disbursementMode'), accountNumber: fd.get('accountNumber'), status:'pending', progress:0, createdAt: Date.now()
       };
-
-      // push to DB
-      const newRef = db.ref('loanApplications').push(); await newRef.set(appObj);
-      alert('Application submitted. Generating PDF...');
-      generateLoanPDF(appObj);
+      const newRef = push(ref(db, 'loanApplications')); await set(newRef, appObj);
+      // also add to loans/{uid}/{id} for quick display
+      const loanRef = push(ref(db, 'loans/'+currentUser.uid)); await set(loanRef, { ...appObj, id: newRef.key });
+      toast('Application submitted'); generateLoanPDF(appObj);
     });
 
-    // Withdrawal submit
-    document.getElementById('submitWithdraw').addEventListener('click', ()=>{
-      const f = document.getElementById('withdrawForm'); const fd = new FormData(f);
-      if(!currentUser) return alert('Sign in to submit');
-      const reason = fd.get('reason')||'';
-      if(reason.length < 200) return alert('Reason must be at least 200 characters.');
-      const w = { uid: currentUser.uid, memberNo: fd.get('memberNo'), amount: Number(fd.get('amount')||0), reason, status: 'submitted', createdAt: Date.now() };
-      const newW = db.ref('withdrawals').push(); newW.set(w);
-      alert('Withdrawal recorded. Preparing PDF...'); generateWithdrawPDF(w);
+    // ---------- Withdraw submit ----------
+    qs('#withdrawSubmit').addEventListener('click', async ()=>{
+      if(!currentUser) return alert('Sign in'); const f = qs('#withdrawForm'); const fd = new FormData(f); const reason = fd.get('reason')||''; if(reason.length < 200) return alert('Reason must be at least 200 characters'); const w = { uid: currentUser.uid, memberNo: fd.get('memberNo'), amount: Number(fd.get('amount')||0), reason, status:'submitted', createdAt: Date.now() }; const newW = push(ref(db,'withdrawals')); await set(newW, w); toast('Withdrawal recorded'); generateWithdrawPDF(w);
     });
 
-    // Profile save
-    document.getElementById('saveProfile').addEventListener('click', async ()=>{
-      if(!currentUser) return alert('Sign in to save');
-      const f = document.getElementById('profileForm'); const fd = new FormData(f);
-      const profile = { fullName: fd.get('fullName'), phone: fd.get('phone'), memberNo: fd.get('memberNo'), residence: fd.get('residence') };
-      await db.ref('profiles/'+currentUser.uid).set(profile);
-      alert('Profile saved');
-    });
+    // ---------- Save profile ----------
+    qs('#saveProfileBtn').addEventListener('click', async ()=>{ if(!currentUser) return alert('Sign in'); const f = qs('#profileForm'); const fd = new FormData(f); const p = { fullName: fd.get('fullName'), phone: fd.get('phone'), memberNo: fd.get('memberNo'), residence: fd.get('residence') }; await set(ref(db, 'profiles/'+currentUser.uid), p); toast('Profile saved'); });
 
-    // Download Statement (compiles transactions and balances into PDF)
-    document.getElementById('downloadStatementBtn').addEventListener('click', async ()=>{
-      if(!currentUser) return alert('Sign in to download');
-      const txSnap = await db.ref('transactions/'+currentUser.uid).once('value'); const txns = txSnap.exists()? Object.values(txSnap.val()):[];
-      const balSnap = await db.ref('balances/'+currentUser.uid).once('value'); const balances = balSnap.exists()? balSnap.val(): {};
-      generateStatementPDF({ profile: (await db.ref('profiles/'+currentUser.uid).once('value')).val()||{}, balances, txns });
-    });
+    // ---------- PDF generation helpers ----------
+    function generateLoanPDF(app){ const doc = new jsPDF({unit:'pt'}); doc.setFontSize(20); doc.text('Visionary Youth Group', 40, 48); doc.setFontSize(12); doc.text('Loan Application', 40, 68); doc.setFillColor(240,240,240); doc.rect(36,76,520,2,'F'); doc.setFontSize(10); doc.text(`Name: ${app.applicantProfile.fullName}`, 40, 96); doc.text(`ID: ${app.applicantProfile.idNumber}`, 40, 110); doc.text(`Phone: ${app.applicantProfile.phone||'-'}`, 40, 124); doc.text(`Email: ${app.applicantEmail||'-'}`, 40, 138); doc.text(`Amount: ${fmt(app.amount)}`, 40, 154); doc.text(`Disbursement: ${app.disbursementMode} • Account: ${app.accountNumber||'-'}`, 40, 168); doc.text('--- Residence ---', 40, 192); doc.text(`${app.residence.county || ''} • ${app.residence.constituency || ''} • ${app.residence.ward || ''}`, 40, 206); doc.text('--- Guarantors ---', 40, 230); app.guarantors.forEach((g,i)=> doc.text(`${i+1}. ${g.name} • ${g.phone} • Ksh ${Number(g.amount||0).toLocaleString()}`, 40, 244 + i*14)); doc.setFontSize(9); doc.text(`Generated: ${new Date().toLocaleString()}`, 40, 760); doc.save('loan_application_'+(app.applicantProfile.idNumber||Date.now())+'.pdf'); }
 
-    // Utility: PDF generation (loan)
-    async function generateLoanPDF(app){
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({unit:'pt'});
-      // watermark
-      doc.setFontSize(22);
-      doc.setTextColor(200);
-      doc.text('VISIONARY', 200, 150, {angle:45});
-      doc.setTextColor(0);
-      doc.setFontSize(14);
-      doc.text('Visionary Youth Group — Loan Application', 40, 40);
+    function generateWithdrawPDF(w){ const doc = new jsPDF({unit:'pt'}); doc.setFontSize(16); doc.text('Visionary Youth Group — Withdrawal', 40, 48); doc.setFontSize(10); doc.text(`Member: ${w.memberNo||''}`, 40, 80); doc.text(`Amount: ${fmt(w.amount)}`, 40, 96); doc.text('Reason:', 40, 118); doc.text(doc.splitTextToSize(w.reason, 520), 40, 136); doc.text('Office Use Only:\nApproved: _______\nStamp: ________', 40, 520); doc.setFontSize(9); doc.text(`Generated: ${new Date().toLocaleString()}`, 40, 760); doc.save('withdrawal_'+(w.memberNo||Date.now())+'.pdf'); }
 
-      doc.setFontSize(11);
-      doc.text(`Applicant: ${app.applicantProfile.fullName}`, 40, 70);
-      doc.text(`ID: ${app.applicantProfile.idNumber}`, 40, 86);
-      doc.text(`Phone: ${app.applicantProfile.phone}`, 40, 102);
-      doc.text(`Email: ${app.applicantEmail}`, 40, 118);
-      doc.text(`Amount: Ksh ${Number(app.amount).toLocaleString()}`, 40, 138);
-      doc.text(`Disbursement: ${app.disbursementMode} • Account: ${app.accountNumber || '-'}`, 40, 154);
+    function generateStatementPDF({profile, balances, txns}){ const doc = new jsPDF({unit:'pt'}); doc.setFontSize(16); doc.text('Visionary Youth Group — Account Statement', 40, 48); doc.setFontSize(10); doc.text(`Member: ${profile.fullName||''}`, 40, 72); doc.text(`Member No: ${profile.memberNo||''}`, 40, 86); doc.text(`Generated: ${new Date().toLocaleString()}`, 40, 100); doc.text('--- Balances ---', 40, 124); doc.text(`Monthly: ${fmt(balances.monthly)}`, 40, 140); doc.text(`Weekly: ${fmt(balances.weekly)}`, 200, 140); doc.text(`Total Loans: ${fmt(balances.totalLoans)}`, 40, 156); doc.text(`Outstanding: ${fmt(balances.outstanding)}`, 200, 156); doc.text('--- Transactions ---', 40, 184); let y=200; (txns||[]).forEach(t=>{ if(y>720){ doc.addPage(); y=40; } doc.text(new Date(t.date||t.createdAt||Date.now()).toLocaleDateString(), 40, y); doc.text((t.type||'')+'', 140, y); doc.text(fmt(t.amount), 240, y); y+=14; }); doc.save('statement_'+(profile.memberNo||Date.now())+'.pdf'); }
 
-      doc.setFontSize(12); doc.text('Residence', 40, 184);
-      doc.setFontSize(10); doc.text(`${app.residence.county || ''} / ${app.residence.constituency || ''} / ${app.residence.ward || ''}`, 40, 200);
+    // ---------- Download actions ----------
+    qs('#downloadStmt').addEventListener('click', async ()=>{ if(!currentUser) return alert('Sign in'); const txSnap = await get(child(ref(db), 'transactions/'+currentUser.uid)); const txns = txSnap.exists()? Object.values(txSnap.val()):[]; const balSnap = await get(child(ref(db), 'balances/'+currentUser.uid)); const balances = balSnap.exists()? balSnap.val(): {}; const profileSnap = await get(child(ref(db),'profiles/'+currentUser.uid)); const profile = profileSnap.exists()? profileSnap.val(): {}; generateStatementPDF({profile, balances, txns}); });
+    qs('#dlLoanAppBtn').addEventListener('click', ()=>{ alert('This will download your latest loan application (when available)'); });
 
-      doc.setFontSize(12); doc.text('Education', 40, 226);
-      doc.setFontSize(10); doc.text(`${app.education.level || ''} • ${app.education.institution || ''} (${app.education.year||''})`, 40, 240);
+    // ---------- Reminder creation (for Cloud Function to send email) ----------
+    async function createReminder(uid, subject, message){ await push(ref(db,'reminders'), { uid, subject, message, createdAt: Date.now() }); }
 
-      doc.setFontSize(12); doc.text('Guarantors', 40, 268);
-      app.guarantors.forEach((g, idx)=>{
-        doc.setFontSize(10); doc.text(`${idx+1}. ${g.name} — ${g.phone} — Ksh ${Number(g.amount||0).toLocaleString()}`, 40, 286 + idx*14);
-      });
+    // Expose for debugging
+    window._visionary = { db, auth, awardPoints, createReminder };
 
-      doc.setFontSize(12); doc.text('Parents / Guardian', 40, 330);
-      doc.setFontSize(10); doc.text(`${app.parents.relation} • ${app.parents.name} • ${app.parents.phone} • ID:${app.parents.id || ''}`, 40, 348);
+  </script>
 
-      doc.setFontSize(12); doc.text('Purpose', 40, 380);
-      doc.setFontSize(10); doc.text(doc.splitTextToSize(app.purpose || '-', 520), 40, 396);
-
-      doc.setFontSize(10); doc.text(`Generated: ${new Date().toLocaleString()}`, 40, 760);
-      doc.save('loan_application_'+(app.applicantProfile.idNumber||Date.now())+'.pdf');
-    }
-
-    // Withdraw PDF
-    function generateWithdrawPDF(w){
-      const { jsPDF } = window.jspdf; const doc = new jsPDF({unit:'pt'});
-      doc.setFontSize(16); doc.text('Visionary Youth Group — Withdrawal Form', 40, 40);
-      doc.setFontSize(11);
-      doc.text(`Member No: ${w.memberNo||''}`, 40, 70);
-      doc.text(`Amount: Ksh ${Number(w.amount||0).toLocaleString()}`, 40, 86);
-      doc.text('Reason:', 40, 110);
-      doc.text(doc.splitTextToSize(w.reason, 520), 40, 126);
-      doc.text('\nOffice Use Only:\nApproved: _________\nStamp: ___________', 40, 520);
-      doc.setFontSize(10); doc.text(`Generated: ${new Date().toLocaleString()}`, 40, 760);
-      doc.save('withdrawal_'+(w.memberNo||Date.now())+'.pdf');
-    }
-
-    // Statement PDF
-    function generateStatementPDF({profile, balances, txns}){
-      const { jsPDF } = window.jspdf; const doc = new jsPDF({unit:'pt'});
-      doc.setFontSize(16); doc.text('Visionary Youth Group — Account Statement', 40, 40);
-      doc.setFontSize(11); doc.text(`Member: ${profile.fullName || ''}`, 40, 64);
-      doc.text(`Member No: ${profile.memberNo || ''}`, 40, 80);
-      doc.text(`Generated: ${new Date().toLocaleString()}`, 40, 96);
-
-      doc.setFontSize(12); doc.text('Balances', 40, 120);
-      doc.setFontSize(10);
-      doc.text(`Monthly: Ksh ${Number(balances.monthly||0).toLocaleString()}`, 40, 136);
-      doc.text(`Weekly: Ksh ${Number(balances.weekly||0).toLocaleString()}`, 240, 136);
-      doc.text(`Total Loans: Ksh ${Number(balances.totalLoans||0).toLocaleString()}`, 40, 152);
-      doc.text(`Outstanding: Ksh ${Number(balances.outstanding||0).toLocaleString()}`, 240, 152);
-
-      doc.setFontSize(12); doc.text('Transactions', 40, 184);
-      doc.setFontSize(10);
-      let y = 200;
-      if(!txns || txns.length===0) { doc.text('No transactions', 40, y); }
-      else{
-        txns.forEach(t=>{
-          if(y>720){ doc.addPage(); y=40; }
-          doc.text(new Date(t.date||t.createdAt||Date.now()).toLocaleDateString(), 40, y);
-          doc.text((t.type||'')+'', 140, y);
-          doc.text('Ksh '+Number(t.amount||0).toLocaleString(), 260, y);
-          doc.text((t.note||'').toString().slice(0,30), 360, y);
-          y+=14;
-        });
-      }
-      doc.setFontSize(10); doc.text('Footer: Visionary Youth Group • www.example.org', 40, 780);
-      doc.save('statement_'+(profile.memberNo||Date.now())+'.pdf');
-    }
-
-    // Admin: sending reminders (creates a request in DB for a cloud-function to email)
-    // Example: write to /reminders/{uid} and backend cloud function sends email
-    function sendReminder(uid, message){ db.ref('reminders').push({uid, message, createdAt:Date.now()}); }
-
-    // Simple helper: when page loads show dashboard tab
-    document.querySelector('[data-tab][data-tab="dashboard"]')?.click();
-
-    // Note: this is a front-end prototype. For production:
-    // - Use Firebase modular SDK (ESM), secure DB rules, server-side email/notifications (Cloud Functions)
-    // - Store admin roles in DB and check via custom claims
-    // - Use more robust PDF templates (server-side) if required
+  <script>
+    // Activate feather icons
+    feather.replace();
   </script>
 </body>
 </html>
