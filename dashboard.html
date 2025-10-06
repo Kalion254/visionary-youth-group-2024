@@ -1,896 +1,1388 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Visionary Youth Group — Final Dashboard</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Visionary Youth Group — Dashboard (Merged)</title>
 
-  <!-- Tailwind CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
+<!-- Fonts & Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-  <!-- Icons (Heroicons / FontAwesome minimal used) -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<!-- jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-  <!-- jsPDF for PDF generation -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root{
+    --dark:#164e2a;
+    --accent:#2e7d32;
+    --gold:#ffcc00;
+    --bg1:#e9ffec;
+    --card:#ffffff;
+    --muted:#6b7280;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;font-family:'Poppins',sans-serif;background:linear-gradient(120deg,var(--bg1),#f6fff6);color:#123;
+    -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  }
 
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
+  /* Top bar */
+  .topbar{
+    position:fixed;left:0;right:0;top:0;height:64px;background:linear-gradient(90deg,var(--dark),#26734d);color:#fff;
+    display:flex;align-items:center;justify-content:space-between;padding:0 18px;z-index:1200;
+    box-shadow:0 6px 20px rgba(6,50,20,0.12);
+  }
+  .brand{display:flex;align-items:center;gap:12px}
+  .brand h1{font-size:1.05rem;margin:0;font-weight:700}
+  .hamburger{font-size:1.6rem;cursor:pointer}
+  .user-area{display:flex;align-items:center;gap:12px}
+  .avatar-wrap{width:44px;height:44px;border-radius:8px;overflow:hidden;background:#fff;display:flex;align-items:center;justify-content:center}
+  .avatar-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+  .user-info{text-align:right;font-size:0.95rem}
+  .user-info small{display:block;color:rgba(255,255,255,0.85)}
 
-  <style>
-    /* small extra styles */
-    .card { background: white; border-radius: 12px; box-shadow: 0 8px 30px rgba(2,6,23,0.06); }
-    .badge { padding: .25rem .5rem; border-radius: 9999px; font-weight:600; font-size:.75rem; display:inline-block; }
-    .status-pending{ background:#fff7ed; color:#92400e; }
-    .status-approved{ background:#ecfdf5; color:#065f46; }
-    .status-rejected{ background:#fff1f2; color:#9f1239; }
-    .sidebar-collapsed { width:72px !important; }
-    .wiz-step { display:none; }
-    .wiz-step.active { display:block; }
-    /* toast */
-    #toast { position: fixed; right: 20px; bottom: 20px; z-index: 60; }
-  </style>
+  /* Menu overlay (slightly offset from left for mobile) */
+  .menu{
+    position:fixed;top:64px;left:12px;background:rgba(255,255,255,0.98);max-width:320px;border-radius:8px;padding:8px;
+    box-shadow:0 8px 30px rgba(0,0,0,0.12);display:none;z-index:1199;
+    transform-origin:top left;
+  }
+  .menu a{display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;color:#123;text-decoration:none}
+  .menu a:hover{background:#f1fff1}
+
+  /* Layout */
+  .page{
+    max-width:1200px;margin:92px auto 48px;padding:0 18px;
+    display:grid;grid-template-columns:repeat(12,1fr);gap:18px;
+  }
+
+  /* Hero / summary */
+  .hero{grid-column:span 12;background:var(--card);border-radius:12px;padding:16px;display:flex;justify-content:space-between;align-items:center;gap:16px;box-shadow:0 8px 20px rgba(6,50,20,0.03)}
+  .welcome{display:flex;flex-direction:column}
+  .welcome h2{margin:0;color:var(--dark)}
+  .quick-actions{display:flex;gap:10px}
+
+  /* cards */
+  .card{background:var(--card);border-radius:12px;padding:14px;box-shadow:0 8px 20px rgba(6,50,20,0.05);}
+  .balances-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+  .balance{background:linear-gradient(180deg,#f3fff3,#ffffff);padding:12px;border-radius:10px;text-align:center}
+  .balance .label{color:var(--muted);font-size:0.95rem}
+  .balance .value{font-weight:700;font-size:1.25rem;color:var(--accent);margin-top:8px}
+
+  /* loan application large area */
+  .big{grid-column:span 8}
+  .side{grid-column:span 4}
+
+  /* form */
+  .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .form-grid .full{grid-column:1/-1}
+  input, select, textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #d1d5db;font-size:0.95rem}
+  textarea{min-height:100px;resize:vertical}
+  .btn{background:var(--accent);color:white;padding:10px 14px;border:none;border-radius:8px;cursor:pointer;font-weight:700}
+  .btn.secondary{background:#fff;color:var(--accent);border:1px solid #e3f1e3}
+
+  /* Voluntary Withdrawal Application specifics - kept styles */
+  /* loan stages */
+  .stages{display:flex;gap:10px;align-items:center;justify-content:space-between}
+  .stage{flex:1;padding:10px;border-radius:8px;background:#f5faf5;text-align:center}
+  .stage.active{background:var(--dark);color:white;font-weight:700}
+  .stage.done{background:#27ae60;color:white}
+
+  /* guarantors table */
+  table{width:100%;border-collapse:collapse;margin-top:10px}
+  th,td{padding:8px;border:1px solid #e6f0ea;font-size:0.9rem;text-align:left}
+
+  /* sidebar small tweaks */
+  .side h2{margin-top:0}
+  .muted{color:var(--muted)}
+
+  /* profile area fix: ensure it can grow and isn't cut on small screens */
+  #profile-area{overflow:visible}
+  .profile-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+
+  /* small screens adjustments */
+  @media (max-width:1000px){
+    .big{grid-column:span 12}
+    .side{grid-column:span 12}
+    .form-grid{grid-template-columns:1fr}
+    .menu{left:8px;right:8px;max-width:unset}
+  }
+
+  /* PDF watermark (visual only in page if needed) */
+  .watermark{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);opacity:0.06;font-size:72px;color:#2e7d32;pointer-events:none;white-space:nowrap}
+
+  /* Added: wizard steps & loan actions small styles */
+  .wiz-steps { display:flex; gap:8px; align-items:center; }
+  .wiz-step { display:none; }
+  .wiz-step.active { display:block; }
+  .loan-actions-hidden { display:none; }
+  .status-pending { background: #fff7ed; color: #92400e; padding:.2rem .5rem; border-radius:.4rem; font-weight:600; }
+  .status-approved { background: #ecfdf5; color: #065f46; padding:.2rem .5rem; border-radius:.4rem; font-weight:600; }
+  .status-rejected { background: #fff1f2; color: #9f1239; padding:.2rem .5rem; border-radius:.4rem; font-weight:600; }
+
+  #goalProgressBar{height:10px;background:linear-gradient(90deg,#16a34a,#86efac);border-radius:8px;width:0%}
+  .small-muted{font-size:0.85rem;color:var(--muted)}
+</style>
 </head>
-<body class="bg-gradient-to-br from-emerald-50 to-emerald-100 min-h-screen">
+<body>
 
-  <!-- Topbar -->
-  <header class="fixed left-0 right-0 top-0 h-16 bg-emerald-800 text-white flex items-center justify-between px-4 z-40">
-    <div class="flex items-center gap-3">
-      <div class="w-10 h-10 rounded bg-white/20 flex items-center justify-center font-bold">VY</div>
-      <div>
-        <div class="text-lg font-semibold">Visionary Youth Group</div>
-        <div class="text-xs opacity-80">Member Portal</div>
-      </div>
+  <div class="topbar">
+    <div class="brand">
+      <i class="fas fa-seedling" style="font-size:1.25rem;color:var(--gold)"></i>
+      <h1>Visionary Youth Group</h1>
     </div>
 
-    <div class="flex items-center gap-4">
-      <div class="text-right">
-        <div id="memberName" class="font-semibold">Guest</div>
-        <div id="memberStatus" class="text-xs opacity-80">Not signed in</div>
+    <div class="user-area">
+      <div class="avatar-wrap" id="topAvatar" title="Profile photo">
+        <!-- avatar inserted by JS -->
+      </div>
+      <div class="user-info">
+        <div id="topEmail">—</div>
+        <small id="topStatus">Status: <strong style="color:#9ff2b8">Active</strong></small>
       </div>
 
-      <button id="toggleSidebar" class="p-2 rounded bg-white/10 hover:bg-white/20">
-        <i class="fa fa-bars"></i>
-      </button>
-
-      <button id="signOutBtn" class="px-3 py-2 bg-white/10 rounded hover:bg-white/20">Sign out</button>
+      <div style="display:flex;align-items:center;gap:10px">
+        <button id="downloadStatementTop" title="Download Account Statement" class="btn secondary"><i class="fas fa-file-pdf"></i>&nbsp;Statement</button>
+        <i class="fas fa-bars hamburger hamburgerAction" role="button" aria-label="Menu" style="font-size:20px;color:#fff;margin-left:6px"></i>
+      </div>
     </div>
-  </header>
-
-  <!-- Layout -->
-  <div class="pt-20 flex gap-6 max-w-7xl mx-auto px-4">
-
-    <!-- Sidebar -->
-    <aside id="sidebar" class="w-72 p-4 card sticky top-20 h-[calc(100vh-5rem)] overflow-auto">
-      <nav class="space-y-2">
-        <button data-tab="overview" class="tab-btn w-full text-left px-3 py-2 rounded hover:bg-emerald-50 flex items-center gap-3"><i class="fa fa-home w-4"></i> Overview</button>
-        <button data-tab="balances" class="tab-btn w-full text-left px-3 py-2 rounded hover:bg-emerald-50 flex items-center gap-3"><i class="fa fa-wallet w-4"></i> Balances</button>
-        <button data-tab="loanWizard" class="tab-btn w-full text-left px-3 py-2 rounded hover:bg-emerald-50 flex items-center gap-3"><i class="fa fa-file-signature w-4"></i> Apply Loan (Wizard)</button>
-        <button data-tab="loanActions" class="tab-btn w-full text-left px-3 py-2 rounded hover:bg-emerald-50 flex items-center gap-3"><i class="fa fa-list"></i> Loan Actions</button>
-        <button data-tab="withdraw" class="tab-btn w-full text-left px-3 py-2 rounded hover:bg-emerald-50 flex items-center gap-3"><i class="fa fa-hand-holding-dollar"></i> Withdraw</button>
-        <button data-tab="goals" class="tab-btn w-full text-left px-3 py-2 rounded hover:bg-emerald-50 flex items-center gap-3"><i class="fa fa-bullseye"></i> Goals</button>
-        <button data-tab="profile" class="tab-btn w-full text-left px-3 py-2 rounded hover:bg-emerald-50 flex items-center gap-3"><i class="fa fa-user"></i> Profile</button>
-        <button data-tab="statements" class="tab-btn w-full text-left px-3 py-2 rounded hover:bg-emerald-50 flex items-center gap-3"><i class="fa fa-file-pdf"></i> Statements</button>
-      </nav>
-
-      <div class="mt-6 text-sm text-gray-600">
-        <div>Points: <strong id="pointsTop">0</strong></div>
-        <div class="mt-2">Auto logout: <strong>3 minutes</strong> inactivity</div>
-      </div>
-    </aside>
-
-    <!-- Main -->
-    <main class="flex-1 space-y-6 pb-24">
-
-      <!-- Overview -->
-      <section id="tab-overview" class="card p-6">
-        <div class="flex items-start justify-between gap-6">
-          <div>
-            <h2 class="text-2xl font-bold" id="welcome">Welcome, <span id="welcomeName">Member</span></h2>
-            <p class="text-sm text-gray-600">Realtime snapshot of balances and loans</p>
-          </div>
-
-          <div class="flex items-center gap-3">
-            <button id="downloadStatement" class="btn px-4 py-2 bg-emerald-700 text-white rounded">Download Statement</button>
-            <button id="openLoanWizardQuick" class="btn px-4 py-2 bg-white text-emerald-700 rounded border border-emerald-100">Apply Loan</button>
-          </div>
-        </div>
-
-        <!-- balances -->
-        <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="card p-4">
-            <div class="text-sm text-gray-500">Monthly Saving</div>
-            <div class="text-2xl font-bold text-emerald-700" id="monthlyVal">Ksh 0</div>
-            <div class="text-xs text-gray-500 mt-1">Target: <span id="monthlyTarget">Ksh 0</span></div>
-          </div>
-          <div class="card p-4">
-            <div class="text-sm text-gray-500">Weekly Saving</div>
-            <div class="text-2xl font-bold text-emerald-700" id="weeklyVal">Ksh 0</div>
-            <div class="text-xs text-gray-500 mt-1">Progress: <span id="weeklyProgress">0%</span></div>
-          </div>
-          <div class="card p-4">
-            <div class="text-sm text-gray-500">Outstanding Loans</div>
-            <div class="text-2xl font-bold text-emerald-700" id="outstandingVal">Ksh 0</div>
-            <div class="text-xs text-gray-500 mt-1">Unpaid: <span id="unpaidVal">Ksh 0</span></div>
-          </div>
-        </div>
-
-        <div class="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div class="card p-4 lg:col-span-2">
-            <h3 class="font-semibold mb-2">Active Loans</h3>
-            <div id="loansBrief">Loading...</div>
-          </div>
-
-          <div class="card p-4">
-            <h3 class="font-semibold mb-2">Savings Goal</h3>
-            <canvas id="goalChart" height="180"></canvas>
-            <div class="mt-3 text-sm text-gray-600">Goal: <span id="goalTargetVal">Ksh 0</span> • Progress: <span id="goalProgressPct">0%</span></div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Balances tab (detailed) -->
-      <section id="tab-balances" class="card p-6 hidden">
-        <h3 class="font-semibold">Balances</h3>
-        <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="card p-4">
-            <div class="text-sm text-gray-500">Monthly</div>
-            <div id="monthlyVal2" class="text-2xl font-bold text-emerald-700">Ksh 0</div>
-            <div class="mt-2">
-              <label class="text-sm">Set monthly target (Ksh)</label>
-              <input id="setGoalAmount" type="number" class="mt-1 p-2 border rounded w-full" placeholder="e.g., 5000">
-              <button id="saveGoal" class="mt-2 px-3 py-2 bg-emerald-700 text-white rounded">Save Goal</button>
-            </div>
-          </div>
-
-          <div class="card p-4">
-            <div class="text-sm text-gray-500">Weekly</div>
-            <div id="weeklyVal2" class="text-2xl font-bold text-emerald-700">Ksh 0</div>
-            <div class="mt-2 text-sm text-gray-500">Transactions & history on statements</div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Loan Wizard -->
-      <section id="tab-loanWizard" class="card p-6 hidden">
-        <h3 class="font-semibold">Loan Application (Wizard)</h3>
-        <div class="mt-3 text-sm text-gray-600 mb-4">
-          <div id="wizStepLabel">Step 1 / 6</div>
-          <div class="w-full bg-slate-100 rounded overflow-hidden h-2 mt-2">
-            <div id="wizBar" class="h-2 bg-emerald-600" style="width:0%"></div>
-          </div>
-        </div>
-
-        <form id="loanWizardForm" class="space-y-4">
-          <!-- Step 1 -->
-          <div id="wiz-1" class="wiz-step active grid grid-cols-1 md:grid-cols-2 gap-3">
-            <input name="fullName" placeholder="Full name" class="p-2 border rounded" required />
-            <input name="idNumber" placeholder="ID / Passport" class="p-2 border rounded" required />
-            <input name="dob" type="date" class="p-2 border rounded" required />
-            <input name="phone" placeholder="Phone" class="p-2 border rounded" required />
-            <input name="email" type="email" placeholder="Email" class="p-2 border rounded" />
-            <input name="memberNo" placeholder="Member No" class="p-2 border rounded" />
-          </div>
-
-          <!-- Step 2 (Residence) -->
-          <div id="wiz-2" class="wiz-step grid grid-cols-1 md:grid-cols-2 gap-3">
-            <select name="county" class="p-2 border rounded" id="countySelect"></select>
-            <input name="constituency" placeholder="Constituency" class="p-2 border rounded" />
-            <input name="ward" placeholder="Ward" class="p-2 border rounded" />
-            <input name="village" placeholder="Village/estate" class="p-2 border rounded" />
-            <input name="residence" placeholder="Residence / House" class="p-2 border rounded full" />
-          </div>
-
-          <!-- Step 3 (Education) -->
-          <div id="wiz-3" class="wiz-step grid grid-cols-1 md:grid-cols-2 gap-3">
-            <select name="educationLevel" class="p-2 border rounded">
-              <option value="">Education level</option>
-              <option>Primary</option><option>Secondary</option><option>Diploma</option><option>Undergraduate</option><option>Postgraduate</option>
-            </select>
-            <input name="institution" placeholder="Institution" class="p-2 border rounded" />
-            <input name="educationYear" placeholder="Year / Index" class="p-2 border rounded" />
-            <input name="course" placeholder="Course" class="p-2 border rounded" />
-          </div>
-
-          <!-- Step 4 (Guarantors) -->
-          <div id="wiz-4" class="wiz-step">
-            <div class="text-sm text-gray-600 mb-2">Provide 3 guarantors (required)</div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
-              <div><input name="g1_name" placeholder="Guarantor 1 name" class="p-2 border rounded" required /></div>
-              <div><input name="g1_phone" placeholder="Guarantor 1 phone" class="p-2 border rounded" required /></div>
-              <div><input name="g1_amount" placeholder="Ksh" type="number" class="p-2 border rounded" required /></div>
-
-              <div><input name="g2_name" placeholder="Guarantor 2 name" class="p-2 border rounded" required /></div>
-              <div><input name="g2_phone" placeholder="Guarantor 2 phone" class="p-2 border rounded" required /></div>
-              <div><input name="g2_amount" placeholder="Ksh" type="number" class="p-2 border rounded" required /></div>
-
-              <div><input name="g3_name" placeholder="Guarantor 3 name" class="p-2 border rounded" required /></div>
-              <div><input name="g3_phone" placeholder="Guarantor 3 phone" class="p-2 border rounded" required /></div>
-              <div><input name="g3_amount" placeholder="Ksh" type="number" class="p-2 border rounded" required /></div>
-            </div>
-          </div>
-
-          <!-- Step 5 (Loan details) -->
-          <div id="wiz-5" class="wiz-step grid grid-cols-1 md:grid-cols-2 gap-3">
-            <input name="amount" placeholder="Amount requested (Ksh)" type="number" class="p-2 border rounded" required />
-            <input name="amountWords" placeholder="Amount in words" class="p-2 border rounded" required />
-            <input name="purpose" placeholder="Purpose" class="p-2 border rounded" required />
-            <input name="repayableMonths" placeholder="Repayable in months" class="p-2 border rounded" required />
-            <select name="disbursementMode" class="p-2 border rounded">
-              <option value="mpesa">M-Pesa</option><option value="bank">Bank Transfer</option><option value="cash">Cash (Office)</option>
-            </select>
-            <input name="accountNumber" placeholder="Account / Till no" class="p-2 border rounded" />
-          </div>
-
-          <!-- Step 6 (Review & submit) -->
-          <div id="wiz-6" class="wiz-step">
-            <div class="text-sm text-gray-600">Review details and submit. You will download a styled PDF to present to the office.</div>
-            <div class="mt-3">
-              <label class="inline-flex items-center gap-2"><input type="checkbox" id="wizardAgree" /> I confirm the details above are true.</label>
-            </div>
-          </div>
-
-          <div class="flex justify-between">
-            <button type="button" id="wizPrev" class="px-4 py-2 bg-gray-200 rounded">Back</button>
-            <div class="flex gap-2">
-              <button type="button" id="wizNext" class="px-4 py-2 bg-emerald-600 text-white rounded">Next</button>
-              <button type="submit" id="wizSubmit" class="px-4 py-2 bg-emerald-700 text-white rounded hidden">Submit & Download PDF</button>
-            </div>
-          </div>
-        </form>
-      </section>
-
-      <!-- Loan Actions -->
-      <section id="tab-loanActions" class="card p-6 hidden">
-        <div class="flex items-center justify-between">
-          <h3 class="font-semibold">Loan Actions</h3>
-          <button id="toggleLoanActions" class="text-sm text-emerald-600 underline">Show full table</button>
-        </div>
-
-        <div class="mt-4 loan-summary p-3 flex items-center justify-between">
-          <div><strong id="loanCount">0</strong> active loan(s) • Outstanding: <span id="loanOutstanding">Ksh 0</span></div>
-          <div id="loanSummaryBadges"></div>
-        </div>
-
-        <div id="loanActionsPanel" class="mt-4 hidden">
-          <table class="min-w-full text-sm">
-            <thead><tr class="text-left"><th class="px-3 py-2">Loan Date</th><th class="px-3 py-2">Purpose</th><th class="px-3 py-2">Amount</th><th class="px-3 py-2">Due Date</th><th class="px-3 py-2">Status</th><th class="px-3 py-2">Progress</th></tr></thead>
-            <tbody id="loanActionsBody"></tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- Withdraw -->
-      <section id="tab-withdraw" class="card p-6 hidden">
-        <h3 class="font-semibold">Withdrawal</h3>
-        <form id="withdrawForm" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
-          <input name="w_memberName" placeholder="Member name" class="p-2 border rounded" required />
-          <input name="w_membershipNumber" placeholder="Membership No" class="p-2 border rounded" required />
-          <input name="w_idNumber" placeholder="ID number" class="p-2 border rounded" required />
-          <input name="w_phone" placeholder="Phone" class="p-2 border rounded" required />
-          <input name="w_amountFigures" placeholder="Amount (Ksh)" type="number" class="p-2 border rounded" required />
-          <textarea name="w_reason" placeholder="Reason (min 200 characters)" class="p-2 border rounded md:col-span-2" required></textarea>
-
-          <div class="md:col-span-2 flex justify-end gap-2">
-            <button id="previewWithdraw" type="button" class="px-4 py-2 bg-gray-200 rounded">Preview PDF</button>
-            <button id="submitWithdraw" type="submit" class="px-4 py-2 bg-emerald-700 text-white rounded">Submit & Download</button>
-          </div>
-        </form>
-      </section>
-
-      <!-- Goals -->
-      <section id="tab-goals" class="card p-6 hidden">
-        <h3 class="font-semibold">Savings Goal</h3>
-        <div class="mt-4">
-          <label>Target amount (Ksh)</label>
-          <input id="goalAmountInput" type="number" class="p-2 border rounded mt-1" placeholder="e.g., 10000" />
-          <label class="block mt-2">Target date</label>
-          <input id="goalDateInput" type="date" class="p-2 border rounded mt-1" />
-          <div class="mt-3 flex gap-2">
-            <button id="saveGoalBtn" class="px-3 py-2 bg-emerald-700 text-white rounded">Save Goal</button>
-            <button id="clearGoalBtn" class="px-3 py-2 bg-gray-200 rounded">Clear Goal</button>
-          </div>
-        </div>
-        <div class="mt-6">
-          <div>Progress: <strong id="goalProgressLabel">0%</strong></div>
-          <div class="w-full bg-slate-100 rounded h-3 mt-2"><div id="goalProgressBar" class="h-3 bg-emerald-600" style="width:0%"></div></div>
-        </div>
-      </section>
-
-      <!-- Profile -->
-      <section id="tab-profile" class="card p-6 hidden">
-        <h3 class="font-semibold">Profile</h3>
-        <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
-          <input id="profile_fullName" placeholder="Full name" class="p-2 border rounded" />
-          <input id="profile_phone" placeholder="Phone" class="p-2 border rounded" />
-          <input id="profile_id" placeholder="ID number" class="p-2 border rounded" />
-          <input id="profile_yearJoined" placeholder="Year joined" class="p-2 border rounded" />
-          <input id="profile_dob" type="date" placeholder="DOB" class="p-2 border rounded" />
-          <input id="profile_status" placeholder="Status (Active/Dormant)" class="p-2 border rounded" />
-        </div>
-        <div class="mt-3 flex gap-2">
-          <input id="photoInput" type="file" accept="image/*" class="hidden" />
-          <button id="choosePhotoBtn" class="px-3 py-2 bg-gray-200 rounded">Upload Photo</button>
-          <button id="saveProfileBtn" class="px-3 py-2 bg-emerald-700 text-white rounded">Save</button>
-        </div>
-      </section>
-
-      <!-- Statements -->
-      <section id="tab-statements" class="card p-6 hidden">
-        <h3 class="font-semibold">Statements</h3>
-        <div class="mt-3 flex gap-2">
-          <button id="downloadStatementBtn" class="px-3 py-2 bg-emerald-700 text-white rounded">Download Account Statement (PDF)</button>
-          <button id="downloadAppsBtn" class="px-3 py-2 bg-gray-200 rounded">Download My Applications</button>
-        </div>
-      </section>
-
-    </main>
   </div>
 
-  <!-- toast area -->
-  <div id="toast" class="hidden"></div>
+  <!-- Menu: hidden by default and offset a bit for mobile finger tap -->
+  <div class="menu" id="menu" aria-hidden="true">
+    <a href="#" data-target="overview"><i class="fas fa-home"></i> Overview</a>
+    <a href="#" data-target="balancesCard"><i class="fas fa-wallet"></i> Balances</a>
+    <a href="#" data-target="loan-section"><i class="fas fa-file-signature"></i> Loan Application</a>
+    <a href="#" data-target="loan-wizard-tab"><i class="fas fa-file-signature"></i> Loan Wizard</a> <!-- ADDED: wizard menu -->
+    <a href="#" data-target="loansListFull"><i class="fas fa-money-bill-wave"></i> Loans (Manage)</a>
+    <a href="#" data-target="withdraw-section"><i class="fas fa-hand-holding-usd"></i> Withdrawals</a>
+    <a href="#" data-target="profile-area"><i class="fas fa-user-edit"></i> Update Profile</a>
+    <a href="#" id="menuLogout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+  </div>
 
-  <!-- Firebase + App Logic -->
-  <script type="module">
-    /* ===============================
-       Imports
-       =============================== */
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
-    import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js';
-    import { getDatabase, ref, onValue, push, set, update, get, onChildChanged } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js';
-    import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js';
-    const { jsPDF } = window.jspdf;
-    const Chart = window.Chart;
+  <main class="page" id="pageRoot">
+    <!-- hero -->
+    <div class="hero card" id="overview">
+      <div class="welcome">
+        <h2 id="welcomeName">Welcome, Member</h2>
+        <div style="color:var(--muted);margin-top:6px">Quick snapshot — all amounts shown in <strong>Ksh</strong></div>
+        <div style="margin-top:6px;font-size:0.9rem">Points: <strong id="pointsDisplay">0</strong></div>
+      </div>
+      <div class="quick-actions">
+        <button id="quickApply" class="btn"><i class="fas fa-file-signature"></i>&nbsp;Apply Loan</button>
+        <button id="quickStatement" class="btn secondary"><i class="fas fa-file-download"></i>&nbsp;Statement</button>
+      </div>
+    </div>
 
-    /* ===============================
-       Firebase config (from you)
-       =============================== */
-    const firebaseConfig = {
-      apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
-      authDomain: "visionary-youth-grou-2024.firebaseapp.com",
-      databaseURL: "https://visionary-youth-grou-2024-default-rtdb.firebaseio.com",
-      projectId: "visionary-youth-grou-2024",
-      storageBucket: "visionary-youth-grou-2024.appspot.com",
-      messagingSenderId: "372978592717",
-      appId: "1:372978592717:web:1c15aec728ee5f854f3284"
-    };
+    <!-- balances summary -->
+    <div class="card big" id="balancesCard">
+      <h2>Balances</h2>
+      <div class="balances-grid">
+        <div class="balance"><div class="label">Monthly Savings</div><div class="value" id="monthlyVal">Ksh 0</div></div>
+        <div class="balance"><div class="label">Weekly Savings</div><div class="value" id="weeklyVal">Ksh 0</div></div>
+        <div class="balance"><div class="label">Shares</div><div class="value" id="sharesVal">Ksh 0</div></div>
+        <div class="balance"><div class="label">Dividends</div><div class="value" id="dividendsVal">Ksh 0</div></div>
+        <div class="balance"><div class="label">Total Loans</div><div class="value" id="totalLoansVal">Ksh 0</div></div>
+        <div class="balance"><div class="label">Unpaid Balances</div><div class="value" id="unpaidVal">Ksh 0</div></div>
+        <div class="balance"><div class="label">Outstanding Loans</div><div class="value" id="outstandingLoansVal">Ksh 0</div></div>
+      </div>
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getDatabase(app);
-    const storage = getStorage(app);
+      <!-- ADDED: Goal setting UI integrated with your RTDB -->
+      <div style="margin-top:12px;display:flex;gap:10px;align-items:center">
+        <div style="flex:1">
+          <label class="small-muted">Set savings goal (Ksh)</label>
+          <input id="goalInput" placeholder="Enter target amount" style="padding:8px;border-radius:8px;border:1px solid #d1d5db;width:100%;margin-top:6px">
+        </div>
+        <div>
+          <label class="small-muted">Target date</label>
+          <input id="goalDate" type="date" style="padding:8px;border-radius:8px;border:1px solid #d1d5db;margin-top:6px">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <button id="saveGoalBtn" class="btn">Save Goal</button>
+          <button id="clearGoalBtn" class="btn secondary">Clear Goal</button>
+        </div>
+      </div>
 
-    /* ===============================
-       Small helpers & DOM refs
-       =============================== */
-    const qs = sel => document.querySelector(sel);
-    function toast(msg, ms=3000){
-      const el = qs('#toast');
-      el.textContent = msg; el.classList.remove('hidden'); el.classList.add('fixed','right-6','bottom-6','bg-emerald-600','text-white','px-4','py-2','rounded','shadow');
-      setTimeout(()=> { el.classList.add('hidden'); el.className=''; el.id='toast'; }, ms);
-    }
-    function fmtK(n){ return 'Ksh ' + (Number(n||0)).toLocaleString('en-KE'); }
+      <div style="margin-top:10px">
+        <div class="small-muted">Goal Progress</div>
+        <div style="height:10px;background:#eefaf0;border-radius:6px;overflow:hidden;margin-top:6px">
+          <div id="goalProgressBar" style="height:100%;width:0;background:linear-gradient(90deg,#16a34a,#86efac)"></div>
+        </div>
+        <div class="small-muted" style="margin-top:6px">Progress: <span id="goalProgressPct">0%</span></div>
+      </div>
+    </div>
 
-    /* ===============================
-       UI: tabs
-       =============================== */
-    const tabButtons = document.querySelectorAll('.tab-btn');
-    function openTab(tabId){
-      // hide all tab sections (sections have id="tab-<id>" OR elements like tab-loanWizard)
-      const sections = document.querySelectorAll('main [id^="tab-"], main #loan-wizard-tab, main #tab-loanWizard, main #tab-overview');
-      sections.forEach(s => { if(s.id) s.classList.add('hidden'); });
-      // map button data-tab to section ids used in markup
-      const mapping = {
-        'overview': 'tab-overview',
-        'balances': 'tab-balances',
-        'loanWizard': 'tab-loanWizard',
-        'loanActions': 'tab-loanActions',
-        'withdraw': 'tab-withdraw',
-        'goals': 'tab-goals',
-        'profile': 'tab-profile',
-        'statements': 'tab-statements'
-      };
-      const target = mapping[tabId] || tabId;
+    <!-- loan application big form (your original full form kept) -->
+    <section class="card big" id="loan-section" aria-labelledby="loanHeading">
+      <h2 id="loanHeading"><i class="fas fa-file-signature"></i> Loan Application (Official Form)</h2>
+
+      <form id="fullLoanForm">
+        <!-- (Your existing fullLoanForm content left intact) -->
+        <!-- header -->
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div>
+            <div style="font-weight:800">VISIONARY YOUTH GROUP 2024</div>
+            <div style="font-weight:700;color:var(--muted)">SOCIAL PROMOTION REGISTERED TRUSTEES</div>
+            <div style="font-size:0.9rem;color:var(--muted)">Group: <strong id="groupNameDisplay">Visionary Youth Group</strong></div>
+          </div>
+          <div style="text-align:right;font-size:0.9rem">
+            <div>Loan Number: <span id="loanNoDisplay">—</span></div>
+            <div>Serial No: <span id="serialNo">—</span></div>
+            <div style="margin-top:8px;font-size:0.8rem"><small>FOR OFFICIAL USE ONLY</small></div>
+          </div>
+        </div>
+
+        <!-- APPLICANT INFORMATION -->
+        <h3>APPLICANT INFORMATION</h3>
+        <div class="form-grid">
+          <input class="full" name="selfHelpGroup" placeholder="Name of Self-Help Group" required>
+          <input name="memberName" placeholder="Name of Applicant" required>
+          <input name="membershipNumber" placeholder="Membership Number (M/No)" required>
+          <input name="nationalId" placeholder="National ID / Passport No" required>
+          <select name="maritalStatus" required>
+            <option value="">Marital Status</option>
+            <option>Single</option><option>Married</option><option>Widow</option><option>Others</option>
+          </select>
+          <input name="dob" type="date" placeholder="Date of Birth" required>
+          <input name="county" placeholder="County" required>
+          <input name="town" placeholder="City / Town" required>
+          <input name="currentAddress" placeholder="Current Address" required>
+          <input name="areaResidence" placeholder="Area of Residence" required>
+          <input name="phone" placeholder="Phone" required>
+          <input name="email" type="email" placeholder="E-mail" required>
+          <select name="ownedRented">
+            <option value="">Owned / Rented</option>
+            <option>Owned</option><option>Rented</option>
+          </select>
+          <input name="monthlyRent" placeholder="Monthly payment or rent">
+        </div>
+
+        <!-- EMPLOYMENT -->
+        <h3>EMPLOYMENT INFORMATION (WHERE APPLICABLE)</h3>
+        <div class="form-grid">
+          <input name="employer" placeholder="Current Employer">
+          <input name="position" placeholder="Position">
+          <input name="periodEmployment" placeholder="Period in Current Employment">
+          <input name="employerAddress" placeholder="Employer Address">
+          <input name="monthlyIncome" placeholder="Monthly Income (Ksh)" required>
+        </div>
+
+        <!-- OTHER SOURCES -->
+        <h3>OTHER SOURCES OF INCOME</h3>
+        <div class="form-grid">
+          <input name="income1" placeholder="Income source 1 (Ksh)">
+          <input name="income2" placeholder="Income source 2 (Ksh)">
+          <input name="income3" placeholder="Income source 3 (Ksh)">
+        </div>
+
+        <!-- LOAN APPLICATION -->
+        <h3>LOAN APPLICATION</h3>
+        <div class="form-grid">
+          <input name="amountFigures" placeholder="Amount Requested (Figures, Ksh)" required>
+          <input name="amountWords" placeholder="Amount in words" required>
+          <input name="purpose" placeholder="Purpose of the Loan" required>
+          <input name="repayableMonths" placeholder="Repayable in monthly instalments (months)" required>
+        </div>
+
+        <!-- OTHER LOANS -->
+        <h3>OTHER LOANS / DEBTS / OBLIGATIONS</h3>
+        <div class="form-grid">
+          <input name="otherLoan1" placeholder="Institution / Amount">
+          <input name="otherLoan2" placeholder="Institution / Amount">
+        </div>
+
+        <!-- GUARANTORS -->
+        <h3>GUARANTORS (Fill details, sign after applicant enters amount)</h3>
+        <table>
+          <thead>
+            <tr><th>M No.</th><th>Name in Full</th><th>Cell Phone</th><th>ID No.</th><th>Group Name</th><th>Amount Offered (Ksh)</th></tr>
+          </thead>
+          <tbody id="guarantorRows">
+            <!-- 3 default rows -->
+            <tr>
+              <td><input name="g_mno_1" placeholder="MNo"></td>
+              <td><input name="g_name_1" placeholder="Full name"></td>
+              <td><input name="g_phone_1" placeholder="Phone"></td>
+              <td><input name="g_id_1" placeholder="ID No"></td>
+              <td><input name="g_group_1" placeholder="SHG Name"></td>
+              <td><input name="g_amount_1" placeholder="Ksh"></td>
+            </tr>
+            <tr>
+              <td><input name="g_mno_2" placeholder="MNo"></td>
+              <td><input name="g_name_2" placeholder="Full name"></td>
+              <td><input name="g_phone_2" placeholder="Phone"></td>
+              <td><input name="g_id_2" placeholder="ID No"></td>
+              <td><input name="g_group_2" placeholder="SHG Name"></td>
+              <td><input name="g_amount_2" placeholder="Ksh"></td>
+            </tr>
+            <tr>
+              <td><input name="g_mno_3" placeholder="MNo"></td>
+              <td><input name="g_name_3" placeholder="Full name"></td>
+              <td><input name="g_phone_3" placeholder="Phone"></td>
+              <td><input name="g_id_3" placeholder="ID No"></td>
+              <td><input name="g_group_3" placeholder="SHG Name"></td>
+              <td><input name="g_amount_3" placeholder="Ksh"></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- TERMS -->
+        <h3>TERMS &amp; CONDITIONS — Applicant Commitment</h3>
+        <textarea name="terms" readonly>
+Please read the full terms on the system: you must have 6 consecutive months savings, savings cover a third of guarantorship, loans above Ksh 10,000 require bank statements, school fees loan evidence required, cancellations fee may apply, CRB checks permitted.
+        </textarea>
+
+        <div style="margin-top:12px;display:flex;gap:10px;align-items:center">
+          <label style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="agreeTerms" required> I have read and agree to the Terms & Conditions</label>
+          <div style="margin-left:auto;display:flex;gap:8px">
+            <button class="btn" type="button" id="previewLoanPdf">Preview PDF</button>
+            <button class="btn" type="submit" id="submitLoanBtn">Submit Application & Download PDF</button>
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <!-- ADDED: Wizard-based loan application (non-destructive; user can choose either) -->
+    <section class="card big" id="loan-wizard-tab" style="display:none">
+      <h2><i class="fas fa-magic"></i> Loan Application — Wizard (Recommended)</h2>
+      <div style="margin-top:8px" class="small-muted">Follow the steps — this writes to the same RTDB path as the main form.</div>
+
+      <div style="margin-top:10px" class="wiz-steps">
+        <div id="wizProgressText">Step <span id="wizStepNum">1</span> / 6</div>
+        <div style="flex:1;height:8px;background:#eef6ee;border-radius:6px;margin-left:12px;overflow:hidden">
+          <div id="wizProgressBar" style="height:100%;width:0;background:linear-gradient(90deg,var(--accent),#86efac)"></div>
+        </div>
+      </div>
+
+      <form id="loanWizardForm" style="margin-top:12px">
+        <!-- Step 1 -->
+        <div class="wiz-step active" id="wiz-1">
+          <h4>Personal Information</h4>
+          <div class="form-grid">
+            <input name="wiz_selfHelpGroup" placeholder="Self-help group" class="full">
+            <input name="wiz_memberName" placeholder="Full name" required>
+            <input name="wiz_nationalId" placeholder="National ID / Passport" required>
+            <input name="wiz_dob" type="date" placeholder="Date of birth" required>
+            <input name="wiz_phone" placeholder="Phone" required>
+            <input name="wiz_email" type="email" placeholder="Email">
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="wiz-step" id="wiz-2">
+          <h4>Residence</h4>
+          <div class="form-grid">
+            <input name="wiz_county" placeholder="County" required>
+            <input name="wiz_town" placeholder="Town / City">
+            <input name="wiz_ward" placeholder="Ward">
+            <input name="wiz_village" placeholder="Village / Estate">
+            <input name="wiz_address" placeholder="Current Address" class="full">
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="wiz-step" id="wiz-3">
+          <h4>Education</h4>
+          <div class="form-grid">
+            <input name="wiz_educationLevel" placeholder="Education level">
+            <input name="wiz_institution" placeholder="Institution">
+            <input name="wiz_educationYear" placeholder="Year / Index">
+            <input name="wiz_course" placeholder="Course">
+            <input name="wiz_duration" placeholder="Duration">
+          </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="wiz-step" id="wiz-4">
+          <h4>Guarantors (3)</h4>
+          <table>
+            <thead><tr><th>#</th><th>Name</th><th>Phone</th><th>ID</th><th>Group</th><th>Amount</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td><input name="wiz_g1_name" required></td><td><input name="wiz_g1_phone" required></td><td><input name="wiz_g1_id" required></td><td><input name="wiz_g1_group"></td><td><input name="wiz_g1_amount" required></td></tr>
+              <tr><td>2</td><td><input name="wiz_g2_name" required></td><td><input name="wiz_g2_phone" required></td><td><input name="wiz_g2_id" required></td><td><input name="wiz_g2_group"></td><td><input name="wiz_g2_amount" required></td></tr>
+              <tr><td>3</td><td><input name="wiz_g3_name" required></td><td><input name="wiz_g3_phone" required></td><td><input name="wiz_g3_id" required></td><td><input name="wiz_g3_group"></td><td><input name="wiz_g3_amount" required></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Step 5 -->
+        <div class="wiz-step" id="wiz-5">
+          <h4>Loan Details</h4>
+          <div class="form-grid">
+            <input name="wiz_amount" placeholder="Amount requested (Ksh)" required>
+            <input name="wiz_amountWords" placeholder="Amount in words" required>
+            <input name="wiz_purpose" placeholder="Purpose" required>
+            <input name="wiz_repayableMonths" placeholder="Months to repay" required>
+            <select name="wiz_disbursementMode"><option value="mpesa">M-Pesa</option><option value="bank">Bank</option><option value="cash">Cash</option></select>
+            <input name="wiz_accountNumber" placeholder="Account / Till">
+          </div>
+        </div>
+
+        <!-- Step 6 -->
+        <div class="wiz-step" id="wiz-6">
+          <h4>Review & Submit</h4>
+          <div class="small-muted">When you submit, a copy will be saved to your applications and you'll download a branded PDF to hand to the office.</div>
+          <div style="margin-top:8px"><label><input type="checkbox" id="wiz_agree" required> I confirm the information above.</label></div>
+        </div>
+
+        <div style="margin-top:12px;display:flex;justify-content:space-between">
+          <button type="button" id="wizPrev" class="btn secondary">Back</button>
+          <div>
+            <button type="button" id="wizNext" class="btn">Next</button>
+            <button type="submit" id="wizSubmit" class="btn" style="display:none">Submit & Download PDF</button>
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <!-- New Withdrawable Form -->
+    <section class="card big" id="withdraw-section">
+      <h2><i class="fas fa-hand-holding-usd"></i> Voluntary Withdrawable Savings Form</h2>
+
+      <form id="withdrawForm">
+        <div class="form-grid">
+          <input class="full" name="memberName" placeholder="Member Name" required>
+          <input name="membershipNumber" placeholder="Membership Number" required>
+          <input name="idNumber" placeholder="ID / Passport Number" required>
+          <input name="phone" placeholder="Phone Number" required>
+          <input name="amountFigures" placeholder="Amount Requested (Figures, Ksh)" required>
+          <input name="amountWords" placeholder="Amount in Words" required>
+          <input class="full" name="reason" placeholder="Reason for Withdrawal" required>
+        </div>
+
+        <div style="margin-top:12px;display:flex;gap:10px;align-items:center">
+          <button class="btn" type="button" id="previewWithdrawPdf">Preview PDF</button>
+          <button class="btn" type="submit" id="submitWithdrawBtn">Submit & Download PDF</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- loans management full list (with status update selects) -->
+    <section class="card side" id="loansListFull">
+      <h2>Loans — Manage Applications</h2>
+      <div id="loansListArea">Loading loans…</div>
+      <div id="loansListFull" style="margin-top:12px"></div>
+
+      <hr style="margin:12px 0">
+      <div style="display:flex;gap:8px">
+        <button id="downloadStatement" class="btn secondary"><i class="fas fa-file-pdf"></i>&nbsp;Download Statement</button>
+        <button id="downloadApplications" class="btn" title="Download all my applications"><i class="fas fa-download"></i>&nbsp;My Applications</button>
+      </div>
+    </section>
+
+    <!-- profile area -->
+    <section class="card" id="profile-area">
+      <h2><i class="fas fa-user-edit"></i> Update Profile</h2>
+      <div class="profile-grid" style="margin-top:10px">
+        <input class="full" id="profile_fullName" placeholder="Full name">
+        <input id="profile_phone" placeholder="Phone">
+        <input id="profile_id" placeholder="ID Number">
+        <input id="profile_yearJoined" placeholder="Year Joined (e.g. 2021)">
+        <input id="profile_dob" type="date" placeholder="Date of Birth">
+      </div>
+
+      <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+        <input type="file" id="photoUploadInput" accept="image/*" style="display:none">
+        <button id="choosePhotoBtn" class="btn secondary"><i class="fas fa-camera"></i>&nbsp;Upload Photo</button>
+        <button id="saveProfile" class="btn">Save Profile</button>
+        <button id="profileStatement" class="btn secondary">Account Statement</button>
+      </div>
+
+      <div style="margin-top:12px;font-size:0.9rem;color:var(--muted)">
+        <strong>Note:</strong> Your photo will be visible at the top when uploaded. Profile changes are saved to the server.
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" style="position:fixed;right:18px;bottom:18px;background:#28a745;color:#fff;padding:10px 14px;border-radius:8px;display:none;z-index:2000"></div>
+
+<!-- Firebase & App logic -->
+<script type="module">
+  // Imports (kept original)
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+  import { getDatabase, ref, onValue, get, push, set, update, onChildChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+  import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
+
+  // jsPDF
+  const { jsPDF } = window.jspdf;
+
+  // Firebase config (kept as provided)
+  const firebaseConfig = {
+    apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
+    authDomain: "visionary-youth-grou-2024.firebaseapp.com",
+    databaseURL: "https://visionary-youth-grou-2024-default-rtdb.firebaseio.com",
+    projectId: "visionary-youth-grou-2024",
+    storageBucket: "visionary-youth-grou-2024.appspot.com",
+    messagingSenderId: "372978592717",
+    appId: "1:372978592717:web:1c15aec728ee5f854f3284"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getDatabase(app);
+  const storage = getStorage(app);
+
+  // UI refs (kept original)
+  const hamburger = document.querySelector('.hamburgerAction');
+  const menu = document.getElementById('menu');
+  const toast = document.getElementById('toast');
+  const topEmail = document.getElementById('topEmail');
+  const welcomeName = document.getElementById('welcomeName');
+  const pointsDisplay = document.getElementById('pointsDisplay');
+  const topAvatar = document.getElementById('topAvatar');
+  const welcomeNameSidebar = document.getElementById('welcomeNameSidebar'); // may not exist
+  const topEmailSidebar = document.getElementById('topEmailSidebar'); // may not exist
+
+  // helpers
+  function showToast(msg, timeout=3000){
+    toast.textContent = msg; toast.style.display='block';
+    setTimeout(()=> toast.style.display='none', timeout);
+  }
+
+  function formatKsh(n){
+    const num = Number(n||0);
+    return 'Ksh ' + num.toLocaleString('en-KE');
+  }
+
+  // menu toggles (offset is already in CSS via left)
+  if (hamburger) {
+    hamburger.addEventListener('click', ()=> {
+      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    });
+  }
+
+  // menu links close and scroll
+  menu.querySelectorAll('a[data-target]').forEach(a=>{
+    a.addEventListener('click', (e)=>{
+      e.preventDefault();
+      const target = a.dataset.target;
       const el = document.getElementById(target);
-      if(el) el.classList.remove('hidden');
-      window.scrollTo({top:0, behavior:'smooth'});
+      // hide all major sections and show the requested one
+      const allSections = ['overview','balancesCard','loan-section','loan-wizard-tab','loansListFull','withdraw-section','profile-area'];
+      allSections.forEach(id => { const node = document.getElementById(id); if(node) node.style.display = 'none'; });
+      if(el) el.style.display = 'block';
+      menu.style.display = 'none';
+      el && el.scrollIntoView({behavior:'smooth', block:'start'});
+    });
+  });
+
+  // global auth variables
+  let currentUid = null;
+  let profileSavedOnce = false;
+
+  // Auto logout (3 minutes)
+  let logoutTimer;
+  function resetLogoutTimer(){
+    clearTimeout(logoutTimer);
+    logoutTimer = setTimeout(()=>{
+      try { signOut(auth); } catch(e) {}
+      alert('Logged out due to inactivity');
+      location.href='index.html';
+    }, 3*60*1000);
+  }
+  ['mousemove','keydown','click','touchstart'].forEach(ev=> window.addEventListener(ev, resetLogoutTimer));
+
+  // ----- Points functions -----
+  async function getPoints(){
+    if(!currentUid) return 0;
+    try{
+      const snap = await get(ref(db, `members/${currentUid}/points`));
+      return snap.exists()? Number(snap.val()||0) : 0;
+    }catch(e){ console.error(e); return 0; }
+  }
+  async function setPoints(n){
+    if(!currentUid) return;
+    await set(ref(db, `members/${currentUid}/points`), Number(n||0));
+    if(pointsDisplay) pointsDisplay.textContent = String(Number(n||0));
+  }
+  async function logActivity(msg){
+    if(!currentUid) return;
+    const entryRef = push(ref(db, `members/${currentUid}/activityLog`));
+    await set(entryRef, {text: msg, ts: Date.now()});
+  }
+  async function awardPoints(n, reason){
+    if(!currentUid || !n) return;
+    const current = await getPoints();
+    const updated = (Number(current)||0) + Number(n);
+    await setPoints(updated);
+    showToast(`+${n} points`);
+    logActivity(`Points +${n} (${reason})`);
+  }
+
+  // ----- AUTH STATE -----
+  onAuthStateChanged(auth, async user => {
+    if(!user){ location.href='index.html'; return; }
+    currentUid = user.uid;
+    topEmail.textContent = user.email || '—';
+    welcomeName.textContent = (user.email || 'Member').split('@')[0];
+    resetLogoutTimer();
+    awardPoints(10, 'Logged in'); // small login bonus
+
+    // load profile
+    onValue(ref(db, `members/${currentUid}/profile`), snap=>{
+      if(snap.exists()){
+        const p = snap.val();
+        if(p.name){ document.getElementById('welcomeName').textContent = p.name; if(document.getElementById('welcomeNameSidebar')) document.getElementById('welcomeNameSidebar').textContent = p.name; }
+        if(p.name) document.getElementById('profile_fullName').value = p.name;
+        if(p.phone) document.getElementById('profile_phone').value = p.phone;
+        if(p.id) document.getElementById('profile_id').value = p.id;
+        if(p.yearJoined) document.getElementById('profile_yearJoined').value = p.yearJoined;
+        if(p.dob) document.getElementById('profile_dob').value = p.dob;
+        if(p.status) document.getElementById('topStatus').innerHTML = `Status: <strong style="color:#9ff2b8">${p.status}</strong>`;
+      }
+    });
+
+    // profile photo: get url if exists
+    try{
+      const photoSnap = await get(ref(db, `members/${currentUid}/photoURL`));
+      if(photoSnap && photoSnap.exists()){
+        const url = photoSnap.val();
+        setAvatar(url);
+      } else {
+        // placeholder avatar
+        if(topAvatar) topAvatar.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--dark)"><i class="fas fa-user"></i></div>';
+      }
+    }catch(e){ console.error(e); }
+
+    // balances listeners (preserve original reading semantics)
+    const monthlyRef = ref(db, `members/${currentUid}/savings/monthly`);
+    const weeklyRef = ref(db, `members/${currentUid}/savings/weekly`);
+    const sharesRef = ref(db, `members/${currentUid}/shares/total`);
+    const dividendsRef = ref(db, `members/${currentUid}/shares/dividends`);
+    const unpaidRef = ref(db, `members/${currentUid}/unpaidBalances`);
+    const loansTotalsRef = ref(db, `members/${currentUid}/loans/summary`);
+    const outstandingLoansRef = ref(db, `members/${currentUid}/outstandingLoans`);
+
+    async function snapToAmount(snap){
+      if(!snap.exists()) return 0;
+      const val = snap.val();
+      if(typeof val === 'number' || typeof val === 'string') return Number(val) || 0;
+      let total = 0;
+      Object.values(val).forEach(child=>{
+        if(child && typeof child === 'object' && ('amount' in child)) total += Number(child.amount||0);
+        else if(typeof child === 'number') total += child;
+        else if(typeof child === 'object' && !('amount' in child)){
+          Object.values(child).forEach(c2=>{ if(c2 && typeof c2 === 'object' && ('amount' in c2)) total += Number(c2.amount||0); });
+        }
+      });
+      return total;
     }
-    tabButtons.forEach(b => b.addEventListener('click', ()=> openTab(b.dataset.tab)));
-    // default
-    openTab('overview');
 
-    // menu toggle
-    qs('#toggleSidebar').addEventListener('click', ()=> qs('#sidebar').classList.toggle('hidden'));
+    onValue(monthlyRef, async s=>{ const v = await snapToAmount(s); const el = document.getElementById('monthlyVal'); if(el) el.textContent = formatKsh(v); document.getElementById('monthlyVal2') && (document.getElementById('monthlyVal2').textContent = formatKsh(v)); });
+    onValue(weeklyRef, async s=>{ const v = await snapToAmount(s); const el = document.getElementById('weeklyVal'); if(el) el.textContent = formatKsh(v); document.getElementById('weeklyVal2') && (document.getElementById('weeklyVal2').textContent = formatKsh(v)); });
+    onValue(sharesRef, s=>{ const v = s.exists()? Number(s.val()||0) : 0; const el = document.getElementById('sharesVal'); if(el) el.textContent = formatKsh(v); });
+    onValue(dividendsRef, s=>{ const v = s.exists()? Number(s.val()||0) : 0; const el = document.getElementById('dividendsVal'); if(el) el.textContent = formatKsh(v); });
+    onValue(unpaidRef, s=>{ const v = s.exists()? Number(s.val()||0) : 0; const el = document.getElementById('unpaidVal'); if(el) el.textContent = formatKsh(v); });
 
-    /* ===============================
-       Inactivity auto-logout (3 min)
-       =============================== */
-    let inactivityTimer = null;
-    const INACTIVITY_LIMIT = 3*60*1000;
-    function resetInactivity(){
-      clearTimeout(inactivityTimer);
-      inactivityTimer = setTimeout(async ()=> {
-        try{ await signOut(auth); } catch(e){}
-        alert('Signed out due to inactivity');
-        location.reload();
-      }, INACTIVITY_LIMIT);
-    }
-    ['mousemove','keydown','click','touchstart'].forEach(ev => window.addEventListener(ev, resetInactivity));
+    onValue(loansTotalsRef, s=>{
+      const obj = s.exists()? s.val() : {total:0,unpaid:0};
+      const total = obj.total || 0; const unpaid = obj.unpaid || 0;
+      const totalEl = document.getElementById('totalLoansVal'); if(totalEl) totalEl.textContent = formatKsh(total);
+      const unpaidEl = document.getElementById('unpaidVal'); if(unpaidEl) unpaidEl.textContent = formatKsh(unpaid);
+    });
 
-    /* ===============================
-       County list (for wizard)
-       =============================== */
-    const counties = ["Mombasa","Kwale","Kilifi","Tana River","Lamu","Taita-Taveta","Garissa","Wajir","Mandera","Marsabit","Isiolo","Meru","Tharaka-Nithi","Embu","Kitui","Machakos","Makueni","Nyandarua","Nyeri","Kirinyaga","Murang'a","Kiambu","Turkana","West Pokot","Samburu","Trans-Nzoia","Uasin Gishu","Elgeyo-Marakwet","Nandi","Baringo","Laikipia","Nakuru","Narok","Kajiado","Kericho","Bomet","Kakamega","Vihiga","Bungoma","Busia","Siaya","Kisumu","Homa Bay","Migori","Kisii","Nyamira","Nairobi"];
-    const countySelect = qs('#countySelect');
-    if(countySelect){
-      counties.forEach(c => { const o = document.createElement('option'); o.value=c; o.textContent=c; countySelect.appendChild(o); });
-    }
+    onValue(outstandingLoansRef, s=>{
+      const v = s.exists() ? (typeof s.val() === 'number' ? s.val() : 0) : 0;
+      const outEl = document.getElementById('outstandingLoansVal'); if(outEl) outEl.textContent = formatKsh(v);
+    });
 
-    /* ===============================
-       Authentication state & initial subscriptions
-       =============================== */
-    let currentUid = null;
-    onAuthStateChanged(auth, async user => {
-      if(!user) {
-        // no user: redirect or show guest
-        // For now, alert & stop
-        alert('No authenticated user. Redirecting to login.');
-        window.location.href = 'index.html';
+    // load applications and render with status update dropdown
+    const appsRef = ref(db, `members/${currentUid}/loans/applications`);
+    onValue(appsRef, snap=>{
+      const area = document.getElementById('loansListArea');
+      const areaFull = document.getElementById('loansListFull');
+      if(area) area.innerHTML = '';
+      if(areaFull) areaFull.innerHTML = '';
+      if(!snap.exists()){
+        if(area) area.innerHTML = '<div class="muted">No applications yet</div>';
+        if(areaFull) areaFull.innerHTML = '<div class="muted">No applications yet</div>';
         return;
       }
-      currentUid = user.uid;
-      qs('#memberName').textContent = user.displayName || user.email || 'Member';
-      qs('#memberStatus').textContent = 'Status: Active';
-      qs('#welcomeName').textContent = user.displayName || (user.email? user.email.split('@')[0] : 'Member');
+      const apps = snap.val();
+      const list = document.createElement('div');
+      const listFull = document.createElement('div');
 
-      // reset inactivity timer
-      resetInactivity();
+      Object.entries(apps).forEach(([id, app])=>{
+        const short = document.createElement('div');
+        short.style.padding='8px';
+        short.style.borderBottom='1px solid #eef6ee';
+        short.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
+          <div><strong>${app.memberName || app.name || '(Applicant)'}</strong><div style="font-size:0.85rem;color:var(--muted)">Amount: ${formatKsh(app.amountFigures || app.amount || 0)} • Status: ${app.status||'Pending'}</div></div>
+          <div style="text-align:right"><small>${new Date(app.appliedAt || 0).toLocaleString()||''}</small></div>
+        </div>`;
+        list.appendChild(short);
 
-      // start listeners
-      subscribeBalances();
-      subscribeLoanApplications();
-      subscribeGoal();
-      subscribePoints();
-      subscribeProfile();
-
-      // award small points for login
-      try{ await awardPoints(5, 'Login'); } catch(e){}
-    });
-
-    // sign out button
-    qs('#signOutBtn').addEventListener('click', async ()=> {
-      try{ await signOut(auth); } catch(e){}
-      location.href = 'index.html';
-    });
-
-    /* ===============================
-       Points & activity
-       =============================== */
-    async function awardPoints(n, reason){
-      if(!currentUid) return;
-      const pRef = ref(db, `members/${currentUid}/points`);
-      const snap = await get(pRef);
-      const curr = snap.exists() ? Number(snap.val()||0) : 0;
-      await set(pRef, curr + n);
-      // log activity
-      await push(ref(db, `members/${currentUid}/activityLog`), { text: reason || 'action', ts: Date.now() });
-      qs('#pointsTop').textContent = String(curr + n);
-    }
-    async function subscribePoints(){
-      onValue(ref(db, `members/${currentUid}/points`), snap => {
-        const v = snap.exists() ? snap.val() : 0;
-        qs('#pointsTop').textContent = String(v||0);
+        // full list entry with status control
+        const fullEntry = document.createElement('div');
+        fullEntry.style.padding='8px';
+        fullEntry.style.borderBottom='1px solid #eef6ee';
+        const status = app.status || 'Pending';
+        fullEntry.innerHTML = `
+          <div style="display:flex;justify-content:space-between;gap:12px;align-items:center">
+            <div style="flex:1">
+              <div style="font-weight:700">${app.memberName || app.name || '(Applicant)'}</div>
+              <div class="muted" style="font-size:0.9rem">Amount: ${formatKsh(app.amountFigures || app.amount || 0)} • Applied: ${new Date(app.appliedAt || 0).toLocaleString()}</div>
+              <div style="margin-top:6px">${(app.purpose||'')}</div>
+            </div>
+            <div style="min-width:220px;display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+              <select class="status-select" data-app-id="${id}">
+                <option ${status==='Pending'?'selected':''}>Pending</option>
+                <option ${status==='Approved'?'selected':''}>Approved</option>
+                <option ${status==='Disbursed'?'selected':''}>Disbursed</option>
+                <option ${status==='Paid'?'selected':''}>Paid</option>
+                <option ${status==='Rejected'?'selected':''}>Rejected</option>
+              </select>
+              <small class="muted">Change status (updates RTDB)</small>
+            </div>
+          </div>
+        `;
+        listFull.appendChild(fullEntry);
       });
-    }
 
-    /* ===============================
-       Profile
-       =============================== */
-    async function subscribeProfile(){
-      onValue(ref(db, `members/${currentUid}/profile`), snap => {
-        if(!snap.exists()) return;
-        const p = snap.val();
-        if(p.name) qs('#profile_fullName').value = p.name, qs('#welcomeName').textContent = p.name;
-        if(p.phone) qs('#profile_phone').value = p.phone;
-        if(p.id) qs('#profile_id').value = p.id;
-        if(p.yearJoined) qs('#profile_yearJoined').value = p.yearJoined;
-        if(p.dob) qs('#profile_dob').value = p.dob;
-        if(p.status) qs('#profile_status').value = p.status, qs('#memberStatus').textContent = p.status;
-        if(p.photoURL) qs('#topAvatar').innerHTML = `<img src="${p.photoURL}" class="w-10 h-10 rounded object-cover">`;
+      if(area) area.appendChild(list);
+      if(areaFull) areaFull.appendChild(listFull);
+
+      // attach change listeners for status selects
+      document.querySelectorAll('.status-select').forEach(sel=>{
+        sel.addEventListener('change', async (e)=>{
+          const appId = sel.dataset.appId;
+          const newStatus = sel.value;
+          try{
+            await set(ref(db, `members/${currentUid}/loans/applications/${appId}/status`), newStatus);
+            showToast('Status updated');
+            logActivity(`Application ${appId} status -> ${newStatus}`);
+            awardPoints(3, 'Updated application status');
+          }catch(err){ console.error(err); alert('Failed to update status'); }
+        });
       });
-    }
-
-    qs('#saveProfileBtn')?.addEventListener('click', async ()=>{
-      if(!currentUid) return alert('Sign in');
-      const payload = {
-        name: qs('#profile_fullName').value,
-        phone: qs('#profile_phone').value,
-        id: qs('#profile_id').value,
-        yearJoined: qs('#profile_yearJoined').value,
-        dob: qs('#profile_dob').value,
-        status: qs('#profile_status').value || 'Active'
-      };
-      await set(ref(db, `members/${currentUid}/profile`), payload);
-      toast('Profile saved');
-      await awardPoints(5, 'Updated profile');
     });
 
-    // photo upload
-    qs('#choosePhotoBtn')?.addEventListener('click', ()=> qs('#photoInput').click());
-    qs('#photoInput')?.addEventListener('change', async (e)=>{
-      const f = e.target.files && e.target.files[0]; if(!f) return;
-      const path = `members/${currentUid}/photo_${Date.now()}`;
-      const st = sRef(storage, path);
-      try{
-        await uploadBytes(st, f);
-        const url = await getDownloadURL(st);
-        await set(ref(db, `members/${currentUid}/profile/photoURL`), url);
-        toast('Photo uploaded');
-      }catch(err){
-        console.error(err); alert('Upload failed');
+    // display points
+    const ptsSnap = await get(ref(db, `members/${currentUid}/points`));
+    pointsDisplay.textContent = ptsSnap.exists()? String(ptsSnap.val()||0) : '0';
+  }); // end onAuthStateChanged
+
+  // ------------------ Loan Application logic & PDF ------------------
+  const loanForm = document.getElementById('fullLoanForm');
+  if (document.getElementById('previewLoanPdf')) {
+    document.getElementById('previewLoanPdf').addEventListener('click', (e)=>{
+      e.preventDefault();
+      if(!loanForm) return;
+      const formData = new FormData(loanForm);
+      const data = Object.fromEntries(formData.entries());
+      const doc = buildLoanPdfDoc(data, {preview:true});
+      doc.save(`Loan_Application_PREVIEW.pdf`);
+      awardPoints(2, 'Previewed loan PDF');
+    });
+  }
+
+  if(loanForm){
+    loanForm.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      if(!currentUid) return alert('Not authenticated');
+      const agree = document.getElementById('agreeTerms');
+      if(!agree || !agree.checked) return alert('Please agree to the terms');
+
+      const formData = new FormData(loanForm);
+      const data = Object.fromEntries(formData.entries());
+      const guarantors = [];
+      for(let i=1;i<=3;i++){
+        guarantors.push({
+          mno: data[`g_mno_${i}`] || '',
+          name: data[`g_name_${i}`] || '',
+          phone: data[`g_phone_${i}`] || '',
+          id: data[`g_id_${i}`] || '',
+          group: data[`g_group_${i}`] || '',
+          amount: data[`g_amount_${i}`] || ''
+        });
       }
-    });
-
-    /* ===============================
-       Balances subscriptions
-       =============================== */
-    function subscribeBalances(){
-      onValue(ref(db, `members/${currentUid}/savings/monthly`), snap => qs('#monthlyVal').textContent = fmtK(snap.exists()? snap.val() : 0));
-      onValue(ref(db, `members/${currentUid}/savings/weekly`), snap => qs('#weeklyVal').textContent = fmtK(snap.exists()? snap.val() : 0));
-      onValue(ref(db, `members/${currentUid}/unpaidBalances`), snap => qs('#unpaidVal').textContent = fmtK(snap.exists()? snap.val() : 0));
-      onValue(ref(db, `members/${currentUid}/loans/summary/outstanding`), snap => qs('#outstandingVal').textContent = fmtK(snap.exists()? snap.val() : 0));
-      // mirror other UI nodes if needed
-    }
-
-    /* ===============================
-       Goal (target + progress)
-       =============================== */
-    // subscribe & chart
-    let goalChart = null;
-    function subscribeGoal(){
-      onValue(ref(db, `members/${currentUid}/goal/target`), snap => {
-        const v = snap.exists()? Number(snap.val()||0) : 0;
-        qs('#goalTargetVal').textContent = fmtK(v);
-        qs('#goalAmountInput') && (qs('#goalAmountInput').value = v || '');
-        qs('#monthlyTarget') && (qs('#monthlyTarget').textContent = fmtK(v));
-      });
-      onValue(ref(db, `members/${currentUid}/goal/progress`), snap => {
-        const v = snap.exists()? Number(snap.val()||0) : 0;
-        const pct = snap.exists() && getPercent(v, (document.getElementById('goalAmountInput')?.value || Number(qs('#goalTargetVal').textContent.replace(/[^0-9]/g,'')) || 0));
-        qs('#goalProgressPct').textContent = (pct || 0) + '%';
-        qs('#goalProgressLabel').textContent = (pct || 0) + '%';
-        qs('#goalProgressBar').style.width = (pct || 0) + '%';
-        // update chart
-        renderGoalChart(pct || 0);
-      });
-      onValue(ref(db, `members/${currentUid}/goal/targetDate`), snap => {
-        if(snap.exists()) qs('#goalDateInput').value = new Date(snap.val()).toISOString().split('T')[0];
-      });
-    }
-
-    function getPercent(current, target){ target = Number(target||0); if(!target) return 0; return Math.min(100, Math.round( (Number(current||0)/target) * 100 )); }
-
-    function renderGoalChart(pct){
-      const ctx = qs('#goalChart');
-      if(!ctx) return;
-      if(goalChart) { goalChart.destroy(); goalChart = null; }
-      goalChart = new Chart(ctx, {
-        type:'doughnut',
-        data: { labels:['Saved','Remaining'], datasets:[{ data: [pct, 100-pct], backgroundColor:['#16a34a','#d1fae5'] }] },
-        options: { cutout: '70%', plugins:{legend:{display:false}} }
-      });
-    }
-
-    // Save goal
-    qs('#saveGoalBtn')?.addEventListener('click', async ()=>{
-      if(!currentUid) return alert('Sign in');
-      const val = Number(qs('#goalAmountInput').value || 0);
-      const dateVal = qs('#goalDateInput').value ? new Date(qs('#goalDateInput').value).getTime() : null;
-      if(!val || val <= 0) return alert('Enter valid target');
-      await set(ref(db, `members/${currentUid}/goal/target`), val);
-      if(dateVal) await set(ref(db, `members/${currentUid}/goal/targetDate`), dateVal);
-      toast('Goal saved');
-      await awardPoints(3, 'Set goal');
-    });
-
-    qs('#clearGoalBtn')?.addEventListener('click', async ()=> {
-      if(!confirm('Clear your goal?')) return;
-      await set(ref(db, `members/${currentUid}/goal`), { target:0, progress:0 });
-      toast('Goal cleared');
-    });
-
-    /* ===============================
-       Loan Applications (wizard) -> RTDB
-       + PDF generation, reminders, listeners to update UI.
-       =============================== */
-    const wizardForm = qs('#loanWizardForm');
-    let currentStep = 1;
-    const totalSteps = 6;
-    function showWizardStep(){
-      for(let i=1;i<=totalSteps;i++){
-        const el = qs('#wiz-' + i);
-        if(!el) continue;
-        el.classList.toggle('active', i === currentStep);
-      }
-      qs('#wizStepLabel').textContent = `Step ${currentStep} / ${totalSteps}`;
-      const pct = Math.round(((currentStep-1)/(totalSteps-1))*100);
-      qs('#wizBar').style.width = pct + '%';
-      qs('#wizPrev').disabled = currentStep === 1;
-      if(currentStep === totalSteps){
-        qs('#wizNext').classList.add('hidden'); qs('#wizSubmit').classList.remove('hidden');
-      } else {
-        qs('#wizNext').classList.remove('hidden'); qs('#wizSubmit').classList.add('hidden');
-      }
-    }
-    qs('#wizNext').addEventListener('click', ()=> { if(currentStep < totalSteps) currentStep++; showWizardStep(); });
-    qs('#wizPrev').addEventListener('click', ()=> { if(currentStep > 1) currentStep--; showWizardStep(); });
-    showWizardStep();
-
-    // Submit wizard
-    wizardForm.addEventListener('submit', async (ev)=>{
-      ev.preventDefault();
-      if(!currentUid) return alert('Not signed in');
-      // ensure agree
-      if(!qs('#wizardAgree')?.checked) return alert('Please confirm the details.');
-      const fd = new FormData(wizardForm);
-      const data = Object.fromEntries(fd.entries());
-      // Add guarantors aggregated
-      const guarantors = [
-        { name: data.g1_name, phone: data.g1_phone, amount: Number(data.g1_amount||0) },
-        { name: data.g2_name, phone: data.g2_phone, amount: Number(data.g2_amount||0) },
-        { name: data.g3_name, phone: data.g3_phone, amount: Number(data.g3_amount||0) }
-      ];
       data.guarantors = guarantors;
       data.appliedAt = Date.now();
       data.status = 'Pending';
-      data.progress = 0;
-      // Optionally compute dueDate from repayableMonths - here we leave dueDate empty until admin approves
+      // ADDED: optional dueDate from extra field (if user added) -- keep empty otherwise
+      if(!data.dueDate && data.repayableMonths) {
+        // approximate due date from months
+        const months = Number(data.repayableMonths||0);
+        if(months>0) data.dueDate = new Date(Date.now() + months*30*24*3600*1000).toISOString();
+      }
+
       try{
         const appRef = push(ref(db, `members/${currentUid}/loans/applications`));
+        const appId = appRef.key;
         await set(appRef, data);
-        // also copy summary perhaps to loans/summary or loans list
-        // For simplicity, add a copy under members/{uid}/loans/list (if desired)
-        toast('Application submitted — generating PDF');
-        await awardPoints(12, 'Submitted loan application');
-        // generate PDF
-        const doc = buildLoanPdf(data);
-        doc.save(`Loan_Application_${(data.fullName||'member').replace(/\s+/g,'_')}_${appRef.key}.pdf`);
-        // push reminder for dueDate if user set one (if data.dueDate)
+        showToast('Application saved — downloading PDF');
+        awardPoints(10, 'Submitted loan application');
+
+        // ADDED: push reminder record if dueDate present
         if(data.dueDate){
-          await push(ref(db, 'reminders'), { uid: currentUid, title: 'Loan due', message: `Loan "${data.purpose}" due on ${new Date(data.dueDate).toLocaleDateString()}`, ts: Date.now() });
+          await push(ref(db, `reminders`), {
+            uid: currentUid,
+            applicationId: appId,
+            dueDate: data.dueDate,
+            title: 'Loan due reminder',
+            message: `Loan "${data.purpose}" is due on ${new Date(data.dueDate).toLocaleDateString()}`,
+            ts: Date.now()
+          });
+          // client-side notify later if within this session
+          const dueTs = new Date(data.dueDate).getTime();
+          const msToDue = dueTs - Date.now();
+          if(msToDue > 0 && msToDue < 7*24*3600*1000) { // only set if due within 7 days (safe)
+            setTimeout(()=> {
+              alert(`Reminder: Your loan "${data.purpose}" is due today.`);
+            }, msToDue);
+          }
         }
+
+        const doc = buildLoanPdfDoc(data, {id: appId});
+        doc.save(`Loan_Application_${(data.memberName || data.name || currentUid).replace(/\s+/g,'_')}_${appId}.pdf`);
       }catch(err){
-        console.error(err); alert('Failed to submit application');
+        console.error(err);
+        alert('Failed to save application to DB. PDF will be generated locally.');
+        const doc = buildLoanPdfDoc(data, {});
+        doc.save(`Loan_Application_${(data.memberName || data.name || currentUid).replace(/\s+/g,'_')}.pdf`);
+      }
+    });
+  }
+
+  // Build loan PDF with a modern header + watermark + group name (kept from your original)
+  function buildLoanPdfDoc(data, opts={}){
+    const doc = new jsPDF({unit:'pt',format:'a4'});
+    let y = 40; const left = 36;
+
+    // header block with accent bar
+    doc.setFillColor(46,125,50); // --accent
+    doc.rect(0,0,595,60,'F');
+    doc.setFont('helvetica','bold'); doc.setTextColor(255,255,255); doc.setFontSize(16);
+    doc.text('VISIONARY YOUTH GROUP', 300, 36, {align:'center'});
+    doc.setTextColor(0,0,0);
+
+    // watermark text faint (repeat lightly)
+    doc.setTextColor(200,230,200);
+    doc.setFontSize(48);
+    doc.text('VISIONARY YOUTH GROUP', 300, 320, {align:'center', angle:0, baseline: 'middle' });
+    doc.setTextColor(0,0,0);
+
+    y = 80;
+    doc.setFontSize(12); doc.setFont('helvetica','bold');
+    doc.text('LOAN APPLICATION FORM', 300, y, {align:'center'}); y += 16;
+    doc.setLineWidth(0.5); doc.line(left, y, 555, y); y += 14;
+
+    // meta
+    doc.setFontSize(10); doc.setFont('helvetica','bold');
+    doc.text('APPLICANT INFORMATION', left, y); y+=12;
+    doc.setFont('helvetica','normal'); const info = [
+      `Self-help group: ${data.selfHelpGroup||document.getElementById('groupNameDisplay').textContent||''}`,
+      `Name: ${data.memberName||data.wiz_memberName||''}`,
+      `Membership No: ${data.membershipNumber||''}`,
+      `National ID/Passport: ${data.nationalId||data.wiz_nationalId||''}`,
+      `Marital Status: ${data.maritalStatus||''} • DOB: ${data.dob||data.wiz_dob||''}`,
+      `County/Town: ${data.county||data.wiz_county||''} / ${data.town||''}`,
+      `Address: ${data.currentAddress||''}`,
+      `Phone: ${data.phone||data.wiz_phone||''} • Email: ${data.email||data.wiz_email||''}`
+    ];
+    info.forEach(line=>{
+      const wrap = doc.splitTextToSize(line, 520);
+      doc.text(wrap, left, y); y += wrap.length * 12;
+    });
+
+    y += 6;
+    doc.setFont('helvetica','bold'); doc.text('LOAN DETAILS', left, y); y+=12;
+    doc.setFont('helvetica','normal');
+    const loanLines = [
+      `Amount: Ksh ${data.amountFigures||data.wiz_amount||''} (${data.amountWords||data.wiz_amountWords||''})`,
+      `Purpose: ${data.purpose||data.wiz_purpose||''}`,
+      `Repayable (months): ${data.repayableMonths||data.wiz_repayableMonths||''}`
+    ];
+    loanLines.forEach(line=>{ const wr = doc.splitTextToSize(line,520); doc.text(wr,left,y); y += wr.length*12; });
+
+    y+=8;
+    doc.setFont('helvetica','bold'); doc.text('GUARANTORS', left, y); y+=10;
+    doc.setFont('helvetica','normal'); doc.setFontSize(9);
+    const guars = data.guarantors || [];
+    guars.forEach(g=>{
+      const row = `${g.mno||g.name||''} • ${g.name||''} • ${g.phone||''} • ID:${g.id||''} • ${g.group||''} • Ksh ${g.amount||''}`;
+      const wr = doc.splitTextToSize(row,520);
+      doc.text(wr,left,y); y += wr.length*12;
+      if(y > 720){ doc.addPage(); y = 40; }
+    });
+
+    y += 8;
+    doc.setFontSize(9); const terms = (data.terms||'').trim() || 'Applicant confirms they have read and agree to terms described in the system.';
+    const tw = doc.splitTextToSize(terms, 520);
+    doc.text(tw, left, y); y += tw.length*12;
+
+    if(y > 700){ doc.addPage(); y=40; }
+    doc.setFont('helvetica','bold'); doc.text('Applicant Signature: ______________________   Date: ___________', left, y);
+    // footer with page number
+    const pageCount = doc.getNumberOfPages();
+    for (let i=1;i<=pageCount;i++){
+      doc.setPage(i);
+      doc.setFontSize(8); doc.setTextColor(120);
+      doc.text(`Visionary Youth Group • Official Loan Application • Page ${i} of ${pageCount}`, 300, 820, {align:'center'});
+    }
+    return doc;
+  }
+
+  // ------------------ Withdrawal handlers & PDF ------------------
+  const withdrawForm = document.getElementById('withdrawForm');
+  if (document.getElementById('previewWithdrawPdf')) {
+    document.getElementById('previewWithdrawPdf').addEventListener('click',(e)=>{
+      e.preventDefault();
+      if(!withdrawForm) return;
+      const formData = new FormData(withdrawForm);
+      const data = Object.fromEntries(formData.entries());
+      const doc = buildWithdrawPdfDoc(data, {preview:true});
+      doc.save(`Withdrawal_PREVIEW.pdf`);
+      awardPoints(2, 'Previewed withdrawal PDF');
+    });
+  }
+  if(withdrawForm){
+    withdrawForm.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const formData = new FormData(withdrawForm);
+      const data = Object.fromEntries(formData.entries());
+      const doc = buildWithdrawPdfDoc(data, {submitted:true});
+      doc.save(`Withdrawal_${(data.memberName||'Member').replace(/\s+/g,'_')}.pdf`);
+      awardPoints(6, 'Submitted withdrawal');
+
+      // ADDED: save withdrawal request to RTDB so admin can process
+      if(currentUid) {
+        const wRef = push(ref(db, `members/${currentUid}/withdrawals`));
+        set(wRef, {...data, submittedAt: Date.now(), status: 'submitted'}).catch(e=>console.error('withdraw save failed', e));
+      }
+    });
+  }
+  function buildWithdrawPdfDoc(data, opts={}){
+    const doc = new jsPDF({unit:'pt',format:'a4'});
+    let y = 50, left = 40;
+    doc.setFillColor(46,125,50); doc.rect(0,0,595,56,'F');
+    doc.setFont('helvetica','bold'); doc.setTextColor(255,255,255); doc.setFontSize(14);
+    doc.text('VOLUNTARY WITHDRAWABLE SAVINGS FORM', 300, 36, {align:'center'});
+    doc.setTextColor(0,0,0);
+    y = 80;
+    doc.setFont('helvetica','bold'); doc.text('Member Information', left, y); y+=14;
+    doc.setFont('helvetica','normal'); const lines = [
+      `Name: ${data.memberName||''}`,
+      `Membership Number: ${data.membershipNumber||''}`,
+      `ID/Passport: ${data.idNumber||''}`,
+      `Phone: ${data.phone||''}`,
+      `Amount in figures: Ksh ${data.amountFigures||''}`,
+      `Amount in words: ${data.amountWords||''}`,
+      `Reason: ${data.reason||''}`,
+    ];
+    lines.forEach(line=>{ const wrap = doc.splitTextToSize(line,520); doc.text(wrap,left,y); y += wrap.length*14; });
+    y+=18;
+    doc.setFont('helvetica','bold'); doc.text('Member Signature: ________________________   Date: ____________', left, y);
+    // footer
+    doc.setFontSize(8); doc.setTextColor(120);
+    doc.text(`Visionary Youth Group • Voluntary Withdrawal Form`, 300, 820, {align:'center'});
+    return doc;
+  }
+
+  // ------------------ Account Statement PDF ------------------
+  async function buildAccountStatementPdf(){
+    if(!currentUid) return alert('Not signed in');
+    const snapMember = await get(ref(db, `members/${currentUid}`));
+    const snapshotMonthly = await get(ref(db, `members/${currentUid}/savings/monthly`));
+    const snapshotWeekly = await get(ref(db, `members/${currentUid}/savings/weekly`));
+    const loansSnap = await get(ref(db, `members/${currentUid}/loans`));
+    const sharesSnap = await get(ref(db, `members/${currentUid}/shares`));
+
+    const doc = new jsPDF({unit:'pt', format:'a4'});
+    let left = 36, y = 40;
+    doc.setFillColor(46,125,50); doc.rect(0,0,595,56,'F');
+    doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(16);
+    doc.text('ACCOUNT STATEMENT', 300, 36, {align:'center'});
+    doc.setTextColor(0,0,0);
+    y = 80;
+    const profile = snapMember.exists() && snapMember.val().profile ? snapMember.val().profile : {};
+    doc.setFontSize(10); doc.setFont('helvetica','normal');
+    doc.text(`Member: ${profile.name || profile.fullName || topEmail.textContent}`, left, y); y+=12;
+    doc.text(`Email: ${topEmail.textContent}`, left, y); y+=12;
+    doc.text(`Date: ${new Date().toLocaleDateString()}`, left, y); y+=18;
+
+    // Totals:
+    function calcSnap(snap){
+      if(!snap.exists()) return 0;
+      const val = snap.val();
+      if(typeof val === 'number' || typeof val === 'string') return Number(val)||0;
+      let total = 0; Object.values(val).forEach(child=>{ if(child && typeof child === 'object' && ('amount' in child)) total += Number(child.amount||0); else if(typeof child === 'number') total += child; });
+      return total;
+    }
+    const monthly = calcSnap(snapshotMonthly);
+    const weekly = calcSnap(snapshotWeekly);
+    const shares = sharesSnap.exists()? (sharesSnap.val().total || sharesSnap.val() || 0) : 0;
+    const dividends = sharesSnap.exists()? (sharesSnap.val().dividends || 0) : 0;
+
+    let totalLoans = 0, unpaid = 0, appsList = [];
+    if(loansSnap.exists()){
+      const loansObj = loansSnap.val();
+      if(loansObj.summary){
+        totalLoans = loansObj.summary.total || 0; unpaid = loansObj.summary.unpaid || 0;
+      } else {
+        Object.values(loansObj).forEach(v=>{
+          if(v && typeof v === 'object' && v.amountFigures) { totalLoans += Number(v.amountFigures||0); if((v.status||'').toLowerCase() !== 'paid') unpaid += Number(v.amountFigures||0); appsList.push(v); }
+        });
+      }
+    }
+
+    doc.setFont('helvetica','bold'); doc.text('Financial Summary', left, y); y+=14;
+    doc.setFont('helvetica','normal');
+    doc.text(`Weekly Savings: ${formatKsh(weekly)}`, left, y); y+=12;
+    doc.text(`Monthly Savings: ${formatKsh(monthly)}`, left, y); y+=12;
+    doc.text(`Shares: ${formatKsh(shares)}`, left, y); y+=12;
+    doc.text(`Dividends: ${formatKsh(dividends)}`, left, y); y+=12;
+    doc.text(`Total Loans: ${formatKsh(totalLoans)}`, left, y); y+=12;
+    doc.text(`Unpaid Balances: ${formatKsh(unpaid)}`, left, y); y+=18;
+
+    if(appsList.length){
+      doc.setFont('helvetica','bold'); doc.text('Loan Applications (recent)', left, y); y += 14;
+      doc.setFont('helvetica','normal');
+      appsList.slice(-10).forEach(app=>{
+        const line = `${app.memberName || app.name || ''} — ${formatKsh(app.amountFigures || 0)} — ${app.status || 'Pending'}`;
+        const wr = doc.splitTextToSize(line, 500); doc.text(wr,left,y); y += wr.length*12;
+        if(y > 720){ doc.addPage(); y=40; }
+      });
+      y+=8;
+    }
+    if(y > 700){ doc.addPage(); y=40; }
+    doc.line(left, y+20, left+240, y+20); doc.text('Prepared by / Signature', left, y+34);
+    return doc;
+  }
+
+  // account statement button handlers
+  const downloadStatementTopBtn = document.getElementById('downloadStatementTop');
+  if(downloadStatementTopBtn) downloadStatementTopBtn.addEventListener('click', async ()=>{
+    const doc = await buildAccountStatementPdf();
+    doc.save(`Account_Statement_${(topEmail.textContent||'member').replace(/[^\w@.-]/g,'')}.pdf`);
+    awardPoints(4, 'Downloaded account statement');
+  });
+  const downloadStatementBtn = document.getElementById('downloadStatement');
+  if(downloadStatementBtn) downloadStatementBtn.addEventListener('click', async ()=>{
+    const doc = await buildAccountStatementPdf();
+    doc.save(`Account_Statement_${(topEmail.textContent||'member').replace(/[^\w@.-]/g,'')}.pdf`);
+    awardPoints(4, 'Downloaded account statement');
+  });
+  const profileStatementBtn = document.getElementById('profileStatement');
+  if(profileStatementBtn) profileStatementBtn.addEventListener('click', async ()=>{
+    const doc = await buildAccountStatementPdf();
+    doc.save(`Account_Statement_${(topEmail.textContent||'member').replace(/[^\w@.-]/g,'')}.pdf`);
+    awardPoints(4, 'Downloaded account statement');
+  });
+  const quickStatementBtn = document.getElementById('quickStatement');
+  if(quickStatementBtn) quickStatementBtn.addEventListener('click', async ()=>{
+    const doc = await buildAccountStatementPdf();
+    doc.save(`Account_Statement_${(topEmail.textContent||'member').replace(/[^\w@.-]/g,'')}.pdf`);
+    awardPoints(4, 'Downloaded account statement');
+  });
+
+  // downloadApplications (compile user's apps)
+  const downloadAppsBtn = document.getElementById('downloadApplications');
+  if(downloadAppsBtn) downloadAppsBtn.addEventListener('click', async ()=>{
+    if(!currentUid) return alert('Not signed in');
+    const snap = await get(ref(db, `members/${currentUid}/loans/applications`));
+    if(!snap.exists()) return alert('No applications found');
+    const apps = snap.val();
+    const doc = new jsPDF({unit:'pt',format:'a4'}); let y=40; const left=36;
+    doc.setFontSize(16); doc.text('Loan Applications',300,y,{align:'center'}); y+=20;
+    doc.setFontSize(10);
+    for(const [id,app] of Object.entries(apps)){
+      const title = `${app.memberName || app.name || ''} — ${formatKsh(app.amountFigures || 0)} — ${app.status||''}`;
+      const wrapped = doc.splitTextToSize(title, 520);
+      doc.text(wrapped, left, y); y += wrapped.length * 12;
+      const details = [
+        `Applied: ${new Date(app.appliedAt || 0).toLocaleString()}`,
+        `Purpose: ${app.purpose || ''}`,
+        `Guarantors: ${ (app.guarantors || []).map(g=>g.name).filter(Boolean).join('; ') }`
+      ];
+      details.forEach(d => { const w = doc.splitTextToSize(d,520); doc.text(w, left+8, y); y += w.length * 12; });
+      y += 8;
+      if(y > 720){ doc.addPage(); y=40; }
+    }
+    doc.save(`Loan_Applications_${(topEmail.textContent||'member').replace(/[^\w@.-]/g,'')}.pdf`);
+    awardPoints(6, 'Downloaded applications PDF');
+  });
+
+  // preview / quick apply handlers
+  const quickApplyBtn = document.getElementById('quickApply');
+  if(quickApplyBtn) quickApplyBtn.addEventListener('click', ()=> {
+    // show wizard tab (added UI)
+    document.getElementById('loan-wizard-tab').style.display = 'block';
+    // hide original big section for clarity, but not remove it
+    document.getElementById('loan-section').style.display = 'none';
+    window.scrollTo({top: document.getElementById('loan-wizard-tab').offsetTop - 80, behavior: 'smooth'});
+  });
+  if(document.getElementById('quickStatement')) document.getElementById('quickStatement').addEventListener('click', ()=> {
+    // same as other statement buttons
+    (async()=> { const doc = await buildAccountStatementPdf(); doc.save(`Account_Statement_${(topEmail.textContent||'member').replace(/[^\w@.-]/g,'')}.pdf`); awardPoints(4, 'Downloaded account statement'); })();
+  });
+
+  // Save profile (and optionally upload photo)
+  const saveProfileBtn = document.getElementById('saveProfile');
+  if(saveProfileBtn) saveProfileBtn.addEventListener('click', async ()=>{
+    if(!currentUid) return alert('Not authenticated');
+    if(profileSavedOnce) { showToast('Profile already updated in this session'); return; }
+    const payload = {
+      name: document.getElementById('profile_fullName').value,
+      phone: document.getElementById('profile_phone').value,
+      id: document.getElementById('profile_id').value,
+      yearJoined: document.getElementById('profile_yearJoined').value,
+      dob: document.getElementById('profile_dob').value,
+      status: 'Active'
+    };
+    await set(ref(db, `members/${currentUid}/profile`), payload);
+    profileSavedOnce = true;
+    showToast('Profile updated');
+    awardPoints(5, 'Updated profile');
+  });
+
+  // choose photo button
+  const choosePhotoBtn = document.getElementById('choosePhotoBtn');
+  const photoInput = document.getElementById('photoUploadInput');
+  if(choosePhotoBtn && photoInput){
+    choosePhotoBtn.addEventListener('click', ()=> photoInput.click());
+  }
+
+  // Photo upload handling
+  if(photoInput){
+    photoInput.addEventListener('change', async (e)=>{
+      const file = e.target.files && e.target.files[0];
+      if(!file) return;
+      if(!currentUid) return alert('Not signed in');
+      const path = `members/${currentUid}/photo_${Date.now()}`;
+      const sRef = storageRef(storage, path);
+      try{
+        await uploadBytes(sRef, file);
+        const url = await getDownloadURL(sRef);
+        // store URL in RTDB for easy retrieval
+        await set(ref(db, `members/${currentUid}/photoURL`), url);
+        setAvatar(url);
+        showToast('Photo uploaded');
+        awardPoints(4, 'Uploaded profile photo');
+      }catch(err){
+        console.error(err); alert('Photo upload failed');
+      }
+    });
+  }
+
+  function setAvatar(url){
+    const html = `<img src="${url}" alt="avatar">`;
+    if(topAvatar) topAvatar.innerHTML = html;
+  }
+
+  // initial placeholder
+  if(!topAvatar || !topAvatar.innerHTML) {
+    if(topAvatar) topAvatar.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--dark)"><i class="fas fa-user"></i></div>';
+  }
+
+  // logout via menu
+  const menuLogout = document.getElementById('menuLogout');
+  if(menuLogout) menuLogout.addEventListener('click', ()=> { try{ signOut(auth); }catch(e){} window.location.href='index.html'; });
+
+  // award some points on page actions (e.g., opening loan or withdrawal)
+  document.querySelectorAll('[data-target]').forEach(a=>{
+    a.addEventListener('click', ()=> awardPoints(1, `Visited ${a.dataset.target}`));
+  });
+
+  // small listener to award points for downloads via buttons in header (already attached above)
+  // initial small activity
+  (async()=>{ try{ await logActivity('Dashboard loaded'); }catch(e){} })();
+
+
+  /* ============================
+       ADDED: Wizard logic integration (non-destructive)
+     ============================ */
+  (function wireWizard(){
+    const steps = [1,2,3,4,5,6];
+    let current = 1;
+    const total = steps.length;
+
+    function show(){
+      steps.forEach(s => {
+        const el = document.getElementById('wiz-' + s);
+        if(!el) return;
+        if(s === current) el.classList.add('active'); else el.classList.remove('active');
+      });
+      document.getElementById('wizStepNum').textContent = String(current);
+      const pct = Math.round(((current-1)/(total-1))*100);
+      document.getElementById('wizProgressBar').style.width = pct + '%';
+      document.getElementById('wizProgressText') && (document.getElementById('wizProgressText').textContent = `Step ${current} / ${total}`);
+      document.getElementById('wizPrev') && (document.getElementById('wizPrev').disabled = current === 1);
+      if(current === total){
+        document.getElementById('wizNext').style.display = 'none';
+        document.getElementById('wizSubmit').style.display = 'inline-block';
+      } else {
+        if(document.getElementById('wizNext')) document.getElementById('wizNext').style.display = 'inline-block';
+        if(document.getElementById('wizSubmit')) document.getElementById('wizSubmit').style.display = 'none';
+      }
+    }
+
+    document.getElementById('wizNext')?.addEventListener('click', ()=> { if(current<total) current++; show(); });
+    document.getElementById('wizPrev')?.addEventListener('click', ()=> { if(current>1) current--; show(); });
+    show();
+
+    // Wizard submit - writes to same RTDB path as your full form
+    document.getElementById('loanWizardForm')?.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      if(!currentUid) return alert('Not signed in');
+      if(!document.getElementById('wiz_agree')?.checked) return alert('Please confirm details');
+      const fd = new FormData(document.getElementById('loanWizardForm'));
+      const data = Object.fromEntries(fd.entries());
+      // aggregate guarantors
+      data.guarantors = [
+        { name: data.wiz_g1_name, phone: data.wiz_g1_phone, id: data.wiz_g1_id, amount: data.wiz_g1_amount },
+        { name: data.wiz_g2_name, phone: data.wiz_g2_phone, id: data.wiz_g2_id, amount: data.wiz_g2_amount },
+        { name: data.wiz_g3_name, phone: data.wiz_g3_phone, id: data.wiz_g3_id, amount: data.wiz_g3_amount },
+      ];
+      data.appliedAt = Date.now();
+      data.status = 'Pending';
+      try{
+        const newRef = push(ref(db, `members/${currentUid}/loans/applications`));
+        await set(newRef, data);
+        // push reminders if provided
+        if(data.dueDate){
+          await push(ref(db, `reminders`), { uid: currentUid, applicationId: newRef.key, dueDate: data.dueDate, ts: Date.now(), title:'Loan due' });
+        }
+        showToast('Wizard application saved');
+        awardPoints(10, 'Submitted wizard loan');
+        const doc = buildLoanPdfDoc(data, {id: newRef.key});
+        doc.save(`Loan_Application_${(data.wiz_memberName || 'member').replace(/\s+/g,'_')}_${newRef.key}.pdf`);
+      }catch(err){
+        console.error('wizard submit failed', err);
+        alert('Failed to submit wizard application');
+      }
+    });
+  })();
+
+  /* ============================
+    ADDED: Goal setting integration with RTDB
+     ============================ */
+  (function wireGoals(){
+    const goalInput = document.getElementById('goalInput');
+    const goalDate = document.getElementById('goalDate');
+    const saveBtn = document.getElementById('saveGoalBtn');
+    const clearBtn = document.getElementById('clearGoalBtn');
+    const progressBar = document.getElementById('goalProgressBar');
+    const progressPct = document.getElementById('goalProgressPct');
+
+    // load existing goal values
+    onAuthStateChanged(auth, async user => {
+      if(!user) return;
+      const gSnap = await get(ref(db, `members/${user.uid}/goal`));
+      if(gSnap && gSnap.exists()){
+        const g = gSnap.val();
+        if(goalInput) goalInput.value = g.target || '';
+        if(goalDate && g.targetDate) goalDate.value = new Date(g.targetDate).toISOString().split('T')[0];
+        if(progressBar) progressBar.style.width = (g.progressPct || 0) + '%';
+        if(progressPct) progressPct.textContent = (g.progressPct || 0) + '%';
       }
     });
 
-    // Loan PDF builder (basic layout, watermark)
-    function buildLoanPdf(data){
-      const doc = new jsPDF({ unit:'pt', format:'a4' });
-      const left = 36;
-      // header
-      doc.setFillColor(16, 185, 129); doc.rect(0,0,595,60,'F');
-      doc.setFontSize(16); doc.setTextColor(255,255,255); doc.text('VISIONARY YOUTH GROUP', 300, 34, { align: 'center' });
-      doc.setTextColor(0,0,0); doc.setFontSize(11);
-      let y = 84;
-      doc.text('LOAN APPLICATION', left, y); y += 14;
-      doc.setFontSize(10);
-      const lines = [
-        `Name: ${data.fullName || ''}`,
-        `ID: ${data.idNumber || ''}`,
-        `Phone: ${data.phone || ''} • Email: ${data.email || ''}`,
-        `Amount: Ksh ${data.amount || data.amountFigures || ''} (${data.amountWords||''})`,
-        `Purpose: ${data.purpose || ''}`,
-        `Guarantors: ${ (data.guarantors||[]).map(g=>g.name+'('+ (g.amount||0) +')').join('; ') }`
-      ];
-      lines.forEach(l => { const wrap = doc.splitTextToSize(l, 520); doc.text(wrap, left, y); y += wrap.length * 12; });
-      y += 8;
-      doc.text('Applicant signature: ____________________  Date: __________', left, y);
-      // footer
-      const pageCount = doc.getNumberOfPages();
-      for(let i=1;i<=pageCount;i++){
-        doc.setPage(i);
-        doc.setFontSize(8); doc.text('Visionary Youth Group — Official Application', 300, 820, { align: 'center' });
-      }
-      return doc;
-    }
+    saveBtn?.addEventListener('click', async ()=>{
+      if(!currentUid) return alert('Sign in');
+      const target = Number(goalInput.value || 0);
+      const tDate = goalDate.value ? new Date(goalDate.value).getTime() : null;
+      await set(ref(db, `members/${currentUid}/goal/target`), target);
+      if(tDate) await set(ref(db, `members/${currentUid}/goal/targetDate`), tDate);
+      // compute progress from monthly savings if exists
+      const monthlySnap = await get(ref(db, `members/${currentUid}/savings/monthly`));
+      const monthly = monthlySnap.exists()? Number(monthlySnap.val()) : 0;
+      const progress = target ? Math.min(100, Math.round((monthly / target)*100)) : 0;
+      await set(ref(db, `members/${currentUid}/goal/progress`), monthly);
+      await set(ref(db, `members/${currentUid}/goal/progressPct`), progress);
+      progressBar.style.width = progress + '%';
+      progressPct.textContent = progress + '%';
+      showToast('Goal saved');
+      awardPoints(3, 'Set goal');
+    });
 
-    /* ===============================
-       Loan Actions: listen & render live
-       =============================== */
-    function subscribeLoanApplications(){
-      const appsRef = ref(db, `members/${currentUid}/loans/applications`);
+    clearBtn?.addEventListener('click', async ()=>{
+      if(!currentUid) return;
+      await set(ref(db, `members/${currentUid}/goal`), { target:0, targetDate:null, progress:0, progressPct:0 });
+      if(goalInput) goalInput.value = '';
+      if(goalDate) goalDate.value = '';
+      progressBar.style.width = '0%';
+      progressPct.textContent = '0%';
+      showToast('Goal cleared');
+    });
+
+    // live listener: update UI when goal progress changes (e.g., admin or cloud function updates)
+    onAuthStateChanged(auth, user => {
+      if(!user) return;
+      onValue(ref(db, `members/${user.uid}/goal/progressPct`), snap => {
+        const pct = snap.exists()? snap.val() : 0;
+        if(progressBar) progressBar.style.width = pct + '%';
+        if(progressPct) progressPct.textContent = pct + '%';
+      });
+    });
+  })();
+
+  /* ============================
+    ADDED: Loan actions panel (toggle + listener) — minimal and uses your RTDB path
+     ============================ */
+  (function wireLoanActions(){
+    const loanActionsPanel = document.getElementById('loanActionsPanel');
+    const loanActionsBody = document.getElementById('loanActionsBody');
+    const toggleLoanActions = document.getElementById('toggleLoanActions');
+    const loanCount = document.getElementById('loanCount');
+    const loanOutstanding = document.getElementById('loanOutstanding');
+
+    toggleLoanActions?.addEventListener('click', ()=> {
+      if(!loanActionsPanel) return;
+      loanActionsPanel.classList.toggle('loan-actions-hidden');
+      toggleLoanActions.textContent = loanActionsPanel.classList.contains('loan-actions-hidden') ? 'Show full table' : 'Hide full table';
+    });
+
+    onAuthStateChanged(auth, user => {
+      if(!user) return;
+      const appsRef = ref(db, `members/${user.uid}/loans/applications`);
       onValue(appsRef, snap => {
-        const obj = snap.exists()? snap.val() : {};
-        // Build brief active loans (show up to 5)
-        const loansList = Object.values(obj || {});
-        const brief = qs('#loansBrief');
-        brief.innerHTML = '';
-        if(!loansList.length){
-          brief.innerHTML = '<div class="text-sm text-gray-500">No active loans</div>';
-          qs('#loanCount').textContent = '0';
-          qs('#loanOutstanding').textContent = fmtK(0);
-          return;
-        }
-        // summary numbers
+        const data = snap.exists()? snap.val() : {};
+        loanActionsBody && (loanActionsBody.innerHTML = '');
+        const keys = Object.keys(data||{});
         let outstanding = 0;
-        loansList.slice(0,6).forEach(l => {
-          const div = document.createElement('div');
-          div.className = 'p-2 border-b border-slate-100';
-          div.innerHTML = `<div class="flex justify-between"><div><strong>${l.purpose || 'Loan'}</strong><div class="text-xs text-gray-500">${l.fullName || ''}</div></div><div class="text-right">${fmtK(l.amount || l.amountFigures || 0)}<div class="text-xs ${ (l.status||'').toLowerCase() === 'approved' ? 'text-green-600' : 'text-yellow-600' }">${l.status || 'Pending'}</div></div></div>`;
-          brief.appendChild(div);
-          outstanding += Number(l.amount || l.amountFigures || 0);
-        });
-        qs('#loanCount').textContent = String(loansList.length);
-        qs('#loanOutstanding').textContent = fmtK(outstanding);
-        // Full table
-        const body = qs('#loanActionsBody');
-        body.innerHTML = '';
-        Object.entries(obj || {}).forEach(([id, loan]) => {
+        keys.forEach(k => {
+          const loan = data[k];
+          outstanding += Number(loan.amount || loan.amountFigures || 0);
           const tr = document.createElement('tr');
-          const applied = loan.appliedAt ? new Date(loan.appliedAt).toLocaleDateString() : '-';
+          const loanDate = loan.appliedAt ? new Date(loan.appliedAt).toLocaleDateString() : '-';
           const due = loan.dueDate ? new Date(loan.dueDate).toLocaleDateString() : '-';
-          const amt = fmtK(loan.amount || loan.amountFigures || 0);
+          const amount = formatKsh(loan.amount || loan.amountFigures || 0);
           const status = loan.status || 'Pending';
           const progress = loan.progress || 0;
           let statusClass = 'status-pending';
-          if(['approved','disbursed','paid'].includes((status||'').toLowerCase())) statusClass = 'status-approved';
+          if((status||'').toLowerCase() === 'approved') statusClass = 'status-approved';
           if((status||'').toLowerCase() === 'rejected') statusClass = 'status-rejected';
-          tr.innerHTML = `<td class="px-3 py-2">${applied}</td><td class="px-3 py-2">${escapeHtml(loan.purpose || '')}</td><td class="px-3 py-2">${amt}</td><td class="px-3 py-2">${due}</td><td class="px-3 py-2"><span class="${statusClass}">${status}</span></td><td class="px-3 py-2">${progress}%</td>`;
-          body.appendChild(tr);
+          tr.innerHTML = `<td>${loanDate}</td><td>${escapeHtml(loan.purpose||'')}</td><td>${amount}</td><td>${due}</td><td><span class="${statusClass}">${status}</span></td><td>${progress}%</td>`;
+          loanActionsBody && loanActionsBody.appendChild(tr);
         });
+        loanCount && (loanCount.textContent = String(keys.length));
+        loanOutstanding && (loanOutstanding.textContent = formatKsh(outstanding));
       });
 
-      // also listen for child changed to highlight updates
-      onChildChanged(ref(db, `members/${currentUid}/loans/applications`), (snap) => {
+      // highlight child changes
+      onChildChanged(ref(db, `members/${user.uid}/loans/applications`), snap => {
         const updated = snap.val();
-        // Optionally highlight or notify
-        toast(`Loan ${updated.purpose || ''} updated: ${updated.status || ''}`);
+        if(updated && updated.status){
+          showToast(`Loan "${updated.purpose || ''}" status: ${updated.status}`);
+        }
       });
-    }
-
-    /* ===============================
-       Goals progress: simple client-side demo
-       (you can integrate server-calculated progress)
-       =============================== */
-    // update `members/{uid}/goal/progress` when savings change (example)
-    // NOTE: here we only show how to update progress if you want to auto-update based on monthly savings
-    onValue(ref(db), ()=>{}); // keep connection alive
-
-    /* ===============================
-       Withdraw handlers & PDF
-       =============================== */
-    qs('#previewWithdraw')?.addEventListener('click', ()=>{
-      const fd = new FormData(qs('#withdrawForm'));
-      const data = Object.fromEntries(fd.entries());
-      const doc = buildWithdrawPdf(data);
-      doc.save('Withdrawal_PREVIEW.pdf');
     });
+  })();
 
-    qs('#withdrawForm')?.addEventListener('submit', async (ev)=>{
-      ev.preventDefault();
-      if(!currentUid) return alert('Sign in');
-      const fd = new FormData(qs('#withdrawForm'));
-      const data = Object.fromEntries(fd.entries());
-      if((data.w_reason || '').length < 200) return alert('Reason must be at least 200 characters');
-      // save withdrawal request
-      const wRef = push(ref(db, `members/${currentUid}/withdrawals`));
-      await set(wRef, { ...data, submittedAt: Date.now(), status: 'submitted' });
-      toast('Withdrawal submitted');
-      await awardPoints(6, 'Submitted withdrawal');
-      const doc = buildWithdrawPdf(data);
-      doc.save(`Withdrawal_${(data.w_memberName||'member').replace(/\s+/g,'_')}.pdf`);
+  /* ============================
+    small util
+   ============================ */
+  function escapeHtml(unsafe) {
+    return String(unsafe).replace(/[&<>"'`=\/]/g, function (s) {
+      return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','/':'&#x2F;','`':'&#x60;','=':'&#x3D;'})[s];
     });
+  }
 
-    function buildWithdrawPdf(data){
-      const doc = new jsPDF({ unit:'pt', format:'a4' });
-      const left = 36; let y = 48;
-      doc.setFillColor(16,185,129); doc.rect(0,0,595,60,'F');
-      doc.setFontSize(14); doc.setTextColor(255,255,255); doc.text('VOLUNTARY WITHDRAWAL FORM', 300, 36, { align:'center' });
-      doc.setTextColor(0,0,0); doc.setFontSize(10);
-      y = 90;
-      doc.text(`Member: ${data.w_memberName || ''}`, left, y); y += 14;
-      doc.text(`Membership No: ${data.w_membershipNumber || ''}`, left, y); y += 14;
-      doc.text(`ID: ${data.w_idNumber || ''}`, left, y); y += 14;
-      doc.text(`Phone: ${data.w_phone || ''}`, left, y); y += 14;
-      doc.text(`Amount: ${fmtK(data.w_amountFigures || 0)}`, left, y); y += 18;
-      const wrap = doc.splitTextToSize(`Reason: ${data.w_reason || ''}`, 520);
-      doc.text(wrap, left, y); y += wrap.length * 12;
-      return doc;
-    }
+</script>
 
-    /* ===============================
-       Statements PDF
-       =============================== */
-    async function buildAccountStatement(){
-      if(!currentUid) return alert('Sign in');
-      const memberSnap = await get(ref(db, `members/${currentUid}`));
-      const doc = new jsPDF({ unit:'pt', format:'a4' });
-      const left = 36; let y = 40;
-      doc.setFillColor(16,185,129); doc.rect(0,0,595,56,'F');
-      doc.setFontSize(14); doc.setTextColor(255,255,255); doc.text('ACCOUNT STATEMENT', 300, 34, { align:'center' });
-      doc.setTextColor(0,0,0);
-      y = 80;
-      const profile = memberSnap.exists() && memberSnap.val().profile ? memberSnap.val().profile : {};
-      doc.setFontSize(10);
-      doc.text(`Member: ${profile.name || ''}`, left, y); y += 12;
-      doc.text(`Email: ${auth.currentUser?.email || ''}`, left, y); y += 14;
-      // fetch some nodes
-      const monthlySnap = await get(ref(db, `members/${currentUid}/savings/monthly`));
-      const weeklySnap = await get(ref(db, `members/${currentUid}/savings/weekly`));
-      const loansSnap = await get(ref(db, `members/${currentUid}/loans/applications`));
-      doc.text(`Monthly: ${fmtK(monthlySnap.exists()? monthlySnap.val() : 0)}`, left, y); y += 12;
-      doc.text(`Weekly: ${fmtK(weeklySnap.exists()? weeklySnap.val() : 0)}`, left, y); y += 12;
-      doc.text('Loans:', left, y); y += 12;
-      if(loansSnap.exists()){
-        Object.values(loansSnap.val()).slice(-10).forEach(l => {
-          const line = `${l.purpose || ''} — ${fmtK(l.amount || l.amountFigures || 0)} — ${l.status || 'Pending'}`;
-          const w = doc.splitTextToSize(line, 520);
-          doc.text(w, left, y); y += w.length * 12;
-          if(y > 720){ doc.addPage(); y = 40; }
-        });
-      } else {
-        doc.text('No loans found', left, y); y += 12;
-      }
-      return doc;
-    }
-
-    qs('#downloadStatement')?.addEventListener('click', async () => {
-      const doc = await buildAccountStatement();
-      doc.save(`Account_Statement_${(auth.currentUser?.email||'member').replace(/[^\w@.-]/g,'')}.pdf`);
-      await awardPoints(4, 'Downloaded statement');
-    });
-    qs('#downloadStatementBtn')?.addEventListener('click', async () => {
-      const doc = await buildAccountStatement();
-      doc.save(`Account_Statement_${(auth.currentUser?.email||'member').replace(/[^\w@.-]/g,'')}.pdf`);
-      await awardPoints(4, 'Downloaded statement');
-    });
-
-    qs('#downloadAppsBtn')?.addEventListener('click', async () => {
-      if(!currentUid) return alert('Sign in');
-      const appsSnap = await get(ref(db, `members/${currentUid}/loans/applications`));
-      if(!appsSnap.exists()) return alert('No applications found');
-      const doc = new jsPDF({ unit:'pt', format:'a4' }); let y = 40;
-      doc.setFontSize(12); doc.text('Loan Applications', 40, y); y += 20;
-      Object.entries(appsSnap.val()).forEach(([id, app]) => {
-        const title = `${app.fullName || app.memberName || ''} — ${fmtK(app.amount || app.amountFigures || 0)} — ${app.status || ''}`;
-        const w = doc.splitTextToSize(title, 520);
-        doc.text(w, 40, y); y += w.length * 12;
-        if(y > 720){ doc.addPage(); y = 40; }
-      });
-      doc.save(`Loan_Applications_${(auth.currentUser?.email||'member').replace(/[^\w@.-]/g,'')}.pdf`);
-      await awardPoints(5, 'Downloaded applications');
-    });
-
-    /* ===============================
-       Misc UI bindings
-       =============================== */
-    // quick open loan wizard
-    qs('#openLoanWizardQuick')?.addEventListener('click', () => {
-      openTab('loanWizard');
-      currentStep = 1; showWizardStep();
-    });
-
-    // loan actions toggle
-    qs('#toggleLoanActions')?.addEventListener('click', () => {
-      const panel = qs('#loanActionsPanel');
-      if(panel.classList.contains('hidden')) { panel.classList.remove('hidden'); qs('#toggleLoanActions').textContent = 'Hide full table'; }
-      else { panel.classList.add('hidden'); qs('#toggleLoanActions').textContent = 'Show full table'; }
-    });
-
-    // helper escape
-    function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c])); }
-
-    // small helper: subscribe points (already awarded on login)
-    async function subscribePoints(){ onValue(ref(db, `members/${currentUid}/points`), snap => { if(snap.exists()) qs('#pointsTop').textContent = String(snap.val()); }); }
-
-    /* ===============================
-       Final note:
-       - This file writes/reads to RTDB paths under `members/{uid}/...`
-       - For production: secure DB rules and implement cloud functions to send emails/notifications and copy admin decisions into user nodes
-       - The reminders node `reminders` is created for backend processing
-       =============================== */
-
-  </script>
 </body>
 </html>
