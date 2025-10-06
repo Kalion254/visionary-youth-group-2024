@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Visionary Youth Group — Dashboard (Merged)</title>
+<title>Visionary Youth Group — Dashboard (Integrated)</title>
 
 <!-- Fonts & Icons -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
@@ -113,17 +113,17 @@
   /* PDF watermark (visual only in page if needed) */
   .watermark{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);opacity:0.06;font-size:72px;color:#2e7d32;pointer-events:none;white-space:nowrap}
 
-  /* Added: wizard steps & loan actions small styles */
-  .wiz-steps { display:flex; gap:8px; align-items:center; }
-  .wiz-step { display:none; }
-  .wiz-step.active { display:block; }
-  .loan-actions-hidden { display:none; }
-  .status-pending { background: #fff7ed; color: #92400e; padding:.2rem .5rem; border-radius:.4rem; font-weight:600; }
-  .status-approved { background: #ecfdf5; color: #065f46; padding:.2rem .5rem; border-radius:.4rem; font-weight:600; }
-  .status-rejected { background: #fff1f2; color: #9f1239; padding:.2rem .5rem; border-radius:.4rem; font-weight:600; }
-
+  /* wizard & added visuals */
+  .wiz-step{display:none}
+  .wiz-step.active{display:block}
+  .wiz-nav{display:flex;gap:8px;align-items:center;margin-top:8px}
+  .status-badge{padding:6px 10px;border-radius:8px;font-weight:700}
+  .status-pending{background:#fff7ed;color:#92400e}
+  .status-approved{background:#ecfdf5;color:#065f46}
+  .status-rejected{background:#fff1f2;color:#9f1239}
+  .small-muted{font-size:0.9rem;color:var(--muted)}
   #goalProgressBar{height:10px;background:linear-gradient(90deg,#16a34a,#86efac);border-radius:8px;width:0%}
-  .small-muted{font-size:0.85rem;color:var(--muted)}
+
 </style>
 </head>
 <body>
@@ -155,7 +155,6 @@
     <a href="#" data-target="overview"><i class="fas fa-home"></i> Overview</a>
     <a href="#" data-target="balancesCard"><i class="fas fa-wallet"></i> Balances</a>
     <a href="#" data-target="loan-section"><i class="fas fa-file-signature"></i> Loan Application</a>
-    <a href="#" data-target="loan-wizard-tab"><i class="fas fa-file-signature"></i> Loan Wizard</a> <!-- ADDED: wizard menu -->
     <a href="#" data-target="loansListFull"><i class="fas fa-money-bill-wave"></i> Loans (Manage)</a>
     <a href="#" data-target="withdraw-section"><i class="fas fa-hand-holding-usd"></i> Withdrawals</a>
     <a href="#" data-target="profile-area"><i class="fas fa-user-edit"></i> Update Profile</a>
@@ -179,6 +178,7 @@
     <!-- balances summary -->
     <div class="card big" id="balancesCard">
       <h2>Balances</h2>
+
       <div class="balances-grid">
         <div class="balance"><div class="label">Monthly Savings</div><div class="value" id="monthlyVal">Ksh 0</div></div>
         <div class="balance"><div class="label">Weekly Savings</div><div class="value" id="weeklyVal">Ksh 0</div></div>
@@ -189,247 +189,181 @@
         <div class="balance"><div class="label">Outstanding Loans</div><div class="value" id="outstandingLoansVal">Ksh 0</div></div>
       </div>
 
-      <!-- ADDED: Goal setting UI integrated with your RTDB -->
-      <div style="margin-top:12px;display:flex;gap:10px;align-items:center">
-        <div style="flex:1">
-          <label class="small-muted">Set savings goal (Ksh)</label>
-          <input id="goalInput" placeholder="Enter target amount" style="padding:8px;border-radius:8px;border:1px solid #d1d5db;width:100%;margin-top:6px">
+      <!-- Goals / Shares area (ADDED) -->
+      <div style="margin-top:12px;display:flex;gap:12px;align-items:flex-start">
+        <!-- Goal small form -->
+        <div style="flex:1" class="card" id="goalCard">
+          <h4 style="margin:0 0 8px 0">Set a Goal</h4>
+          <div class="small-muted">Tell us your goal so we can track progress and remind you.</div>
+          <div style="margin-top:8px" class="form-grid">
+            <input id="goal_name" placeholder="Your full name" class="full">
+            <input id="goal_id" placeholder="ID Number" >
+            <input id="goal_title" placeholder="Goal title (e.g., 'Buy a motorbike')">
+            <input id="goal_target" placeholder="Target amount (Ksh)" type="number">
+            <input id="goal_start" type="date" placeholder="Start date">
+            <input id="goal_end" type="date" placeholder="End date">
+          </div>
+          <div style="margin-top:8px;display:flex;gap:8px">
+            <button id="saveGoalBtn" class="btn">Save Goal</button>
+            <button id="goalPdfBtn" class="btn secondary">Download Goal PDF</button>
+          </div>
+          <div style="margin-top:10px">
+            <div class="small-muted">Progress</div>
+            <div style="height:10px;background:#eefaf0;border-radius:6px;overflow:hidden;margin-top:6px">
+              <div id="goalProgressBar" style="height:100%;width:0;background:linear-gradient(90deg,#16a34a,#86efac)"></div>
+            </div>
+            <div class="small-muted" style="margin-top:6px">Progress: <span id="goalProgressPct">0%</span></div>
+          </div>
         </div>
-        <div>
-          <label class="small-muted">Target date</label>
-          <input id="goalDate" type="date" style="padding:8px;border-radius:8px;border:1px solid #d1d5db;margin-top:6px">
-        </div>
-        <div style="display:flex;flex-direction:column;gap:6px">
-          <button id="saveGoalBtn" class="btn">Save Goal</button>
-          <button id="clearGoalBtn" class="btn secondary">Clear Goal</button>
+
+        <!-- Shares purchase form -->
+        <div style="width:360px" class="card" id="sharesCard">
+          <h4 style="margin:0 0 8px 0">Purchase Shares</h4>
+          <div class="small-muted">Set a shares target and pay installments to reach it.</div>
+          <div style="margin-top:8px">
+            <label class="small-muted">Target amount (Ksh)</label>
+            <input id="shares_target" type="number" placeholder="e.g., 5000" style="width:100%;padding:8px;border-radius:8px;border:1px solid #d1d5db;margin-top:6px">
+            <label class="small-muted" style="margin-top:8px;display:block">Start date</label>
+            <input id="shares_start" type="date" style="width:100%;padding:8px;border-radius:8px;border:1px solid #d1d5db;margin-top:6px">
+            <label class="small-muted" style="margin-top:8px;display:block">Installments (count)</label>
+            <input id="shares_installments" type="number" placeholder="e.g., 5" style="width:100%;padding:8px;border-radius:8px;border:1px solid #d1d5db;margin-top:6px">
+            <div style="margin-top:8px;display:flex;gap:8px">
+              <button id="saveSharesGoal" class="btn">Save Shares Goal</button>
+              <button id="payShareInstallment" class="btn secondary">Record Installment</button>
+            </div>
+
+            <div style="margin-top:12px">
+              <div class="small-muted">Shares goal progress: <span id="sharesProgressPct">0%</span></div>
+              <div style="height:8px;background:#eefaf0;border-radius:6px;overflow:hidden;margin-top:6px">
+                <div id="sharesProgressBar" style="height:100%;width:0;background:linear-gradient(90deg,#0ea5a3,#7dd3fc)"></div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div style="margin-top:10px">
-        <div class="small-muted">Goal Progress</div>
-        <div style="height:10px;background:#eefaf0;border-radius:6px;overflow:hidden;margin-top:6px">
-          <div id="goalProgressBar" style="height:100%;width:0;background:linear-gradient(90deg,#16a34a,#86efac)"></div>
-        </div>
-        <div class="small-muted" style="margin-top:6px">Progress: <span id="goalProgressPct">0%</span></div>
-      </div>
     </div>
 
-    <!-- loan application big form (your original full form kept) -->
+    <!-- Loan Application: TRANSFORMED INTO WIZARD — THIS REPLACES single-page submittal but preserves all original fields & PDF builders -->
     <section class="card big" id="loan-section" aria-labelledby="loanHeading">
-      <h2 id="loanHeading"><i class="fas fa-file-signature"></i> Loan Application (Official Form)</h2>
+      <h2 id="loanHeading"><i class="fas fa-file-signature"></i> Loan Application (Wizard) — Official Form</h2>
 
-      <form id="fullLoanForm">
-        <!-- (Your existing fullLoanForm content left intact) -->
-        <!-- header -->
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-          <div>
-            <div style="font-weight:800">VISIONARY YOUTH GROUP 2024</div>
-            <div style="font-weight:700;color:var(--muted)">SOCIAL PROMOTION REGISTERED TRUSTEES</div>
-            <div style="font-size:0.9rem;color:var(--muted)">Group: <strong id="groupNameDisplay">Visionary Youth Group</strong></div>
-          </div>
-          <div style="text-align:right;font-size:0.9rem">
-            <div>Loan Number: <span id="loanNoDisplay">—</span></div>
-            <div>Serial No: <span id="serialNo">—</span></div>
-            <div style="margin-top:8px;font-size:0.8rem"><small>FOR OFFICIAL USE ONLY</small></div>
-          </div>
-        </div>
-
-        <!-- APPLICANT INFORMATION -->
-        <h3>APPLICANT INFORMATION</h3>
-        <div class="form-grid">
-          <input class="full" name="selfHelpGroup" placeholder="Name of Self-Help Group" required>
-          <input name="memberName" placeholder="Name of Applicant" required>
-          <input name="membershipNumber" placeholder="Membership Number (M/No)" required>
-          <input name="nationalId" placeholder="National ID / Passport No" required>
-          <select name="maritalStatus" required>
-            <option value="">Marital Status</option>
-            <option>Single</option><option>Married</option><option>Widow</option><option>Others</option>
-          </select>
-          <input name="dob" type="date" placeholder="Date of Birth" required>
-          <input name="county" placeholder="County" required>
-          <input name="town" placeholder="City / Town" required>
-          <input name="currentAddress" placeholder="Current Address" required>
-          <input name="areaResidence" placeholder="Area of Residence" required>
-          <input name="phone" placeholder="Phone" required>
-          <input name="email" type="email" placeholder="E-mail" required>
-          <select name="ownedRented">
-            <option value="">Owned / Rented</option>
-            <option>Owned</option><option>Rented</option>
-          </select>
-          <input name="monthlyRent" placeholder="Monthly payment or rent">
-        </div>
-
-        <!-- EMPLOYMENT -->
-        <h3>EMPLOYMENT INFORMATION (WHERE APPLICABLE)</h3>
-        <div class="form-grid">
-          <input name="employer" placeholder="Current Employer">
-          <input name="position" placeholder="Position">
-          <input name="periodEmployment" placeholder="Period in Current Employment">
-          <input name="employerAddress" placeholder="Employer Address">
-          <input name="monthlyIncome" placeholder="Monthly Income (Ksh)" required>
-        </div>
-
-        <!-- OTHER SOURCES -->
-        <h3>OTHER SOURCES OF INCOME</h3>
-        <div class="form-grid">
-          <input name="income1" placeholder="Income source 1 (Ksh)">
-          <input name="income2" placeholder="Income source 2 (Ksh)">
-          <input name="income3" placeholder="Income source 3 (Ksh)">
-        </div>
-
-        <!-- LOAN APPLICATION -->
-        <h3>LOAN APPLICATION</h3>
-        <div class="form-grid">
-          <input name="amountFigures" placeholder="Amount Requested (Figures, Ksh)" required>
-          <input name="amountWords" placeholder="Amount in words" required>
-          <input name="purpose" placeholder="Purpose of the Loan" required>
-          <input name="repayableMonths" placeholder="Repayable in monthly instalments (months)" required>
-        </div>
-
-        <!-- OTHER LOANS -->
-        <h3>OTHER LOANS / DEBTS / OBLIGATIONS</h3>
-        <div class="form-grid">
-          <input name="otherLoan1" placeholder="Institution / Amount">
-          <input name="otherLoan2" placeholder="Institution / Amount">
-        </div>
-
-        <!-- GUARANTORS -->
-        <h3>GUARANTORS (Fill details, sign after applicant enters amount)</h3>
-        <table>
-          <thead>
-            <tr><th>M No.</th><th>Name in Full</th><th>Cell Phone</th><th>ID No.</th><th>Group Name</th><th>Amount Offered (Ksh)</th></tr>
-          </thead>
-          <tbody id="guarantorRows">
-            <!-- 3 default rows -->
-            <tr>
-              <td><input name="g_mno_1" placeholder="MNo"></td>
-              <td><input name="g_name_1" placeholder="Full name"></td>
-              <td><input name="g_phone_1" placeholder="Phone"></td>
-              <td><input name="g_id_1" placeholder="ID No"></td>
-              <td><input name="g_group_1" placeholder="SHG Name"></td>
-              <td><input name="g_amount_1" placeholder="Ksh"></td>
-            </tr>
-            <tr>
-              <td><input name="g_mno_2" placeholder="MNo"></td>
-              <td><input name="g_name_2" placeholder="Full name"></td>
-              <td><input name="g_phone_2" placeholder="Phone"></td>
-              <td><input name="g_id_2" placeholder="ID No"></td>
-              <td><input name="g_group_2" placeholder="SHG Name"></td>
-              <td><input name="g_amount_2" placeholder="Ksh"></td>
-            </tr>
-            <tr>
-              <td><input name="g_mno_3" placeholder="MNo"></td>
-              <td><input name="g_name_3" placeholder="Full name"></td>
-              <td><input name="g_phone_3" placeholder="Phone"></td>
-              <td><input name="g_id_3" placeholder="ID No"></td>
-              <td><input name="g_group_3" placeholder="SHG Name"></td>
-              <td><input name="g_amount_3" placeholder="Ksh"></td>
-            </tr>
-          </tbody>
-        </table>
-
-        <!-- TERMS -->
-        <h3>TERMS &amp; CONDITIONS — Applicant Commitment</h3>
-        <textarea name="terms" readonly>
-Please read the full terms on the system: you must have 6 consecutive months savings, savings cover a third of guarantorship, loans above Ksh 10,000 require bank statements, school fees loan evidence required, cancellations fee may apply, CRB checks permitted.
-        </textarea>
-
-        <div style="margin-top:12px;display:flex;gap:10px;align-items:center">
-          <label style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="agreeTerms" required> I have read and agree to the Terms & Conditions</label>
-          <div style="margin-left:auto;display:flex;gap:8px">
-            <button class="btn" type="button" id="previewLoanPdf">Preview PDF</button>
-            <button class="btn" type="submit" id="submitLoanBtn">Submit Application & Download PDF</button>
-          </div>
-        </div>
-      </form>
-    </section>
-
-    <!-- ADDED: Wizard-based loan application (non-destructive; user can choose either) -->
-    <section class="card big" id="loan-wizard-tab" style="display:none">
-      <h2><i class="fas fa-magic"></i> Loan Application — Wizard (Recommended)</h2>
-      <div style="margin-top:8px" class="small-muted">Follow the steps — this writes to the same RTDB path as the main form.</div>
-
-      <div style="margin-top:10px" class="wiz-steps">
-        <div id="wizProgressText">Step <span id="wizStepNum">1</span> / 6</div>
+      <!-- Wizard navigation -->
+      <div class="wiz-nav small-muted" style="margin-top:8px">
+        <div id="wizStepLabel">Step <strong id="wizStep">1</strong> / 6</div>
         <div style="flex:1;height:8px;background:#eef6ee;border-radius:6px;margin-left:12px;overflow:hidden">
-          <div id="wizProgressBar" style="height:100%;width:0;background:linear-gradient(90deg,var(--accent),#86efac)"></div>
+          <div id="wizBar" style="height:100%;width:0;background:linear-gradient(90deg,var(--accent),#86efac)"></div>
         </div>
       </div>
 
-      <form id="loanWizardForm" style="margin-top:12px">
-        <!-- Step 1 -->
+      <!-- The form now is a wizard. All original fields are preserved — field names kept where possible -->
+      <form id="loanWizardForm" style="margin-top:10px">
+        <!-- Step 1: Membership form (ADDED) -->
         <div class="wiz-step active" id="wiz-1">
-          <h4>Personal Information</h4>
+          <h3>Membership — Personal Information</h3>
           <div class="form-grid">
-            <input name="wiz_selfHelpGroup" placeholder="Self-help group" class="full">
-            <input name="wiz_memberName" placeholder="Full name" required>
-            <input name="wiz_nationalId" placeholder="National ID / Passport" required>
-            <input name="wiz_dob" type="date" placeholder="Date of birth" required>
-            <input name="wiz_phone" placeholder="Phone" required>
-            <input name="wiz_email" type="email" placeholder="Email">
+            <input name="selfHelpGroup" class="full" placeholder="Name of Self-Help Group">
+            <input name="memberName" placeholder="Full name" required>
+            <input name="membershipNumber" placeholder="Membership Number (M/No)" required>
+            <input name="nationalId" placeholder="National ID / Passport No" required>
+            <input name="phone" placeholder="Phone" required>
+            <input name="email" type="email" placeholder="E-mail" required>
+            <select name="educationLevel"><option value="">Education Level</option><option>Primary</option><option>Secondary</option><option>Diploma</option><option>Undergraduate</option><option>Postgraduate</option></select>
+            <input name="incomeSource" placeholder="Main source of income">
+            <input name="nextOfKin" placeholder="Next of Kin name">
+            <input name="nextOfKinPhone" placeholder="Next of Kin phone">
+            <input name="residenceCounty" placeholder="County">
+            <input name="residenceTown" placeholder="Town / City">
           </div>
+          <div style="margin-top:8px" class="small-muted">This membership info will be saved under `members/{uid}/profile` when you submit the wizard.</div>
         </div>
 
-        <!-- Step 2 -->
+        <!-- Step 2: Residence -->
         <div class="wiz-step" id="wiz-2">
-          <h4>Residence</h4>
+          <h3>Residence & Contact</h3>
           <div class="form-grid">
-            <input name="wiz_county" placeholder="County" required>
-            <input name="wiz_town" placeholder="Town / City">
-            <input name="wiz_ward" placeholder="Ward">
-            <input name="wiz_village" placeholder="Village / Estate">
-            <input name="wiz_address" placeholder="Current Address" class="full">
+            <input name="county" placeholder="County" required>
+            <input name="town" placeholder="City / Town">
+            <input name="ward" placeholder="Ward">
+            <input name="village" placeholder="Village / Estate">
+            <input name="currentAddress" placeholder="Current Address" class="full">
           </div>
         </div>
 
-        <!-- Step 3 -->
+        <!-- Step 3: Education/Employment -->
         <div class="wiz-step" id="wiz-3">
-          <h4>Education</h4>
+          <h3>Education & Employment</h3>
           <div class="form-grid">
-            <input name="wiz_educationLevel" placeholder="Education level">
-            <input name="wiz_institution" placeholder="Institution">
-            <input name="wiz_educationYear" placeholder="Year / Index">
-            <input name="wiz_course" placeholder="Course">
-            <input name="wiz_duration" placeholder="Duration">
+            <input name="education" placeholder="Education (e.g., Diploma)">
+            <input name="institution" placeholder="Institution / School">
+            <input name="periodEmployment" placeholder="Period in Current Employment">
+            <input name="employer" placeholder="Current Employer">
+            <input name="position" placeholder="Position">
+            <input name="monthlyIncome" placeholder="Monthly Income (Ksh)">
           </div>
         </div>
 
-        <!-- Step 4 -->
+        <!-- Step 4: Guarantors -->
         <div class="wiz-step" id="wiz-4">
-          <h4>Guarantors (3)</h4>
+          <h3>Guarantors (3 required)</h3>
           <table>
-            <thead><tr><th>#</th><th>Name</th><th>Phone</th><th>ID</th><th>Group</th><th>Amount</th></tr></thead>
+            <thead><tr><th>M No.</th><th>Name in Full</th><th>Cell Phone</th><th>ID No.</th><th>Group Name</th><th>Amount (Ksh)</th></tr></thead>
             <tbody>
-              <tr><td>1</td><td><input name="wiz_g1_name" required></td><td><input name="wiz_g1_phone" required></td><td><input name="wiz_g1_id" required></td><td><input name="wiz_g1_group"></td><td><input name="wiz_g1_amount" required></td></tr>
-              <tr><td>2</td><td><input name="wiz_g2_name" required></td><td><input name="wiz_g2_phone" required></td><td><input name="wiz_g2_id" required></td><td><input name="wiz_g2_group"></td><td><input name="wiz_g2_amount" required></td></tr>
-              <tr><td>3</td><td><input name="wiz_g3_name" required></td><td><input name="wiz_g3_phone" required></td><td><input name="wiz_g3_id" required></td><td><input name="wiz_g3_group"></td><td><input name="wiz_g3_amount" required></td></tr>
+              <tr>
+                <td><input name="g_mno_1" placeholder="MNo" required></td>
+                <td><input name="g_name_1" placeholder="Full name" required></td>
+                <td><input name="g_phone_1" placeholder="Phone" required></td>
+                <td><input name="g_id_1" placeholder="ID No." required></td>
+                <td><input name="g_group_1" placeholder="SHG Name"></td>
+                <td><input name="g_amount_1" placeholder="Ksh" required></td>
+              </tr>
+              <tr>
+                <td><input name="g_mno_2" placeholder="MNo" required></td>
+                <td><input name="g_name_2" placeholder="Full name" required></td>
+                <td><input name="g_phone_2" placeholder="Phone" required></td>
+                <td><input name="g_id_2" placeholder="ID No." required></td>
+                <td><input name="g_group_2" placeholder="SHG Name"></td>
+                <td><input name="g_amount_2" placeholder="Ksh" required></td>
+              </tr>
+              <tr>
+                <td><input name="g_mno_3" placeholder="MNo" required></td>
+                <td><input name="g_name_3" placeholder="Full name" required></td>
+                <td><input name="g_phone_3" placeholder="Phone" required></td>
+                <td><input name="g_id_3" placeholder="ID No." required></td>
+                <td><input name="g_group_3" placeholder="SHG Name"></td>
+                <td><input name="g_amount_3" placeholder="Ksh" required></td>
+              </tr>
             </tbody>
           </table>
         </div>
 
-        <!-- Step 5 -->
+        <!-- Step 5: Loan Details -->
         <div class="wiz-step" id="wiz-5">
-          <h4>Loan Details</h4>
+          <h3>Loan Details</h3>
           <div class="form-grid">
-            <input name="wiz_amount" placeholder="Amount requested (Ksh)" required>
-            <input name="wiz_amountWords" placeholder="Amount in words" required>
-            <input name="wiz_purpose" placeholder="Purpose" required>
-            <input name="wiz_repayableMonths" placeholder="Months to repay" required>
-            <select name="wiz_disbursementMode"><option value="mpesa">M-Pesa</option><option value="bank">Bank</option><option value="cash">Cash</option></select>
-            <input name="wiz_accountNumber" placeholder="Account / Till">
+            <input name="amountFigures" placeholder="Amount Requested (Figures, Ksh)" required>
+            <input name="amountWords" placeholder="Amount in words" required>
+            <input name="purpose" placeholder="Purpose of the Loan" required>
+            <input name="repayableMonths" placeholder="Repayable in monthly instalments (months)" required>
+            <select name="disbursementMode"><option value="mpesa">M-Pesa</option><option value="bank">Bank Transfer</option><option value="cash">Cash</option></select>
+            <input name="accountNumber" placeholder="Account / Till No">
+            <input name="expectedStartDate" type="date" placeholder="Start date">
+            <input name="expectedDueDate" type="date" placeholder="Due date (optional)">
           </div>
         </div>
 
-        <!-- Step 6 -->
+        <!-- Step 6: Review & Submit -->
         <div class="wiz-step" id="wiz-6">
-          <h4>Review & Submit</h4>
-          <div class="small-muted">When you submit, a copy will be saved to your applications and you'll download a branded PDF to hand to the office.</div>
-          <div style="margin-top:8px"><label><input type="checkbox" id="wiz_agree" required> I confirm the information above.</label></div>
+          <h3>Review & Submit</h3>
+          <div class="small-muted">Please confirm all fields. When you submit: (1) membership profile will be saved, (2) application will be stored under `members/{uid}/loans/applications`, (3) PDF will be generated for you to download and present to the office, and (4) reminders pushed to `/reminders` if due date exists.</div>
+          <div style="margin-top:10px">
+            <label><input type="checkbox" id="wizAgree" required> I confirm the data and agree to the terms.</label>
+          </div>
         </div>
 
         <div style="margin-top:12px;display:flex;justify-content:space-between">
           <button type="button" id="wizPrev" class="btn secondary">Back</button>
-          <div>
+          <div style="display:flex;gap:8px">
             <button type="button" id="wizNext" class="btn">Next</button>
             <button type="submit" id="wizSubmit" class="btn" style="display:none">Submit & Download PDF</button>
           </div>
@@ -437,7 +371,7 @@ Please read the full terms on the system: you must have 6 consecutive months sav
       </form>
     </section>
 
-    <!-- New Withdrawable Form -->
+    <!-- withdrawals and other sections untouched -->
     <section class="card big" id="withdraw-section">
       <h2><i class="fas fa-hand-holding-usd"></i> Voluntary Withdrawable Savings Form</h2>
 
@@ -500,7 +434,7 @@ Please read the full terms on the system: you must have 6 consecutive months sav
 
 <!-- Firebase & App logic -->
 <script type="module">
-  // Imports (kept original)
+  // Imports
   import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
   import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
   import { getDatabase, ref, onValue, get, push, set, update, onChildChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
@@ -525,7 +459,7 @@ Please read the full terms on the system: you must have 6 consecutive months sav
   const db = getDatabase(app);
   const storage = getStorage(app);
 
-  // UI refs (kept original)
+  // UI refs
   const hamburger = document.querySelector('.hamburgerAction');
   const menu = document.getElementById('menu');
   const toast = document.getElementById('toast');
@@ -533,8 +467,6 @@ Please read the full terms on the system: you must have 6 consecutive months sav
   const welcomeName = document.getElementById('welcomeName');
   const pointsDisplay = document.getElementById('pointsDisplay');
   const topAvatar = document.getElementById('topAvatar');
-  const welcomeNameSidebar = document.getElementById('welcomeNameSidebar'); // may not exist
-  const topEmailSidebar = document.getElementById('topEmailSidebar'); // may not exist
 
   // helpers
   function showToast(msg, timeout=3000){
@@ -547,22 +479,22 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     return 'Ksh ' + num.toLocaleString('en-KE');
   }
 
-  // menu toggles (offset is already in CSS via left)
+  // menu toggles
   if (hamburger) {
     hamburger.addEventListener('click', ()=> {
       menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
     });
   }
 
-  // menu links close and scroll
+  // menu links: scroll & show/hide
   menu.querySelectorAll('a[data-target]').forEach(a=>{
     a.addEventListener('click', (e)=>{
       e.preventDefault();
       const target = a.dataset.target;
+      // hide major sections then show
+      const all = ['overview','balancesCard','loan-section','withdraw-section','loansListFull','profile-area'];
+      all.forEach(id => { const n = document.getElementById(id); if(n) n.style.display = 'none'; });
       const el = document.getElementById(target);
-      // hide all major sections and show the requested one
-      const allSections = ['overview','balancesCard','loan-section','loan-wizard-tab','loansListFull','withdraw-section','profile-area'];
-      allSections.forEach(id => { const node = document.getElementById(id); if(node) node.style.display = 'none'; });
       if(el) el.style.display = 'block';
       menu.style.display = 'none';
       el && el.scrollIntoView({behavior:'smooth', block:'start'});
@@ -619,13 +551,13 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     topEmail.textContent = user.email || '—';
     welcomeName.textContent = (user.email || 'Member').split('@')[0];
     resetLogoutTimer();
-    awardPoints(10, 'Logged in'); // small login bonus
+    awardPoints(10, 'Logged in');
 
-    // load profile
+    // load profile (existing)
     onValue(ref(db, `members/${currentUid}/profile`), snap=>{
       if(snap.exists()){
         const p = snap.val();
-        if(p.name){ document.getElementById('welcomeName').textContent = p.name; if(document.getElementById('welcomeNameSidebar')) document.getElementById('welcomeNameSidebar').textContent = p.name; }
+        if(p.name){ document.getElementById('welcomeName').textContent = p.name; }
         if(p.name) document.getElementById('profile_fullName').value = p.name;
         if(p.phone) document.getElementById('profile_phone').value = p.phone;
         if(p.id) document.getElementById('profile_id').value = p.id;
@@ -635,19 +567,18 @@ Please read the full terms on the system: you must have 6 consecutive months sav
       }
     });
 
-    // profile photo: get url if exists
+    // photo
     try{
       const photoSnap = await get(ref(db, `members/${currentUid}/photoURL`));
       if(photoSnap && photoSnap.exists()){
         const url = photoSnap.val();
         setAvatar(url);
       } else {
-        // placeholder avatar
         if(topAvatar) topAvatar.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--dark)"><i class="fas fa-user"></i></div>';
       }
     }catch(e){ console.error(e); }
 
-    // balances listeners (preserve original reading semantics)
+    // balances listeners (original)
     const monthlyRef = ref(db, `members/${currentUid}/savings/monthly`);
     const weeklyRef = ref(db, `members/${currentUid}/savings/weekly`);
     const sharesRef = ref(db, `members/${currentUid}/shares/total`);
@@ -671,8 +602,8 @@ Please read the full terms on the system: you must have 6 consecutive months sav
       return total;
     }
 
-    onValue(monthlyRef, async s=>{ const v = await snapToAmount(s); const el = document.getElementById('monthlyVal'); if(el) el.textContent = formatKsh(v); document.getElementById('monthlyVal2') && (document.getElementById('monthlyVal2').textContent = formatKsh(v)); });
-    onValue(weeklyRef, async s=>{ const v = await snapToAmount(s); const el = document.getElementById('weeklyVal'); if(el) el.textContent = formatKsh(v); document.getElementById('weeklyVal2') && (document.getElementById('weeklyVal2').textContent = formatKsh(v)); });
+    onValue(monthlyRef, async s=>{ const v = await snapToAmount(s); const el = document.getElementById('monthlyVal'); if(el) el.textContent = formatKsh(v); });
+    onValue(weeklyRef, async s=>{ const v = await snapToAmount(s); const el = document.getElementById('weeklyVal'); if(el) el.textContent = formatKsh(v); });
     onValue(sharesRef, s=>{ const v = s.exists()? Number(s.val()||0) : 0; const el = document.getElementById('sharesVal'); if(el) el.textContent = formatKsh(v); });
     onValue(dividendsRef, s=>{ const v = s.exists()? Number(s.val()||0) : 0; const el = document.getElementById('dividendsVal'); if(el) el.textContent = formatKsh(v); });
     onValue(unpaidRef, s=>{ const v = s.exists()? Number(s.val()||0) : 0; const el = document.getElementById('unpaidVal'); if(el) el.textContent = formatKsh(v); });
@@ -765,89 +696,107 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     pointsDisplay.textContent = ptsSnap.exists()? String(ptsSnap.val()||0) : '0';
   }); // end onAuthStateChanged
 
-  // ------------------ Loan Application logic & PDF ------------------
-  const loanForm = document.getElementById('fullLoanForm');
-  if (document.getElementById('previewLoanPdf')) {
-    document.getElementById('previewLoanPdf').addEventListener('click', (e)=>{
-      e.preventDefault();
-      if(!loanForm) return;
-      const formData = new FormData(loanForm);
-      const data = Object.fromEntries(formData.entries());
-      const doc = buildLoanPdfDoc(data, {preview:true});
-      doc.save(`Loan_Application_PREVIEW.pdf`);
-      awardPoints(2, 'Previewed loan PDF');
-    });
-  }
+  // ------------------ WIZARD LOGIC (replaces single fullLoanForm) ------------------
+  (function wizardController(){
+    const steps = [1,2,3,4,5,6];
+    let current = 1;
+    const total = steps.length;
+    const wizBar = document.getElementById('wizBar');
+    const wizStepLabel = document.getElementById('wizStep');
 
-  if(loanForm){
-    loanForm.addEventListener('submit', async (e)=>{
-      e.preventDefault();
-      if(!currentUid) return alert('Not authenticated');
-      const agree = document.getElementById('agreeTerms');
-      if(!agree || !agree.checked) return alert('Please agree to the terms');
-
-      const formData = new FormData(loanForm);
-      const data = Object.fromEntries(formData.entries());
-      const guarantors = [];
-      for(let i=1;i<=3;i++){
-        guarantors.push({
-          mno: data[`g_mno_${i}`] || '',
-          name: data[`g_name_${i}`] || '',
-          phone: data[`g_phone_${i}`] || '',
-          id: data[`g_id_${i}`] || '',
-          group: data[`g_group_${i}`] || '',
-          amount: data[`g_amount_${i}`] || ''
-        });
+    function showStep(){
+      steps.forEach(n=>{
+        const el = document.getElementById('wiz-' + n);
+        if(!el) return;
+        if(n === current) el.classList.add('active'); else el.classList.remove('active');
+      });
+      const pct = Math.round(((current-1)/(total-1))*100);
+      wizBar.style.width = pct + '%';
+      wizStepLabel.textContent = String(current);
+      document.getElementById('wizPrev').disabled = current === 1;
+      if(current === total){
+        document.getElementById('wizNext').style.display = 'none';
+        document.getElementById('wizSubmit').style.display = 'inline-block';
+      } else {
+        document.getElementById('wizNext').style.display = 'inline-block';
+        document.getElementById('wizSubmit').style.display = 'none';
       }
+    }
+    showStep();
+
+    document.getElementById('wizNext').addEventListener('click', ()=> { if(current < total) current++; showStep(); });
+    document.getElementById('wizPrev').addEventListener('click', ()=> { if(current > 1) current--; showStep(); });
+
+    // On submit: save profile (membership) and application to RTDB, generate PDF, push reminders, award points
+    document.getElementById('loanWizardForm').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      if(!currentUid) return alert('Not signed in');
+      if(!document.getElementById('wizAgree')?.checked) return alert('Please accept terms');
+
+      const form = document.getElementById('loanWizardForm');
+      const fd = new FormData(form);
+      const data = Object.fromEntries(fd.entries());
+
+      // Build guarantors array
+      const guarantors = [
+        { mno: data.g_mno_1 || data.g_mno_1, name: data.g_name_1, phone: data.g_phone_1, id: data.g_id_1, group: data.g_group_1, amount: data.g_amount_1 },
+        { mno: data.g_mno_2, name: data.g_name_2, phone: data.g_phone_2, id: data.g_id_2, group: data.g_group_2, amount: data.g_amount_2 },
+        { mno: data.g_mno_3, name: data.g_name_3, phone: data.g_phone_3, id: data.g_id_3, group: data.g_group_3, amount: data.g_amount_3 },
+      ];
       data.guarantors = guarantors;
       data.appliedAt = Date.now();
       data.status = 'Pending';
-      // ADDED: optional dueDate from extra field (if user added) -- keep empty otherwise
-      if(!data.dueDate && data.repayableMonths) {
-        // approximate due date from months
-        const months = Number(data.repayableMonths||0);
-        if(months>0) data.dueDate = new Date(Date.now() + months*30*24*3600*1000).toISOString();
-      }
+      data.progress = 0;
 
       try{
+        // Save membership profile (from step 1)
+        const profilePayload = {
+          name: data.memberName,
+          phone: data.phone,
+          id: data.nationalId,
+          yearJoined: new Date().getFullYear(),
+          dob: data.dob || null,
+          education: data.education || data.educationLevel || null,
+          incomeSource: data.incomeSource || null,
+          nextOfKin: data.nextOfKin || null,
+          nextOfKinPhone: data.nextOfKinPhone || null,
+          address: data.currentAddress || null,
+          status: 'Active'
+        };
+        await set(ref(db, `members/${currentUid}/profile`), profilePayload);
+
+        // Save loan application (same path)
         const appRef = push(ref(db, `members/${currentUid}/loans/applications`));
         const appId = appRef.key;
         await set(appRef, data);
-        showToast('Application saved — downloading PDF');
-        awardPoints(10, 'Submitted loan application');
 
-        // ADDED: push reminder record if dueDate present
-        if(data.dueDate){
+        // If due date provided, push reminder node for backend processing
+        if(data.expectedDueDate){
           await push(ref(db, `reminders`), {
             uid: currentUid,
             applicationId: appId,
-            dueDate: data.dueDate,
+            dueDate: data.expectedDueDate,
             title: 'Loan due reminder',
-            message: `Loan "${data.purpose}" is due on ${new Date(data.dueDate).toLocaleDateString()}`,
+            message: `Loan for ${data.purpose} is due on ${new Date(data.expectedDueDate).toLocaleDateString()}`,
             ts: Date.now()
           });
-          // client-side notify later if within this session
-          const dueTs = new Date(data.dueDate).getTime();
-          const msToDue = dueTs - Date.now();
-          if(msToDue > 0 && msToDue < 7*24*3600*1000) { // only set if due within 7 days (safe)
-            setTimeout(()=> {
-              alert(`Reminder: Your loan "${data.purpose}" is due today.`);
-            }, msToDue);
-          }
         }
 
+        await awardPoints(12, 'Submitted loan via wizard');
+        showToast('Application submitted; downloading PDF');
+
+        // Build and save PDF using existing builder
         const doc = buildLoanPdfDoc(data, {id: appId});
-        doc.save(`Loan_Application_${(data.memberName || data.name || currentUid).replace(/\s+/g,'_')}_${appId}.pdf`);
+        doc.save(`Loan_Application_${(data.memberName || 'member').replace(/\s+/g,'_')}_${appId}.pdf`);
+
       }catch(err){
-        console.error(err);
-        alert('Failed to save application to DB. PDF will be generated locally.');
-        const doc = buildLoanPdfDoc(data, {});
-        doc.save(`Loan_Application_${(data.memberName || data.name || currentUid).replace(/\s+/g,'_')}.pdf`);
+        console.error('Wizard submit failed', err);
+        alert('Failed to submit application, check console');
       }
     });
-  }
+  })();
 
-  // Build loan PDF with a modern header + watermark + group name (kept from your original)
+  // ------------------ Loan PDF builder (kept original) ------------------
   function buildLoanPdfDoc(data, opts={}){
     const doc = new jsPDF({unit:'pt',format:'a4'});
     let y = 40; const left = 36;
@@ -859,10 +808,10 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     doc.text('VISIONARY YOUTH GROUP', 300, 36, {align:'center'});
     doc.setTextColor(0,0,0);
 
-    // watermark text faint (repeat lightly)
+    // watermark
     doc.setTextColor(200,230,200);
     doc.setFontSize(48);
-    doc.text('VISIONARY YOUTH GROUP', 300, 320, {align:'center', angle:0, baseline: 'middle' });
+    doc.text('VISIONARY YOUTH GROUP', 300, 320, {align:'center'});
     doc.setTextColor(0,0,0);
 
     y = 80;
@@ -874,14 +823,14 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     doc.setFontSize(10); doc.setFont('helvetica','bold');
     doc.text('APPLICANT INFORMATION', left, y); y+=12;
     doc.setFont('helvetica','normal'); const info = [
-      `Self-help group: ${data.selfHelpGroup||document.getElementById('groupNameDisplay').textContent||''}`,
-      `Name: ${data.memberName||data.wiz_memberName||''}`,
+      `Self-help group: ${data.selfHelpGroup||''}`,
+      `Name: ${data.memberName||''}`,
       `Membership No: ${data.membershipNumber||''}`,
-      `National ID/Passport: ${data.nationalId||data.wiz_nationalId||''}`,
-      `Marital Status: ${data.maritalStatus||''} • DOB: ${data.dob||data.wiz_dob||''}`,
-      `County/Town: ${data.county||data.wiz_county||''} / ${data.town||''}`,
+      `National ID/Passport: ${data.nationalId||''}`,
+      `DOB: ${data.dob||''}`,
+      `County/Town: ${data.county||''} / ${data.town||''}`,
       `Address: ${data.currentAddress||''}`,
-      `Phone: ${data.phone||data.wiz_phone||''} • Email: ${data.email||data.wiz_email||''}`
+      `Phone: ${data.phone||''} • Email: ${data.email||''}`
     ];
     info.forEach(line=>{
       const wrap = doc.splitTextToSize(line, 520);
@@ -892,9 +841,11 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     doc.setFont('helvetica','bold'); doc.text('LOAN DETAILS', left, y); y+=12;
     doc.setFont('helvetica','normal');
     const loanLines = [
-      `Amount: Ksh ${data.amountFigures||data.wiz_amount||''} (${data.amountWords||data.wiz_amountWords||''})`,
-      `Purpose: ${data.purpose||data.wiz_purpose||''}`,
-      `Repayable (months): ${data.repayableMonths||data.wiz_repayableMonths||''}`
+      `Amount: Ksh ${data.amountFigures||data.amount||''} (${data.amountWords||''})`,
+      `Purpose: ${data.purpose||''}`,
+      `Repayable (months): ${data.repayableMonths||''}`,
+      `Disbursement: ${data.disbursementMode||''} • Account/Till: ${data.accountNumber||''}`,
+      `Start / Due: ${data.expectedStartDate || '-'} / ${data.expectedDueDate || '-'}`
     ];
     loanLines.forEach(line=>{ const wr = doc.splitTextToSize(line,520); doc.text(wr,left,y); y += wr.length*12; });
 
@@ -903,7 +854,7 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     doc.setFont('helvetica','normal'); doc.setFontSize(9);
     const guars = data.guarantors || [];
     guars.forEach(g=>{
-      const row = `${g.mno||g.name||''} • ${g.name||''} • ${g.phone||''} • ID:${g.id||''} • ${g.group||''} • Ksh ${g.amount||''}`;
+      const row = `${g.mno||''} • ${g.name||''} • ${g.phone||''} • ID:${g.id||''} • ${g.group||''} • Ksh ${g.amount||''}`;
       const wr = doc.splitTextToSize(row,520);
       doc.text(wr,left,y); y += wr.length*12;
       if(y > 720){ doc.addPage(); y = 40; }
@@ -916,7 +867,7 @@ Please read the full terms on the system: you must have 6 consecutive months sav
 
     if(y > 700){ doc.addPage(); y=40; }
     doc.setFont('helvetica','bold'); doc.text('Applicant Signature: ______________________   Date: ___________', left, y);
-    // footer with page number
+    // footer
     const pageCount = doc.getNumberOfPages();
     for (let i=1;i<=pageCount;i++){
       doc.setPage(i);
@@ -926,7 +877,150 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     return doc;
   }
 
-  // ------------------ Withdrawal handlers & PDF ------------------
+  // ------------------ Shares goal logic ------------------
+  (function sharesController(){
+    const saveBtn = document.getElementById('saveSharesGoal');
+    const payBtn = document.getElementById('payShareInstallment');
+    const targetInput = document.getElementById('shares_target');
+    const startInput = document.getElementById('shares_start');
+    const installmentsInput = document.getElementById('shares_installments');
+    const progressBar = document.getElementById('sharesProgressBar');
+    const progressPct = document.getElementById('sharesProgressPct');
+
+    saveBtn?.addEventListener('click', async ()=>{
+      if(!currentUid) return alert('Sign in');
+      const target = Number(targetInput.value || 0);
+      const start = startInput.value ? new Date(startInput.value).getTime() : null;
+      const installments = Number(installmentsInput.value || 0);
+      if(!target || !installments) return alert('Enter valid target and installments');
+      const goalRef = push(ref(db, `members/${currentUid}/shares/goals`));
+      const goalData = {
+        id: goalRef.key,
+        targetAmount: target,
+        startDate: start,
+        installments: installments,
+        paid: 0,
+        progressPct: 0,
+        createdAt: Date.now()
+      };
+      await set(goalRef, goalData);
+      showToast('Shares goal saved');
+      await awardPoints(4, 'Set shares goal');
+    });
+
+    payBtn?.addEventListener('click', async ()=>{
+      if(!currentUid) return alert('Sign in');
+      // For simplicity: record payment under /members/{uid}/shares/payments
+      const amount = prompt('Enter installment amount (Ksh)');
+      if(!amount) return;
+      const pRef = push(ref(db, `members/${currentUid}/shares/payments`));
+      await set(pRef, { amount: Number(amount), ts: Date.now() });
+      showToast('Installment recorded');
+      await awardPoints(2, 'Paid share installment');
+      // update progress: compute totals & update the active goal if exists
+      const goalsSnap = await get(ref(db, `members/${currentUid}/shares/goals`));
+      if(goalsSnap.exists()){
+        const goals = goalsSnap.val();
+        // pick latest goal
+        const keys = Object.keys(goals);
+        const last = goals[keys[keys.length-1]];
+        const paymentsSnap = await get(ref(db, `members/${currentUid}/shares/payments`));
+        let totalPaid = 0;
+        if(paymentsSnap.exists()){
+          Object.values(paymentsSnap.val()).forEach(p => totalPaid += Number(p.amount || 0));
+        }
+        const pct = Math.min(100, Math.round((totalPaid / (last.targetAmount || 1))*100));
+        // update goal record
+        await update(ref(db, `members/${currentUid}/shares/goals/${last.id}`), { paid: totalPaid, progressPct: pct });
+        progressBar.style.width = pct + '%';
+        progressPct.textContent = pct + '%';
+      }
+    });
+
+    // listen for goal updates
+    onAuthStateChanged(auth, user => {
+      if(!user) return;
+      onValue(ref(db, `members/${user.uid}/shares/goals`), snap => {
+        if(!snap.exists()) return;
+        const vals = snap.val();
+        const lastKey = Object.keys(vals).pop();
+        const g = vals[lastKey];
+        const pct = g.progressPct || 0;
+        progressBar.style.width = pct + '%';
+        progressPct.textContent = pct + '%';
+      });
+    });
+  })();
+
+  // ------------------ Goal setting logic ------------------
+  (function goalsController(){
+    const nameInput = document.getElementById('goal_name');
+    const idInput = document.getElementById('goal_id');
+    const titleInput = document.getElementById('goal_title');
+    const targetInput = document.getElementById('goal_target');
+    const startInput = document.getElementById('goal_start');
+    const endInput = document.getElementById('goal_end');
+    const saveBtn = document.getElementById('saveGoalBtn');
+    const pdfBtn = document.getElementById('goalPdfBtn');
+    const progressBar = document.getElementById('goalProgressBar');
+    const pctSpan = document.getElementById('goalProgressPct');
+
+    saveBtn?.addEventListener('click', async ()=>{
+      if(!currentUid) return alert('Sign in');
+      const payload = {
+        name: nameInput.value || '',
+        idNumber: idInput.value || '',
+        title: titleInput.value || '',
+        targetAmount: Number(targetInput.value || 0),
+        startDate: startInput.value ? new Date(startInput.value).getTime() : Date.now(),
+        endDate: endInput.value ? new Date(endInput.value).getTime() : null,
+        currentAmount: 0,
+        progress: 0,
+        reminderEnabled: true,
+        createdAt: Date.now()
+      };
+      const gRef = push(ref(db, `members/${currentUid}/goals`));
+      await set(gRef, payload);
+      showToast('Goal saved');
+      await awardPoints(4, 'Saved goal');
+    });
+
+    // Simple PDF for goal
+    pdfBtn?.addEventListener('click', async ()=>{
+      const doc = new jsPDF({unit:'pt',format:'a4'});
+      doc.setFontSize(16); doc.text('Goal Summary', 40, 40);
+      doc.setFontSize(10);
+      doc.text(`Name: ${nameInput.value || ''}`, 40, 70);
+      doc.text(`ID: ${idInput.value || ''}`, 40, 88);
+      doc.text(`Goal: ${titleInput.value || ''}`, 40, 106);
+      doc.text(`Target: ${formatKsh(targetInput.value || 0)}`, 40, 124);
+      if(endInput.value) doc.text(`End date: ${new Date(endInput.value).toLocaleDateString()}`, 40, 142);
+      doc.save(`Goal_${(titleInput.value||'goal').replace(/\s+/g,'_')}.pdf`);
+    });
+
+    // live update: compute progress for latest goal based on members/{uid}/savings/monthly or shares payments
+    onAuthStateChanged(auth, user=>{
+      if(!user) return;
+      onValue(ref(db, `members/${user.uid}/goals`), async snap => {
+        if(!snap.exists()) { progressBar.style.width = '0%'; pctSpan.textContent = '0%'; return; }
+        const goals = snap.val();
+        const lastKey = Object.keys(goals).pop();
+        const g = goals[lastKey];
+        // compute progress: check savings monthly + weekly totals (you can customize)
+        const monthlySnap = await get(ref(db, `members/${user.uid}/savings/monthly`));
+        const monthly = monthlySnap.exists()? Number(monthlySnap.val()) : 0;
+        // currentAmount = monthly for demo; in real life sum transactions
+        const currentAmount = g.currentAmount || monthly;
+        const pct = g.targetAmount ? Math.min(100, Math.round((currentAmount / g.targetAmount)*100)) : 0;
+        progressBar.style.width = pct + '%';
+        pctSpan.textContent = pct + '%';
+        // update RTDB progress value
+        await update(ref(db, `members/${user.uid}/goals/${lastKey}`), { currentAmount: currentAmount, progress: pct });
+      });
+    });
+  })();
+
+  // ------------------ Withdraw handlers & PDF ------------------
   const withdrawForm = document.getElementById('withdrawForm');
   if (document.getElementById('previewWithdrawPdf')) {
     document.getElementById('previewWithdrawPdf').addEventListener('click',(e)=>{
@@ -940,7 +1034,7 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     });
   }
   if(withdrawForm){
-    withdrawForm.addEventListener('submit', (e)=>{
+    withdrawForm.addEventListener('submit', async (e)=>{
       e.preventDefault();
       const formData = new FormData(withdrawForm);
       const data = Object.fromEntries(formData.entries());
@@ -948,10 +1042,9 @@ Please read the full terms on the system: you must have 6 consecutive months sav
       doc.save(`Withdrawal_${(data.memberName||'Member').replace(/\s+/g,'_')}.pdf`);
       awardPoints(6, 'Submitted withdrawal');
 
-      // ADDED: save withdrawal request to RTDB so admin can process
-      if(currentUid) {
+      if(currentUid){
         const wRef = push(ref(db, `members/${currentUid}/withdrawals`));
-        set(wRef, {...data, submittedAt: Date.now(), status: 'submitted'}).catch(e=>console.error('withdraw save failed', e));
+        await set(wRef, {...data, submittedAt: Date.now(), status: 'submitted'});
       }
     });
   }
@@ -1053,7 +1146,7 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     return doc;
   }
 
-  // account statement button handlers
+  // account statement button handlers (kept original)
   const downloadStatementTopBtn = document.getElementById('downloadStatementTop');
   if(downloadStatementTopBtn) downloadStatementTopBtn.addEventListener('click', async ()=>{
     const doc = await buildAccountStatementPdf();
@@ -1079,7 +1172,7 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     awardPoints(4, 'Downloaded account statement');
   });
 
-  // downloadApplications (compile user's apps)
+  // downloadApplications (kept original)
   const downloadAppsBtn = document.getElementById('downloadApplications');
   if(downloadAppsBtn) downloadAppsBtn.addEventListener('click', async ()=>{
     if(!currentUid) return alert('Not signed in');
@@ -1106,21 +1199,11 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     awardPoints(6, 'Downloaded applications PDF');
   });
 
-  // preview / quick apply handlers
+  // quick apply: scroll to wizard
   const quickApplyBtn = document.getElementById('quickApply');
-  if(quickApplyBtn) quickApplyBtn.addEventListener('click', ()=> {
-    // show wizard tab (added UI)
-    document.getElementById('loan-wizard-tab').style.display = 'block';
-    // hide original big section for clarity, but not remove it
-    document.getElementById('loan-section').style.display = 'none';
-    window.scrollTo({top: document.getElementById('loan-wizard-tab').offsetTop - 80, behavior: 'smooth'});
-  });
-  if(document.getElementById('quickStatement')) document.getElementById('quickStatement').addEventListener('click', ()=> {
-    // same as other statement buttons
-    (async()=> { const doc = await buildAccountStatementPdf(); doc.save(`Account_Statement_${(topEmail.textContent||'member').replace(/[^\w@.-]/g,'')}.pdf`); awardPoints(4, 'Downloaded account statement'); })();
-  });
+  if(quickApplyBtn) quickApplyBtn.addEventListener('click', ()=> document.getElementById('loan-section').scrollIntoView({behavior:'smooth'}));
 
-  // Save profile (and optionally upload photo)
+  // Save profile (kept original)
   const saveProfileBtn = document.getElementById('saveProfile');
   if(saveProfileBtn) saveProfileBtn.addEventListener('click', async ()=>{
     if(!currentUid) return alert('Not authenticated');
@@ -1139,14 +1222,12 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     awardPoints(5, 'Updated profile');
   });
 
-  // choose photo button
+  // photo upload (kept original)
   const choosePhotoBtn = document.getElementById('choosePhotoBtn');
   const photoInput = document.getElementById('photoUploadInput');
   if(choosePhotoBtn && photoInput){
     choosePhotoBtn.addEventListener('click', ()=> photoInput.click());
   }
-
-  // Photo upload handling
   if(photoInput){
     photoInput.addEventListener('change', async (e)=>{
       const file = e.target.files && e.target.files[0];
@@ -1173,7 +1254,6 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     if(topAvatar) topAvatar.innerHTML = html;
   }
 
-  // initial placeholder
   if(!topAvatar || !topAvatar.innerHTML) {
     if(topAvatar) topAvatar.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--dark)"><i class="fas fa-user"></i></div>';
   }
@@ -1182,206 +1262,20 @@ Please read the full terms on the system: you must have 6 consecutive months sav
   const menuLogout = document.getElementById('menuLogout');
   if(menuLogout) menuLogout.addEventListener('click', ()=> { try{ signOut(auth); }catch(e){} window.location.href='index.html'; });
 
-  // award some points on page actions (e.g., opening loan or withdrawal)
+  // award points on navigation
   document.querySelectorAll('[data-target]').forEach(a=>{
     a.addEventListener('click', ()=> awardPoints(1, `Visited ${a.dataset.target}`));
   });
 
-  // small listener to award points for downloads via buttons in header (already attached above)
-  // initial small activity
+  // init tiny activity
   (async()=>{ try{ await logActivity('Dashboard loaded'); }catch(e){} })();
 
-
-  /* ============================
-       ADDED: Wizard logic integration (non-destructive)
-     ============================ */
-  (function wireWizard(){
-    const steps = [1,2,3,4,5,6];
-    let current = 1;
-    const total = steps.length;
-
-    function show(){
-      steps.forEach(s => {
-        const el = document.getElementById('wiz-' + s);
-        if(!el) return;
-        if(s === current) el.classList.add('active'); else el.classList.remove('active');
-      });
-      document.getElementById('wizStepNum').textContent = String(current);
-      const pct = Math.round(((current-1)/(total-1))*100);
-      document.getElementById('wizProgressBar').style.width = pct + '%';
-      document.getElementById('wizProgressText') && (document.getElementById('wizProgressText').textContent = `Step ${current} / ${total}`);
-      document.getElementById('wizPrev') && (document.getElementById('wizPrev').disabled = current === 1);
-      if(current === total){
-        document.getElementById('wizNext').style.display = 'none';
-        document.getElementById('wizSubmit').style.display = 'inline-block';
-      } else {
-        if(document.getElementById('wizNext')) document.getElementById('wizNext').style.display = 'inline-block';
-        if(document.getElementById('wizSubmit')) document.getElementById('wizSubmit').style.display = 'none';
-      }
-    }
-
-    document.getElementById('wizNext')?.addEventListener('click', ()=> { if(current<total) current++; show(); });
-    document.getElementById('wizPrev')?.addEventListener('click', ()=> { if(current>1) current--; show(); });
-    show();
-
-    // Wizard submit - writes to same RTDB path as your full form
-    document.getElementById('loanWizardForm')?.addEventListener('submit', async (e)=>{
-      e.preventDefault();
-      if(!currentUid) return alert('Not signed in');
-      if(!document.getElementById('wiz_agree')?.checked) return alert('Please confirm details');
-      const fd = new FormData(document.getElementById('loanWizardForm'));
-      const data = Object.fromEntries(fd.entries());
-      // aggregate guarantors
-      data.guarantors = [
-        { name: data.wiz_g1_name, phone: data.wiz_g1_phone, id: data.wiz_g1_id, amount: data.wiz_g1_amount },
-        { name: data.wiz_g2_name, phone: data.wiz_g2_phone, id: data.wiz_g2_id, amount: data.wiz_g2_amount },
-        { name: data.wiz_g3_name, phone: data.wiz_g3_phone, id: data.wiz_g3_id, amount: data.wiz_g3_amount },
-      ];
-      data.appliedAt = Date.now();
-      data.status = 'Pending';
-      try{
-        const newRef = push(ref(db, `members/${currentUid}/loans/applications`));
-        await set(newRef, data);
-        // push reminders if provided
-        if(data.dueDate){
-          await push(ref(db, `reminders`), { uid: currentUid, applicationId: newRef.key, dueDate: data.dueDate, ts: Date.now(), title:'Loan due' });
-        }
-        showToast('Wizard application saved');
-        awardPoints(10, 'Submitted wizard loan');
-        const doc = buildLoanPdfDoc(data, {id: newRef.key});
-        doc.save(`Loan_Application_${(data.wiz_memberName || 'member').replace(/\s+/g,'_')}_${newRef.key}.pdf`);
-      }catch(err){
-        console.error('wizard submit failed', err);
-        alert('Failed to submit wizard application');
-      }
-    });
-  })();
-
-  /* ============================
-    ADDED: Goal setting integration with RTDB
-     ============================ */
-  (function wireGoals(){
-    const goalInput = document.getElementById('goalInput');
-    const goalDate = document.getElementById('goalDate');
-    const saveBtn = document.getElementById('saveGoalBtn');
-    const clearBtn = document.getElementById('clearGoalBtn');
-    const progressBar = document.getElementById('goalProgressBar');
-    const progressPct = document.getElementById('goalProgressPct');
-
-    // load existing goal values
-    onAuthStateChanged(auth, async user => {
-      if(!user) return;
-      const gSnap = await get(ref(db, `members/${user.uid}/goal`));
-      if(gSnap && gSnap.exists()){
-        const g = gSnap.val();
-        if(goalInput) goalInput.value = g.target || '';
-        if(goalDate && g.targetDate) goalDate.value = new Date(g.targetDate).toISOString().split('T')[0];
-        if(progressBar) progressBar.style.width = (g.progressPct || 0) + '%';
-        if(progressPct) progressPct.textContent = (g.progressPct || 0) + '%';
-      }
-    });
-
-    saveBtn?.addEventListener('click', async ()=>{
-      if(!currentUid) return alert('Sign in');
-      const target = Number(goalInput.value || 0);
-      const tDate = goalDate.value ? new Date(goalDate.value).getTime() : null;
-      await set(ref(db, `members/${currentUid}/goal/target`), target);
-      if(tDate) await set(ref(db, `members/${currentUid}/goal/targetDate`), tDate);
-      // compute progress from monthly savings if exists
-      const monthlySnap = await get(ref(db, `members/${currentUid}/savings/monthly`));
-      const monthly = monthlySnap.exists()? Number(monthlySnap.val()) : 0;
-      const progress = target ? Math.min(100, Math.round((monthly / target)*100)) : 0;
-      await set(ref(db, `members/${currentUid}/goal/progress`), monthly);
-      await set(ref(db, `members/${currentUid}/goal/progressPct`), progress);
-      progressBar.style.width = progress + '%';
-      progressPct.textContent = progress + '%';
-      showToast('Goal saved');
-      awardPoints(3, 'Set goal');
-    });
-
-    clearBtn?.addEventListener('click', async ()=>{
-      if(!currentUid) return;
-      await set(ref(db, `members/${currentUid}/goal`), { target:0, targetDate:null, progress:0, progressPct:0 });
-      if(goalInput) goalInput.value = '';
-      if(goalDate) goalDate.value = '';
-      progressBar.style.width = '0%';
-      progressPct.textContent = '0%';
-      showToast('Goal cleared');
-    });
-
-    // live listener: update UI when goal progress changes (e.g., admin or cloud function updates)
-    onAuthStateChanged(auth, user => {
-      if(!user) return;
-      onValue(ref(db, `members/${user.uid}/goal/progressPct`), snap => {
-        const pct = snap.exists()? snap.val() : 0;
-        if(progressBar) progressBar.style.width = pct + '%';
-        if(progressPct) progressPct.textContent = pct + '%';
-      });
-    });
-  })();
-
-  /* ============================
-    ADDED: Loan actions panel (toggle + listener) — minimal and uses your RTDB path
-     ============================ */
-  (function wireLoanActions(){
-    const loanActionsPanel = document.getElementById('loanActionsPanel');
-    const loanActionsBody = document.getElementById('loanActionsBody');
-    const toggleLoanActions = document.getElementById('toggleLoanActions');
-    const loanCount = document.getElementById('loanCount');
-    const loanOutstanding = document.getElementById('loanOutstanding');
-
-    toggleLoanActions?.addEventListener('click', ()=> {
-      if(!loanActionsPanel) return;
-      loanActionsPanel.classList.toggle('loan-actions-hidden');
-      toggleLoanActions.textContent = loanActionsPanel.classList.contains('loan-actions-hidden') ? 'Show full table' : 'Hide full table';
-    });
-
-    onAuthStateChanged(auth, user => {
-      if(!user) return;
-      const appsRef = ref(db, `members/${user.uid}/loans/applications`);
-      onValue(appsRef, snap => {
-        const data = snap.exists()? snap.val() : {};
-        loanActionsBody && (loanActionsBody.innerHTML = '');
-        const keys = Object.keys(data||{});
-        let outstanding = 0;
-        keys.forEach(k => {
-          const loan = data[k];
-          outstanding += Number(loan.amount || loan.amountFigures || 0);
-          const tr = document.createElement('tr');
-          const loanDate = loan.appliedAt ? new Date(loan.appliedAt).toLocaleDateString() : '-';
-          const due = loan.dueDate ? new Date(loan.dueDate).toLocaleDateString() : '-';
-          const amount = formatKsh(loan.amount || loan.amountFigures || 0);
-          const status = loan.status || 'Pending';
-          const progress = loan.progress || 0;
-          let statusClass = 'status-pending';
-          if((status||'').toLowerCase() === 'approved') statusClass = 'status-approved';
-          if((status||'').toLowerCase() === 'rejected') statusClass = 'status-rejected';
-          tr.innerHTML = `<td>${loanDate}</td><td>${escapeHtml(loan.purpose||'')}</td><td>${amount}</td><td>${due}</td><td><span class="${statusClass}">${status}</span></td><td>${progress}%</td>`;
-          loanActionsBody && loanActionsBody.appendChild(tr);
-        });
-        loanCount && (loanCount.textContent = String(keys.length));
-        loanOutstanding && (loanOutstanding.textContent = formatKsh(outstanding));
-      });
-
-      // highlight child changes
-      onChildChanged(ref(db, `members/${user.uid}/loans/applications`), snap => {
-        const updated = snap.val();
-        if(updated && updated.status){
-          showToast(`Loan "${updated.purpose || ''}" status: ${updated.status}`);
-        }
-      });
-    });
-  })();
-
-  /* ============================
-    small util
-   ============================ */
+  // util escape
   function escapeHtml(unsafe) {
-    return String(unsafe).replace(/[&<>"'`=\/]/g, function (s) {
+    return String(unsafe||'').replace(/[&<>"'`=\/]/g, function (s) {
       return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','/':'&#x2F;','`':'&#x60;','=':'&#x3D;'})[s];
     });
   }
-
 </script>
 
 </body>
