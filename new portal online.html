@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Visionary Youth Group 2024 — Home</title>
+
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+            margin: 0;
+            padding: 0
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f8f9fa;
+            color: #222;
+            line-height: 1.5
+        }
+        /* Top bar */
+        
+        .topbar {
+            background: #004d26;
+            color: #fff;
+            padding: 6px 18px;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center
+        }
+        
+        .topbar .left {
+            display: flex;
+            gap: 14px;
+            align-items: center
+        }
+        
+        .topbar a {
+            color: #fff;
+            text-decoration: none;
+            margin-left: 10px
+        }
+        
+        .topbar a:hover {
+            color: #ffcc00
+        }
+        /* Navbar */
+        
+        nav {
+            background: #fff;
+            padding: 14px 28px;
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, .08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center
+        }
+        
+        nav h1 {
+            color: #004d26;
+            font-size: 22px
+        }
+        
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 18px;
+            align-items: center
+        }
+        
+        nav a {
+            color: #222;
+            text-decoration: none;
+            font-weight: 600
+        }
+        
+        nav li {
+            position: relative
+        }
+        
+        nav li ul {
+            position: absolute;
+            top: 36px;
+            left: 0;
+            display: none;
+            background: #fff;
+            padding: 8px;
+            border-radius: 6px;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, .08)
+        }
+        
+        nav li:hover ul {
+            display: block
+        }
+        
+        nav li ul li {
+            white-space: nowrap;
+            padding: 6px 10px
+        }
+        /* Hero */
+        
+        .hero {
+            position: relative;
+            height: 520px;
+            overflow: hidden
+        }
+        
+        .hero img {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 520px;
+            object-fit: cover;
+            opacity: 0;
+            animation: fade 18s infinite
+        }
+        
+        .hero img:nth-child(1) {
+            animation-delay: 0s
+        }
+        
+        .hero img:nth-child(2) {
+            animation-delay: 6s
+        }
+        
+        .hero img:nth-child(3) {
+            animation-delay: 12s
+        }
+        
+        @keyframes fade {
+            0%,
+            15% {
+                opacity: 1
+            }
+            25%,
+            100% {
+                opacity: 0
+            }
+        }
+        
+        .hero .overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(0, 0, 0, .35), rgba(0, 0, 0, .45));
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            text-align: center;
+            padding: 0 20px
+        }
+        
+        .hero h1 {
+            font-size: 40px;
+            margin-bottom: 12px
+        }
+        
+        .hero p {
+            font-size: 18px;
+            margin-bottom: 18px
+        }
+        
+        .hero .cta {
+            display: inline-block;
+            background: #ffcc00;
+            color: #00371a;
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 700
+        }
+        
+        .hero .cta.secondary {
+            background: transparent;
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, .25);
+            margin-left: 10px
+        }
+        /* Container sections */
+        
+        .container {
+            width: 92%;
+            max-width: 1200px;
+            margin: 34px auto
+        }
+        
+        section {
+            background: #fff;
+            border-radius: 10px;
+            padding: 28px;
+            box-shadow: 0 6px 20px rgba(7, 13, 21, .04);
+            margin-bottom: 26px
+        }
+        /* Titles */
+        
+        h2 {
+            color: #004d26;
+            text-align: center;
+            margin-bottom: 14px;
+            font-size: 28px
+        }
+        /* Grid utilities */
+        
+        .grid {
+            display: grid;
+            gap: 18px
+        }
+        
+        .grid-3 {
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr))
+        }
+        
+        .card {
+            background: #fbfbfb;
+            padding: 18px;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform .18s, box-shadow .18s
+        }
+        
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 10px 30px rgba(7, 13, 21, .06)
+        }
+        
+        .card i {
+            font-size: 34px;
+            color: #ffcc00;
+            margin-bottom: 12px
+        }
+        
+        .muted {
+            color: #666;
+            font-size: 15px
+        }
+        /* Bank banner / notice */
+        
+        .banner {
+            background: #004d26;
+            color: #fff;
+            padding: 14px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 700;
+            margin: 12px auto
+        }
+        /* Join / Auth area */
+        
+        #auth .intro {
+            text-align: center;
+            margin-bottom: 18px
+        }
+        
+        .forms {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 22px
+        }
+        
+        .form-box {
+            background: #fbfbfb;
+            padding: 18px;
+            border-radius: 10px
+        }
+        
+        .form-box h3 {
+            color: #004d26;
+            margin-bottom: 12px
+        }
+        
+        .form-box input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px
+        }
+        
+        .btn {
+            display: inline-block;
+            background: #004d26;
+            color: #fff;
+            padding: 10px 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 700;
+            border: none;
+            cursor: pointer
+        }
+        
+        .btn.ghost {
+            background: transparent;
+            border: 1px solid #004d26;
+            color: #004d26
+        }
+        
+        .member-preview {
+            background: #f7fff7;
+            border-left: 4px solid #009a44;
+            padding: 14px;
+            border-radius: 8px;
+            margin-top: 10px
+        }
+        /* Downloads / small UI */
+        
+        .small-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-top: 12px
+        }
+        
+        .small-row button {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            background: #fff;
+            cursor: pointer
+        }
+        
+        .small-note {
+            font-size: 13px;
+            color: #666
+        }
+        /* Testimonials & gallery */
+        
+        .testimonial {
+            background: #fbfbfb;
+            padding: 16px;
+            border-radius: 10px
+        }
+        
+        .gallery img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 10px
+        }
+        /* Footer */
+        
+        footer {
+            background: #004d26;
+            color: #fff;
+            padding: 24px;
+            text-align: center
+        }
+        
+        footer a {
+            color: #ffcc00;
+            text-decoration: none;
+            margin: 0 10px
+        }
+        /* Responsive tweaks */
+        
+        @media (max-width:880px) {
+            .forms {
+                grid-template-columns: 1fr
+            }
+            .hero h1 {
+                font-size: 30px
+            }
+            .hero img {
+                height: 360px
+            }
+            .hero {
+                height: 360px
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Topbar -->
+    <div class="topbar">
+        <div class="left"><i class="fas fa-phone"></i> +254 741 453336 <span style="opacity:.6">|</span> <i class="fas fa-envelope"></i> visionaryyouthgroup32@gmail.com</div>
+        <div class="right">
+            <a href="#" title="facebook"><i class="fab fa-facebook"></i></a>
+            <a href="#" title="twitter"><i class="fab fa-twitter"></i></a>
+            <a href="#" title="instagram"><i class="fab fa-instagram"></i></a>
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav>
+        <h1>Visionary Youth Group</h1>
+        <ul>
+            <li><a href="#about">About</a>
+                <ul>
+                    <li><a href="#vision">Vision & Mission</a></li>
+                    <li><a href="#programs">Programs</a></li>
+                </ul>
+            </li>
+            <li><a href="#benefits">Membership</a>
+                <ul>
+                    <li><a href="#auth">Join / Login</a></li>
+                </ul>
+            </li>
+            <li><a href="#news">News</a></li>
+            <li><a href="#faq">FAQ</a></li>
+            <li><a href="#contact">Contact</a></li>
+            <li><a href="#auth">Join</a></li>
+        </ul>
+    </nav>
+
+    <!-- Hero (Updated with New Online Portal button) -->
+    <div class="hero">
+        <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=1600&auto=format&fit=crop" alt="youth1">
+        <img src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=1600&auto=format&fit=crop" alt="youth2">
+        <img src="https://images.unsplash.com/photo-1605902711622-cfb43c4437b5?q=80&w=1600&auto=format&fit=crop" alt="youth3">
+        <div class="overlay">
+            <h1>Empowering youth through savings, investments & skills</h1>
+            <p>Join Visionary Youth Group — build financial independence with peers</p>
+            <a class="cta" href="#auth">Join Community</a>
+            <a class="cta secondary" href="portal.html" target="_blank">New Online Portal</a>
+        </div>
+    </div>
+
+    <!-- The rest of your page remains unchanged -->
+    <!-- (About, Vision, Programs, Membership, etc...) -->
+
+    <!-- Firebase + App logic, AOS scripts at bottom stay same -->
+    <!-- No changes below this line -->
+
+    <!-- ... (keep all the rest of your code exactly as it is) ... -->
+
+</body>
+
+</html>
