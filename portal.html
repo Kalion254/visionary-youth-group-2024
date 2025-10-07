@@ -214,8 +214,8 @@
 
   <div class="info">
     <h3>About Our Membership</h3>
-    <p><strong>Mean Members</strong> are the core investors responsible for group governance, funding initiatives, and making policy decisions. They enjoy full privileges and voting rights.</p>
-    <p><strong>Ordinary Members</strong> are active contributors in savings, capacity building, and community projects. They access basic benefits and financial education programs.</p>
+    <p><strong>Mean Members</strong> are the core investors responsible for governance, funding initiatives, and decision-making. They enjoy full privileges and voting rights.</p>
+    <p><strong>Ordinary Members</strong> are active contributors in savings, capacity building, and projects. They access benefits and financial education opportunities.</p>
   </div>
 
   <div class="images">
@@ -233,7 +233,7 @@
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-    // --- Firebase Config (same as dashboard) ---
+    // ✅ Correct Firebase Configuration
     const firebaseConfig = {
       apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
       authDomain: "visionary-youth-grou-2024.firebaseapp.com",
@@ -282,10 +282,6 @@
       const confirm = signupForm["confirmPassword"].value.trim();
       const terms = signupForm["terms"].checked;
 
-      if (memberType !== "Mean") {
-        alert("Only 'Mean' members are eligible to register online.");
-        return;
-      }
       if (!terms) return alert("Please agree to the terms and conditions.");
       if (password !== confirm) return alert("Passwords do not match.");
 
@@ -296,7 +292,7 @@
           fullName, idNo, memberNo, memberType, origin, ethnicity, email, phone,
           createdAt: new Date().toISOString()
         });
-        alert("Sign-up successful! Redirecting to dashboard space...");
+        alert("Sign-up successful! Redirecting to dashboard...");
         window.location.href = "dashboard space.html";
       } catch (err) {
         alert("Error: " + err.message);
@@ -311,7 +307,7 @@
       try {
         await signInWithEmailAndPassword(auth, email, password);
         alert("Login successful!");
-        window.location.href = "dashboard.html";
+        window.location.href = "dashboard space.html";
       } catch (err) {
         alert("Login failed: " + err.message);
       }
