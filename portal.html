@@ -2,184 +2,183 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Visionary Youth Group Portal</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
+    * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
     body {
       margin: 0;
-      font-family: "Poppins", sans-serif;
-      background: #f3f6fa;
-      color: #222;
       display: flex;
       height: 100vh;
+      background: #f4f8fb;
+      color: #333;
     }
-
     .left-panel {
       flex: 1;
-      background: url('https://images.unsplash.com/photo-1522205408450-add114ad53fe?q=80&w=1600') center/cover no-repeat;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      background: linear-gradient(135deg, #003366, #0073e6);
       color: #fff;
+      display: flex;
       flex-direction: column;
+      justify-content: center;
+      align-items: center;
       padding: 40px;
-      text-align: center;
     }
-
     .left-panel h1 {
-      font-size: 32px;
+      font-size: 2.2em;
       margin-bottom: 10px;
-      font-weight: 700;
     }
-
     .left-panel p {
-      font-size: 16px;
-      max-width: 420px;
-      opacity: 0.9;
+      max-width: 400px;
+      text-align: center;
+      line-height: 1.6;
     }
-
+    .left-panel img {
+      width: 80%;
+      max-width: 350px;
+      border-radius: 15px;
+      margin-top: 20px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+    }
     .right-panel {
       flex: 1;
       display: flex;
       justify-content: center;
       align-items: center;
       background: #fff;
-      box-shadow: -4px 0 10px rgba(0, 0, 0, 0.05);
+      position: relative;
     }
-
-    .form-box {
-      width: 100%;
+    .form-container {
+      width: 90%;
       max-width: 400px;
-      padding: 40px;
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      transition: all 0.4s ease;
     }
-
-    h2 {
+    .form-container h2 {
       text-align: center;
-      color: #004aad;
       margin-bottom: 20px;
-      font-size: 24px;
+      color: #003366;
     }
-
-    label {
-      font-weight: 600;
-      font-size: 14px;
-      margin-top: 10px;
-      display: block;
+    .form-container form {
+      display: flex;
+      flex-direction: column;
     }
-
-    input, select {
-      width: 100%;
+    .form-container input, .form-container select {
+      margin-bottom: 12px;
       padding: 10px;
-      border-radius: 6px;
       border: 1px solid #ccc;
-      margin-top: 5px;
-    }
-
-    button {
-      width: 100%;
-      padding: 12px;
-      background: #004aad;
-      border: none;
-      color: #fff;
-      font-weight: 600;
-      font-size: 16px;
-      border-radius: 6px;
-      margin-top: 15px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #003580;
-    }
-
-    .switch-link {
-      text-align: center;
-      margin-top: 15px;
+      border-radius: 8px;
       font-size: 14px;
     }
-
-    .switch-link a {
-      color: #004aad;
-      font-weight: 600;
-      text-decoration: none;
+    .form-container label {
+      font-size: 14px;
+      margin-bottom: 5px;
+      color: #003366;
     }
-
-    .switch-link a:hover {
+    .form-container button {
+      background: #003366;
+      color: #fff;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .form-container button:hover {
+      background: #005bb5;
+    }
+    .toggle-link {
+      text-align: center;
+      margin-top: 10px;
+      color: #0073e6;
+      cursor: pointer;
       text-decoration: underline;
+    }
+    .reset-link {
+      font-size: 13px;
+      text-align: right;
+      color: #0073e6;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+    .hidden { display: none; }
+    @media (max-width: 900px) {
+      .left-panel { display: none; }
+      .right-panel { flex: 1; background: #fff; }
     }
   </style>
 </head>
 <body>
   <div class="left-panel">
     <h1>Visionary Youth Group</h1>
-    <p>Empowering youth through savings, investment, and innovation. Join us and shape your future today.</p>
+    <p>Empowering youth through financial growth and community development. Join us to access savings, loans, and share investments. Whether Mean or Ordinary Member, we’re here to build your vision.</p>
+    <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf" alt="Youth Investment" />
   </div>
 
   <div class="right-panel">
-    <div class="form-box">
-      <h2 id="formTitle">Member Sign Up</h2>
-
+    <!-- Sign Up -->
+    <div id="signup-container" class="form-container">
+      <h2>Member Sign Up</h2>
       <form id="signupForm">
         <label>Full Name</label>
         <input type="text" id="fullName" required>
-
         <label>ID Number</label>
         <input type="text" id="idNumber" required>
-
         <label>Member Number</label>
         <input type="text" id="memberNumber" required>
-
-        <label>Member Type</label>
+        <label>Kind of Member</label>
         <select id="memberType" required>
-          <option value="">Select...</option>
-          <option value="Mean">Mean Member</option>
-          <option value="Ordinary">Ordinary Member</option>
+          <option value="">Select</option>
+          <option value="Mean">Mean</option>
+          <option value="Ordinary">Ordinary</option>
         </select>
-
+        <label>Origin</label>
+        <input type="text" id="origin" required>
+        <label>Ethnicity</label>
+        <input type="text" id="ethnicity" required>
         <label>Email</label>
-        <input type="email" id="email" required>
-
+        <input type="email" id="signupEmail" required>
         <label>Phone</label>
         <input type="tel" id="phone" required>
-
         <label>Password</label>
-        <input type="password" id="password" required>
-
+        <input type="password" id="signupPassword" required>
         <label>Confirm Password</label>
         <input type="password" id="confirmPassword" required>
-
-        <button type="submit">Create Account</button>
-        <div class="switch-link">
-          Already registered? <a href="#" id="switchToLogin">Login here</a>
-        </div>
+        <label><input type="checkbox" id="terms" required> I agree to the Terms & Conditions</label>
+        <button type="submit">Sign Up</button>
+        <div class="toggle-link" id="toLogin">Already a member? Login</div>
       </form>
+    </div>
 
-      <form id="loginForm" style="display:none;">
+    <!-- Login -->
+    <div id="login-container" class="form-container hidden">
+      <h2>Member Login</h2>
+      <form id="loginForm">
         <label>Email</label>
         <input type="email" id="loginEmail" required>
-
         <label>Password</label>
         <input type="password" id="loginPassword" required>
-
+        <div class="reset-link" id="forgotPassword">Forgot Password?</div>
         <button type="submit">Login</button>
-        <div class="switch-link">
-          <a href="#" id="resetLink">Forgot Password?</a><br>
-          Not yet a member? <a href="#" id="switchToSignup">Sign Up</a>
-        </div>
+        <div class="toggle-link" id="toSignup">Create an account</div>
       </form>
     </div>
   </div>
 
-  <script type="module">
-    // ---------- Firebase Setup ----------
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js"></script>
 
+  <script>
+    // Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
       authDomain: "visionary-youth-grou-2024.firebaseapp.com",
+      databaseURL: "https://visionary-youth-grou-2024-default-rtdb.firebaseio.com",
       projectId: "visionary-youth-grou-2024",
       storageBucket: "visionary-youth-grou-2024.appspot.com",
       messagingSenderId: "372978592717",
@@ -187,78 +186,76 @@
       measurementId: "G-QP1RBT2ZCP"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getDatabase(app);
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.getAuth(app);
+    const db = firebase.getDatabase(app);
 
-    // ---------- Sign Up ----------
-    const signupForm = document.getElementById("signupForm");
-    signupForm.addEventListener("submit", async (e) => {
+    // UI switching
+    const signupContainer = document.getElementById('signup-container');
+    const loginContainer = document.getElementById('login-container');
+    document.getElementById('toLogin').onclick = () => {
+      signupContainer.classList.add('hidden');
+      loginContainer.classList.remove('hidden');
+    };
+    document.getElementById('toSignup').onclick = () => {
+      loginContainer.classList.add('hidden');
+      signupContainer.classList.remove('hidden');
+    };
+
+    // Sign up
+    document.getElementById('signupForm').addEventListener('submit', async (e) => {
       e.preventDefault();
+      const fullName = fullName.value.trim();
+      const idNumber = idNumber.value.trim();
+      const memberNumber = memberNumber.value.trim();
+      const memberType = memberType.value;
+      const origin = origin.value.trim();
+      const ethnicity = ethnicity.value.trim();
+      const email = signupEmail.value.trim();
+      const phone = phone.value.trim();
+      const password = signupPassword.value;
+      const confirmPassword = confirmPassword.value;
 
-      const fullName = signupForm["fullName"].value.trim();
-      const idNo = signupForm["idNumber"].value.trim();
-      const memberNo = signupForm["memberNumber"].value.trim();
-      const memberType = signupForm["memberType"].value;
-      const email = signupForm["email"].value.trim();
-      const phone = signupForm["phone"].value.trim();
-      const password = signupForm["password"].value.trim();
-      const confirm = signupForm["confirmPassword"].value.trim();
-
-      if (password !== confirm) return alert("Passwords do not match.");
+      if (password !== confirmPassword) return alert("Passwords do not match!");
+      if (memberType !== "Mean") return alert("Only Mean Members can sign up online.");
 
       try {
-        const cred = await createUserWithEmailAndPassword(auth, email, password);
-        const uid = cred.user.uid;
-        await set(ref(db, "members/" + uid), {
-          fullName, idNo, memberNo, memberType, email, phone,
-          joinedAt: new Date().toISOString()
+        const userCred = await firebase.createUserWithEmailAndPassword(auth, email, password);
+        const uid = userCred.user.uid;
+        await firebase.set(firebase.ref(db, "members/" + uid), {
+          fullName, idNumber, memberNumber, memberType, origin, ethnicity, email, phone, joinedAt: new Date().toISOString()
         });
-        alert("Sign-up successful! Redirecting...");
-        window.location.href = "dashboard.html";
+        alert("Signup successful! You can now log in.");
+        signupContainer.classList.add('hidden');
+        loginContainer.classList.remove('hidden');
       } catch (err) {
-        alert("Error: " + err.message);
+        alert(err.message);
       }
     });
 
-    // ---------- Login ----------
-    const loginForm = document.getElementById("loginForm");
-    loginForm.addEventListener("submit", async (e) => {
+    // Login
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const email = loginForm["loginEmail"].value.trim();
-      const password = loginForm["loginPassword"].value.trim();
-
+      const email = loginEmail.value.trim();
+      const password = loginPassword.value;
       try {
-        await signInWithEmailAndPassword(auth, email, password);
-        alert("Login successful!");
-        window.location.href = "dashboard.html";
+        await firebase.signInWithEmailAndPassword(auth, email, password);
+        window.location.href = "dashboard space.html";
       } catch (err) {
-        alert("Login failed: " + err.message);
+        alert(err.message);
       }
     });
 
-    // ---------- Reset Password ----------
-    document.getElementById("resetLink").addEventListener("click", async () => {
-      const email = prompt("Enter your email for password reset:");
+    // Reset password
+    document.getElementById('forgotPassword').onclick = async () => {
+      const email = prompt("Enter your email to reset password:");
       if (!email) return;
       try {
-        await sendPasswordResetEmail(auth, email);
-        alert("Password reset link sent to " + email);
+        await firebase.sendPasswordResetEmail(auth, email);
+        alert("Password reset link sent to your email.");
       } catch (err) {
-        alert("Error: " + err.message);
+        alert(err.message);
       }
-    });
-
-    // ---------- Switch Forms ----------
-    document.getElementById("switchToLogin").onclick = () => {
-      signupForm.style.display = "none";
-      loginForm.style.display = "block";
-      document.getElementById("formTitle").innerText = "Member Login";
-    };
-    document.getElementById("switchToSignup").onclick = () => {
-      signupForm.style.display = "block";
-      loginForm.style.display = "none";
-      document.getElementById("formTitle").innerText = "Member Sign Up";
     };
   </script>
 </body>
