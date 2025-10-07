@@ -1,142 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Visionary Youth Group – Member Portal</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Visionary Youth Group Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
   <style>
     body {
       margin: 0;
-      font-family: 'Poppins', sans-serif;
-      background: #f4f7f6;
+      font-family: "Poppins", sans-serif;
+      background: #f3f6fa;
       color: #222;
       display: flex;
-      flex-direction: column;
-      align-items: center;
+      height: 100vh;
     }
 
-    header {
-      background: #004d26;
-      color: white;
-      width: 100%;
-      padding: 1.5rem;
+    .left-panel {
+      flex: 1;
+      background: url('https://images.unsplash.com/photo-1522205408450-add114ad53fe?q=80&w=1600') center/cover no-repeat;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      flex-direction: column;
+      padding: 40px;
       text-align: center;
     }
 
-    .portal-container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-items: flex-start;
-      margin-top: 2rem;
-      width: 95%;
-      max-width: 1200px;
-      gap: 2rem;
+    .left-panel h1 {
+      font-size: 32px;
+      margin-bottom: 10px;
+      font-weight: 700;
     }
 
-    .form-card {
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.1);
-      padding: 25px;
-      width: 360px;
-      flex-shrink: 0;
+    .left-panel p {
+      font-size: 16px;
+      max-width: 420px;
+      opacity: 0.9;
+    }
+
+    .right-panel {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #fff;
+      box-shadow: -4px 0 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .form-box {
+      width: 100%;
+      max-width: 400px;
+      padding: 40px;
     }
 
     h2 {
       text-align: center;
-      color: #004d26;
-      margin-bottom: 1rem;
+      color: #004aad;
+      margin-bottom: 20px;
+      font-size: 24px;
     }
 
     label {
       font-weight: 600;
       font-size: 14px;
+      margin-top: 10px;
+      display: block;
     }
 
     input, select {
       width: 100%;
       padding: 10px;
-      margin: 6px 0 14px;
-      border: 1px solid #ccc;
       border-radius: 6px;
+      border: 1px solid #ccc;
+      margin-top: 5px;
     }
 
     button {
       width: 100%;
       padding: 12px;
-      background: #004d26;
+      background: #004aad;
       border: none;
-      color: white;
+      color: #fff;
       font-weight: 600;
+      font-size: 16px;
       border-radius: 6px;
+      margin-top: 15px;
       cursor: pointer;
-      transition: 0.3s;
     }
 
     button:hover {
-      background: #007a33;
+      background: #003580;
     }
 
-    .helb-info {
-      background: white;
-      border-radius: 10px;
-      padding: 25px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.1);
-      max-width: 650px;
-      line-height: 1.6;
-    }
-
-    .helb-info h3 {
-      color: #004d26;
-      margin-bottom: 10px;
-    }
-
-    .images {
-      margin-top: 2rem;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 15px;
-      width: 90%;
-      max-width: 1100px;
-    }
-
-    .images img {
-      width: 100%;
-      border-radius: 12px;
-      height: 200px;
-      object-fit: cover;
-    }
-
-    footer {
-      margin-top: 2rem;
-      padding: 1rem;
-      background: #004d26;
-      color: white;
+    .switch-link {
       text-align: center;
-      width: 100%;
+      margin-top: 15px;
+      font-size: 14px;
     }
 
-    a {
-      color: #004d26;
-      text-decoration: none;
+    .switch-link a {
+      color: #004aad;
       font-weight: 600;
+      text-decoration: none;
+    }
+
+    .switch-link a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
-
 <body>
-  <header>
-    <h1>Visionary Youth Group – Member Portal</h1>
-    <p>Empowering youth through financial independence and innovation</p>
-  </header>
+  <div class="left-panel">
+    <h1>Visionary Youth Group</h1>
+    <p>Empowering youth through savings, investment, and innovation. Join us and shape your future today.</p>
+  </div>
 
-  <div class="portal-container">
-    <!-- Sign Up -->
-    <div class="form-card">
-      <h2>Sign Up</h2>
+  <div class="right-panel">
+    <div class="form-box">
+      <h2 id="formTitle">Member Sign Up</h2>
+
       <form id="signupForm">
         <label>Full Name</label>
         <input type="text" id="fullName" required>
@@ -147,40 +130,32 @@
         <label>Member Number</label>
         <input type="text" id="memberNumber" required>
 
-        <label>Type of Member</label>
+        <label>Member Type</label>
         <select id="memberType" required>
           <option value="">Select...</option>
           <option value="Mean">Mean Member</option>
           <option value="Ordinary">Ordinary Member</option>
         </select>
 
-        <label>Origin</label>
-        <input type="text" id="origin" required>
-
-        <label>Ethnicity</label>
-        <input type="text" id="ethnicity" required>
-
         <label>Email</label>
         <input type="email" id="email" required>
 
-        <label>Phone Number</label>
+        <label>Phone</label>
         <input type="tel" id="phone" required>
 
-        <label>Create Password</label>
+        <label>Password</label>
         <input type="password" id="password" required>
 
         <label>Confirm Password</label>
         <input type="password" id="confirmPassword" required>
 
-        <label><input type="checkbox" id="terms" required> I agree to the Terms & Conditions</label>
         <button type="submit">Create Account</button>
+        <div class="switch-link">
+          Already registered? <a href="#" id="switchToLogin">Login here</a>
+        </div>
       </form>
-    </div>
 
-    <!-- Login -->
-    <div class="form-card">
-      <h2>Login</h2>
-      <form id="loginForm">
+      <form id="loginForm" style="display:none;">
         <label>Email</label>
         <input type="email" id="loginEmail" required>
 
@@ -188,43 +163,19 @@
         <input type="password" id="loginPassword" required>
 
         <button type="submit">Login</button>
+        <div class="switch-link">
+          <a href="#" id="resetLink">Forgot Password?</a><br>
+          Not yet a member? <a href="#" id="switchToSignup">Sign Up</a>
+        </div>
       </form>
-      <p style="text-align:center;margin-top:10px;">
-        <a href="#" id="resetLink">Forgot Password?</a>
-      </p>
     </div>
   </div>
 
-  <div class="helb-info">
-    <h3>About Our Membership</h3>
-    <p><strong>Mean Members</strong> lead decision-making, investments, and development projects within the group. They have full access to all financial products and voting rights.</p>
-    <p><strong>Ordinary Members</strong> participate in savings, training, and income-generating activities but have limited policy influence.</p>
-  </div>
-
-  <div class="images">
-    <img src="https://images.unsplash.com/photo-1522205408450-add114ad53fe?q=80&w=1200" alt="Youth empowerment">
-    <img src="https://images.unsplash.com/photo-1605902711622-cfb43c4437b5?q=80&w=1200" alt="Investments">
-    <img src="https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?q=80&w=1200" alt="Sustainability">
-  </div>
-
-  <footer>
-    &copy; 2025 Visionary Youth Group | HELB-Inspired Design | All Rights Reserved
-  </footer>
-
-  <!-- Firebase Auth Logic -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-    import { 
-      getAuth, 
-      createUserWithEmailAndPassword, 
-      signInWithEmailAndPassword, 
-      sendPasswordResetEmail 
-    } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
-    import { 
-      getDatabase, 
-      ref, 
-      set 
-    } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
+    // ---------- Firebase Setup ----------
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
@@ -240,47 +191,43 @@
     const auth = getAuth(app);
     const db = getDatabase(app);
 
-    // ---------------- SIGN UP ----------------
-    document.getElementById("signupForm").addEventListener("submit", async (e) => {
+    // ---------- Sign Up ----------
+    const signupForm = document.getElementById("signupForm");
+    signupForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const fullName = fullNameEl.value.trim();
-      const idNo = idNumber.value.trim();
-      const memberNo = memberNumber.value.trim();
-      const memberType = memberTypeEl.value;
-      const origin = originEl.value.trim();
-      const ethnicity = ethnicityEl.value.trim();
-      const email = emailEl.value.trim();
-      const phone = phoneEl.value.trim();
-      const password = passwordEl.value.trim();
-      const confirm = confirmPassword.value.trim();
-      const terms = termsEl.checked;
 
-      if (memberType !== "Mean") {
-        alert("Only 'Mean' members are currently eligible to register online.");
-        return;
-      }
+      const fullName = signupForm["fullName"].value.trim();
+      const idNo = signupForm["idNumber"].value.trim();
+      const memberNo = signupForm["memberNumber"].value.trim();
+      const memberType = signupForm["memberType"].value;
+      const email = signupForm["email"].value.trim();
+      const phone = signupForm["phone"].value.trim();
+      const password = signupForm["password"].value.trim();
+      const confirm = signupForm["confirmPassword"].value.trim();
 
-      if (!terms) return alert("Please agree to the terms and conditions.");
       if (password !== confirm) return alert("Passwords do not match.");
 
       try {
         const cred = await createUserWithEmailAndPassword(auth, email, password);
-        await set(ref(db, "members/" + cred.user.uid), {
-          fullName, idNo, memberNo, memberType, origin, ethnicity, email, phone,
-          createdAt: new Date().toISOString()
+        const uid = cred.user.uid;
+        await set(ref(db, "members/" + uid), {
+          fullName, idNo, memberNo, memberType, email, phone,
+          joinedAt: new Date().toISOString()
         });
-        alert("Sign-up successful! Redirecting to dashboard...");
+        alert("Sign-up successful! Redirecting...");
         window.location.href = "dashboard.html";
       } catch (err) {
         alert("Error: " + err.message);
       }
     });
 
-    // ---------------- LOGIN ----------------
-    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    // ---------- Login ----------
+    const loginForm = document.getElementById("loginForm");
+    loginForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const email = loginEmail.value.trim();
-      const password = loginPassword.value.trim();
+      const email = loginForm["loginEmail"].value.trim();
+      const password = loginForm["loginPassword"].value.trim();
+
       try {
         await signInWithEmailAndPassword(auth, email, password);
         alert("Login successful!");
@@ -290,9 +237,8 @@
       }
     });
 
-    // ---------------- RESET PASSWORD ----------------
-    document.getElementById("resetLink").addEventListener("click", async (e) => {
-      e.preventDefault();
+    // ---------- Reset Password ----------
+    document.getElementById("resetLink").addEventListener("click", async () => {
       const email = prompt("Enter your email for password reset:");
       if (!email) return;
       try {
@@ -303,18 +249,17 @@
       }
     });
 
-    // Element aliases
-    const fullNameEl = document.getElementById("fullName");
-    const idNumber = document.getElementById("idNumber");
-    const memberNumber = document.getElementById("memberNumber");
-    const memberTypeEl = document.getElementById("memberType");
-    const originEl = document.getElementById("origin");
-    const ethnicityEl = document.getElementById("ethnicity");
-    const emailEl = document.getElementById("email");
-    const phoneEl = document.getElementById("phone");
-    const passwordEl = document.getElementById("password");
-    const confirmPassword = document.getElementById("confirmPassword");
-    const termsEl = document.getElementById("terms");
+    // ---------- Switch Forms ----------
+    document.getElementById("switchToLogin").onclick = () => {
+      signupForm.style.display = "none";
+      loginForm.style.display = "block";
+      document.getElementById("formTitle").innerText = "Member Login";
+    };
+    document.getElementById("switchToSignup").onclick = () => {
+      signupForm.style.display = "block";
+      loginForm.style.display = "none";
+      document.getElementById("formTitle").innerText = "Member Sign Up";
+    };
   </script>
 </body>
 </html>
