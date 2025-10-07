@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Visionary Youth Group — Dashboard</title>
+
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- jsPDF for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+         :root {
+            --green: #004d26;
+            --accent: #ffcc00;
+            --muted: #666;
+            --card-bg: #fff;
+            --page-bg: #f4f7f5;
+        }
+        
+        * {
+            box-sizing: border-box
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--page-bg);
+            margin: 0;
+            color: #222
+        }
+        
+        header {
+            background: var(--green);
+            color: #fff;
+            padding: 18px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center
+        }
+        
+        header h1 {
+            font-size: 20px;
+            margin: 0
+        }
+        
+        header .user {
+            font-size: 14px;
+            opacity: .95
+        }
+        
+        .container {
+            width: 94%;
+            max-width: 1200px;
+            margin: 26px auto;
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: 20px;
+            align-items: start
+        }
+        /* Left column */
+        
+        .main-col {
+            display: flex;
+            flex-direction: column;
+            gap: 18px
+        }
+        
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px
+        }
+        
+        .card {
+            background: var(--card-bg);
+            padding: 16px;
+            border-radius: 10px;
+            box-shadow: 0 6px 18px rgba(7, 13, 21, .06)
+        }
+        
+        .card h3 {
+            margin: 0;
+            color: var(--green);
+            font-size: 14px
+        }
+        
+        .card .value {
+            font-weight: 700;
+            font-size: 20px;
+            margin-top: 8px
+        }
+        
+        .small {
+            color: var(--muted);
+            font-size: 13px;
+            margin-top: 6px
+        }
+        /* Loan wizard & action */
+        
+        .panel {
+            background: var(--card-bg);
+            padding: 16px;
+            border-radius: 10px;
+            box-shadow: 0 6px 18px rgba(7, 13, 21, .06)
+        }
+        
+        .wizard-steps {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap
+        }
+        
+        .step-pill {
+            padding: 8px 10px;
+            border-radius: 8px;
+            background: #f2f6f3;
+            color: #333;
+            font-weight: 600;
+            font-size: 13px
+        }
+        
+        .wizard-body {
+            margin-top: 8px
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 10px
+        }
+        
+        .form-row .col {
+            flex: 1
+        }
+        
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-top: 8px
+        }
+        
+        button.btn {
+            background: var(--green);
+            color: #fff;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 700
+        }
+        
+        button.ghost {
+            background: transparent;
+            border: 1px solid var(--green);
+            color: var(--green)
+        }
+        
+        .actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px
+        }
+        /* Right column */
+        
+        .side-col {
+            display: flex;
+            flex-direction: column;
+            gap: 18px
+        }
+        
+        .profile {
+            background: var(--card-bg);
+            padding: 16px;
+            border-radius: 10px;
+            box-shadow: 0 6px 18px rgba(7, 13, 21, .06);
+            text-align: center
+        }
+        
+        .profile .email {
+            font-weight: 700;
+            color: var(--green)
+        }
+        
+        .loan-action-bar {
+            background: linear-gradient(90deg, #fff, #f8fff8);
+            padding: 8px;
+            border-radius: 8px
+        }
+        
+        .loan-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 8px;
+            border-bottom: 1px dashed #eee
+        }
+        
+        .loan-row:last-child {
+            border-bottom: none
+        }
+        
+        .muted {
+            color: var(--muted);
+            font-size: 13px
+        }
+        /* Goals */
+        
+        .goal {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px
+        }
+        
+        .progress {
+            height: 12px;
+            background: #eef6ee;
+            border-radius: 8px;
+            overflow: hidden;
+            width: 60%
+        }
+        
+        .progress>i {
+            display: block;
+            height: 100%;
+            background: var(--green);
+            width: 0%
+        }
+        /* Statement / downloads */
+        
+        .row {
+            display: flex;
+            gap: 8px;
+            align-items: center
+        }
+        
+        .small-note {
+            font-size: 13px;
+            color: var(--muted)
+        }
+        
+        @media (max-width:980px) {
+            .container {
+                grid-template-columns: 1fr;
+                padding: 12px;
+            }
+            .side-col {
+                order: 2
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>Visionary Youth Group — Member Dashboard</h1>
+        <div class="user">
+            <span id="userEmail">—</span>
+            <button id="signOutBtn" class="btn ghost" style="margin-left:12px">Sign out</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- main column -->
+        <div class="main-col">
+
+            <!-- balance cards -->
+            <div class="cards">
+                <div class="card">
+                    <h3>Monthly Saving</h3>
+                    <div class="value" id="monthlySaving">Ksh 0</div>
+                    <div class="small">Target: Ksh <span id="monthlyTarget">1000</span> / month</div>
+                </div>
+
+                <div class="card">
+                    <h3>Weekly Saving</h3>
+                    <div class="value" id="weeklySaving">Ksh 0</div>
+                    <div class="small">Weekly contributions</div>
+                </div>
+
+                <div class="card">
+                    <h3>Shares Dividends</h3>
+                    <div class="value" id="sharesDividends">Ksh 0</div>
+                    <div class="small">Earnings from group shares</div>
+                </div>
+
+                <div class="card">
+                    <h3>Outstanding Loans</h3>
+                    <div class="value" id="outstandingLoans">Ksh 0</div>
+                    <div class="small">Active loan principal</div>
+                </div>
+
+                <div class="card">
+                    <h3>Unpaid Balances</h3>
+                    <div class="value" id="unpaidBalances">Ksh 0</div>
+                    <div class="small">Late or overdue amounts</div>
+                </div>
+
+                <div class="card">
+                    <h3>Loan Limit</h3>
+                    <div class="value" id="loanLimit">Ksh 0</div>
+                    <div class="small">Based on monthly saving</div>
+                </div>
+            </div>
+
+            <!-- Goals & Targets -->
+            <div class="panel" id="goalsPanel">
+                <h3 style="margin:0;color:var(--green)">Goals & Targets</h3>
+                <p class="muted">Set a saving goal and track progress. Progress updates from your RTDB savings entries.</p>
+
+                <div style="display:flex;gap:12px;margin-top:10px;flex-wrap:wrap">
+                    <input id="goalTitle" placeholder="Goal title (e.g., Buy laptop)" style="flex:1;min-width:180px">
+                    <input id="goalTarget" placeholder="Target amount Ksh" type="number" style="width:160px">
+                    <button id="saveGoalBtn" class="btn">Save Goal</button>
+                </div>
+
+                <div id="goalsList" style="margin-top:12px"></div>
+            </div>
+
+            <!-- Loan Application Wizard -->
+            <div class="panel" id="loanPanel">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                    <h3 style="margin:0;color:var(--green)">Loan Application</h3>
+                    <div class="muted">Wizard — complete all steps</div>
+                </div>
+
+                <div class="wizard-steps" style="margin-top:10px">
+                    <span class="step-pill">1. Details</span>
+                    <span class="step-pill">2. Terms</span>
+                    <span class="step-pill">3. Review & Submit</span>
+                </div>
+
+                <div class="wizard-body">
+                    <form id="loanWizard">
+                        <!-- Step 1 -->
+                        <div class="step" data-step="1">
+                            <label>Loan Amount (Ksh)</label>
+                            <input type="number" id="loanAmount" required>
+
+                            <div class="form-row">
+                                <div class="col">
+                                    <label>Tenure (months)</label>
+                                    <input type="number" id="loanTenure" required>
+                                </div>
+                                <div class="col">
+                                    <label>Purpose</label>
+                                    <input id="loanPurpose" placeholder="e.g., Stock, capital" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 2 -->
+                        <div class="step" data-step="2" style="display:none;margin-top:10px">
+                            <label>Collateral / Security (optional)</label>
+                            <input id="loanCollateral">
+
+                            <label>Repayment plan summary</label>
+                            <textarea id="loanSummary" rows="3" placeholder="How will you repay?" required></textarea>
+                        </div>
+
+                        <!-- Step 3 -->
+                        <div class="step" data-step="3" style="display:none;margin-top:10px">
+                            <h4>Review</h4>
+                            <div class="muted">Check details before submitting</div>
+                            <div style="margin-top:8px">
+                                <div><strong>Amount:</strong> Ksh <span id="revAmount"></span></div>
+                                <div><strong>Tenure:</strong> <span id="revTenure"></span> months</div>
+                                <div><strong>Purpose:</strong> <span id="revPurpose"></span></div>
+                                <div><strong>Plan:</strong> <span id="revPlan"></span></div>
+                            </div>
+                        </div>
+
+                        <div class="actions">
+                            <button type="button" id="prevStep" class="btn ghost" style="display:none">Back</button>
+                            <button type="button" id="nextStep" class="btn">Next</button>
+                            <button type="button" id="submitLoan" class="btn" style="display:none">Submit Application</button>
+                            <button type="button" id="downloadLoanPdf" class="btn ghost" style="display:none">Download PDF</button>
+                        </div>
+                    </form>
+
+                    <div style="margin-top:12px" class="muted">Your loan status will appear in the action bar once applied.</div>
+                </div>
+            </div>
+
+            <!-- Statement / Downloads -->
+            <div class="panel">
+                <h3 style="margin:0;color:var(--green)">Account Statement</h3>
+                <p class="muted">Download your statement (CSV) showing transactions, loans, and balances.</p>
+                <div style="display:flex;gap:8px;margin-top:10px">
+                    <button id="downloadStatementBtn" class="btn">Download Statement (CSV)</button>
+                    <button id="refreshBtn" class="btn ghost">Refresh</button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- side column -->
+        <div class="side-col">
+            <div class="profile">
+                <div style="font-size:13px;color:var(--muted)">Signed in as</div>
+                <div class="email" id="profileEmail">—</div>
+                <div style="margin-top:8px" class="muted">Member Dashboard — Live data from RTDB</div>
+            </div>
+
+            <div class="panel">
+                <h3 style="margin:0;color:var(--green)">Loan Action Bar</h3>
+                <div class="loan-action-bar" id="loanActionBar" style="margin-top:8px">
+                    <!-- loan rows appended here -->
+                    <div class="muted" id="noLoansNote">No loan applications yet.</div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h3 style="margin:0;color:var(--green)">Quick Info</h3>
+                <p class="muted" style="margin-top:8px">Loan limit is determined by your monthly savings. Increase monthly saving to raise your max allowed loan. All balances update from RTDB.</p>
+                <div style="margin-top:12px">
+                    <div class="row">
+                        <div class="small-note">Last sync:</div>
+                        <div id="lastSync" class="small-note" style="margin-left:8px">—</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase & App Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"; import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"; import { getDatabase, ref, onValue, set, push,
+        update, get, child, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js"; // ===== REPLACE with your real Firebase project config ===== const firebaseConfig = { apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
+        authDomain: "visionary-youth-grou-2024.firebaseapp.com", databaseURL: "https://visionary-youth-grou-2024-default-rtdb.firebaseio.com", // put your RTDB url projectId: "visionary-youth-grou-2024", storageBucket: "visionary-youth-grou-2024.appspot.com",
+        messagingSenderId: "372978592717", appId: "1:372978592717:web:1c15aec728ee5f854f3284" }; // ========================================================= const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getDatabase(app);
+        // UI elements const userEmailEl = document.getElementById('userEmail'); const profileEmailEl = document.getElementById('profileEmail'); const signOutBtn = document.getElementById('signOutBtn'); const monthlySavingEl = document.getElementById('monthlySaving');
+        const weeklySavingEl = document.getElementById('weeklySaving'); const sharesDividendsEl = document.getElementById('sharesDividends'); const outstandingLoansEl = document.getElementById('outstandingLoans'); const unpaidBalancesEl = document.getElementById('unpaidBalances');
+        const loanLimitEl = document.getElementById('loanLimit'); const lastSyncEl = document.getElementById('lastSync'); const downloadStatementBtn = document.getElementById('downloadStatementBtn'); const refreshBtn = document.getElementById('refreshBtn');
+        // Goals const goalTitle = document.getElementById('goalTitle'); const goalTarget = document.getElementById('goalTarget'); const saveGoalBtn = document.getElementById('saveGoalBtn'); const goalsList = document.getElementById('goalsList'); // Loan
+        wizard elements const loanWizard = document.getElementById('loanWizard'); const steps = Array.from(document.querySelectorAll('.step')); let currentStep = 1; const prevStepBtn = document.getElementById('prevStep'); const nextStepBtn = document.getElementById('nextStep');
+        const submitLoanBtn = document.getElementById('submitLoan'); const downloadLoanPdfBtn = document.getElementById('downloadLoanPdf'); const revAmount = document.getElementById('revAmount'); const revTenure = document.getElementById('revTenure');
+        const revPurpose = document.getElementById('revPurpose'); const revPlan = document.getElementById('revPlan'); const loanActionBar = document.getElementById('loanActionBar'); const noLoansNote = document.getElementById('noLoansNote'); // Helpers
+        function showStep(n){ steps.forEach(s => s.style.display = s.dataset.step == n ? 'block':'none'); prevStepBtn.style.display = (n===1) ? 'none':'inline-block'; nextStepBtn.style.display = (n===3) ? 'none':'inline-block'; submitLoanBtn.style.display
+        = (n===3) ? 'inline-block':'none'; } function formatKsh(n){ return `Ksh ${Number(n||0).toLocaleString()}`; } // Authentication + RTDB listeners let currentUid = null; onAuthStateChanged(auth, user => { if (!user) { // redirect to portal login
+        window.location.href = "portal.html"; return; } currentUid = user.uid; userEmailEl.textContent = user.email; profileEmailEl.textContent = user.email; // attach RTDB listeners for balances, loans, goals const baseRef = ref(db, `members/${currentUid}`);
+        // listen to balances node — assumed structure: members/{uid}/balances/{monthly,weekly,shares,outstanding,unpaid} onValue(ref(db, `members/${currentUid}/balances`), snap => { const val = snap.exists() ? snap.val() : {}; monthlySavingEl.textContent
+        = formatKsh(val.monthlySaving ?? 0); weeklySavingEl.textContent = formatKsh(val.weeklySaving ?? 0); sharesDividendsEl.textContent = formatKsh(val.sharesDividends ?? 0); outstandingLoansEl.textContent = formatKsh(val.outstandingLoans ?? 0); unpaidBalancesEl.textContent
+        = formatKsh(val.unpaidBalances ?? 0); // compute loan limit const monthly = Number(val.monthlySaving ?? 0); let limit = 0; if (monthly >= 2000) limit = 1000; else if (monthly >= 1000) limit = 500; else limit = 0; loanLimitEl.textContent = formatKsh(limit);
+        // persist back loanLimit to RTDB (so server-side visibility) set(ref(db, `members/${currentUid}/loanLimit`), limit).catch(console.error); lastSyncEl.textContent = new Date().toLocaleString(); }); // Loans list onValue(ref(db, `members/${currentUid}/loans`),
+        snap => { loanActionBar.innerHTML = ''; if (!snap.exists()) { loanActionBar.appendChild(noLoansNote); return; } const loans = snap.val(); const entries = Object.keys(loans).map(k => ({id:k, ...loans[k]})).sort((a,b)=> b.createdAt - a.createdAt);
+        entries.forEach(l => { const row = document.createElement('div'); row.className = 'loan-row'; row.innerHTML = `
+        <div style="max-width:65%">
+            <div style="font-weight:700">Ksh ${Number(l.amount).toLocaleString()}</div>
+            <div class="muted" style="font-size:13px">${new Date(l.createdAt).toLocaleDateString()} • ${l.purpose}</div>
+        </div>
+        <div style="text-align:right">
+            <div style="font-weight:700;color:${l.status==='approved'?'#008000': l.status==='rejected'?'#cc0000':'#004d26'}">${l.status}</div>
+            <div class="muted" style="font-size:13px">${l.tenure}m</div>
+        </div>
+        `; loanActionBar.appendChild(row); }); }); // Goals onValue(ref(db, `members/${currentUid}/goals`), snap => { goalsList.innerHTML = ''; if (!snap.exists()) { goalsList.innerHTML = `
+        <div class="muted">No goals set yet.</div>`; return; } const goals = snap.val(); Object.keys(goals).forEach(k => { const g = goals[k]; const wrapper = document.createElement('div'); wrapper.className = 'goal'; const pct = Math.min(100, Math.round((Number(g.progress||0)
+        / Number(g.target||1)) * 100)); wrapper.innerHTML = `
+        <div style="flex:1">
+            <div style="font-weight:700">${g.title}</div>
+            <div class="small">${formatKsh(g.progress)} / ${formatKsh(g.target)}</div>
+        </div>
+        <div style="width:40%">
+            <div class="progress"><i style="width:${pct}%"></i></div>
+            <div class="small muted">${pct}%</div>
+        </div>
+        `; goalsList.appendChild(wrapper); }); }); }); // SIGN OUT signOutBtn.addEventListener('click', async () => { await signOut(auth); window.location.href = "portal.html"; }); // Refresh (manual) refreshBtn.addEventListener('click', () => location.reload());
+        // Download statement CSV downloadStatementBtn.addEventListener('click', async () => { if (!currentUid) return alert("Not signed in."); try { // fetch transactions node (assumed members/{uid}/transactions) const snap = await get(ref(db, `members/${currentUid}/transactions`));
+        const rows = [["Date","Description","Debit","Credit","Balance"]]; if (snap.exists()) { const tx = snap.val(); Object.values(tx).forEach(t => { rows.push([ t.date || "", (t.description || "").replace(/,/g," "), t.debit ?? "", t.credit ?? "", t.balance
+        ?? "" ]); }); } else { rows.push([new Date().toISOString().slice(0,10), "Opening Balance", "", "", "0"]); } const csv = rows.map(r => r.join(",")).join("\n"); const url = URL.createObjectURL(new Blob([csv], {type:"text/csv"})); const a = document.createElement('a');
+        a.href = url; a.download = "statement.csv"; a.click(); URL.revokeObjectURL(url); } catch (err) { alert("Failed to create statement: " + err.message); } }); // Goals saving saveGoalBtn.addEventListener('click', async () => { if (!currentUid) return
+        alert("Not signed in."); const title = goalTitle.value.trim(); const target = Number(goalTarget.value || 0); if (!title || !target) return alert("Provide goal title and target amount."); try { const newGoalRef = push(ref(db, `members/${currentUid}/goals`));
+        await set(newGoalRef, { title, target, progress: 0, createdAt: Date.now() }); goalTitle.value = ""; goalTarget.value = ""; } catch (err) { alert("Failed to save goal: " + err.message); } }); // ===== Loan wizard logic ===== showStep(currentStep);
+        nextStepBtn.addEventListener('click', () => { if (currentStep === 1) { const amt = document.getElementById('loanAmount').value; const tenure = document.getElementById('loanTenure').value; const purpose = document.getElementById('loanPurpose').value.trim();
+        if (!amt || !tenure || !purpose) return alert("Fill amount, tenure and purpose."); // preview values revAmount.textContent = Number(amt).toLocaleString(); revTenure.textContent = tenure; revPurpose.textContent = purpose; } if (currentStep
+        < 3) currentStep++; showStep(currentStep); }); prevStepBtn.addEventListener( 'click', ()=> { if (currentStep > 1) currentStep--; showStep(currentStep); }); submitLoanBtn.addEventListener('click', async () => { if (!currentUid) return alert("Not signed in."); // collect data const amount = Number(document.getElementById('loanAmount').value);
+            const tenure = Number(document.getElementById('loanTenure').value); const purpose = document.getElementById('loanPurpose').value.trim(); const collateral = document.getElementById('loanCollateral').value.trim(); const summary = document.getElementById('loanSummary').value.trim();
+            // check loan limit in RTDB const limitSnap = await get(ref(db, `members/${currentUid}/loanLimit`)); const limit = limitSnap.exists() ? Number(limitSnap.val()) : 0; if (amount > limit) { if (!confirm(`Requested amount Ksh ${amount} exceeds
+            your current loan limit Ksh ${limit}. Submit anyway?`)) return; } try { const loanRef = push(ref(db, `members/${currentUid}/loans`)); const loanData = { amount, tenure, purpose, collateral, summary, status: 'pending', createdAt: Date.now()
+            }; await set(loanRef, loanData); alert("Loan application submitted successfully."); // show pdf download button downloadLoanPdfBtn.style.display = 'inline-block'; // set this loan id on button dataset for pdf generator downloadLoanPdfBtn.dataset.loanId
+            = loanRef.key; // clear form loanWizard.reset(); currentStep = 1; showStep(currentStep); } catch (err) { alert("Failed to submit loan: " + err.message); } }); // PDF generation for last submitted loan or selected loan downloadLoanPdfBtn.addEventListener('click',
+            async () => { const loanId = downloadLoanPdfBtn.dataset.loanId; if (!loanId) return alert("No loan to generate PDF for."); try { const snap = await get(ref(db, `members/${currentUid}/loans/${loanId}`)); if (!snap.exists()) return alert("Loan
+            not found."); const l = snap.val(); // generate pdf using jsPDF const { jsPDF } = window.jspdf; const doc = new jsPDF(); doc.setFontSize(16); doc.text("Visionary Youth Group — Loan Application", 14, 20); doc.setFontSize(11); doc.text(`Member:
+            ${profileEmailEl.textContent}`, 14, 34); doc.text(`Date: ${new Date(l.createdAt).toLocaleString()}`, 14, 42); doc.text(`Amount: Ksh ${Number(l.amount).toLocaleString()}`, 14, 52); doc.text(`Tenure: ${l.tenure} months`, 14, 60); doc.text(`Purpose:
+            ${l.purpose}`, 14, 68); doc.text("Repayment Plan:", 14, 78); doc.text((l.summary || "").slice(0, 300), 14, 86, { maxWidth: 180 }); doc.text("Status: " + (l.status || "pending"), 14, 140); doc.save(`loan_${loanId}.pdf`); } catch (err) { alert("PDF
+            generation failed: " + err.message); } }); // initial showStep call already made — hide PDF button until a loan exists downloadLoanPdfBtn.style.display = 'none'; // Optionally, allow clicking action rows to download PDF of specific loan loanActionBar.addEventListener('click',
+            async (e) => { const row = e.target.closest('.loan-row'); if (!row) return; // no direct id stored — we could implement clickable feature later to map id }); // Utility: update a sample balances node if it doesn't exist (for demonstration
+            only) // Comment out in production if you have real data async function ensureBalancesExist(){ if (!currentUid) return; const snap = await get(ref(db, `members/${currentUid}/balances`)); if (!snap.exists()){ await set(ref(db, `members/${currentUid}/balances`),
+            { monthlySaving: 0, weeklySaving: 0, sharesDividends: 0, outstandingLoans: 0, unpaidBalances: 0 }); } } // when signed in, ensure balances exist onAuthStateChanged(auth, user => { if (user) ensureBalancesExist(); }); // Optional: automatic
+            loanLimit update when monthlySaving changes already handled above by computing and writing loanLimit. // End of module script
+    </script>
+</body>
+
+</html>
