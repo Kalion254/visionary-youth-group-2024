@@ -3,359 +3,1028 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Visionary Youth Group — Member Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <title>Visionary Youth Group — Member Dashboard (SEKU)</title>
+
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- jsPDF for PDF generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      margin: 0;
-      background: #f1f3f6;
-      color: #333;
-      display: flex;
-      min-height: 100vh;
+    :root{
+      --green:#005826;
+      --green-2:#00793a;
+      --gold:#ffcc00;
+      --muted:#6b6b6b;
+      --card-bg:#ffffff;
+      --page-bg:#f3f6f5;
     }
-    /* Sidebar */
-    .sidebar {
-      width: 250px;
-      background: #004d26;
-      color: #fff;
-      flex-shrink: 0;
-      display: flex;
-      flex-direction: column;
-      transition: all .3s;
-    }
-    .sidebar.hidden { width: 70px; }
-    .sidebar h2 {
-      text-align: center;
-      padding: 20px;
-      font-size: 18px;
-      border-bottom: 1px solid rgba(255,255,255,.2);
-    }
-    .sidebar ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-    .sidebar ul li {
-      padding: 14px 20px;
-      cursor: pointer;
-      border-bottom: 1px solid rgba(255,255,255,.1);
-    }
-    .sidebar ul li:hover {
-      background: #006d37;
-    }
-    .sidebar ul li i {
-      margin-right: 10px;
-    }
-    .toggle-btn {
-      background: #004d26;
-      color: #fff;
-      padding: 10px;
-      text-align: center;
-      cursor: pointer;
-    }
+    *{box-sizing:border-box}
+    body{font-family:'Poppins',sans-serif;background:var(--page-bg);margin:0;color:#123}
 
-    /* Main content */
-    .main {
-      flex-grow: 1;
-      padding: 20px;
-    }
-    header {
-      background: #fff;
-      padding: 15px 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-      margin-bottom: 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    header .member-info h3 {
-      margin: 0;
-      color: #004d26;
-    }
-    header .member-info small {
-      color: #555;
-    }
+    /* Topbar */
+    .topbar{background:linear-gradient(90deg,var(--green),var(--green-2));color:#fff;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:0;z-index:40}
+    .brand{display:flex;align-items:center;gap:10px}
+    .brand img{height:36px;width:36px;border-radius:6px;background:#fff;padding:4px}
+    .brand h1{font-size:18px;margin:0;font-weight:700}
+    .top-right{display:flex;align-items:center;gap:12px}
+    .profile-mini{display:flex;flex-direction:column;align-items:flex-end;font-size:13px}
+    .points{background:rgba(255,255,255,0.12);padding:6px 10px;border-radius:20px;font-weight:700}
 
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 15px;
-      margin-bottom: 30px;
-    }
-    .card {
-      background: #fff;
-      border-radius: 10px;
-      padding: 20px;
-      text-align: center;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-    .card h4 { color: #004d26; margin-bottom: 5px; }
-    .card p { font-size: 20px; font-weight: 600; }
+    /* Layout */
+    .layout{display:flex;min-height:calc(100vh - 72px)}
+    aside.sidebar{width:260px;background:var(--card-bg);box-shadow:0 6px 16px rgba(0,0,0,0.08);padding:18px;border-right:1px solid #eee}
+    .sidebar .menu{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
+    .sidebar a{display:flex;gap:12px;align-items:center;padding:10px;border-radius:8px;color:#123;text-decoration:none;font-weight:600}
+    .sidebar a:hover{background:#f1fbf5;color:var(--green)}
+    .sidebar .small{font-size:12px;color:var(--muted);padding:6px 0}
 
-    section {
-      background: #fff;
-      border-radius: 10px;
-      padding: 20px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-      margin-bottom: 25px;
-    }
-    section h3 {
-      color: #004d26;
-      margin-bottom: 10px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
-    table, th, td {
-      border: 1px solid #ddd;
-    }
-    th, td {
-      padding: 10px;
-      text-align: center;
-      font-size: 14px;
-    }
-    th {
-      background: #004d26;
-      color: #fff;
-    }
-    .download-btn {
-      background: #004d26;
-      color: #fff;
-      padding: 10px 16px;
-      border: none;
-      border-radius: 6px;
-      float: right;
-      cursor: pointer;
-      font-weight: 600;
-    }
-    .profile-form label, .loan-form label {
-      display: block;
-      margin-top: 10px;
-      font-weight: 500;
-    }
-    .profile-form input, .loan-form input, .loan-form select {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      margin-top: 5px;
-    }
-    .submit-btn {
-      background: #004d26;
-      color: #fff;
-      border: none;
-      padding: 10px 14px;
-      margin-top: 15px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    footer {
-      text-align: center;
-      padding: 15px;
-      color: #666;
-      font-size: 14px;
+    main.content{flex:1;padding:22px 28px}
+
+    /* Header row inside content */
+    .content-header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}
+    .welcome{font-size:18px;font-weight:700}
+    .member-meta{font-size:13px;color:var(--muted)}
+
+    /* Cards */
+    .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:18px}
+    .card{background:var(--card-bg);padding:14px;border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,0.04);display:flex;flex-direction:column;gap:10px}
+    .card .icon{font-size:20px;padding:10px;border-radius:10px;width:44px;height:44px;display:flex;align-items:center;justify-content:center}
+    .card h4{margin:0;font-size:13px;color:var(--muted)}
+    .card .value{font-size:20px;font-weight:700}
+
+    .card .icon.savings{background:linear-gradient(180deg,var(--green),var(--green-2));color:#fff}
+    .card .icon.shares{background:linear-gradient(180deg,#b08900,#ffcc00);color:#fff}
+    .card .icon.loans{background:linear-gradient(180deg,#9c2a2a,#d9534f);color:#fff}
+    .card .icon.unpaid{background:linear-gradient(180deg,#6b6b6b,#9a9a9a);color:#fff}
+
+    /* Action bar (loan) */
+    .action-bar{background:linear-gradient(90deg,#fff,#fbfff9);padding:12px;border-radius:10px;border:1px solid #eee;margin-bottom:18px}
+    .action-list{display:flex;flex-direction:column;gap:10px}
+    .action-item{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:8px;border-radius:8px;background:linear-gradient(180deg,#fff,#fafaf9);box-shadow:0 4px 10px rgba(0,0,0,0.03)}
+    .status-pill{padding:6px 10px;border-radius:20px;font-weight:700;font-size:12px}
+
+    .status-pending{background:#fff3cd;color:#7a5b00}
+    .status-approved{background:#d1fae5;color:#036635}
+    .status-declined{background:#ffdede;color:#7a1a1a}
+
+    /* Statement area */
+    .statement{background:var(--card-bg);padding:14px;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,0.04);margin-bottom:18px}
+    .statement table{width:100%;border-collapse:collapse;font-size:13px}
+    .statement th, .statement td{padding:8px;text-align:left;border-bottom:1px solid #f0f0f0}
+    .statement thead th{font-weight:700;color:var(--muted)}
+    .statement .hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+
+    /* Loan wizard */
+    .wizard{background:var(--card-bg);padding:14px;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,0.04)}
+    .wizard .steps{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+    .wizard .step{background:#f3f6f5;padding:8px 10px;border-radius:8px;font-weight:700;color:var(--muted)}
+    .wizard form{display:grid;gap:10px}
+    .wizard label{font-size:13px;font-weight:700;color:var(--muted)}
+    .wizard input, .wizard select, .wizard textarea{padding:10px;border-radius:8px;border:1px solid #e6e6e6;font-size:14px}
+    .wizard .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
+
+    /* Profile */
+    .profile{background:var(--card-bg);padding:14px;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,0.04);margin-bottom:18px}
+    .profile .row{display:flex;gap:12px;flex-wrap:wrap}
+
+    /* Utilities */
+    .muted{color:var(--muted)}
+    .btn{background:var(--green);color:#fff;padding:10px 14px;border-radius:10px;border:none;cursor:pointer;font-weight:700}
+    .btn.ghost{background:transparent;border:1px solid var(--green);color:var(--green)}
+    .small{font-size:12px;color:var(--muted)}
+    .hide{display:none}
+
+    /* Responsive */
+    @media (max-width:900px){
+      aside.sidebar{display:none}
+      .layout{flex-direction:column}
     }
   </style>
 </head>
 <body>
-  <div class="sidebar" id="sidebar">
-    <div class="toggle-btn" onclick="toggleMenu()">☰</div>
-    <h2>Menu</h2>
-    <ul>
-      <li onclick="showSection('overview')"><i class="fas fa-home"></i> Dashboard</li>
-      <li onclick="showSection('statement')"><i class="fas fa-file-invoice"></i> Account Statement</li>
-      <li onclick="showSection('loan')"><i class="fas fa-hand-holding-usd"></i> Apply Loan</li>
-      <li onclick="showSection('profile')"><i class="fas fa-user"></i> Profile</li>
-      <li onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> Logout</li>
-    </ul>
-  </div>
-
-  <div class="main">
-    <header>
-      <div class="member-info">
-        <h3 id="memberName">Loading...</h3>
-        <small id="memberDetails"></small>
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="brand">
+      <img src="https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?q=80&w=800&auto=format&fit=crop" alt="logo">
+      <div>
+        <h1>Visionary Youth Group</h1>
+        <div class="small">Member Portal — SEKU Theme</div>
       </div>
-    </header>
-
-    <div id="overview" class="section">
-      <div class="cards">
-        <div class="card"><h4>Monthly Savings</h4><p id="monthlySavings">0</p></div>
-        <div class="card"><h4>Weekly Savings</h4><p id="weeklySavings">0</p></div>
-        <div class="card"><h4>Shares</h4><p id="shares">0</p></div>
-        <div class="card"><h4>Outstanding Loans</h4><p id="loans">0</p></div>
-        <div class="card"><h4>Loan Limit</h4><p id="loanLimit">0</p></div>
-      </div>
-
-      <section id="loanAction">
-        <h3>Current Loan Status</h3>
-        <table>
-          <thead><tr><th>Date</th><th>Amount</th><th>Due Date</th><th>Installment</th><th>Status</th></tr></thead>
-          <tbody id="loanData"><tr><td colspan="5">No loan data</td></tr></tbody>
-        </table>
-      </section>
     </div>
 
-    <section id="statement" style="display:none">
-      <h3>Account Statement</h3>
-      <button class="download-btn" onclick="downloadPDF()">Download PDF</button>
-      <table id="statementTable">
-        <thead><tr><th>Date</th><th>Description</th><th>Credit</th><th>Debit</th><th>Balance</th></tr></thead>
-        <tbody><tr><td colspan="5">No transactions found</td></tr></tbody>
-      </table>
-    </section>
-
-    <section id="loan" style="display:none">
-      <h3>Apply for a Loan</h3>
-      <form class="loan-form" id="loanForm">
-        <label>Loan Purpose</label><input type="text" id="purpose" required>
-        <label>Loan Amount</label><input type="number" id="loanAmount" required>
-        <label>Repayment Period (months)</label><input type="number" id="period" required>
-        <label>Source of Income</label><input type="text" id="income" required>
-        <label>Guarantor Name (optional)</label><input type="text" id="guarantor">
-        <button type="submit" class="submit-btn">Submit Application</button>
-      </form>
-    </section>
-
-    <section id="profile" style="display:none">
-      <h3>Update Profile</h3>
-      <form class="profile-form" id="profileForm">
-        <label>Name</label><input type="text" id="profileName">
-        <label>DOB</label><input type="date" id="profileDOB">
-        <label>ID Number</label><input type="text" id="profileID">
-        <label>Phone</label><input type="tel" id="profilePhone">
-        <label>Email</label><input type="email" id="profileEmail">
-        <button type="submit" class="submit-btn">Update Profile</button>
-      </form>
-    </section>
-
-    <footer>&copy; 2025 Visionary Youth Group | All Rights Reserved</footer>
+    <div class="top-right">
+      <div class="small muted">Branch: Nairobi</div>
+      <div class="points" id="points">Points: 0</div>
+      <div class="profile-mini" id="topProfile">
+        <div id="topName">Member</div>
+        <div id="topEmail" class="small muted">email@example.com</div>
+      </div>
+      <button class="btn ghost" id="signOutBtnTop">Sign out</button>
+    </div>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getDatabase, ref, onValue, set, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+  <!-- Main layout -->
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div>
+          <div class="small">Welcome</div>
+          <div id="sideName" style="font-weight:800">Member</div>
+          <div id="sideMemberNo" class="small muted">Member No: -</div>
+        </div>
+        <button id="toggleMenu" class="btn ghost" title="Hide/Show menu"><i class="fa fa-bars"></i></button>
+      </div>
 
+      <div class="small">Menu</div>
+      <ul class="menu">
+        <li><a href="#balances" data-show="balances"><i class="fa fa-chart-line"></i> Balances</a></li>
+        <li><a href="#statement" data-show="statement"><i class="fa fa-file-alt"></i> Account Statement</a></li>
+        <li><a href="#loan" data-show="loan"><i class="fa fa-money-bill-wave"></i> Apply for Loan</a></li>
+        <li><a href="#profile" data-show="profile"><i class="fa fa-user"></i> Profile</a></li>
+        <li><a href="#actionbar" data-show="actionbar"><i class="fa fa-tasks"></i> Loan Action Bar</a></li>
+        <li><a href="#" id="downloadAllPdf"><i class="fa fa-download"></i> Download Statement (PDF)</a></li>
+      </ul>
+
+      <div class="small" style="margin-top:12px">Quick links</div>
+      <ul class="menu" style="margin-top:6px">
+        <li><a href="portal.html" target="_blank"><i class="fa fa-external-link-alt"></i> Open Portal (new)</a></li>
+        <li><a href="#"><i class="fa fa-calendar"></i> Events</a></li>
+      </ul>
+    </aside>
+
+    <!-- Content -->
+    <main class="content">
+      <div class="content-header">
+        <div>
+          <div class="welcome" id="welcome">Welcome, Member</div>
+          <div class="member-meta" id="memberMeta">Status: <strong id="memberStatus">—</strong></div>
+        </div>
+        <div>
+          <div class="small muted">Auto logout in <span id="countdown">180</span>s</div>
+        </div>
+      </div>
+
+      <!-- Balances cards -->
+      <section id="balances">
+        <div class="cards">
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <h4>Monthly Savings</h4>
+                <div class="value" id="monthlySavings">Ksh 0</div>
+              </div>
+              <div class="icon savings"><i class="fa fa-wallet"></i></div>
+            </div>
+            <div class="small muted">Last updated: <span id="lastUpdateMonthly">-</span></div>
+          </div>
+
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <h4>Weekly Savings</h4>
+                <div class="value" id="weeklySavings">Ksh 0</div>
+              </div>
+              <div class="icon savings"><i class="fa fa-calendar-week"></i></div>
+            </div>
+            <div class="small muted">Last updated: <span id="lastUpdateWeekly">-</span></div>
+          </div>
+
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <h4>Shares & Dividends</h4>
+                <div class="value" id="sharesDividends">Ksh 0</div>
+              </div>
+              <div class="icon shares"><i class="fa fa-piggy-bank"></i></div>
+            </div>
+            <div class="small muted">Available: <span id="sharesAvailable">-</span></div>
+          </div>
+
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <h4>Outstanding Loans</h4>
+                <div class="value" id="outstandingLoans">Ksh 0</div>
+              </div>
+              <div class="icon loans"><i class="fa fa-hand-holding-usd"></i></div>
+            </div>
+            <div class="small muted">Next installment: <span id="nextInstallment">-</span></div>
+          </div>
+
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <h4>Unpaid Balances</h4>
+                <div class="value" id="unpaidBalances">Ksh 0</div>
+              </div>
+              <div class="icon unpaid"><i class="fa fa-exclamation-triangle"></i></div>
+            </div>
+            <div class="small muted">Overdue items: <span id="overdueCount">0</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Action bar -->
+      <section id="actionbar" class="action-bar">
+        <strong>Loan Action Bar</strong>
+        <div class="action-list" id="loanActions">
+          <div class="small muted">No loan activity yet.</div>
+        </div>
+      </section>
+
+      <!-- Statement -->
+      <section id="statement" class="statement">
+        <div class="hdr">
+          <div>
+            <h3 style="margin:0">Account Statement</h3>
+            <div class="small muted">Visionary Youth Group — Nairobi Branch</div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <button class="btn" id="downloadPdfBtn"><i class="fa fa-file-pdf"></i> Download PDF</button>
+            <button class="btn ghost" id="downloadCsvBtn"><i class="fa fa-file-csv"></i> CSV</button>
+            <button class="btn ghost" id="refreshStatement"><i class="fa fa-sync-alt"></i> Refresh</button>
+          </div>
+        </div>
+
+        <table id="statementTable">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Description</th>
+              <th>Credit</th>
+              <th>Debit</th>
+              <th>Balance</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="5" class="small muted">No transactions yet.</td></tr>
+          </tbody>
+        </table>
+        <div style="margin-top:12px" class="small muted">Note: balances reflect RTDB live values. Watermark & footer will appear on generated PDF.</div>
+      </section>
+
+      <!-- Loan Wizard -->
+      <section id="loan" class="wizard">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div>
+            <strong>Loan Application Wizard</strong>
+            <div class="small muted">Complete all sections — PDF summary available after submission</div>
+          </div>
+          <div class="small muted">Loan Limit: <strong id="loanLimit">Ksh 0</strong></div>
+        </div>
+
+        <div class="steps" id="wizardSteps">
+          <div class="step">1. Identification</div>
+          <div class="step">2. Contact & Personal</div>
+          <div class="step">3. Employment & Income</div>
+          <div class="step">4. Financial & Collateral</div>
+          <div class="step">5. Supporting Docs</div>
+        </div>
+
+        <form id="loanForm">
+          <!-- Identification -->
+          <div id="step1">
+            <label>Legal Name</label>
+            <input name="legalName" required>
+
+            <label>Date of Birth</label>
+            <input type="date" name="dob" required>
+
+            <label>Gender</label>
+            <select name="gender" required>
+              <option value="">Select...</option>
+              <option>Male</option>
+              <option>Female</option>
+              <option>Other</option>
+            </select>
+
+            <label>Nationality</label>
+            <input name="nationality" required>
+
+            <label>Government ID Number</label>
+            <input name="govId" required>
+          </div>
+
+          <!-- Contact & Personal -->
+          <div id="step2" class="hide">
+            <label>Current Address</label>
+            <input name="currentAddress" required>
+
+            <label>Permanent Address</label>
+            <input name="permanentAddress" required>
+
+            <label>Postal Address</label>
+            <input name="postalAddress" required>
+
+            <label>Email</label>
+            <input name="contactEmail" type="email" required>
+
+            <label>Phone</label>
+            <input name="contactPhone" required>
+
+            <label>Marital Status</label>
+            <select name="maritalStatus" required>
+              <option value="">Select...</option>
+              <option>Single</option>
+              <option>Married</option>
+              <option>Divorced</option>
+              <option>Widowed</option>
+            </select>
+
+            <label>Number of Dependents</label>
+            <input type="number" name="dependents" min="0" required>
+          </div>
+
+          <!-- Employment & Income -->
+          <div id="step3" class="hide">
+            <label>Employment Status</label>
+            <select name="employmentStatus" required>
+              <option value="">Select...</option>
+              <option>Permanently employed</option>
+              <option>On contract</option>
+              <option>Self-employed</option>
+              <option>Student</option>
+              <option>Unemployed</option>
+            </select>
+
+            <label>Employer/Business Name</label>
+            <input name="employerName" required>
+
+            <label>Employer Address</label>
+            <input name="employerAddress" required>
+
+            <label>Designation / Job Title</label>
+            <input name="jobTitle" required>
+
+            <label>Length of Service (years)</label>
+            <input type="number" name="yearsService" min="0" required>
+
+            <label>Gross Monthly Income</label>
+            <input type="number" name="grossIncome" min="0" required>
+
+            <label>Net Monthly Income</label>
+            <input type="number" name="netIncome" min="0" required>
+
+            <label>Other Income Sources (describe)</label>
+            <textarea name="otherIncome" rows="2"></textarea>
+          </div>
+
+          <!-- Financial & Collateral -->
+          <div id="step4" class="hide">
+            <label>Loan Amount Requested (Ksh)</label>
+            <input type="number" name="loanAmount" min="100" required>
+
+            <label>Purpose of Loan</label>
+            <input name="loanPurpose" required>
+
+            <label>Desired Repayment Period (months)</label>
+            <input type="number" name="repaymentMonths" min="1" required>
+
+            <label>Existing Credit Facilities (details)</label>
+            <textarea name="existingCredit" rows="2"></textarea>
+
+            <label>Assets & Liabilities (summary)</label>
+            <textarea name="assetsLiabilities" rows="2"></textarea>
+
+            <label>Monthly Household Expenses</label>
+            <input type="number" name="householdExpenses" min="0" required>
+          </div>
+
+          <!-- Supporting Documents -->
+          <div id="step5" class="hide">
+            <label>Security Offered (describe)</label>
+            <input name="security" required>
+
+            <label>Guarantor 1: Name & Phone</label>
+            <input name="guarantor1" required>
+
+            <label>Guarantor 2: Name & Phone</label>
+            <input name="guarantor2">
+
+            <label>Business Financials (if business loan) — notes</label>
+            <textarea name="businessFinancials" rows="3"></textarea>
+
+            <label>Proof of Identity (enter file name or reference)</label>
+            <input name="proofId" required>
+
+            <label>Proof of Income (enter file name or reference)</label>
+            <input name="proofIncome" required>
+
+            <label>Bank Statements (months)</label>
+            <input name="bankStatementsMonths" type="number" min="0" value="3" required>
+          </div>
+
+          <div class="actions">
+            <button type="button" id="prevStep" class="btn ghost">Previous</button>
+            <button type="button" id="nextStep" class="btn">Next</button>
+            <button type="submit" id="submitLoan" class="btn hide"><i class="fa fa-paper-plane"></i> Apply</button>
+          </div>
+        </form>
+        <div id="loanMsg" class="small muted" style="margin-top:10px"></div>
+      </section>
+
+      <!-- Profile -->
+      <section id="profile" class="profile">
+        <strong>Profile</strong>
+        <div class="small muted">Update your details — once-only update option available</div>
+        <form id="profileForm" style="margin-top:10px">
+          <div class="row">
+            <div style="flex:1">
+              <label>Full Name</label>
+              <input name="profileName" required>
+            </div>
+            <div style="width:180px">
+              <label>Member No</label>
+              <input name="profileMemberNo" required>
+            </div>
+          </div>
+
+          <div class="row">
+            <div style="flex:1">
+              <label>Date of Birth</label>
+              <input type="date" name="profileDob" required>
+            </div>
+            <div style="width:180px">
+              <label>ID / Passport</label>
+              <input name="profileId" required>
+            </div>
+          </div>
+
+          <div class="row">
+            <div style="flex:1">
+              <label>Phone</label>
+              <input name="profilePhone" required>
+            </div>
+            <div style="flex:1">
+              <label>Email</label>
+              <input type="email" name="profileEmail" required>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button type="submit" class="btn" id="saveProfileBtn">Save Profile</button>
+            <button type="button" id="lockProfileBtn" class="btn ghost">Lock Profile</button>
+            <div class="small muted" id="profileNote" style="align-self:center">Profile can be updated once. Lock to prevent further changes.</div>
+          </div>
+        </form>
+      </section>
+
+    </main>
+  </div>
+
+  <footer style="padding:12px 18px;background:#fff;text-align:center;border-top:1px solid #eee">
+    <div class="small muted">© 2025 Visionary Youth Group — Nairobi | SEKU Theme</div>
+  </footer>
+
+  <!-- Firebase SDKs -->
+  <script type="module">
+    // Firebase modular imports
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import { getDatabase, ref, onValue, get, set, push, update, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+    // Use your firebase config (you provided earlier)
     const firebaseConfig = {
       apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
       authDomain: "visionary-youth-grou-2024.firebaseapp.com",
-      databaseURL: "https://visionary-youth-grou-2024-default-rtdb.firebaseio.com",
       projectId: "visionary-youth-grou-2024",
       storageBucket: "visionary-youth-grou-2024.appspot.com",
       messagingSenderId: "372978592717",
-      appId: "1:372978592717:web:1c15aec728ee5f854f3284"
+      appId: "1:372978592717:web:1c15aec728ee5f854f3284",
+      measurementId: "G-QP1RBT2ZCP",
+      // If you use RTDB, add databaseURL here (optional if configured)
+      // databaseURL: "https://your-project.firebaseio.com"
     };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getDatabase(app);
 
-    let uid;
+    // Convenience references
+    let uid = null;
+    let profileRef = null;
+    let balancesRef = null;
+    let loansRef = null;
+    let transactionsRef = null;
+    let pointsRef = null;
 
-    onAuthStateChanged(auth, user => {
+    // Elements
+    const topName = document.getElementById('topName');
+    const topEmail = document.getElementById('topEmail');
+    const sideName = document.getElementById('sideName');
+    const sideMemberNo = document.getElementById('sideMemberNo');
+    const memberStatusEl = document.getElementById('memberStatus');
+    const pointsEl = document.getElementById('points');
+
+    const monthlyEl = document.getElementById('monthlySavings');
+    const weeklyEl = document.getElementById('weeklySavings');
+    const sharesEl = document.getElementById('sharesDividends');
+    const outstandingEl = document.getElementById('outstandingLoans');
+    const unpaidEl = document.getElementById('unpaidBalances');
+    const loanLimitEl = document.getElementById('loanLimit');
+
+    const loanActionsEl = document.getElementById('loanActions');
+    const statementTableBody = document.querySelector("#statementTable tbody");
+
+    // Auto-logout
+    let inactivitySeconds = 180;
+    let lastActivity = Date.now();
+    const countdownEl = document.getElementById('countdown');
+    let countdownTimer = null;
+
+    function resetInactivity() {
+      lastActivity = Date.now();
+      inactivitySeconds = 180;
+      countdownEl.textContent = inactivitySeconds;
+    }
+
+    // reset on interactions
+    ['click','mousemove','keydown','touchstart'].forEach(ev => {
+      window.addEventListener(ev, resetInactivity, {passive:true});
+    });
+
+    function startCountdown() {
+      if (countdownTimer) clearInterval(countdownTimer);
+      countdownTimer = setInterval(() => {
+        inactivitySeconds--;
+        if (inactivitySeconds < 0) {
+          clearInterval(countdownTimer);
+          doSignOut(true);
+          return;
+        }
+        countdownEl.textContent = inactivitySeconds;
+      }, 1000);
+    }
+
+    // Sign out helper
+    async function doSignOut(auto=false) {
+      try {
+        await signOut(auth);
+        alert(auto ? "Signed out due to inactivity" : "Signed out");
+        window.location.href = "index.html"; // fallback homepage
+      } catch (err) {
+        console.error("Sign out error", err);
+      }
+    }
+
+    document.getElementById('signOutBtnTop').addEventListener('click', doSignOut);
+
+    // Menu toggle
+    document.getElementById('toggleMenu').addEventListener('click', () => {
+      const s = document.getElementById('sidebar');
+      s.style.display = (s.style.display === 'none') ? 'block' : 'none';
+    });
+
+    // Sidebar links show/hide sections
+    document.querySelectorAll('.sidebar a[data-show]').forEach(a => {
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        const target = a.dataset.show;
+        // simple scroll to section
+        location.hash = target;
+      });
+    });
+
+    // Authentication state
+    onAuthStateChanged(auth, async (user) => {
       if (!user) {
+        // not logged in - redirect to portal or login
+        alert("Not signed in. Redirecting to portal...");
         window.location.href = "portal.html";
         return;
       }
+
       uid = user.uid;
-      const memberRef = ref(db, `members/${uid}`);
-      onValue(memberRef, snap => {
-        if (snap.exists()) {
-          const data = snap.val();
-          document.getElementById('memberName').textContent = data.fullName || "Member";
-          document.getElementById('memberDetails').textContent = `${data.email || ''} | ${data.memberNo || ''} | ${data.memberType || 'Mean Member'}`;
+      // setup refs
+      profileRef = ref(db, `members/${uid}/profile`);
+      balancesRef = ref(db, `members/${uid}/balances`);
+      loansRef = ref(db, `members/${uid}/loanApplications`);
+      transactionsRef = ref(db, `members/${uid}/transactions`);
+      pointsRef = ref(db, `members/${uid}/points`);
+
+      // start inactivity countdown
+      resetInactivity();
+      startCountdown();
+
+      // Listen to profile
+      onValue(profileRef, (snap) => {
+        const p = snap.val() || {};
+        const name = p.fullName || p.name || user.displayName || "Member";
+        const email = p.email || user.email || "";
+        const memberNo = p.memberNumber || p.memberNo || "-";
+        const status = p.memberType || p.status || "Ordinary";
+
+        topName.textContent = name;
+        topEmail.textContent = email;
+        sideName.textContent = name;
+        sideMemberNo.textContent = `Member No: ${memberNo}`;
+        memberStatusEl.textContent = status;
+      });
+
+      // Listen to balances
+      onValue(balancesRef, (snap) => {
+        const b = snap.val() || {};
+        const monthly = Number(b.monthly ?? 0);
+        const weekly = Number(b.weekly ?? 0);
+        const shares = Number(b.shares ?? 0);
+        const outstanding = Number(b.outstanding ?? 0);
+        const unpaid = Number(b.unpaid ?? 0);
+
+        monthlyEl.textContent = `Ksh ${monthly.toLocaleString()}`;
+        weeklyEl.textContent = `Ksh ${weekly.toLocaleString()}`;
+        sharesEl.textContent = `Ksh ${shares.toLocaleString()}`;
+        outstandingEl.textContent = `Ksh ${outstanding.toLocaleString()}`;
+        unpaidEl.textContent = `Ksh ${unpaid.toLocaleString()}`;
+
+        document.getElementById('lastUpdateMonthly').textContent = (new Date()).toLocaleString();
+
+        // calculate loan limit
+        const limit = calculateLoanLimit(monthly);
+        loanLimitEl.textContent = `Ksh ${limit.toLocaleString()}`;
+      });
+
+      // Listen to loan applications (action bar)
+      onValue(loansRef, (snap) => {
+        const data = snap.val() || {};
+        loanActionsEl.innerHTML = "";
+        const items = Object.keys(data).map(k => ({ id: k, ...data[k] }));
+        if (items.length === 0) {
+          loanActionsEl.innerHTML = `<div class="small muted">No loan activity yet.</div>`;
+        } else {
+          items.sort((a,b)=> (b.createdAt||'').localeCompare(a.createdAt||''));
+          items.forEach(it => {
+            const tr = document.createElement('div');
+            tr.className = 'action-item';
+            const left = document.createElement('div');
+            left.innerHTML = `<div><strong>${(it.loanAmount || 0).toLocaleString ? 'Ksh ' + (it.loanAmount).toLocaleString() : 'Ksh ' + (it.loanAmount || 0)}</strong></div>
+                              <div class="small muted">${it.purpose || ''}</div>`;
+            const right = document.createElement('div');
+            const status = (it.status || 'pending').toLowerCase();
+            let cls = 'status-pending', label='Pending';
+            if (status === 'approved') { cls='status-approved'; label='Approved' }
+            if (status === 'declined') { cls='status-declined'; label='Declined' }
+            right.innerHTML = `<div class="small muted">${new Date(it.createdAt||Date.now()).toLocaleDateString()}</div>
+                               <div class="status-pill ${cls}">${label}</div>`;
+            tr.appendChild(left);
+            tr.appendChild(right);
+            loanActionsEl.appendChild(tr);
+          });
         }
       });
 
-      // balances
-      onValue(ref(db, `members/${uid}/balances`), s=>{
-        if(s.exists()){
-          const b = s.val();
-          document.getElementById('monthlySavings').textContent = b.monthly || 0;
-          document.getElementById('weeklySavings').textContent = b.weekly || 0;
-          document.getElementById('shares').textContent = b.shares || 0;
-          document.getElementById('loans').textContent = b.loans || 0;
-          document.getElementById('loanLimit').textContent = Math.floor((b.monthly||0)*0.5);
+      // Listen to transactions for statement table
+      onValue(transactionsRef, (snap) => {
+        const data = snap.val() || {};
+        const rows = Object.keys(data).map(k => ({ id: k, ...data[k] }));
+        rows.sort((a,b)=> new Date(a.date) - new Date(b.date));
+        statementTableBody.innerHTML = "";
+        if (rows.length === 0) {
+          statementTableBody.innerHTML = `<tr><td colspan="5" class="small muted">No transactions yet.</td></tr>`;
+        } else {
+          rows.forEach(r=> {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td>${r.date || ''}</td>
+                            <td>${r.description || ''}</td>
+                            <td>${r.credit ? Number(r.credit).toLocaleString() : ''}</td>
+                            <td>${r.debit ? Number(r.debit).toLocaleString() : ''}</td>
+                            <td>${r.balance ? Number(r.balance).toLocaleString() : ''}</td>`;
+            statementTableBody.appendChild(tr);
+          });
         }
       });
 
-      // loan status
-      onValue(ref(db, `members/${uid}/loans/current`), s=>{
-        const t = document.getElementById('loanData');
-        if(!s.exists()){t.innerHTML='<tr><td colspan="5">No loan data</td></tr>';return;}
-        const d=s.val();
-        t.innerHTML=`<tr><td>${d.date||'-'}</td><td>${d.amount||'-'}</td><td>${d.due||'-'}</td><td>${d.installment||'-'}</td><td>${d.status||'-'}</td></tr>`;
+      // Points listener
+      onValue(pointsRef, (snap) => {
+        const p = snap.val() || 0;
+        pointsEl.textContent = `Points: ${p}`;
       });
+    });
 
-      // statement
-      onValue(ref(db, `members/${uid}/transactions`), s=>{
-        const tb=document.querySelector('#statementTable tbody');
-        if(!s.exists()){tb.innerHTML='<tr><td colspan="5">No transactions</td></tr>';return;}
-        let html='';
-        s.forEach(x=>{
-          const v=x.val();
-          html+=`<tr><td>${v.date}</td><td>${v.desc}</td><td>${v.credit||'-'}</td><td>${v.debit||'-'}</td><td>${v.balance||'-'}</td></tr>`;
+    // Loan limit calculation rules
+    function calculateLoanLimit(monthlySavings) {
+      const m = Number(monthlySavings || 0);
+      if (m < 1000) return 0;
+      if (m >= 1000 && m < 2000) return 500;
+      if (m >= 2000 && m < 5000) return 1000;
+      // for larger, give half as default
+      return Math.floor(m / 2);
+    }
+
+    // === Profile form saving (one-time or update) ===
+    const profileForm = document.getElementById('profileForm');
+    const saveProfileBtn = document.getElementById('saveProfileBtn');
+    const lockProfileBtn = document.getElementById('lockProfileBtn');
+    const profileNote = document.getElementById('profileNote');
+
+    // Load existing profile to form when available
+    async function loadProfileOnce() {
+      if (!profileRef) return;
+      const snap = await get(profileRef);
+      const p = snap.exists() ? snap.val() : {};
+      profileForm.profileName.value = p.fullName || p.name || '';
+      profileForm.profileMemberNo.value = p.memberNumber || p.memberNo || '';
+      profileForm.profileDob.value = p.dob || '';
+      profileForm.profileId.value = p.idNumber || p.id || '';
+      profileForm.profilePhone.value = p.phone || '';
+      profileForm.profileEmail.value = p.email || '';
+      if (p.locked) {
+        lockUIProfile();
+      }
+    }
+
+    // Listen for profile once ready
+    const profileInitChecker = setInterval(()=> {
+      if (profileRef) {
+        loadProfileOnce();
+        clearInterval(profileInitChecker);
+      }
+    }, 500);
+
+    function lockUIProfile() {
+      profileForm.querySelectorAll('input').forEach(i=>i.setAttribute('disabled','disabled'));
+      saveProfileBtn.setAttribute('disabled','disabled');
+      profileNote.textContent = "Profile is locked (no further edits).";
+    }
+
+    profileForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!profileRef) return alert("Not ready");
+      const data = {
+        fullName: profileForm.profileName.value.trim(),
+        memberNumber: profileForm.profileMemberNo.value.trim(),
+        dob: profileForm.profileDob.value,
+        idNumber: profileForm.profileId.value.trim(),
+        phone: profileForm.profilePhone.value.trim(),
+        email: profileForm.profileEmail.value.trim(),
+        updatedAt: new Date().toISOString()
+      };
+      try {
+        await set(profileRef, { ...(await (await get(profileRef)).val() || {}), ...data });
+        // Reward points
+        await rewardPoints(10, "Profile updated");
+        alert("Profile saved. Top header & sidebar will update shortly.");
+      } catch (err) {
+        alert("Profile save error: " + err.message);
+      }
+    });
+
+    lockProfileBtn.addEventListener('click', async () => {
+      if (!profileRef) return;
+      try {
+        await update(profileRef, { locked: true });
+        lockUIProfile();
+        alert("Profile locked.");
+      } catch (err) {
+        alert("Lock error: " + err.message);
+      }
+    });
+
+    // Reward points helper
+    async function rewardPoints(amount, reason) {
+      if (!pointsRef) return;
+      try {
+        const snap = await get(pointsRef);
+        const cur = snap.exists() ? Number(snap.val()) : 0;
+        await set(pointsRef, cur + amount);
+        // Optionally record a points history node
+        const logRef = ref(db, `members/${uid}/pointsHistory`);
+        await push(logRef, { amount, reason, date: new Date().toISOString() });
+      } catch (err) {
+        console.warn("Points error", err);
+      }
+    }
+
+    // === Statement PDF and CSV ===
+    document.getElementById('downloadCsvBtn').addEventListener('click', async () => {
+      if (!transactionsRef) return alert("No transactions source");
+      // get snapshot
+      const snap = await get(transactionsRef);
+      const data = snap.exists() ? snap.val() : {};
+      const rows = [];
+      rows.push(["Date","Description","Credit","Debit","Balance"]);
+      Object.values(data).forEach(r => {
+        rows.push([r.date||'', r.description||'', r.credit||'', r.debit||'', r.balance||'']);
+      });
+      const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `statement_${uid || 'member'}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      await rewardPoints(2, "Downloaded CSV statement");
+    });
+
+    document.getElementById('downloadPdfBtn').addEventListener('click', async () => {
+      await generateStatementPDF();
+      await rewardPoints(5, "Downloaded PDF statement");
+    });
+
+    document.getElementById('downloadAllPdf').addEventListener('click', async (e) => {
+      e.preventDefault();
+      await generateStatementPDF();
+      await rewardPoints(5, "Downloaded PDF statement (menu)");
+    });
+
+    async function generateStatementPDF() {
+      // fetch transactions
+      const snap = await get(transactionsRef);
+      const data = snap.exists() ? Object.values(snap.val()) : [];
+      // create pdf
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF('p','pt','a4');
+      const margin = 40;
+      // Header
+      doc.setFontSize(14);
+      doc.text("Visionary Youth Group — Nairobi Branch", margin, 60);
+      doc.setFontSize(10);
+      doc.text(`Member: ${topName.textContent}  |  ${topEmail.textContent}`, margin, 78);
+      doc.text(`Generated: ${new Date().toLocaleString()}`, margin, 94);
+
+      // Watermark
+      doc.setTextColor(200,200,200);
+      doc.setFontSize(60);
+      doc.text("VISIONARY", 150, 300, { angle: 45, opacity: 0.08 });
+
+      doc.setTextColor(30,30,30);
+      // Table header
+      const startY = 130;
+      doc.setFontSize(11);
+      doc.text("Date", margin, startY);
+      doc.text("Description", margin + 90, startY);
+      doc.text("Credit", margin + 320, startY);
+      doc.text("Debit", margin + 390, startY);
+      doc.text("Balance", margin + 470, startY);
+
+      let y = startY + 18;
+      doc.setFontSize(10);
+      if (data.length === 0) {
+        doc.text("No transactions.", margin, y);
+      } else {
+        data.sort((a,b)=> new Date(a.date) - new Date(b.date));
+        data.forEach(r => {
+          if (y > 740) {
+            doc.addPage();
+            y = 60;
+          }
+          doc.text(r.date || '', margin, y);
+          doc.text((r.description||'').slice(0,40), margin + 90, y);
+          doc.text(r.credit ? String(r.credit) : '', margin + 320, y, { align: 'right' });
+          doc.text(r.debit ? String(r.debit) : '', margin + 390, y, { align: 'right' });
+          doc.text(r.balance ? String(r.balance) : '', margin + 470, y, { align: 'right' });
+          y += 16;
         });
-        tb.innerHTML=html;
-      });
+      }
+
+      // Footer
+      doc.setFontSize(9);
+      doc.setTextColor(110,110,110);
+      doc.text("Visionary Youth Group — Nairobi | Powered by SEKU theme", margin, 780);
+
+      doc.save(`statement_${uid || 'member'}.pdf`);
+    }
+
+    // Refresh statement button
+    document.getElementById('refreshStatement').addEventListener('click', async () => {
+      // manual refresh triggers the listeners; we also re-fetch
+      if (!transactionsRef) return;
+      const snap = await get(transactionsRef);
+      const data = snap.exists() ? Object.values(snap.val()) : [];
+      // update table (listener already does this but do it here)
+      statementTableBody.innerHTML = "";
+      if (data.length === 0) {
+        statementTableBody.innerHTML = `<tr><td colspan="5" class="small muted">No transactions yet.</td></tr>`;
+      } else {
+        data.sort((a,b)=> new Date(a.date) - new Date(b.date));
+        data.forEach(r => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td>${r.date || ''}</td>
+                          <td>${r.description || ''}</td>
+                          <td>${r.credit ? Number(r.credit).toLocaleString() : ''}</td>
+                          <td>${r.debit ? Number(r.debit).toLocaleString() : ''}</td>
+                          <td>${r.balance ? Number(r.balance).toLocaleString() : ''}</td>`;
+          statementTableBody.appendChild(tr);
+        });
+      }
+      await rewardPoints(1, "Refreshed Statement");
     });
 
-    // profile update
-    document.getElementById('profileForm').addEventListener('submit',e=>{
+    // === Loan wizard navigation & submission ===
+    let currentStep = 1;
+    const totalSteps = 5;
+    const prevBtn = document.getElementById('prevStep');
+    const nextBtn = document.getElementById('nextStep');
+    const submitBtn = document.getElementById('submitLoan');
+    const loanMsg = document.getElementById('loanMsg');
+
+    function showStep(n) {
+      for (let i=1;i<=totalSteps;i++){
+        const el = document.getElementById('step'+i);
+        if (el) el.classList.toggle('hide', i !== n);
+      }
+      prevBtn.classList.toggle('hide', n === 1);
+      nextBtn.classList.toggle('hide', n === totalSteps);
+      submitBtn.classList.toggle('hide', n !== totalSteps);
+      // update step highlights (optional)
+    }
+
+    prevBtn.addEventListener('click', ()=> {
+      if (currentStep > 1) currentStep--;
+      showStep(currentStep);
+    });
+    nextBtn.addEventListener('click', ()=> {
+      // basic validation of visible inputs
+      const inputs = Array.from(document.querySelectorAll('#step'+currentStep+' input, #step'+currentStep+' select, #step'+currentStep+' textarea'));
+      for (const inp of inputs) {
+        if (inp.hasAttribute('required') && !inp.value.trim()) {
+          return alert('Please fill required fields in this step.');
+        }
+      }
+      if (currentStep < totalSteps) currentStep++;
+      showStep(currentStep);
+    });
+
+    showStep(1);
+
+    // Loan submission handler
+    document.getElementById('loanForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const p={
-        name:profileName.value,
-        dob:profileDOB.value,
-        id:profileID.value,
-        phone:profilePhone.value,
-        email:profileEmail.value
+      if (!uid) return alert("User not ready.");
+
+      // gather form values
+      const form = e.target;
+      const formData = {};
+      new FormData(form).forEach((v,k)=> formData[k] = v);
+
+      // parse loan amount and limit
+      const requested = Number(formData.loanAmount || 0);
+      // get monthly savings from balances
+      const snap = await get(balancesRef);
+      const monthly = snap.exists() ? Number(snap.val().monthly || 0) : 0;
+      const limit = calculateLoanLimit(monthly);
+      if (requested > limit) return alert(`Requested amount exceeds your loan limit of Ksh ${limit.toLocaleString()}`);
+
+      // prepare record
+      const now = new Date().toISOString();
+      const loanRecord = {
+        ...formData,
+        loanAmount: requested,
+        memberUid: uid,
+        status: 'pending',
+        createdAt: now
       };
-      set(ref(db,`members/${uid}/profile`),p);
-      alert('Profile updated successfully!');
+
+      try {
+        const newLoanRef = await push(ref(db, `members/${uid}/loanApplications`), loanRecord);
+        // add an action/log also under a general loans node if you want
+        await push(ref(db, `loanRequests`), { memberUid: uid, loanId: newLoanRef.key, createdAt: now });
+        // reward points
+        await rewardPoints(20, "Submitted loan application");
+        alert("Loan application submitted. You can download a PDF summary now.");
+        loanMsg.textContent = "Loan submitted — awaiting review. You may download the PDF summary.";
+        // generate PDF summary automatically
+        generateLoanPDF(loanRecord, newLoanRef.key);
+      } catch (err) {
+        alert("Loan submission failed: " + err.message);
+      }
     });
 
-    // loan form
-    document.getElementById('loanForm').addEventListener('submit',e=>{
-      e.preventDefault();
-      const loan={
-        purpose:purpose.value,
-        amount:loanAmount.value,
-        period:period.value,
-        income:income.value,
-        guarantor:guarantor.value,
-        date:new Date().toLocaleDateString(),
-        status:'Pending'
-      };
-      push(ref(db,`members/${uid}/loanApplications`),loan);
-      set(ref(db,`members/${uid}/loans/current`),loan);
-      alert('Loan application submitted!');
-    });
+    async function generateLoanPDF(data, id) {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFontSize(12);
+      doc.text("Visionary Youth Group — Loan Application Summary", 20, 30);
+      doc.setFontSize(10);
+      doc.text(`Member: ${topName.textContent} (${sideMemberNo.textContent.replace('Member No: ','')})`, 20, 44);
+      doc.text(`Application ID: ${id || 'N/A'}`, 20, 56);
+      doc.text(`Date: ${new Date().toLocaleString()}`, 20, 68);
 
-    window.downloadPDF=()=>{
-      const el=document.getElementById('statementTable');
-      html2pdf().from(el).set({filename:'AccountStatement.pdf',html2canvas:{scale:2}}).save();
+      let y = 86;
+      doc.setFontSize(10);
+      for (const k of Object.keys(data)) {
+        if (y > 740) { doc.addPage(); y = 40; }
+        const label = k.replace(/([A-Z])/g,' $1').replace(/_/g,' ');
+        doc.text(`${label}: ${String(data[k])}`, 20, y);
+        y += 10;
+      }
+      doc.save(`loan_${id || Date.now()}.pdf`);
     }
 
-    window.toggleMenu=()=>{
-      document.getElementById('sidebar').classList.toggle('hidden');
-    }
+    // === Event listeners for balances/loan actions manual test ===
+    // For demo/test: allow admin to modify RTDB or use your API to update statuses.
+    // The onValue listeners above will update the UI when RTDB entries change.
 
-    window.showSection=(id)=>{
-      document.querySelectorAll('.section,section').forEach(s=>s.style.display='none');
-      document.getElementById(id).style.display='block';
-    }
+    // Add small heartbeat to show app ready
+    console.log("Dashboard space loaded. Waiting for Firebase auth...");
 
-    window.logoutUser=()=>{
-      signOut(auth).then(()=>window.location.href='portal.html');
-    }
+    // Start countdown display immediately
+    countdownEl.textContent = '180';
+    startCountdown();
   </script>
 </body>
 </html>
