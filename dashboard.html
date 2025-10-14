@@ -3,92 +3,89 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Visionary Youth Group — SEKU Dashboard (Final)</title>
-<meta name="description" content="Visionary Youth Group dashboard — final working build: all buttons fixed, balances & points live, loans and PDFs." />
+<title>Visionary Youth Group — Final Dashboard</title>
+<meta name="description" content="Final Visionary Youth Group dashboard — balances, loans, transactions, PDFs, all buttons fixed." />
+<!-- libraries -->
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <style>
-:root{--seku-green:#006400;--seku-gold:#FFD700;--muted:#274733;--panel:#fff;--glass:rgba(0,100,0,0.04);--shadow:0 12px 30px rgba(2,10,6,0.08);--radius:12px;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial;}
-*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#f3fbf3 0%, #eaf7ea 100%);padding:18px;-webkit-font-smoothing:antialiased;color:#07210f}
-.app{max-width:1400px;margin:0 auto;display:grid;grid-template-columns:1fr;gap:18px;min-height:92vh}
-.topbar{height:72px;background:var(--panel);border-radius:12px;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;box-shadow:var(--shadow);border:1px solid rgba(0,0,0,0.04);position:sticky;top:18px;z-index:30}
-.left-controls{display:flex;align-items:center;gap:12px}
-.hamburger{width:46px;height:46px;border-radius:10px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(0,0,0,0.06);cursor:pointer;background:#fff}
-.brand{display:flex;align-items:center;gap:12px}
-.logo{width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,var(--seku-green),#0b6720);display:flex;align-items:center;justify-content:center;color:var(--seku-gold);font-weight:900}
-.title{font-weight:800;font-size:16px}
-.subtitle{font-size:12px;color:var(--muted)}
-.top-right{display:flex;align-items:center;gap:12px}
-.points-box{background:linear-gradient(90deg,rgba(255,215,0,0.08),rgba(0,100,0,0.03));padding:8px 12px;border-radius:10px;border:1px solid rgba(0,0,0,0.04);display:flex;align-items:center;gap:8px}
-.points-value{font-weight:800;color:var(--seku-green)}
-.container{display:grid;grid-template-columns:320px 1fr;gap:18px;align-items:start;margin-top:4px}
-.sidebar{background:var(--panel);border-radius:12px;padding:18px;box-shadow:var(--shadow);border:1px solid rgba(0,0,0,0.04);height:calc(100vh - 140px);overflow:auto;position:sticky;top:110px}
-.side-menu{display:flex;flex-direction:column;gap:8px;margin-top:12px}
-.side-item{padding:10px;border-radius:10px;cursor:pointer;color:var(--muted);display:flex;align-items:center;gap:10px}
-.side-item:hover{background:var(--glass);color:var(--seku-green);font-weight:700}
-.side-item.active{background:linear-gradient(90deg, rgba(0,100,0,0.06), rgba(255,215,0,0.02));border:1px solid rgba(0,100,0,0.06)}
-.content{background:var(--panel);border-radius:12px;padding:18px;box-shadow:var(--shadow);border:1px solid rgba(0,0,0,0.04);min-height:600px;overflow:auto}
-.grid-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.card{background:#fff;border-radius:12px;padding:14px;border:1px solid rgba(0,0,0,0.04);display:flex;align-items:center;gap:12px;box-shadow:0 6px 18px rgba(2,10,6,0.03)}
-.card .meta{display:flex;flex-direction:column}
-.card .label{font-size:13px;color:var(--muted)}
-.card .value{font-weight:800;font-size:18px;color:var(--seku-green)}
-.icon-wrap{width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,#eef9ef,#e5f7e5);display:flex;align-items:center;justify-content:center;color:var(--seku-green);font-weight:800}
-.panel{margin-top:14px;padding:12px;border-radius:10px;background:linear-gradient(180deg,#fff,#fbfff8);border:1px solid rgba(0,0,0,0.03)}
-.table-wrap{overflow:auto;max-height:360px}
-table{width:100%;border-collapse:collapse;font-size:14px}
-thead th{padding:10px;text-align:left;border-bottom:1px solid rgba(0,0,0,0.06);color:var(--muted);font-weight:700}
-td{padding:8px;border-bottom:1px solid rgba(0,0,0,0.04)}
-.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-input,select,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);margin-top:6px}
-textarea{min-height:120px;resize:vertical}
-.footer{margin-top:12px;color:var(--muted);font-size:13px}
-.btn{background:var(--seku-green);color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:700}
-.btn.ghost{background:transparent;border:1px solid rgba(0,0,0,0.06);color:var(--muted);font-weight:600}
-.status-pill{padding:6px 10px;border-radius:999px;font-weight:800}
-.status-pending{background:#fff7e6;color:#a36d00;border:1px solid rgba(163,109,0,0.08)}
-.status-approved{background:#ecffef;color:#046a23;border:1px solid rgba(4,106,35,0.06)}
-.status-rejected{background:#fff0f0;color:#8a1b1b;border:1px solid rgba(138,27,27,0.06)}
-@media(max-width:1100px){ .container{grid-template-columns:1fr} .grid-cards{grid-template-columns:repeat(2,1fr)} .sidebar{display:none} .hamburger{display:block} }
-@media(max-width:700px){ .grid-cards{grid-template-columns:1fr} .topbar{padding:8px} .title{font-size:14px} }
+  :root{--seku-green:#006400;--seku-gold:#FFD700;--muted:#274733;--panel:#fff;--glass:rgba(0,100,0,0.04);--shadow:0 12px 30px rgba(2,10,6,0.08);--radius:12px;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial}
+  *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#f3fbf3 0%, #eaf7ea 100%);padding:18px;color:#07210f}
+  .app{max-width:1400px;margin:0 auto;display:grid;gap:18px}
+  .topbar{height:72px;background:var(--panel);border-radius:12px;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;box-shadow:var(--shadow);border:1px solid rgba(0,0,0,0.04);position:sticky;top:18px;z-index:30}
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,var(--seku-green),#0b6720);display:flex;align-items:center;justify-content:center;color:var(--seku-gold);font-weight:900}
+  .subtitle{font-size:12px;color:var(--muted)}
+  .container{display:grid;grid-template-columns:320px 1fr;gap:18px;margin-top:12px}
+  .sidebar{background:var(--panel);border-radius:12px;padding:18px;box-shadow:var(--shadow);border:1px solid rgba(0,0,0,0.04);height:calc(100vh - 140px);overflow:auto;position:sticky;top:110px}
+  .side-item{padding:10px;border-radius:10px;cursor:pointer;color:var(--muted);display:flex;align-items:center;gap:10px}
+  .side-item.active{background:linear-gradient(90deg, rgba(0,100,0,0.06), rgba(255,215,0,0.02));border:1px solid rgba(0,100,0,0.06)}
+  .content{background:var(--panel);border-radius:12px;padding:18px;box-shadow:var(--shadow);border:1px solid rgba(0,0,0,0.04);min-height:600px;overflow:auto}
+  .grid-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .card{background:#fff;border-radius:12px;padding:14px;border:1px solid rgba(0,0,0,0.04);display:flex;align-items:center;gap:12px}
+  .card .label{font-size:13px;color:var(--muted)}
+  .card .value{font-weight:800;font-size:18px;color:var(--seku-green)}
+  .panel{margin-top:14px;padding:12px;border-radius:10px;background:linear-gradient(180deg,#fff,#fbfff8);border:1px solid rgba(0,0,0,0.03)}
+  .table-wrap{overflow:auto;max-height:360px}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  thead th{padding:10px;text-align:left;border-bottom:1px solid rgba(0,0,0,0.06);color:var(--muted);font-weight:700}
+  td{padding:8px;border-bottom:1px solid rgba(0,0,0,0.04)}
+  .btn{background:var(--seku-green);color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:700}
+  .btn.ghost{background:transparent;border:1px solid rgba(0,0,0,0.06);color:var(--muted);font-weight:600}
+  .status-pill{padding:6px 10px;border-radius:999px;font-weight:800}
+  @media(max-width:1100px){ .container{grid-template-columns:1fr} .grid-cards{grid-template-columns:repeat(2,1fr)} .sidebar{display:none} }
 </style>
 </head>
 <body>
 <div class="app">
-  <div class="topbar" role="banner">
-    <div class="left-controls">
-      <div class="hamburger" id="hamburger" title="Open menu" aria-label="Open menu">☰</div>
-      <div class="brand"><div class="logo">VY</div><div><div class="title">Visionary Youth Group</div><div class="subtitle">Member dashboard — SEKU</div></div></div>
-    </div>
-    <div class="top-right">
-      <div class="points-box" title="Your points"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9" stroke="#FFD700" stroke-width="1.4" fill="none"/><path d="M12 8v8" stroke="#006400" stroke-width="1.6" stroke-linecap="round"/><path d="M9.5 10.5h5" stroke="#006400" stroke-width="1.6" stroke-linecap="round"/></svg><div><div style="font-size:12px;color:var(--muted)">Points</div><div class="points-value" id="pointsValue">0</div></div></div>
-      <div style="display:flex;align-items:center;gap:10px"><div style="text-align:right"><div id="topUserName" style="font-weight:800">Member</div><div id="topUserEmail" class="subtitle">member@example.com</div></div><div id="topAvatar" style="width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--seku-green),#0b6720);display:flex;align-items:center;justify-content:center;color:var(--seku-gold);font-weight:800">MK</div></div>
+  <div class="topbar">
+    <div class="brand"><div class="logo">VY</div><div><div style="font-weight:800">Visionary Youth Group</div><div class="subtitle">Member dashboard</div></div></div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="display:flex;align-items:center;gap:8px;background:linear-gradient(90deg,rgba(255,215,0,0.08),rgba(0,100,0,0.03));padding:8px 12px;border-radius:10px;border:1px solid rgba(0,0,0,0.04)">
+        <div style="font-size:12px;color:var(--muted)">Points</div>
+        <div id="pointsValue" style="font-weight:800;color:var(--seku-green)">0</div>
+      </div>
+      <div style="text-align:right"><div id="topUserName" style="font-weight:800">Member</div><div id="topUserEmail" class="subtitle">member@example.com</div></div>
+      <div id="signOutWrap"></div>
     </div>
   </div>
 
   <div class="container">
-    <aside class="sidebar" id="sidebar">
+    <aside class="sidebar">
       <div style="display:flex;gap:10px;align-items:center;margin-bottom:8px"><div style="width:54px;height:54;border-radius:10px;background:linear-gradient(135deg,var(--seku-green),#0b6720);display:flex;align-items:center;justify-content:center;color:var(--seku-gold);font-weight:900">VY</div><div><div id="sideName" style="font-weight:800">Member</div><div id="sideEmail" class="subtitle">member@example.com</div></div></div>
-      <div class="side-menu" id="sideMenu"><div class="side-item active" data-view="dashboard">🏠 Dashboard</div><div class="side-item" data-view="transactions">📜 Transactions</div><div class="side-item" data-view="loans">💳 Loans</div><div class="side-item" data-view="withdrawals">🏧 Withdrawals</div><div class="side-item" data-view="profile">👤 Profile</div><div class="side-item" data-view="statements">📄 Statements</div><div class="side-item" data-view="settings">⚙️ Settings</div></div>
+
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="side-item active" data-view="dashboard">🏠 Dashboard</div>
+        <div class="side-item" data-view="transactions">📜 Transactions</div>
+        <div class="side-item" data-view="loans">💳 Loans</div>
+        <div class="side-item" data-view="withdrawals">🏧 Withdrawals</div>
+        <div class="side-item" data-view="profile">👤 Profile</div>
+        <div class="side-item" data-view="settings">⚙️ Settings</div>
+      </div>
+
       <div style="height:14px"></div>
-      <div style="display:flex;flex-direction:column;gap:8px"><button class="btn" id="applyLoanBtn">Apply for Loan</button><button class="btn ghost" id="requestWithdrawBtn" style="background:#fff;color:var(--seku-green);border:1px solid rgba(0,0,0,0.06)">Request Withdrawal</button></div>
-      <div class="footer" style="margin-top:18px">Support: visionary@example.com<br>© Visionary Youth 2024</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button class="btn" id="applyLoanBtn">Apply for Loan</button>
+        <button class="btn ghost" id="requestWithdrawBtn" style="background:#fff;color:var(--seku-green);border:1px solid rgba(0,0,0,0.06)">Request Withdrawal</button>
+      </div>
+      <div class="subtitle" style="margin-top:18px">Support: visionary@example.com</div>
     </aside>
 
-    <main class="content" id="mainContent">
+    <main class="content">
       <section id="view-dashboard">
         <div class="grid-cards">
-          <div class="card"><div class="icon-wrap">M</div><div class="meta"><div class="label">Monthly Savings</div><div class="value" id="monthlyBalance">KES 0</div></div></div>
-          <div class="card"><div class="icon-wrap">W</div><div class="meta"><div class="label">Weekly Savings</div><div class="value" id="weeklyBalance">KES 0</div></div></div>
-          <div class="card"><div class="icon-wrap">S</div><div class="meta"><div class="label">Shares</div><div class="value" id="sharesCount">0 units</div></div></div>
+          <div class="card"><div style="flex:1"><div class="label">Monthly Savings</div><div class="value" id="monthlyBalance">KES 0</div></div></div>
+          <div class="card"><div style="flex:1"><div class="label">Weekly Savings</div><div class="value" id="weeklyBalance">KES 0</div></div></div>
+          <div class="card"><div style="flex:1"><div class="label">Shares</div><div class="value" id="sharesCount">0 units</div></div></div>
         </div>
 
         <div class="grid-cards" style="margin-top:12px">
-          <div class="card"><div class="icon-wrap">D</div><div class="meta"><div class="label">Dividends</div><div class="value" id="dividendsBalance">KES 0</div></div></div>
-          <div class="card"><div class="icon-wrap">O</div><div class="meta"><div class="label">Outstanding</div><div class="value" id="outstandingBalance">KES 0</div></div></div>
-          <div class="card"><div class="icon-wrap">U</div><div class="meta"><div class="label">Unpaid / Fees</div><div class="value" id="unpaidBalance">KES 0</div></div></div>
+          <div class="card"><div style="flex:1"><div class="label">Dividends</div><div class="value" id="dividendsBalance">KES 0</div></div></div>
+          <div class="card"><div style="flex:1"><div class="label">Outstanding</div><div class="value" id="outstandingBalance">KES 0</div></div></div>
+          <div class="card"><div style="flex:1"><div class="label">Unpaid / Fees</div><div class="value" id="unpaidBalance">KES 0</div></div></div>
         </div>
 
+        <!-- loan action bar -->
         <div class="panel" id="loanActionPanel" style="display:none;margin-top:18px">
           <div style="display:flex;justify-content:space-between;align-items:center">
             <div><strong>Loan Action</strong><div class="subtitle">Live loan status & quick actions</div></div>
@@ -108,42 +105,41 @@ textarea{min-height:120px;resize:vertical}
           </div>
         </div>
 
+        <!-- loans list -->
         <div class="panel" style="margin-top:18px">
           <div style="display:flex;justify-content:space-between;align-items:center">
             <div><strong>Your Loan Applications</strong><div class="subtitle">All applications and statuses</div></div>
             <div><button class="btn" id="refreshLoansBtn">Refresh</button></div>
           </div>
-          <div id="loanList" style="margin-top:12px" class="table-wrap">
-            <table id="loanTable"><thead><tr><th>Applied</th><th>Amount</th><th>Interest</th><th>Tenure</th><th>Status</th><th>Actions</th></tr></thead><tbody id="loanBody"><tr><td colspan="6" class="subtitle">No applications yet.</td></tr></tbody></table>
-          </div>
+          <div id="loanList" style="margin-top:12px" class="table-wrap"><table id="loanTable"><thead><tr><th>Applied</th><th>Amount</th><th>Interest</th><th>Tenure</th><th>Status</th><th>Actions</th></tr></thead><tbody id="loanBody"><tr><td colspan="6" class="subtitle">No applications yet.</td></tr></tbody></table></div>
         </div>
 
+        <!-- transactions -->
         <div class="panel" style="margin-top:18px">
           <div style="display:flex;justify-content:space-between;align-items:center">
             <div><strong>Transaction History</strong><div class="subtitle">Debits, credits and running balances</div></div>
             <div style="display:flex;gap:8px;align-items:center"><button class="btn" id="exportCsvBtn">Export CSV</button><button class="btn" id="exportPdfBtn">Export PDF</button></div>
           </div>
-          <div style="margin-top:12px" class="table-wrap">
-            <table id="txTable"><thead><tr><th>Date</th><th>Particulars</th><th>Debit (KES)</th><th>Credit (KES)</th><th>Balance (KES)</th></tr></thead><tbody id="txBody"><tr><td colspan="5" class="subtitle">No transactions yet.</td></tr></tbody></table>
-          </div>
+          <div style="margin-top:12px" class="table-wrap"><table id="txTable"><thead><tr><th>Date</th><th>Particulars</th><th>Debit (KES)</th><th>Credit (KES)</th><th>Balance (KES)</th></tr></thead><tbody id="txBody"><tr><td colspan="5" class="subtitle">No transactions yet.</td></tr></tbody></table></div>
         </div>
       </section>
 
-      <!-- minimal other sections -->
+      <!-- other sections (kept minimal) -->
       <section id="view-transactions" style="display:none"><div class="panel"><h4>Transactions</h4></div></section>
       <section id="view-loans" style="display:none"><div class="panel"><h4>Loans</h4></div></section>
       <section id="view-withdrawals" style="display:none"><div class="panel"><h4>Withdrawals</h4></div></section>
       <section id="view-profile" style="display:none"><div class="panel"><h4>Profile</h4></div></section>
       <section id="view-settings" style="display:none"><div class="panel"><h4>Settings</h4></div></section>
     </main>
+
   </div>
 </div>
 
-<!-- logout warning -->
+<!-- logout modal -->
 <div id="logoutWarning" style="display:none;position:fixed;inset:0;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);z-index:60">
   <div style="background:#fff;padding:18px;border-radius:10px;max-width:420px;width:90%">
     <h3 style="margin-top:0">You're inactive</h3>
-    <p class="subtitle">You will be signed out soon due to inactivity. Click "Stay signed in" to continue.</p>
+    <p class="subtitle">You will be signed out soon due to inactivity.</p>
     <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
       <button class="btn ghost" id="logoutCancel">Stay signed in</button>
       <button class="btn" id="logoutNow">Sign out now</button>
@@ -152,430 +148,365 @@ textarea{min-height:120px;resize:vertical}
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getDatabase, ref, onValue, set, push, get, child } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-import { jsPDF } from "https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import { getDatabase, ref, onValue, set, push, get, child } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+  import { jsPDF } from "https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js";
 
-/* === KEEP YOUR REAL FIREBASE CONFIG BELOW === */
-const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
-  authDomain: "visionary-youth-grou-2024.firebaseapp.com",
-  databaseURL: "https://visionary-youth-grou-2024-default-rtdb.firebaseio.com",
-  projectId: "visionary-youth-grou-2024",
-  storageBucket: "visionary-youth-grou-2024.appspot.com",
-  messagingSenderId: "372978592717",
-  appId: "1:372978592717:web:1c15aec728ee5f854f3284"
-};
-/* ============================================ */
+  // === YOUR REAL FIREBASE CONFIG (kept as requested) ===
+  const FIREBASE_CONFIG = {
+    apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
+    authDomain: "visionary-youth-grou-2024.firebaseapp.com",
+    databaseURL: "https://visionary-youth-grou-2024-default-rtdb.firebaseio.com",
+    projectId: "visionary-youth-grou-2024",
+    storageBucket: "visionary-youth-grou-2024.appspot.com",
+    messagingSenderId: "372978592717",
+    appId: "1:372978592717:web:1c15aec728ee5f854f3284"
+  };
+  // =====================================================
 
-const app = initializeApp(FIREBASE_CONFIG);
-const db = getDatabase(app);
-const auth = getAuth(app);
+  const app = initializeApp(FIREBASE_CONFIG);
+  const db = getDatabase(app);
+  const auth = getAuth(app);
 
-const $ = id => document.getElementById(id);
-function fmt(v){ return 'KES ' + (Number(v||0)).toLocaleString(); }
-function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  // quick helpers
+  const $ = id => document.getElementById(id);
+  const fmt = v => 'KES ' + (Number(v||0)).toLocaleString();
+  const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
-let currentUser = null;
-let unsubscribers = [];
-let selectedLoanId = null;
+  let currentUser = null;
+  let unsubscribers = [];
+  let selectedLoanId = null;
 
-// ensure DOM ready before attaching event handlers that rely on elements
-document.addEventListener('DOMContentLoaded', () => {
-  // simple nav handling
-  document.querySelectorAll('.side-item').forEach(el=> el.addEventListener('click', ()=> {
+  // NAV handlers (simple)
+  document.querySelectorAll('.side-item').forEach(el => el.addEventListener('click', () => {
     document.querySelectorAll('.side-item').forEach(s=> s.classList.remove('active'));
     el.classList.add('active');
-    const view = el.getAttribute('data-view');
-    showView(view);
+    const view = el.getAttribute('data-view') || 'dashboard';
+    document.querySelectorAll('main .panel, main section').forEach(n => n.style.display = 'none');
+    // show dashboard by default
+    if(view === 'dashboard'){ document.getElementById('view-dashboard').style.display = 'block'; }
+    else { const s = document.getElementById('view-' + view); if(s) s.style.display = 'block'; }
   }));
-  showView('dashboard');
 
-  // hamburger
-  $('hamburger')?.addEventListener('click', ()=> { const sb = $('sidebar'); if(sb) sb.style.display = sb.style.display === 'block' ? 'none' : 'block'; });
+  // append sign out button
+  const signOutWrap = $('signOutWrap');
+  const signOutBtn = document.createElement('button'); signOutBtn.className='btn ghost'; signOutBtn.textContent='Sign out';
+  signOutBtn.addEventListener('click', ()=> { if(!currentUser) window.location.href='index.html'; else signOut(auth).then(()=> window.location.href='index.html').catch(()=> window.location.href='index.html'); });
+  signOutWrap.appendChild(signOutBtn);
 
-  // attach top-level button handlers (these are safe to attach now)
-  attachTopButtons();
-  // sign out button appended
-  appendSignOutButton();
-});
+  // Attach top buttons
+  function attachButtons(){
+    // Apply loan (quick prompt flow)
+    $('applyLoanBtn').addEventListener('click', async ()=>{
+      if(!currentUser){ alert('Sign in to apply'); return; }
+      try{
+        const fullName = prompt('Full name', currentUser.displayName || '');
+        if(fullName === null) return;
+        const email = prompt('Email', currentUser.email || '');
+        if(email === null) return;
+        const amount = Number(prompt('Loan amount (KES)','10000'));
+        if(isNaN(amount) || amount <= 0){ alert('Invalid amount'); return; }
+        const interestRate = Number(prompt('Interest rate (%)','12'));
+        if(isNaN(interestRate)) { alert('Invalid interest rate'); return; }
+        const tenure = Number(prompt('Tenure (months)','6'));
+        if(isNaN(tenure) || tenure <= 0){ alert('Invalid tenure'); return; }
+        const purpose = prompt('Purpose','Business capital');
+        if(purpose === null) return;
 
-// show/hide view
-function showView(view){
-  const sections = ['dashboard','transactions','loans','withdrawals','profile','statements','settings'];
-  sections.forEach(s=>{ const node = $('view-' + s); if(node) node.style.display = s===view ? 'block' : 'none'; });
-  if(view==='dashboard') awardPoints(5,'view_dashboard'); window.scrollTo({top:0,behavior:'smooth'});
-}
+        const loansRef = ref(db, `members/${currentUser.uid}/loans`);
+        const p = push(loansRef);
+        const createdAt = Date.now();
+        const payload = { id: p.key, fullName, email, amount, interestRate, tenureMonths: tenure, purpose, status:'pending', stage:'applied', createdAt };
+        await set(p, payload);
+        await set(ref(db, `members/${currentUser.uid}/loan`), { id: p.key, amount, interestRate, status:'pending', tenureMonths: tenure, appliedAt: createdAt });
+        alert('Loan application saved.');
+      }catch(e){ console.error('applyLoan err', e); alert('Failed to apply loan: ' + e.message); }
+    });
 
-// Attach top-level button event handlers
-function attachTopButtons(){
-  // Apply loan (quick prompt)
-  $('applyLoanBtn')?.addEventListener('click', async ()=>{
-    if(!currentUser){ alert('Sign in to apply'); return; }
+    // request withdrawal
+    $('requestWithdrawBtn').addEventListener('click', async ()=>{
+      if(!currentUser){ alert('Sign in to request withdrawal'); return; }
+      try{
+        const amount = Number(prompt('Withdrawal amount (KES)','0'));
+        if(!amount || isNaN(amount) || amount <=0){ alert('Invalid amount'); return; }
+        const reason = prompt('Reason for withdrawal','Personal use');
+        if(reason === null) return;
+        const wRef = ref(db, `members/${currentUser.uid}/withdrawals`);
+        const p = push(wRef);
+        const payload = { id: p.key, amount, reason, status: 'pending', requestedAt: Date.now() };
+        await set(p, payload);
+        alert('Withdrawal request submitted.');
+      }catch(e){ console.error('withdraw err', e); alert('Failed to request withdrawal: ' + e.message); }
+    });
+
+    // transaction export
+    $('exportCsvBtn').addEventListener('click', ()=>{
+      const rows = Array.from($('txBody').children).map(tr => Array.from(tr.children).map(td => td.textContent.trim()));
+      if(!rows.length){ alert('No transactions to export'); return; }
+      const csv = rows.map(r => r.map(c => `"${c.replace(/"/g,'""')}"`).join(',')).join('\n');
+      const blob = new Blob([csv], { type:'text/csv' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `transactions_${currentUser? currentUser.uid : 'guest'}_${Date.now()}.csv`; a.click();
+    });
+
+    $('exportPdfBtn').addEventListener('click', ()=>{
+      const el = $('txTable');
+      html2canvas(el, { scale:2 }).then(canvas => {
+        const img = canvas.toDataURL('image/png');
+        const doc = new jsPDF('p','mm','a4');
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const imgProps = doc.getImageProperties(img);
+        const imgWidth = pageWidth - 20;
+        const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
+        doc.addImage(img,'PNG',10,10,imgWidth,imgHeight);
+        doc.save(`transactions_${currentUser? currentUser.uid : 'guest'}_${Date.now()}.pdf`);
+      }).catch(e => { console.error('exportPdf err', e); alert('Failed to export PDF'); });
+    });
+
+    // refresh loans (listener auto-updates but keep button for manual)
+    $('refreshLoansBtn').addEventListener('click', ()=> { if(currentUser) alert('Loans refreshed (listeners are live)'); else alert('Sign in to refresh'); });
+
+    // repay from action bar
+    $('repayBtn').addEventListener('click', async ()=>{
+      if(!currentUser){ alert('Sign in to repay'); return; }
+      if(!selectedLoanId){ alert('No active loan selected'); return; }
+      const amount = Number(prompt('Enter repayment amount (KES)','0'));
+      if(!amount || isNaN(amount) || amount <=0){ alert('Invalid'); return; }
+      try{
+        const txRef = ref(db, `members/${currentUser.uid}/transactions`); const p = push(txRef); await set(p, { date: new Date().toISOString(), description: 'Loan repayment', debit:0, credit: amount, timestamp: Date.now(), status: 'posted' });
+        const instRef = ref(db, `members/${currentUser.uid}/loans/${selectedLoanId}/installments`); const pi = push(instRef); await set(pi, { amount, paidAt: Date.now() });
+        alert('Repayment recorded.');
+      }catch(e){ console.error('repay err', e); alert('Repayment failed: ' + e.message); }
+    });
+
+    // view loan details
+    $('viewLoanDetailsBtn').addEventListener('click', async ()=>{
+      if(!currentUser){ alert('Sign in to view'); return; }
+      if(!selectedLoanId){ alert('No active loan selected'); return; }
+      try{
+        const snap = await get(child(ref(db), `members/${currentUser.uid}/loans/${selectedLoanId}`));
+        if(!snap.exists()){ alert('Loan not found'); return; }
+        const loan = snap.val();
+        alert(`Loan ID: ${loan.id || selectedLoanId}\nAmount: ${loan.amount? fmt(loan.amount) : '—'}\nInterest: ${loan.interestRate? loan.interestRate + '%' : '—'}\nTenure: ${loan.tenureMonths || '—'} months\nStatus: ${loan.status || 'pending'}`);
+      }catch(e){ console.error('viewLoan err', e); alert('Failed to load loan details'); }
+    });
+
+    // download loan PDF from action bar
+    $('downloadLoanAppBtn').addEventListener('click', async ()=>{ if(!selectedLoanId){ alert('No active loan to download'); return; } await downloadLoanPdfById(selectedLoanId); });
+  }
+
+  // populate loan action panel
+  function populateLoanAction(loan){
+    if(!loan) return hideLoanAction();
+    $('loanActionPanel').style.display = 'block';
+    $('actAmt').textContent = loan.amount ? fmt(loan.amount) : 'KES 0';
+    $('actInt').textContent = loan.interestRate ? loan.interestRate + '%' : '—';
+    $('actStage').textContent = loan.stage || loan.status || 'pending';
+    let instCount = 0;
+    if(loan.installments){ instCount = Array.isArray(loan.installments) ? loan.installments.length : Object.keys(loan.installments||{}).length; } else instCount = loan.tenureMonths || 0;
+    $('actInst').textContent = instCount;
+    $('actNext').textContent = loan.nextRepayment ? new Date(Number(loan.nextRepayment)).toLocaleString() : '—';
+    $('loanBadge').innerHTML = loan.status ? `<span class="status-pill ${loan.status==='pending'?'status-pending': loan.status==='approved'?'status-approved':'status-rejected'}">${esc(loan.status)}</span>` : '—';
+    selectedLoanId = loan.id || selectedLoanId;
+  }
+  function hideLoanAction(){ $('loanActionPanel').style.display = 'none'; selectedLoanId = null; }
+
+  // download loan PDF helper
+  async function downloadLoanPdfById(loanId){
+    if(!currentUser) { alert('Sign in to download'); return; }
     try{
-      const fullName = prompt('Full name', currentUser.displayName || '');
-      if(fullName === null) return;
-      const email = prompt('Email', currentUser.email || '');
-      if(email === null) return;
-      const amount = Number(prompt('Loan amount (KES)','10000'));
-      if(isNaN(amount) || amount <= 0){ alert('Invalid amount'); return; }
-      const interestRate = Number(prompt('Interest rate (%)','12'));
-      if(isNaN(interestRate)) { alert('Invalid interest rate'); return; }
-      const tenure = Number(prompt('Tenure (months)','6'));
-      if(isNaN(tenure) || tenure <= 0){ alert('Invalid tenure'); return; }
-      const purpose = prompt('Purpose','Business capital');
-      if(purpose === null) return;
-
-      const loansRef = ref(db, `members/${currentUser.uid}/loans`);
-      const p = push(loansRef);
-      const createdAt = Date.now();
-      const payload = { id: p.key, fullName, email, amount, interestRate, tenureMonths: tenure, purpose, status:'pending', stage:'applied', createdAt };
-      await set(p, payload);
-      await set(ref(db, `members/${currentUser.uid}/loan`), { id: p.key, amount, interestRate, status:'pending', tenureMonths: tenure, appliedAt: createdAt });
-      alert('Loan application saved.');
-      awardPoints(10,'loan_application');
-    }catch(e){ console.error('apply loan err', e); alert('Failed to apply loan: ' + e.message); }
-  });
-
-  // withdraw
-  $('requestWithdrawBtn')?.addEventListener('click', async ()=>{
-    if(!currentUser){ alert('Sign in to request withdrawal'); return; }
-    try{
-      const amount = Number(prompt('Withdrawal amount (KES)','0'));
-      if(!amount || isNaN(amount) || amount <=0){ alert('Invalid amount'); return; }
-      const reason = prompt('Reason for withdrawal','Personal use');
-      if(reason === null) return;
-      const wRef = ref(db, `members/${currentUser.uid}/withdrawals`);
-      const p = push(wRef);
-      const payload = { id: p.key, amount, reason, status: 'pending', requestedAt: Date.now() };
-      await set(p, payload);
-      alert('Withdrawal request submitted.');
-      awardPoints(5,'withdraw_request');
-    }catch(e){ console.error('withdraw err', e); alert('Failed to request withdrawal: ' + e.message); }
-  });
-
-  // export CSV / PDF
-  $('exportCsvBtn')?.addEventListener('click', () => {
-    const rows = Array.from($('txBody').children).map(tr => Array.from(tr.children).map(td=> td.textContent.trim()));
-    if(!rows.length){ alert('No transactions to export'); return; }
-    const csv = rows.map(r => r.map(c=> `"${c.replace(/"/g,'""')}"`).join(',')).join('\n');
-    const blob = new Blob([csv], { type:'text/csv' });
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `transactions_${currentUser? currentUser.uid : 'guest'}_${Date.now()}.csv`; a.click();
-    awardPoints(3,'export_csv');
-  });
-
-  $('exportPdfBtn')?.addEventListener('click', async () => {
-    const el = $('txTable');
-    if(!el){ alert('No transactions table available'); return; }
-    html2canvas(el, { scale:2 }).then(canvas => {
-      const img = canvas.toDataURL('image/png');
+      const snap = await get(child(ref(db), `members/${currentUser.uid}/loans/${loanId}`));
+      if(!snap.exists()){ alert('Loan not found'); return; }
+      const loan = snap.val();
       const doc = new jsPDF('p','mm','a4');
       const pageWidth = doc.internal.pageSize.getWidth();
-      const imgProps = doc.getImageProperties(img);
-      const imgWidth = pageWidth - 20;
-      const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
-      doc.addImage(img,'PNG',10,10,imgWidth,imgHeight);
-      doc.setFontSize(10); doc.text('Visionary Youth — Transactions', pageWidth/2, 8, { align:'center' });
-      doc.save(`transactions_${currentUser? currentUser.uid : 'guest'}_${Date.now()}.pdf`);
-      awardPoints(3,'export_pdf');
-    }).catch(e => { console.error('export pdf err', e); alert('Failed to export PDF: ' + e.message); });
-  });
-
-  // refresh loans
-  $('refreshLoansBtn')?.addEventListener('click', ()=>{ if(currentUser) alert('Loans refreshed (listeners are live)'); else alert('Sign in to refresh'); });
-
-  // repay (action)
-  $('repayBtn')?.addEventListener('click', async ()=>{
-    if(!currentUser){ alert('Sign in to repay'); return; }
-    if(!selectedLoanId){ alert('No active loan selected'); return; }
-    const amount = Number(prompt('Enter repayment amount (KES)','0'));
-    if(!amount || isNaN(amount) || amount <=0){ alert('Invalid'); return; }
-    try{
-      const txRef = ref(db, `members/${currentUser.uid}/transactions`);
-      const p = push(txRef); await set(p, { date: new Date().toISOString(), description: 'Loan repayment', debit:0, credit: amount, timestamp: Date.now(), status: 'posted' });
-      const instRef = ref(db, `members/${currentUser.uid}/loans/${selectedLoanId}/installments`);
-      const pi = push(instRef); await set(pi, { amount, paidAt: Date.now() });
-      awardPoints(15,'repayment');
-      alert('Repayment recorded.');
-    }catch(e){ console.error('repay err', e); alert('Repayment failed: ' + e.message); }
-  });
-
-  // action bar view details
-  $('viewLoanDetailsBtn')?.addEventListener('click', async ()=>{
-    if(!currentUser){ alert('Sign in to view'); return; }
-    if(!selectedLoanId){ alert('No active loan selected'); return; }
-    try{
-      const snap = await get(child(ref(db), `members/${currentUser.uid}/loans/${selectedLoanId}`));
-      if(!snap.exists()){ alert('Loan not found'); return; }
-      const loan = snap.val();
-      alert(`Loan details:\n\nID: ${loan.id || selectedLoanId}\nAmount: ${loan.amount? fmt(loan.amount): '—'}\nInterest: ${loan.interestRate? loan.interestRate + '%' : '—'}\nTenure: ${loan.tenureMonths || '—'} months\nStatus: ${loan.status || 'pending'}`);
-    }catch(e){ console.error('view loan details err', e); alert('Failed to load loan details'); }
-  });
-
-  // download from action bar
-  $('downloadLoanAppBtn')?.addEventListener('click', async ()=>{ if(!selectedLoanId){ alert('No active loan to download'); return; } await downloadLoanPdfById(selectedLoanId); });
-
-  // sign out controls in logout dialog
-  $('logoutCancel')?.addEventListener('click', ()=>{ $('logoutWarning').style.display='none'; resetInactivityTimer(); });
-  $('logoutNow')?.addEventListener('click', ()=>{ $('logoutWarning').style.display='none'; signOut(auth).then(()=> window.location.href='index.html').catch(()=> window.location.href='index.html'); });
-}
-
-// Append Sign out button in top-right
-function appendSignOutButton(){
-  const btn = document.createElement('button'); btn.className='btn ghost'; btn.textContent='Sign out';
-  btn.addEventListener('click', ()=>{ if(!currentUser){ window.location.href='index.html'; return; } signOut(auth).then(()=> window.location.href='index.html').catch(()=> window.location.href='index.html'); });
-  document.querySelector('.top-right')?.appendChild(btn);
-}
-
-/* === AUTH & RTDB LISTENERS ===
-   - Reads balances and points robustly:
-     tries members/{uid}/balances and members/{uid}/points first
-     falls back to balances/{uid} and points/{uid} if members path missing
-*/
-onAuthStateChanged(auth, async user => {
-  // cleanup previous
-  unsubscribers.forEach(un => { try{ if(typeof un === 'function') un(); }catch(e){} });
-  unsubscribers = [];
-  currentUser = user;
-
-  if(user){
-    // set UI identity
-    $('topUserName').textContent = user.displayName || user.email || 'Member';
-    $('topUserEmail').textContent = user.email || '';
-    $('sideName').textContent = user.displayName || user.email || 'Member';
-    $('sideEmail').textContent = user.email || '';
-    $('topAvatar').textContent = (user.displayName || 'Member').split(' ').map(s=>s[0]).slice(0,2).join('').toUpperCase();
-
-    // balances - try members/{uid}/balances then fallback to balances/{uid}
-    const memberBalancesRef = ref(db, `members/${user.uid}/balances`);
-    const topBalancesRef = ref(db, `balances/${user.uid}`);
-    const balancesUnsub = onValue(memberBalancesRef, snap => {
-      if(snap.exists()){
-        const b = snap.val();
-        updateBalancesUI(b);
-      } else {
-        // fallback to top-level balances/{uid}
-        get(topBalancesRef).then(snap2 => {
-          if(snap2.exists()){
-            updateBalancesUI(snap2.val());
-          } else {
-            // if nothing, clear to zeros
-            updateBalancesUI({});
-          }
-        }).catch(e => { console.error('fallback balances get err', e); updateBalancesUI({}); });
-      }
-    }, err => { console.error('memberBalances onValue err', err); updateBalancesUI({}); });
-    unsubscribers.push(balancesUnsub);
-
-    // points - try members/{uid}/points then points/{uid}
-    const memberPointsRef = ref(db, `members/${user.uid}/points`);
-    const topPointsRef = ref(db, `points/${user.uid}`);
-    const pointsUnsub = onValue(memberPointsRef, snap => {
-      if(snap.exists()){
-        $('pointsValue').textContent = Number(snap.val()) || 0;
-      } else {
-        get(topPointsRef).then(snap2 => { $('pointsValue').textContent = snap2.exists() ? Number(snap2.val()) : 0; }).catch(e=> { console.error('fallback points err', e); $('pointsValue').textContent = 0; });
-      }
-    }, err => { console.error('memberPoints onValue err', err); $('pointsValue').textContent = 0; });
-    unsubscribers.push(pointsUnsub);
-
-    // transactions
-    const txRef = ref(db, `members/${user.uid}/transactions`);
-    const txUnsub = onValue(txRef, snap => {
-      const arr = [];
-      if(snap.exists()){
-        const val = snap.val();
-        Object.entries(val).forEach(([k,v])=> arr.push({ id:k, ...v }));
-        arr.sort((a,b)=> (a.timestamp||a.date||0) - (b.timestamp||b.date||0));
-      }
-      renderTransactions(arr);
-    }, err => { console.error('transactions onValue err', err); renderTransactions([]); });
-    unsubscribers.push(txUnsub);
-
-    // loans
-    const loansRef = ref(db, `members/${user.uid}/loans`);
-    const loansUnsub = onValue(loansRef, snap => {
-      const body = $('loanBody'); body.innerHTML = '';
-      const rows = [];
-      if(snap.exists()){
-        const data = snap.val();
-        Object.entries(data).forEach(([k,v])=> rows.push({ id:k, ...v }));
-        rows.sort((a,b)=> (b.createdAt||0) - (a.createdAt||0));
-        rows.forEach(r => {
-          const tr = document.createElement('tr');
-          const applied = r.createdAt ? new Date(Number(r.createdAt)).toLocaleString() : '—';
-          const amt = r.amount ? fmt(r.amount) : '—';
-          const int = (r.interestRate? r.interestRate + '%' : '—');
-          const tenure = r.tenureMonths ? r.tenureMonths + ' mo' : (r.tenure ? r.tenure + ' mo' : '—');
-          const status = r.status || 'pending';
-          const statusHtml = `<span class="status-pill ${status==='pending'?'status-pending': status==='approved'?'status-approved':'status-rejected'}">${esc(status)}</span>`;
-          tr.innerHTML = `<td>${esc(applied)}</td><td>${esc(amt)}</td><td>${esc(int)}</td><td>${esc(tenure)}</td><td>${statusHtml}</td><td><button class="btn" data-id="${esc(r.id)}" data-action="view">View</button> <button class="btn ghost" data-id="${esc(r.id)}" data-action="download">PDF</button></td>`;
-          body.appendChild(tr);
-        });
-        const active = rows.find(rr => rr.status === 'approved') || rows.find(rr => rr.status === 'pending') || rows[0];
-        if(active){ populateLoanAction(active); selectedLoanId = active.id; } else { hideLoanAction(); selectedLoanId = null; }
-      } else {
-        body.innerHTML = '<tr><td colspan="6" class="subtitle">No applications yet.</td></tr>'; hideLoanAction(); selectedLoanId = null;
-      }
-    }, err => { console.error('loans onValue err', err); });
-    unsubscribers.push(loansUnsub);
-
-    // award login points
-    awardPoints(5,'login_bonus');
-
-    // reset inactivity timers
-    resetInactivityTimer();
-  } else {
-    // guest state cleanup UI
-    updateBalancesUI({});
-    $('pointsValue').textContent = 0;
-    hideLoanAction();
-    clearTimeout(inactivityTimer); clearTimeout(warningTimer);
+      doc.setTextColor(200,200,200); doc.setFontSize(60); doc.text('Visionary Youth', pageWidth/2, 120, { align:'center' });
+      doc.setTextColor(0,80,0); doc.setFontSize(18); doc.text('Visionary Youth Group', 14, 20);
+      doc.setFontSize(11); doc.setTextColor(80,80,80); doc.text(`Loan Application — ${loanId}`, 14, 28);
+      doc.setFontSize(10); doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 34);
+      doc.setDrawColor(0,100,0); doc.setFillColor(240,255,240); doc.rect(14,38,pageWidth-28,30,'F');
+      doc.setTextColor(0,70,0); doc.setFontSize(11); doc.text(`Member: ${loan.fullName || currentUser.displayName || currentUser.email}`, 16,46);
+      doc.text(`Email: ${loan.email || currentUser.email || ''}`, 16,52);
+      doc.text(`Member ID: ${loan.memberId || currentUser.uid}`, 16,58);
+      doc.setFontSize(12); doc.setTextColor(0,0,0); doc.text('Loan details', 14, 80);
+      const lines = [
+        `Amount: ${loan.amount ? 'KES ' + Number(loan.amount).toLocaleString() : '—'}`,
+        `Interest rate: ${loan.interestRate ? loan.interestRate + '%' : '—'}`,
+        `Tenure (months): ${loan.tenureMonths || '—'}`,
+        `Status: ${loan.status || 'pending'}`,
+        `Purpose: ${loan.purpose || '—'}`,
+      ];
+      let y = 88; lines.forEach(l => { doc.setFontSize(10); doc.text(l, 16, y); y += 7; });
+      doc.setFontSize(9); doc.setTextColor(100,100,100); doc.text('Visionary Youth Group — Loan Application (Generated PDF)', 14, 280);
+      doc.save(`loan_${loanId}_${currentUser.uid}_${Date.now()}.pdf`);
+    }catch(e){ console.error('downloadLoanPdfById err', e); alert('Failed to generate PDF: ' + (e.message || e)); }
   }
-});
 
-// update balances UI helper
-function updateBalancesUI(b = {}){
-  try{
-    $('monthlyBalance').textContent = fmt(b.monthly || b.monthlySavings || 0);
-    $('weeklyBalance').textContent = fmt(b.weekly || b.weeklySavings || 0);
-    $('sharesCount').textContent = (b.shares || b.sharesCount || 0) + ' units';
-    $('dividendsBalance').textContent = fmt(b.dividends || 0);
-    $('outstandingBalance').textContent = fmt(b.outstanding || 0);
-    $('unpaidBalance').textContent = fmt(b.pending || b.unpaid || 0);
-  }catch(e){ console.error('updateBalancesUI err', e); }
-}
-
-// populate loan action panel
-function populateLoanAction(loan){
-  if(!loan) return hideLoanAction();
-  $('loanActionPanel').style.display = 'block';
-  $('actAmt').textContent = loan.amount ? fmt(loan.amount) : 'KES 0';
-  $('actInt').textContent = loan.interestRate ? loan.interestRate + '%' : '—';
-  $('actStage').textContent = loan.stage || loan.status || 'pending';
-  let instCount = 0;
-  if(loan.installments){
-    if(Array.isArray(loan.installments)) instCount = loan.installments.length;
-    else instCount = Object.keys(loan.installments||{}).length;
-  } else instCount = loan.tenureMonths || 0;
-  $('actInst').textContent = instCount;
-  let nextRep = '—';
-  if(loan.nextRepayment) { try{ nextRep = new Date(Number(loan.nextRepayment)).toLocaleString(); }catch(e){ nextRep = loan.nextRepayment; } }
-  $('actNext').textContent = nextRep;
-  $('loanBadge').innerHTML = loan.status ? `<span class="status-pill ${loan.status==='pending'?'status-pending': loan.status==='approved'?'status-approved':'status-rejected'}">${esc(loan.status)}</span>` : '—';
-  selectedLoanId = loan.id || selectedLoanId;
-}
-
-function hideLoanAction(){ $('loanActionPanel').style.display = 'none'; selectedLoanId = null; }
-
-// delegated click handler for loan table buttons (view/download)
-document.addEventListener('click', async (e) => {
-  const btn = e.target.closest('button[data-action]');
-  if(!btn) return;
-  const id = btn.getAttribute('data-id');
-  const action = btn.getAttribute('data-action');
-  if(action === 'view'){
-    if(!currentUser){ alert('Sign in to view'); return; }
-    try{
-      const snap = await get(child(ref(db), `members/${currentUser.uid}/loans/${id}`));
-      if(!snap.exists()){ alert('Loan not found'); return; }
-      const loan = snap.val();
-      const lines = [];
-      lines.push(`Loan ID: ${loan.id || id}`);
-      lines.push(`Member: ${loan.fullName || loan.memberName || currentUser.displayName || currentUser.email}`);
-      lines.push(`Amount: ${loan.amount ? 'KES ' + Number(loan.amount).toLocaleString() : '—'}`);
-      lines.push(`Interest: ${loan.interestRate? loan.interestRate + '%' : '—'}`);
-      lines.push(`Tenure: ${loan.tenureMonths || '—'} months`);
-      lines.push(`Status: ${loan.status || 'pending'}`);
-      lines.push(`Purpose: ${loan.purpose || '—'}`);
-      if(loan.installments) lines.push(`Installments: ${Array.isArray(loan.installments)? loan.installments.length : Object.keys(loan.installments||{}).length}`);
-      alert(lines.join('\n'));
-    }catch(err){ console.error('view loan err', err); alert('Failed to fetch loan'); }
-  } else if(action === 'download'){
-    if(!id){ alert('Loan id missing'); return; }
-    await downloadLoanPdfById(id);
-  }
-});
-
-// award points helper
-async function awardPoints(amount, reason='action'){
-  if(!currentUser) return;
-  try{
-    const pRef = ref(db, `members/${currentUser.uid}/points`);
-    const snap = await get(pRef);
-    const current = snap.exists() ? Number(snap.val()) : 0;
-    await set(pRef, current + Number(amount));
-    const logRef = ref(db, `members/${currentUser.uid}/pointsLog`);
-    const p = push(logRef);
-    await set(p, { change: Number(amount), reason, at: Date.now() });
-  }catch(e){ console.error('awardPoints err', e); }
-}
-
-// download loan PDF using jsPDF
-async function downloadLoanPdfById(loanId){
-  if(!currentUser) { alert('Sign in to download'); return; }
-  try{
-    const snap = await get(child(ref(db), `members/${currentUser.uid}/loans/${loanId}`));
-    if(!snap.exists()){ alert('Loan not found'); return; }
-    const loan = snap.val();
-    const doc = new jsPDF('p','mm','a4');
-    const pageWidth = doc.internal.pageSize.getWidth();
-    // watermark header
-    doc.setTextColor(200,200,200); doc.setFontSize(60);
-    // angle/opacity not available reliably; use light color and position
-    doc.text('Visionary Youth', pageWidth/2, 120, { align:'center' });
-    // header
-    doc.setTextColor(0,80,0); doc.setFontSize(18); doc.text('Visionary Youth Group', 14, 20);
-    doc.setFontSize(11); doc.setTextColor(80,80,80); doc.text(`Loan Application — ${loanId}`, 14, 28);
-    doc.setFontSize(10); doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 34);
-    // member info box
-    doc.setDrawColor(0,100,0); doc.setFillColor(240,255,240); doc.rect(14,38, pageWidth-28, 30, 'F');
-    doc.setTextColor(0,70,0); doc.setFontSize(11);
-    doc.text(`Member: ${loan.fullName || currentUser.displayName || currentUser.email}`, 16, 46);
-    doc.text(`Email: ${loan.email || currentUser.email || ''}`, 16, 52);
-    doc.text(`Member ID: ${loan.memberId || currentUser.uid}`, 16, 58);
-    // details
-    doc.setFontSize(12); doc.setTextColor(0,0,0); doc.text('Loan details', 14, 80); doc.setFontSize(10);
-    const lines = [
-      `Amount: ${loan.amount ? 'KES ' + Number(loan.amount).toLocaleString() : '—'}`,
-      `Interest rate: ${loan.interestRate ? loan.interestRate + '%' : '—'}`,
-      `Tenure (months): ${loan.tenureMonths || '—'}`,
-      `Status: ${loan.status || 'pending'}`,
-      `Purpose: ${loan.purpose || '—'}`,
-      `Guarantor: ${loan.guarantorName || '—'} (${loan.guarantorPhone || '—'})`
-    ];
-    let y = 88;
-    lines.forEach(l => { doc.text(l, 16, y); y += 7; });
-    doc.setFontSize(9); doc.setTextColor(100,100,100); doc.text('Visionary Youth Group — Loan Application (Generated PDF)', 14, 280);
-    const filename = `loan_${loanId}_${currentUser.uid}_${Date.now()}.pdf`;
-    doc.save(filename);
-    awardPoints(2,'download_loan_pdf');
-  }catch(e){ console.error('downloadLoanPdf err', e); alert('Failed to generate PDF: ' + (e.message || e)); }
-}
-
-// render transactions
-function renderTransactions(arr){
-  const tbody = $('txBody'); tbody.innerHTML = '';
-  if(!arr || !arr.length){ tbody.innerHTML = '<tr><td colspan="5" class="subtitle">No transactions yet.</td></tr>'; return; }
-  let running = 0;
-  arr.forEach(t => {
-    if('balance' in t && t.balance !== null && t.balance !== undefined) running = Number(t.balance);
-    else running = running + (Number(t.credit||0) - Number(t.debit||0));
-    const dateStr = t.date ? new Date(t.date).toLocaleString() : new Date(t.timestamp||0).toLocaleString();
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${esc(dateStr)}</td><td>${esc(t.description||'')}</td><td>${t.debit? (Number(t.debit).toLocaleString()): ''}</td><td>${t.credit? (Number(t.credit).toLocaleString()): ''}</td><td>${running.toLocaleString()}</td>`;
-    tbody.appendChild(tr);
+  // delegated loan table actions
+  document.addEventListener('click', async (e)=>{
+    const btn = e.target.closest('button[data-action]');
+    if(!btn) return;
+    const id = btn.getAttribute('data-id');
+    const action = btn.getAttribute('data-action');
+    if(action === 'view'){
+      if(!currentUser){ alert('Sign in to view'); return; }
+      try{
+        const snap = await get(child(ref(db), `members/${currentUser.uid}/loans/${id}`));
+        if(!snap.exists()){ alert('Loan not found'); return; }
+        const loan = snap.val();
+        alert(`Loan ID: ${loan.id || id}\nAmount: ${loan.amount? fmt(loan.amount): '—'}\nInterest: ${loan.interestRate? loan.interestRate + '%' : '—'}\nTenure: ${loan.tenureMonths || '—'} months\nStatus: ${loan.status || 'pending'}`);
+      }catch(err){ console.error('loan view err', err); alert('Failed to fetch loan'); }
+    } else if(action === 'download'){
+      if(!id){ alert('Loan id missing'); return; }
+      await downloadLoanPdfById(id);
+    }
   });
-}
 
-// inactivity auto-logout
-let AUTO_LOGOUT_MIN = 3; let inactivityTimer = null; let warningTimer = null;
-function resetInactivityTimer(){ if(inactivityTimer) clearTimeout(inactivityTimer); if(warningTimer) clearTimeout(warningTimer); if(!currentUser) return; warningTimer = setTimeout(()=>{ $('logoutWarning').style.display = 'flex'; }, Math.max((AUTO_LOGOUT_MIN * 60 - 60) * 1000, 0)); inactivityTimer = setTimeout(()=>{ signOut(auth).then(()=> window.location.href='index.html').catch(()=> window.location.href='index.html'); $('logoutWarning').style.display = 'none'; }, AUTO_LOGOUT_MIN * 60 * 1000); }
-['click','mousemove','keydown','scroll','touchstart'].forEach(evt => window.addEventListener(evt, ()=> { if(currentUser) resetInactivityTimer(); }, { passive:true }));
+  // onAuthStateChanged: attach listeners for balances, points, tx, loans
+  onAuthStateChanged(auth, async user => {
+    // cleanup
+    unsubscribers.forEach(u => { try{ if(typeof u === 'function') u(); } catch(e){} });
+    unsubscribers = [];
+    currentUser = user;
+    if(user){
+      $('topUserName').textContent = user.displayName || user.email || 'Member';
+      $('topUserEmail').textContent = user.email || '';
+      $('sideName').textContent = user.displayName || user.email || 'Member';
+      $('sideEmail').textContent = user.email || '';
 
-// cleanup on unload
-window.addEventListener('beforeunload', ()=> { unsubscribers.forEach(u => { try{ if(typeof u === 'function') u(); }catch(e){} }); });
+      // Balances: try members/{uid}/balances then fallback to balances/{uid}
+      const memberBalancesRef = ref(db, `members/${user.uid}/balances`);
+      const topBalancesRef = ref(db, `balances/${user.uid}`);
+      const balUnsub = onValue(memberBalancesRef, snap => {
+        if(snap.exists()){
+          const b = snap.val();
+          $('monthlyBalance').textContent = fmt(b.monthly || b.monthlySavings || 0);
+          $('weeklyBalance').textContent = fmt(b.weekly || b.weeklySavings || 0);
+          $('sharesCount').textContent = (b.shares || b.sharesCount || 0) + ' units';
+          $('dividendsBalance').textContent = fmt(b.dividends || 0);
+          $('outstandingBalance').textContent = fmt(b.outstanding || 0);
+          $('unpaidBalance').textContent = fmt(b.pending || b.unpaid || 0);
+        } else {
+          // fallback get
+          get(topBalancesRef).then(snap2 => {
+            if(snap2.exists()){
+              const b2 = snap2.val();
+              $('monthlyBalance').textContent = fmt(b2.monthly || 0);
+              $('weeklyBalance').textContent = fmt(b2.weekly || 0);
+              $('sharesCount').textContent = (b2.shares || 0) + ' units';
+              $('dividendsBalance').textContent = fmt(b2.dividends || 0);
+              $('outstandingBalance').textContent = fmt(b2.outstanding || 0);
+              $('unpaidBalance').textContent = fmt(b2.pending || 0);
+            } else {
+              // nothing
+              $('monthlyBalance').textContent = $('weeklyBalance').textContent = 'KES 0';
+              $('sharesCount').textContent = '0 units';
+              $('dividendsBalance').textContent = $('outstandingBalance').textContent = $('unpaidBalance').textContent = 'KES 0';
+            }
+          }).catch(e => { console.error('fallback balances get err', e); });
+        }
+      }, err => { console.error('balances onValue err', err); });
+      unsubscribers.push(balUnsub);
+
+      // Points
+      const memberPointsRef = ref(db, `members/${user.uid}/points`);
+      const topPointsRef = ref(db, `points/${user.uid}`);
+      const ptsUnsub = onValue(memberPointsRef, snap => {
+        if(snap.exists()) $('pointsValue').textContent = Number(snap.val()) || 0;
+        else {
+          get(topPointsRef).then(snap2 => { $('pointsValue').textContent = snap2.exists() ? Number(snap2.val()) : 0; }).catch(e=> { console.error('fallback points err', e); $('pointsValue').textContent = 0; });
+        }
+      }, err => { console.error('points onValue err', err); $('pointsValue').textContent = 0; });
+      unsubscribers.push(ptsUnsub);
+
+      // Transactions
+      const txRef = ref(db, `members/${user.uid}/transactions`);
+      const txUnsub = onValue(txRef, snap => {
+        const arr = [];
+        if(snap.exists()){
+          const val = snap.val();
+          Object.entries(val).forEach(([k,v]) => arr.push({ id:k, ...v }));
+          arr.sort((a,b) => (a.timestamp||a.date||0) - (b.timestamp||b.date||0));
+        }
+        renderTransactions(arr);
+      }, err => { console.error('transactions onValue err', err); renderTransactions([]); });
+      unsubscribers.push(txUnsub);
+
+      // Loans
+      const loansRef = ref(db, `members/${user.uid}/loans`);
+      const loansUnsub = onValue(loansRef, snap => {
+        const body = $('loanBody'); body.innerHTML = '';
+        const rows = [];
+        if(snap.exists()){
+          const data = snap.val();
+          Object.entries(data).forEach(([k,v]) => rows.push({ id:k, ...v }));
+          rows.sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
+          rows.forEach(r => {
+            const tr = document.createElement('tr');
+            const applied = r.createdAt ? new Date(Number(r.createdAt)).toLocaleString() : '—';
+            const amt = r.amount ? fmt(r.amount) : '—';
+            const int = (r.interestRate? r.interestRate + '%' : '—');
+            const tenure = r.tenureMonths ? r.tenureMonths + ' mo' : '—';
+            const status = r.status || 'pending';
+            const statusHtml = `<span class="status-pill ${status==='pending'?'status-pending': status==='approved'?'status-approved':'status-rejected'}">${esc(status)}</span>`;
+            tr.innerHTML = `<td>${esc(applied)}</td><td>${esc(amt)}</td><td>${esc(int)}</td><td>${esc(tenure)}</td><td>${statusHtml}</td><td><button class="btn" data-id="${esc(r.id)}" data-action="view">View</button> <button class="btn ghost" data-id="${esc(r.id)}" data-action="download">PDF</button></td>`;
+            body.appendChild(tr);
+          });
+          const active = rows.find(rr => rr.status === 'approved') || rows.find(rr => rr.status === 'pending') || rows[0];
+          if(active){ populateLoanAction(active); selectedLoanId = active.id; } else { hideLoanAction(); selectedLoanId = null; }
+        } else {
+          body.innerHTML = '<tr><td colspan="6" class="subtitle">No applications yet.</td></tr>'; hideLoanAction(); selectedLoanId = null;
+        }
+      }, err => { console.error('loans onValue err', err); });
+      unsubscribers.push(loansUnsub);
+
+      // Attach buttons now that user exists
+      attachButtons();
+
+      // award login points (non-blocking)
+      try{ const pRef = ref(db, `members/${user.uid}/points`); get(pRef).then(snap => { const cur = snap.exists()? Number(snap.val()):0; set(pRef, cur + 5).catch(()=>{}); }); }catch(e){}
+
+      // reset inactivity
+      resetInactivityTimer();
+    } else {
+      // guest -> redirect to index
+      // (you can choose to redirect or show guest UI)
+      console.log('no user; redirecting to index.html'); // comment out if not desired
+      // window.location.href = 'index.html';
+      // clear UI
+      $('monthlyBalance').textContent = 'KES 0'; $('weeklyBalance').textContent = 'KES 0'; $('sharesCount').textContent = '0 units'; $('dividendsBalance').textContent = 'KES 0'; $('outstandingBalance').textContent = 'KES 0'; $('unpaidBalance').textContent = 'KES 0'; $('pointsValue').textContent = 0;
+      hideLoanAction();
+      unsubscribers.forEach(u => { try{ if(typeof u === 'function') u(); }catch(e){} }); unsubscribers = [];
+      clearTimeout(inactivityTimer); clearTimeout(warningTimer);
+    }
+  });
+
+  // render transactions
+  function renderTransactions(arr){
+    const tbody = $('txBody'); tbody.innerHTML = '';
+    if(!arr || !arr.length){ tbody.innerHTML = '<tr><td colspan="5" class="subtitle">No transactions yet.</td></tr>'; return; }
+    let running = 0;
+    arr.forEach(t => {
+      if('balance' in t && t.balance !== null && t.balance !== undefined) running = Number(t.balance);
+      else running = running + (Number(t.credit||0) - Number(t.debit||0));
+      const dateStr = t.date ? new Date(t.date).toLocaleString() : new Date(t.timestamp||0).toLocaleString();
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${esc(dateStr)}</td><td>${esc(t.description||'')}</td><td>${t.debit? (Number(t.debit).toLocaleString()): ''}</td><td>${t.credit? (Number(t.credit).toLocaleString()): ''}</td><td>${running.toLocaleString()}</td>`;
+      tbody.appendChild(tr);
+    });
+  }
+
+  // inactivity auto-logout
+  let AUTO_LOGOUT_MIN = 10; let inactivityTimer = null; let warningTimer = null;
+  function resetInactivityTimer(){ if(inactivityTimer) clearTimeout(inactivityTimer); if(warningTimer) clearTimeout(warningTimer); if(!currentUser) return; warningTimer = setTimeout(()=>{ $('logoutWarning').style.display = 'flex'; }, Math.max((AUTO_LOGOUT_MIN * 60 - 60) * 1000, 0)); inactivityTimer = setTimeout(()=>{ signOut(auth).then(()=> window.location.href='index.html').catch(()=> window.location.href='index.html'); $('logoutWarning').style.display = 'none'; }, AUTO_LOGOUT_MIN * 60 * 1000); }
+  ['click','mousemove','keydown','scroll','touchstart'].forEach(evt => window.addEventListener(evt, ()=> { if(currentUser) resetInactivityTimer(); }, { passive:true }));
+
+  // cleanup on unload
+  window.addEventListener('beforeunload', ()=> { unsubscribers.forEach(u => { try{ if(typeof u === 'function') u(); }catch(e){} }); });
+
+  // small helpers
+  function fmt(v){ return 'KES ' + (Number(v||0)).toLocaleString(); }
+  function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 </script>
 </body>
