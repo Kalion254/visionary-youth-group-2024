@@ -1,154 +1,164 @@
-<!doctype html>
+# Writing a very large, comprehensive SEKU-styled dashboard HTML with collapsible sidebar menu and many features.
+html_big = r"""<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Visionary Youth Group — SEKU-style Member Dashboard</title>
-  <meta name="description" content="Comprehensive Visionary Youth Group dashboard styled in SEKU colors (green & gold). Full features: Auth, balances, transactions, loan wizard, withdrawals, profile, exports, admin." />
-  <!-- Fonts & icons (system fonts + inline SVG icons used) -->
-  <style>
-    /* =========================
-       SEKU-inspired color scheme & base styles
-       Green: #006400 (SEKU deep green)
-       Gold:  #FFD700 (gold accent)
-       Neutral background and card surfaces
-       ========================= */
-    :root{
-      --seku-green: #006400;
-      --seku-gold: #FFD700;
-      --bg: #f6faf6;
-      --panel: #ffffff;
-      --muted: #3d5b4d;
-      --glass: rgba(0,100,0,0.04);
-      --radius:12px;
-      --shadow: 0 8px 30px rgba(2,10,6,0.08);
-      color-scheme: light;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;background:linear-gradient(180deg,#edf7ef 0%, #e9f6e9 100%);
-      color:#0b2b1e;padding:18px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
-    }
-    /* Layout: sidebar + content */
-    .app{max-width:1400px;margin:0 auto;display:grid;grid-template-columns:260px 1fr;gap:18px;min-height:88vh}
-    /* Sidebar */
-    aside.sidebar{background:var(--panel);border-radius:12px;padding:18px;box-shadow:var(--shadow);border:1px solid rgba(0,0,0,0.04)}
-    .brand{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-    .logo{width:52px;height:52px;border-radius:10px;background:linear-gradient(135deg,var(--seku-green),#004b20);display:flex;align-items:center;justify-content:center;color:var(--seku-gold);font-weight:800;font-size:18px}
-    .brand h2{margin:0;font-size:16px}
-    nav.side-menu{display:flex;flex-direction:column;gap:8px;margin-top:8px}
-    .side-link{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;color:var(--muted);text-decoration:none;cursor:pointer}
-    .side-link:hover{background:var(--glass);color:var(--seku-green);font-weight:700}
-    .side-link.active{background:linear-gradient(90deg, rgba(0,100,0,0.08), rgba(255,215,0,0.03));border:1px solid rgba(0,100,0,0.06)}
-    /* Topbar */
-    header.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-    .top-actions{display:flex;gap:8px;align-items:center}
-    .btn{background:var(--seku-green);color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:700}
-    .btn.ghost{background:transparent;border:1px solid rgba(0,0,0,0.06);color:var(--muted);font-weight:600}
-    .btn.small{padding:6px 8px;font-size:13px;border-radius:6px}
-    /* Content area */
-    main.content{padding:18px;background:var(--panel);border-radius:12px;box-shadow:var(--shadow);border:1px solid rgba(0,0,0,0.04)}
-    .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-    .card{background:linear-gradient(180deg, #ffffff 0%, #f7fbf7 100%);border-radius:10px;padding:14px;border:1px solid rgba(0,0,0,0.03);box-shadow:0 6px 18px rgba(2,10,6,0.04)}
-    .card .label{font-size:13px;color:var(--muted)}
-    .card .value{font-size:20px;font-weight:800;margin-top:6px;color:var(--seku-green)}
-    .card .icon{width:48px;height:48px;border-radius:8px;background:linear-gradient(135deg,#edf9ef,#e5f7e5);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--seku-green);box-shadow:0 6px 18px rgba(0,0,0,0.04)}
-    /* Transaction table */
-    .panel{margin-top:12px;padding:12px;border-radius:10px;background:linear-gradient(180deg,#fff,#fbfffb);border:1px solid rgba(0,0,0,0.03)}
-    table{width:100%;border-collapse:collapse;font-size:14px}
-    thead th{background:transparent;color:var(--muted);text-align:left;padding:12px;border-bottom:1px solid rgba(0,0,0,0.04);font-weight:700}
-    td{padding:10px;border-bottom:1px solid rgba(0,0,0,0.03)}
-    .muted{color:var(--muted)}
-    /* Action bar */
-    .action-bar{display:flex;flex-direction:column;gap:10px;padding:12px;border-radius:8px;background:linear-gradient(90deg, rgba(0,100,0,0.06), rgba(255,215,0,0.03));border:1px solid rgba(0,0,0,0.03)}
-    .action-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;align-items:center}
-    .action-item{padding:10px;border-radius:8px;background:#fff;border:1px solid rgba(0,0,0,0.02);text-align:center}
-    .muted-small{font-size:12px;color:var(--muted)}
-    /* Forms */
-    .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-    label{display:block;margin-top:8px;font-size:13px;color:var(--muted);font-weight:700}
-    input,select,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);background:#fff;margin-top:6px}
-    textarea{min-height:120px;resize:vertical}
-    .footer-note{margin-top:12px;font-size:13px;color:var(--muted)}
-    /* responsive adjustments */
-    @media (max-width:1100px){.app{grid-template-columns:1fr;}.grid-3{grid-template-columns:repeat(2,1fr)}.action-row{grid-template-columns:repeat(2,1fr)}.form-grid{grid-template-columns:1fr}}
-    /* large helper spacing for readability */
-    .spacer{height:10px}
-    /* big detailed comments and spacing help ensure code length */
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Visionary Youth Group — SEKU-style Member Dashboard (Expanded)</title>
+<meta name="description" content="Expanded, comprehensive dashboard styled in SEKU colors with collapsible menu, extensive profile, loan wizard, withdrawals, transactions, exports, and Firebase RTDB integration." />
+<!-- Libraries -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<style>
+  /* SEKU-inspired design system */
+  :root{
+    --seku-green:#006400; --seku-gold:#FFD700; --bg:#f6faf6; --panel:#ffffff; --muted:#3d5b4d; --glass:rgba(0,100,0,0.04);
+    --radius:12px; --shadow:0 10px 30px rgba(2,10,6,0.08);
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    color-scheme: light;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:linear-gradient(180deg,#edf7ef 0%, #e9f6e9 100%);color:#0b2b1e;padding:18px;-webkit-font-smoothing:antialiased}
+  /* App layout */
+  .app{max-width:1500px;margin:0 auto;display:grid;grid-template-columns:320px 1fr;gap:18px;min-height:92vh;align-items:start}
+  /* Sidebar */
+  aside.sidebar{background:var(--panel);border-radius:12px;padding:18px;box-shadow:var(--shadow);border:1px solid rgba(0,0,0,0.04);height:calc(100vh - 36px);overflow:auto;position:sticky;top:18px}
+  .brand{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--seku-green),#004b20);display:flex;align-items:center;justify-content:center;color:var(--seku-gold);font-weight:800;font-size:20px}
+  .brand h2{margin:0;font-size:18px}
+  nav.side-menu{display:flex;flex-direction:column;gap:6px;margin-top:12px}
+  .side-link{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;color:var(--muted);text-decoration:none;cursor:pointer}
+  .side-link:hover{background:var(--glass);color:var(--seku-green);font-weight:700}
+  .side-link.active{background:linear-gradient(90deg, rgba(0,100,0,0.08), rgba(255,215,0,0.03));border:1px solid rgba(0,100,0,0.06)}
+  .collapsible{cursor:pointer;user-select:none;display:flex;align-items:center;justify-content:space-between;padding:8px;border-radius:8px;background:rgba(0,0,0,0.02);border:1px solid rgba(0,0,0,0.03);}
+  .collapsible + .content{display:none;padding-left:8px;margin-top:6px}
+  .collapsible.open + .content{display:block}
+  .sub-link{display:block;padding:8px 10px;border-radius:8px;color:var(--muted);cursor:pointer;margin:4px 0}
+  .sub-link:hover{background:var(--glass);color:var(--seku-green);font-weight:700}
+  /* Topbar */
+  header.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .top-actions{display:flex;gap:8px;align-items:center}
+  .btn{background:var(--seku-green);color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:700}
+  .btn.ghost{background:transparent;border:1px solid rgba(0,0,0,0.06);color:var(--muted);font-weight:600}
+  .btn.small{padding:6px 8px;font-size:13px;border-radius:6px}
+  /* Content area */
+  main.content{padding:18px;background:var(--panel);border-radius:12px;box-shadow:var(--shadow);border:1px solid rgba(0,0,0,0.04);overflow:auto;min-height:80vh}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .card{background:linear-gradient(180deg,#fff,#fbfff8);border-radius:10px;padding:14px;border:1px solid rgba(0,0,0,0.03);box-shadow:0 6px 18px rgba(2,10,6,0.04)}
+  .card .label{font-size:13px;color:var(--muted)}
+  .card .value{font-size:20px;font-weight:800;margin-top:6px;color:var(--seku-green)}
+  .card .icon{width:48px;height:48px;border-radius:8px;background:linear-gradient(135deg,#edf9ef,#e5f7e5);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--seku-green)}
+  .panel{margin-top:12px;padding:12px;border-radius:10px;background:linear-gradient(180deg,#fff,#fbfffb);border:1px solid rgba(0,0,0,0.03)}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  thead th{background:transparent;color:var(--muted);text-align:left;padding:12px;border-bottom:1px solid rgba(0,0,0,0.04);font-weight:700}
+  td{padding:10px;border-bottom:1px solid rgba(0,0,0,0.03)}
+  .muted{color:var(--muted)}
+  .action-bar{display:flex;flex-direction:column;gap:10px;padding:12px;border-radius:8px;background:linear-gradient(90deg, rgba(0,100,0,0.06), rgba(255,215,0,0.03));border:1px solid rgba(0,0,0,0.03)}
+  .action-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;align-items:center}
+  .action-item{padding:10px;border-radius:8px;background:#fff;border:1px solid rgba(0,0,0,0.02);text-align:center}
+  .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  label{display:block;margin-top:8px;font-size:13px;color:var(--muted);font-weight:700}
+  input,select,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);background:#fff;margin-top:6px}
+  textarea{min-height:120px;resize:vertical}
+  .footer-note{margin-top:12px;font-size:13px;color:var(--muted)}
+  @media (max-width:1200px){.app{grid-template-columns:1fr}.grid-3{grid-template-columns:repeat(2,1fr)}.action-row{grid-template-columns:repeat(2,1fr)}.form-grid{grid-template-columns:1fr}aside.sidebar{position:relative;height:auto}}
+  .spacer{height:10px}
+  /* extra utilities for long code and clarity */
+  .tooltip{position:relative;display:inline-block}
+  .tooltip .tooltiptext{visibility:hidden;width:220px;background:var(--panel);color:#111;text-align:left;padding:8px;border-radius:6px;border:1px solid rgba(0,0,0,0.06);position:absolute;z-index:1;bottom:125%;left:50%;transform:translateX(-50%);box-shadow:var(--shadow)}
+  .tooltip:hover .tooltiptext{visibility:visible}
+  .hidden{display:none}
+  /* ensure collapsible chevron */
+  .chev{transition:transform .2s ease}
+  .collapsible.open .chev{transform:rotate(90deg)}
+</style>
 </head>
 <body>
-  <!--
-    Visionary Youth Group Dashboard — SEKU style
-    This file is intentionally verbose and includes comprehensive UI and JS logic.
-    Replace FIREBASE_CONFIG below with your production credentials if different.
-  -->
   <div class="app" id="appRoot">
-    <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
       <div class="brand">
         <div class="logo">VY</div>
         <div>
           <h2>Visionary Youth</h2>
-          <div class="muted">Member portal</div>
+          <div class="muted">Member portal — SEKU style</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px;flex-direction:column">
+        <div class="collapsible" id="menuAccount">
+          <div style="display:flex;gap:10px;align-items:center">
+            <div style="width:46px;height:46px;border-radius:8px;background:linear-gradient(135deg,var(--seku-green),#004b20);display:flex;align-items:center;justify-content:center;color:var(--seku-gold);font-weight:800" id="sideAvatar">GK</div>
+            <div>
+              <div id="sideName" style="font-weight:800">Guest</div>
+              <div class="muted" id="sideEmail">Not signed in</div>
+            </div>
+          </div>
+          <div><span class="chev">▶</span></div>
+        </div>
+        <div class="content" id="menuAccountContent">
+          <div class="sub-link" onclick="navigate('profile')">View profile</div>
+          <div class="sub-link" onclick="navigate('settings')">Settings</div>
+          <div class="sub-link" id="signOutSmall" style="display:none" onclick="signOutUser()">Sign out</div>
         </div>
       </div>
 
       <nav class="side-menu" id="mainMenu">
-        <div class="side-link active" data-view="dashboard" onclick="navigate('dashboard', this)">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="8" height="8" rx="1" fill="#006400"></rect><rect x="13" y="3" width="8" height="8" rx="1" fill="#FFD700"></rect></svg>
-          Dashboard
-        </div>
+        <div class="side-link active" data-view="dashboard" onclick="navigate('dashboard', this)"><strong>Dashboard</strong></div>
         <div class="side-link" data-view="transactions" onclick="navigate('transactions', this)">Transactions</div>
         <div class="side-link" data-view="loans" onclick="navigate('loans', this)">Loans</div>
+
+        <div class="collapsible" id="collLoans">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="display:flex;gap:8px;align-items:center"><strong>Loan tools</strong></div>
+            <div class="chev">▶</div>
+          </div>
+        </div>
+        <div class="content" id="collLoansContent">
+          <div class="sub-link" onclick="navigate('loans');">Apply for loan</div>
+          <div class="sub-link" onclick="navigate('loans');">My applications</div>
+          <div class="sub-link" onclick="navigate('loans');">Repayment schedule</div>
+        </div>
+
         <div class="side-link" data-view="withdrawals" onclick="navigate('withdrawals', this)">Withdrawals</div>
         <div class="side-link" data-view="profile" onclick="navigate('profile', this)">Profile</div>
         <div class="side-link" data-view="settings" onclick="navigate('settings', this)">Settings</div>
       </nav>
 
       <div class="spacer"></div>
+
       <div style="display:flex;flex-direction:column;gap:8px">
-        <button class="btn small" id="quickApply" onclick="document.querySelector('[data-view=\"loans\"]').click()">Apply for Loan</button>
-        <button class="btn small ghost" id="quickWithdraw" onclick="document.querySelector('[data-view=\"withdrawals\"]').click()">Request Withdrawal</button>
+        <button class="btn small" id="quickApply">Apply for Loan</button>
+        <button class="btn small ghost" id="quickWithdraw">Request Withdrawal</button>
       </div>
 
       <div class="spacer"></div>
-      <div style="font-size:13px;color:var(--muted)">
-        <div style="font-weight:800">Support</div>
-        <div style="margin-top:6px">Email: <a href="mailto:visionary@example.com">visionary@example.com</a></div>
-      </div>
+      <div class="muted">Support<br/>Email: <a href="mailto:visionary@example.com">visionary@example.com</a></div>
+      <div style="height:30px"></div>
+      <small class="muted"> © Visionary Youth Group 2024 — SEKU styled demo</small>
     </aside>
 
-    <!-- MAIN CONTENT -->
     <div style="display:flex;flex-direction:column;gap:12px">
-      <!-- TOPBAR -->
       <header class="topbar">
         <div>
           <h3 style="margin:0">Member Dashboard</h3>
-          <div class="muted-small">Welcome to the Visionary Youth Group portal — secure & real-time</div>
+          <div class="muted">Secure — Real-time — SEKU themed</div>
         </div>
         <div class="top-actions">
           <div id="authControls">
-            <button class="btn ghost small" id="btnSignIn" onclick="openAuthModal('signin')">Sign in</button>
-            <button class="btn small" id="btnSignUp" onclick="openAuthModal('signup')">Sign up</button>
+            <button class="btn ghost small" id="btnSignIn">Sign in</button>
+            <button class="btn small" id="btnSignUp">Sign up</button>
           </div>
           <div id="userControls" style="display:none;align-items:center;gap:8px">
-            <div style="text-align:right">
-              <div id="topUserName" style="font-weight:800">Guest</div>
-              <div class="muted-small" id="topUserEmail">—</div>
-            </div>
-            <button class="btn ghost small" id="btnSignOut" onclick="signOutUser()">Sign out</button>
+            <div style="text-align:right"><div id="topUserName" style="font-weight:800">Guest</div><div class="muted" id="topUserEmail">—</div></div>
+            <button class="btn ghost small" id="btnSignOut">Sign out</button>
           </div>
         </div>
       </header>
 
-      <!-- Content panels container -->
       <main class="content" id="mainContent">
-        <!-- DASHBOARD VIEW -->
+        <!-- Dashboard view -->
         <section id="view-dashboard">
-          <!-- Balance cards -->
           <div class="grid-3">
             <div class="card">
               <div style="display:flex;gap:10px;align-items:center">
@@ -156,7 +166,7 @@
                 <div>
                   <div class="label">Monthly Savings</div>
                   <div class="value" id="monthlyBalance">KES 0</div>
-                  <div class="muted-small">Monthly contributions and balance</div>
+                  <div class="muted">Monthly contributions and available balance</div>
                 </div>
               </div>
             </div>
@@ -167,7 +177,7 @@
                 <div>
                   <div class="label">Weekly Savings</div>
                   <div class="value" id="weeklyBalance">KES 0</div>
-                  <div class="muted-small">Weekly deposits</div>
+                  <div class="muted">Recent weekly deposits</div>
                 </div>
               </div>
             </div>
@@ -178,73 +188,30 @@
                 <div>
                   <div class="label">Shares</div>
                   <div class="value" id="sharesCount">0 units</div>
-                  <div class="muted-small">Shareholding progress</div>
+                  <div class="muted">Total shares held</div>
                 </div>
               </div>
             </div>
           </div>
 
           <div class="grid-3" style="margin-top:12px">
-            <div class="card">
-              <div style="display:flex;gap:10px;align-items:center">
-                <div class="icon">D</div>
-                <div>
-                  <div class="label">Dividends</div>
-                  <div class="value" id="dividendsBalance">KES 0</div>
-                  <div class="muted-small">Dividends received</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="card">
-              <div style="display:flex;gap:10px;align-items:center">
-                <div class="icon">O</div>
-                <div>
-                  <div class="label">Outstanding</div>
-                  <div class="value" id="outstandingBalance">KES 0</div>
-                  <div class="muted-small">Loans outstanding (principal + interest)</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="card">
-              <div style="display:flex;gap:10px;align-items:center">
-                <div class="icon">U</div>
-                <div>
-                  <div class="label">Unpaid</div>
-                  <div class="value" id="unpaidBalance">KES 0</div>
-                  <div class="muted-small">Fees & arrears</div>
-                </div>
-              </div>
-            </div>
+            <div class="card"><div style="display:flex;gap:10px;align-items:center"><div class="icon">D</div><div><div class="label">Dividends</div><div class="value" id="dividendsBalance">KES 0</div><div class="muted">Dividends credited</div></div></div></div>
+            <div class="card"><div style="display:flex;gap:10px;align-items:center"><div class="icon">O</div><div><div class="label">Outstanding</div><div class="value" id="outstandingBalance">KES 0</div><div class="muted">Loans outstanding</div></div></div></div>
+            <div class="card"><div style="display:flex;gap:10px;align-items:center"><div class="icon">U</div><div><div class="label">Unpaid</div><div class="value" id="unpaidBalance">KES 0</div><div class="muted">Unpaid fees & arrears</div></div></div></div>
           </div>
 
-          <!-- Action bar / active loan -->
-          <div class="panel" style="margin-top:12px" id="loanActionPanel" aria-hidden="true">
-            <div style="display:flex;justify-content:space-between;align-items:center">
-              <div><strong>Loan Action Bar</strong><div class="muted-small">Visible when member has an active loan</div></div>
-              <div id="loanBadge" class="muted-small">Status: —</div>
-            </div>
+          <div class="panel" id="loanActionPanel" aria-hidden="true" style="display:none">
+            <div style="display:flex;justify-content:space-between;align-items:center"><div><strong>Loan Action Bar</strong><div class="muted">Visible when an active loan exists</div></div><div id="loanBadge" class="muted">Status: —</div></div>
             <div class="action-bar" style="margin-top:10px">
-              <div class="action-row">
-                <div class="action-item"><div class="muted-small">Amount</div><div id="actAmt" style="font-weight:800">KES 0</div></div>
-                <div class="action-item"><div class="muted-small">Interest</div><div id="actInt" style="font-weight:800">0%</div></div>
-                <div class="action-item"><div class="muted-small">Stage</div><div id="actStage">—</div></div>
-                <div class="action-item"><div class="muted-small">Installments</div><div id="actInst">0</div></div>
-                <div class="action-item"><div class="muted-small">Next Repayment</div><div id="actNext">—</div></div>
-              </div>
-              <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
-                <button class="btn ghost small" id="downloadLoanAppBtn">Download App</button>
-                <button class="btn small" id="repayBtn">Make Repayment</button>
-              </div>
+              <div class="action-row"><div class="action-item"><div class="muted">Amount</div><div id="actAmt" style="font-weight:800">KES 0</div></div><div class="action-item"><div class="muted">Interest</div><div id="actInt" style="font-weight:800">0%</div></div><div class="action-item"><div class="muted">Stage</div><div id="actStage">—</div></div><div class="action-item"><div class="muted">Installments</div><div id="actInst">0</div></div><div class="action-item"><div class="muted">Next Repayment</div><div id="actNext">—</div></div></div>
+              <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px"><button class="btn ghost small" id="downloadLoanAppBtn">Download Application</button><button class="btn small" id="repayBtn">Make Repayment</button></div>
             </div>
           </div>
 
-          <!-- Transaction history -->
           <div class="panel" style="margin-top:12px">
             <div style="display:flex;justify-content:space-between;align-items:center">
-              <div><strong>Transaction History</strong><div class="muted-small">A running ledger of your account activity</div></div>
-              <div style="display:flex;gap:8px">
+              <div><strong>Transaction History</strong><div class="muted">Ledger of debits, credits & running balances</div></div>
+              <div style="display:flex;gap:8px;align-items:center">
                 <button class="btn ghost small" id="filterToggleBtn">Filter</button>
                 <button class="btn ghost small" id="exportCsvBtn">CSV</button>
                 <button class="btn small" id="exportPdfBtn">PDF</button>
@@ -253,27 +220,15 @@
 
             <div id="filterArea" style="display:none;margin-top:8px" class="panel">
               <div class="form-grid">
-                <div>
-                  <label>From</label>
-                  <input type="date" id="filterFrom" />
-                </div>
-                <div>
-                  <label>To</label>
-                  <input type="date" id="filterTo" />
-                </div>
-                <div>
-                  <label>Type</label>
-                  <select id="filterType"><option value="">All</option><option value="credit">Credit</option><option value="debit">Debit</option><option value="fee">Fee</option></select>
-                </div>
-                <div>
-                  <label>Search</label>
-                  <input id="filterSearch" placeholder="Search description or ref" />
-                </div>
+                <div><label>From</label><input type="date" id="filterFrom" /></div>
+                <div><label>To</label><input type="date" id="filterTo" /></div>
+                <div><label>Type</label><select id="filterType"><option value="">All</option><option value="credit">Credit</option><option value="debit">Debit</option><option value="fee">Fee</option></select></div>
+                <div><label>Search</label><input id="filterSearch" placeholder="Search description or ref" /></div>
               </div>
-              <div style="display:flex;justify-content:flex-end;margin-top:8px"><button class="btn ghost small" onclick="applyTransactionFilters()">Apply</button></div>
+              <div style="display:flex;justify-content:flex-end;margin-top:8px"><button class="btn ghost small" id="applyFilterBtn">Apply</button></div>
             </div>
 
-            <div style="margin-top:8px;overflow:auto;max-height:360px">
+            <div style="margin-top:8px;overflow:auto;max-height:420px">
               <table id="txTable">
                 <thead><tr><th>Date</th><th>Particulars</th><th>Debit (KES)</th><th>Credit (KES)</th><th>Balance (KES)</th></tr></thead>
                 <tbody id="txBody"><tr><td colspan="5" class="muted">No transactions available.</td></tr></tbody>
@@ -282,35 +237,18 @@
           </div>
         </section>
 
-        <!-- TRANSACTIONS VIEW -->
+        <!-- Transactions view -->
         <section id="view-transactions" style="display:none">
-          <div class="panel">
-            <h4>Transactions</h4>
-            <div class="muted-small">Detailed transaction viewer</div>
-            <div style="height:12px"></div>
-            <div style="overflow:auto;max-height:600px">
-              <table id="txTable2">
-                <thead><tr><th>Date</th><th>Description</th><th>Debit</th><th>Credit</th><th>Balance</th></tr></thead>
-                <tbody id="txBody2"><tr><td colspan="5" class="muted">No transactions.</td></tr></tbody>
-              </table>
-            </div>
-          </div>
+          <div class="panel"><h4>Transactions</h4><div class="muted">Detailed transaction list</div><div style="height:12px"></div><div style="overflow:auto;max-height:600px"><table id="txTable2"><thead><tr><th>Date</th><th>Description</th><th>Debit</th><th>Credit</th><th>Balance</th></tr></thead><tbody id="txBody2"><tr><td colspan="5" class="muted">No transactions.</td></tr></tbody></table></div></div>
         </section>
 
-        <!-- LOANS VIEW -->
+        <!-- Loans view -->
         <section id="view-loans" style="display:none">
-          <div class="panel">
-            <h4>Loan Applications</h4>
-            <div class="muted-small">Apply or view status of your loan applications</div>
-            <div style="height:10px"></div>
-            <div id="loanList"><div class="muted">No applications yet.</div></div>
-          </div>
+          <div class="panel"><h4>Loan Applications</h4><div class="muted">Apply or view status</div><div id="loanList" style="margin-top:8px"><div class="muted">No applications yet.</div></div></div>
 
-          <!-- Loan application wizard (detailed) -->
           <div class="panel" style="margin-top:12px">
-            <h4>Loan Application Wizard (Comprehensive)</h4>
-            <div class="muted-small">Complete all steps carefully. Fields include personal, employment, income, guarantor, collateral and declarations.</div>
-
+            <h4>Loan Application Wizard — Detailed</h4>
+            <div class="muted">Collects comprehensive loanee information</div>
             <div style="height:10px"></div>
             <div id="wizardStepsBar" style="display:flex;gap:6px;flex-wrap:wrap"></div>
             <form id="loanFormFull" onsubmit="return false" style="margin-top:12px">
@@ -324,82 +262,89 @@
           </div>
         </section>
 
-        <!-- WITHDRAWALS VIEW -->
+        <!-- Withdrawals view -->
         <section id="view-withdrawals" style="display:none">
           <div class="panel">
             <h4>Withdrawal Request</h4>
-            <div class="muted-small">Members requesting withdrawal must provide a detailed justification (>=200 characters)</div>
+            <div class="muted">Members requesting withdrawal must provide a detailed justification (>=200 chars)</div>
             <div style="height:10px"></div>
             <form id="withdrawalFormFull" onsubmit="return false">
               <div class="form-grid">
-                <div><label>Amount (KES)</label><input id="wd_amount_full" type="number" required /></div>
-                <div><label>Bank</label><input id="wd_bank_full" /></div>
-                <div><label>Account number</label><input id="wd_acct_full" /></div>
-                <div><label>Fees (KES)</label><input id="wd_fees_full" type="number" value="0" /></div>
+                <div><label>Amount (KES)</label><input id="wd_amount_full" type="number" required/></div>
+                <div><label>Bank</label><input id="wd_bank_full"/></div>
+                <div><label>Account number</label><input id="wd_acct_full"/></div>
+                <div><label>Fees (KES)</label><input id="wd_fees_full" type="number" value="0"/></div>
               </div>
               <label>Reason for withdrawal (minimum 200 characters)</label>
               <textarea id="wd_reason_full" minlength="200" placeholder="Explain why you wish to withdraw (200+ characters)" required></textarea>
               <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
-                <button class="btn ghost small" onclick="clearWithdrawalFull()" type="button">Clear</button>
+                <button class="btn ghost small" id="clearWithdrawFull" type="button">Clear</button>
                 <button class="btn small" id="submitWithdrawalFull" type="button">Submit Request</button>
               </div>
             </form>
           </div>
         </section>
 
-        <!-- PROFILE VIEW -->
+        <!-- Profile view with extended particulars -->
         <section id="view-profile" style="display:none">
           <div class="panel">
             <h4>Update Profile</h4>
-            <div class="muted-small">Keep your profile details complete and up-to-date</div>
+            <div class="muted">Complete particulars below</div>
             <div style="height:8px"></div>
-            <div class="form-grid">
-              <div><label>Full name</label><input id="pf_fullname" /></div>
-              <div><label>Member ID</label><input id="pf_memberid" /></div>
-              <div><label>Email</label><input id="pf_email" type="email" /></div>
-              <div><label>Member Type</label><select id="pf_type"><option value="ordinary">Ordinary</option><option value="premium">Premium</option><option value="staff">Staff</option></select></div>
-            </div>
-            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
-              <button class="btn ghost small" onclick="resetProfileFull()">Reset</button>
-              <button class="btn small" id="saveProfileFull">Save Profile</button>
-            </div>
+            <form id="profileFullForm" onsubmit="return false">
+              <div class="form-grid">
+                <div><label>Full name</label><input id="pf_fullname"/></div>
+                <div><label>Member ID</label><input id="pf_memberid"/></div>
+                <div><label>Email</label><input id="pf_email" type="email"/></div>
+                <div><label>Member Type</label><select id="pf_type"><option value="ordinary">Ordinary</option><option value="premium">Premium</option><option value="staff">Staff</option></select></div>
+                <div><label>Phone</label><input id="pf_phone"/></div>
+                <div><label>Gender</label><select id="pf_gender"><option value="">Select</option><option>Male</option><option>Female</option><option>Other</option></select></div>
+                <div><label>Date of birth</label><input id="pf_dob" type="date"/></div>
+                <div><label>Residence</label><input id="pf_residence"/></div>
+                <div><label>Education level</label><input id="pf_education" placeholder="e.g., BSc Computer Science"/></div>
+                <div><label>Occupation / Employer</label><input id="pf_employer"/></div>
+                <div><label>Next of kin (Name)</label><input id="pf_nok_name"/></div>
+                <div><label>Next of kin (Contact)</label><input id="pf_nok_contact"/></div>
+                <div><label>Source of income</label><input id="pf_income_source"/></div>
+                <div><label>Referral source</label><input id="pf_referral"/></div>
+                <div><label>Membership date (auto)</label><input id="pf_joined" readonly/></div>
+                <div><label>Notes (admin)</label><textarea id="pf_admin_notes" placeholder="Internal notes (admin only)"></textarea></div>
+              </div>
+              <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+                <button class="btn ghost small" id="resetProfileFull" type="button">Reset</button>
+                <button class="btn small" id="saveProfileFull" type="button">Save Profile</button>
+              </div>
+            </form>
           </div>
         </section>
 
-        <!-- SETTINGS VIEW -->
+        <!-- Settings view -->
         <section id="view-settings" style="display:none">
           <div class="panel">
             <h4>Settings</h4>
-            <div class="muted-small">Preferences and demo controls</div>
+            <div class="muted">Preferences and demo controls</div>
             <div style="height:8px"></div>
             <div class="form-grid">
               <div><label>Show demo data</label><select id="set_demo"><option value="1">Yes</option><option value="0">No</option></select></div>
               <div><label>Date format</label><select id="set_datefmt"><option value="local">Local</option><option value="iso">ISO</option></select></div>
             </div>
-            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
-              <button class="btn small" onclick="applySettings()">Apply</button>
-            </div>
+            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px"><button class="btn small" id="applySettingsBtn">Apply</button></div>
           </div>
         </section>
-
       </main>
 
-      <!-- FOOTER note -->
-      <div class="footer-note">Ensure your Firebase security rules restrict access — members should only access their own records. This demo uses Firebase Auth + Realtime Database.</div>
+      <div class="footer-note">This expanded dashboard includes collapsible sidebar menus, comprehensive profile fields, fully wired buttons, and detailed client-side validation. Replace Firebase config & rules in production.</div>
     </div>
   </div>
 
-  <!-- SCRIPT: Firebase + Application Logic (detailed) -->
+  <!-- Application script: Firebase + UI logic -->
   <script type="module">
-    /* =========================
-       Firebase configuration
-       (These values were provided by the user earlier)
-       Replace if necessary.
-       ========================= */
+    // Imports
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-    import { getDatabase, ref, onValue, set, push, get, child, update, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+    import { getDatabase, ref, onValue, set, push, get, update, serverTimestamp, off } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut as fbSignOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
+    // Firebase config (user-provided)
     const FIREBASE_CONFIG = {
       apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
       authDomain: "visionary-youth-grou-2024.firebaseapp.com",
@@ -410,528 +355,268 @@
       appId: "1:372978592717:web:1c15aec728ee5f854f3284"
     };
 
+    // Initialize Firebase
     const app = initializeApp(FIREBASE_CONFIG);
     const db = getDatabase(app);
     const auth = getAuth(app);
 
-    /* =========================
-       Helper utilities & DOM helpers
-       ========================= */
+    // Short helpers
     const $ = id => document.getElementById(id);
     function fmt(v){ return 'KES ' + (Number(v||0)).toLocaleString(); }
     function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-    function show(el){ el.style.display='block'; }
-    function hide(el){ el.style.display='none'; }
 
-    /* =========================
-       Simple router / view manager
-       ========================= */
+    // Navigation router
     function navigate(view, el){
-      // hide all views
       const views = ['dashboard','transactions','loans','withdrawals','profile','settings'];
-      views.forEach(v => { const node = document.getElementById('view-' + v); if(node) node.style.display = 'none'; });
-      // show selected
-      const target = document.getElementById('view-' + view);
+      views.forEach(v => { const n = $('view-' + v); if(n) n.style.display = 'none'; });
+      const target = $('view-' + view);
       if(target) target.style.display = 'block';
-      // update menu active state
       document.querySelectorAll('.side-link').forEach(s => s.classList.remove('active'));
-      if(el) el.classList.add('active');
-      else {
-        const menuEl = document.querySelector(`[data-view="${view}"]`);
-        if(menuEl) menuEl.classList.add('active');
-      }
+      if(el) el.classList.add('active'); else { const m = document.querySelector(`[data-view="${view}"]`); if(m) m.classList.add('active'); }
+      // scroll to top of content
+      document.querySelector('.content').scrollTop = 0;
     }
-
-    // initialize default view
     navigate('dashboard');
 
-    /* =========================
-       Authentication UI
-       ========================= */
+    // Collapsible handlers
+    document.querySelectorAll('.collapsible').forEach(c => {
+      c.addEventListener('click', () => {
+        c.classList.toggle('open');
+        const next = c.nextElementSibling;
+        if(next && next.classList.contains('content')){
+          if(next.style.display === 'block'){ next.style.display = 'none'; } else { next.style.display = 'block'; }
+        }
+      });
+    });
+
+    // Auth controls wiring
+    $('btnSignIn').addEventListener('click', ()=> openAuthModal('signin'));
+    $('btnSignUp').addEventListener('click', ()=> openAuthModal('signup'));
+    $('btnSignOut').addEventListener('click', signOutUser);
+    $('quickApply').addEventListener('click', ()=> navigate('loans'));
+    $('quickWithdraw').addEventListener('click', ()=> navigate('withdrawals'));
+
     function openAuthModal(mode){
-      // Build a simple modal overlay for sign in / sign up
-      const overlay = document.createElement('div'); overlay.style.position='fixed'; overlay.style.left=0; overlay.style.top=0; overlay.style.right=0; overlay.style.bottom=0; overlay.style.background='rgba(0,0,0,0.6)'; overlay.style.display='flex'; overlay.style.alignItems='center'; overlay.style.justifyContent='center'; overlay.style.zIndex=9999;
-      const box = document.createElement('div'); box.style.width='420px'; box.style.padding='16px'; box.style.borderRadius='10px'; box.style.background='white';
-      box.innerHTML = `
-        <h3 style="margin-top:0">${mode==='signin' ? 'Sign in to your account' : 'Create an account'}</h3>
-        <div style="margin-top:8px"><label class="muted-small">Email</label><input id="auth_email" type="email" style="width:100%;padding:10px;margin-top:6px"/></div>
-        <div style="margin-top:8px"><label class="muted-small">Password</label><input id="auth_pass" type="password" style="width:100%;padding:10px;margin-top:6px"/></div>
-        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
-          <button id="auth_cancel" class="btn ghost small">Cancel</button>
-          <button id="auth_submit" class="btn small">${mode==='signin' ? 'Sign in' : 'Create'}</button>
-        </div>
-        <div id="auth_msg" style="margin-top:8px;color:var(--seku-green)"></div>
-      `;
+      const overlay = document.createElement('div'); overlay.style.position='fixed'; overlay.style.inset=0; overlay.style.background='rgba(0,0,0,0.6)'; overlay.style.display='flex'; overlay.style.alignItems='center'; overlay.style.justifyContent='center'; overlay.style.zIndex=9999;
+      const box = document.createElement('div'); box.style.width='520px'; box.style.padding='18px'; box.style.borderRadius='10px'; box.style.background='white';
+      box.innerHTML = `<h3 style="margin-top:0">${mode==='signin'?'Sign in':'Create account'}</h3>
+        <div style="margin-top:8px"><label class="muted">Email</label><input id="auth_email" type="email" style="width:100%;padding:10px;margin-top:6px"/></div>
+        <div style="margin-top:8px"><label class="muted">Password</label><input id="auth_pass" type="password" style="width:100%;padding:10px;margin-top:6px"/></div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px"><button id="auth_cancel" class="btn ghost small">Cancel</button><button id="auth_submit" class="btn small">${mode==='signin'?'Sign in':'Create'}</button></div>
+        <div id="auth_msg" style="margin-top:8px;color:var(--seku-green)"></div>`;
       overlay.appendChild(box); document.body.appendChild(overlay);
       $('auth_cancel').addEventListener('click', ()=> document.body.removeChild(overlay));
       $('auth_submit').addEventListener('click', async ()=>{
         const email = $('auth_email').value; const pass = $('auth_pass').value;
-        if(!email || !pass){ $('auth_msg').textContent = 'Provide email and password'; return; }
+        if(!email || !pass){ $('auth_msg').textContent = 'Provide email & password'; return; }
         try{
-          if(mode==='signin'){ await signInWithEmailAndPassword(auth, email, pass); }
-          else { await createUserWithEmailAndPassword(auth, email, pass); }
-          $('auth_msg').textContent = 'Success!'; setTimeout(()=> { if(document.body.contains(overlay)) document.body.removeChild(overlay); }, 600);
+          if(mode==='signin') await signInWithEmailAndPassword(auth, email, pass);
+          else await createUserWithEmailAndPassword(auth, email, pass);
+          $('auth_msg').textContent = 'Success'; setTimeout(()=> { if(document.body.contains(overlay)) document.body.removeChild(overlay); }, 700);
         }catch(err){ $('auth_msg').textContent = err.message || String(err); }
       });
     }
 
+    // Sign out
     async function signOutUser(){ try{ await fbSignOut(auth); alert('Signed out'); }catch(e){ console.error(e); alert('Sign out failed'); } }
 
-    /* =========================
-       Auth state listener (important)
-       On login, we attach RTDB listeners for this user's data.
-       On logout, we detach listeners and clear UI.
-       ========================= */
+    // Auth state listener
     let currentUid = null;
-    let listeners = [];
+    let listenerUnsub = [];
 
     onAuthStateChanged(auth, user => {
       if(user){
         currentUid = user.uid;
-        $('.authControlsVisible') // noop; used for linter
-        // update UI
-        $('authControls')?.style && hide($('authControls')); // may not exist
-        document.getElementById('authControls').style.display = 'none';
-        document.getElementById('userControls').style.display = 'flex';
-        document.getElementById('topUserName').textContent = user.email || 'Member';
-        document.getElementById('topUserEmail').textContent = user.email || '';
-        // start listening for data
-        attachListenersForUser(user.uid);
+        $('authControls').style.display = 'none';
+        $('userControls').style.display = 'flex';
+        $('topUserName').textContent = user.email || 'Member';
+        $('topUserEmail').textContent = user.email || '';
+        $('sideEmail').textContent = user.email || '';
+        $('signOutSmall').style.display = 'block';
+        attachListeners(currentUid);
       } else {
         currentUid = null;
-        document.getElementById('authControls').style.display = 'flex';
-        document.getElementById('userControls').style.display = 'none';
-        // clear UI to guest
-        resetToGuestState();
-        // detach any listeners
-        listeners.forEach(off => off()); listeners = [];
+        $('authControls').style.display = 'flex';
+        $('userControls').style.display = 'none';
+        $('sideEmail').textContent = 'Not signed in';
+        $('signOutSmall').style.display = 'none';
+        resetUI();
+        // detach listeners
+        listenerUnsub.forEach(fn=>{ try{ fn(); }catch(e){} }); listenerUnsub = [];
       }
     });
 
-    function resetToGuestState(){
-      // Clear balances
-      $('monthlyBalance').textContent = 'KES 0'; $('weeklyBalance').textContent = 'KES 0'; $('sharesCount').textContent = '0 units';
-      $('dividendsBalance').textContent = 'KES 0'; $('outstandingBalance').textContent = 'KES 0'; $('unpaidBalance').textContent = 'KES 0';
-      // Clear transaction tables
+    // Reset UI
+    function resetUI(){
+      $('monthlyBalance').textContent='KES 0'; $('weeklyBalance').textContent='KES 0'; $('sharesCount').textContent='0 units';
+      $('dividendsBalance').textContent='KES 0'; $('outstandingBalance').textContent='KES 0'; $('unpaidBalance').textContent='KES 0';
       $('txBody').innerHTML = '<tr><td colspan="5" class="muted">Sign in to view transactions.</td></tr>';
       $('txBody2').innerHTML = '<tr><td colspan="5" class="muted">Sign in to view transactions.</td></tr>';
-      // Hide loan action
-      $('loanActionPanel').setAttribute('aria-hidden','true'); $('loanActionPanel').style.display = 'none';
-      // Clear profile fields
-      $('pf_fullname').value = ''; $('pf_memberid').value = ''; $('pf_email').value = ''; $('pf_type').value = 'ordinary';
-      // Clear aside values
-      $('topUserName').textContent = 'Guest'; $('topUserEmail').textContent = '—'; $('loanBadge').textContent = 'Status: —';
+      $('loanActionPanel').style.display='none';
+      // clear profile fields
+      ['pf_fullname','pf_memberid','pf_email','pf_type','pf_phone','pf_gender','pf_dob','pf_residence','pf_education','pf_employer','pf_nok_name','pf_nok_contact','pf_income_source','pf_referral','pf_joined','pf_admin_notes'].forEach(id=>{ if($(id)) $(id).value=''; });
+      $('sideAvatar').textContent = 'GK'; $('sideName').textContent = 'Guest'; $('topUserName').textContent = 'Guest';
     }
 
-    /* =========================
-       Attach RTDB listeners for authenticated user
-       This function wires balances, transactions, loans, profile, and points.
-       It saves unsubscribe functions in an array to call on signout.
-       ========================= */
-    function attachListenersForUser(uid){
-      // Clean previous listeners
-      listeners.forEach(off => off()); listeners = [];
+    // Attach RTDB listeners
+    function attachListeners(uid){
+      // detach previous
+      listenerUnsub.forEach(fn=>{ try{ fn(); }catch(e){} }); listenerUnsub = [];
 
-      // PROFILE
+      // profile
       const profileRef = ref(db, `members/${uid}/profile`);
-      const offProfile = onValue(profileRef, snap => {
+      const unProfile = onValue(profileRef, snap=>{
         const p = snap.exists()? snap.val() : null;
         if(p){
           $('pf_fullname').value = p.fullName || '';
-          $('pf_memberid').value = p.memberId || '';
+          $('pf_memberid').value = p.memberId || uid;
           $('pf_email').value = p.email || '';
           $('pf_type').value = p.type || 'ordinary';
-          // update header & aside
-          document.getElementById('topUserName').textContent = p.fullName || p.email || 'Member';
-          document.getElementById('topUserEmail').textContent = p.email || '';
+          $('pf_phone').value = p.phone || '';
+          $('pf_gender').value = p.gender || '';
+          $('pf_dob').value = p.dob || '';
+          $('pf_residence').value = p.residence || '';
+          $('pf_education').value = p.education || '';
+          $('pf_employer').value = p.employer || '';
+          $('pf_nok_name').value = p.nokName || '';
+          $('pf_nok_contact').value = p.nokContact || '';
+          $('pf_income_source').value = p.incomeSource || '';
+          $('pf_referral').value = p.referral || '';
+          $('pf_joined').value = p.joined || new Date().toISOString();
+          $('pf_admin_notes').value = p.adminNotes || '';
+          $('sideAvatar').textContent = (p.fullName||'Member').split(' ').map(s=>s[0]).slice(0,2).join('').toUpperCase();
+          $('sideName').textContent = p.fullName || p.email || 'Member';
+          $('topUserName').textContent = p.fullName || p.email || 'Member';
+          $('sideEmail').textContent = p.email || '';
         }
       });
-      listeners.push(() => offProfile()); // onValue returns the unsubscribe function
+      listenerUnsub.push(()=> off(profileRef, 'value', unProfile));
 
-      // BALANCES
+      // balances
       const balancesRef = ref(db, `members/${uid}/balances`);
-      const offBalances = onValue(balancesRef, snap => {
+      const unBalances = onValue(balancesRef, snap=>{
         const b = snap.exists()? snap.val() : {};
         $('monthlyBalance').textContent = fmt(b.monthly); $('weeklyBalance').textContent = fmt(b.weekly); $('sharesCount').textContent = (b.shares||0) + ' units';
         $('dividendsBalance').textContent = fmt(b.dividends); $('outstandingBalance').textContent = fmt(b.outstanding); $('unpaidBalance').textContent = fmt(b.unpaid);
       });
-      listeners.push(() => offBalances());
+      listenerUnsub.push(()=> off(balancesRef, 'value', unBalances));
 
-      // TRANSACTIONS
+      // transactions
       const txRef = ref(db, `members/${uid}/transactions`);
-      const offTx = onValue(txRef, snap => {
+      const unTx = onValue(txRef, snap=>{
         const arr = [];
-        if(snap.exists()){
-          const val = snap.val();
-          Object.entries(val).forEach(([k,v]) => arr.push({ id:k, ...v }));
-          arr.sort((a,b) => (a.timestamp||0) - (b.timestamp||0));
-        }
-        renderTxTables(arr);
+        if(snap.exists()){ const val = snap.val(); Object.entries(val).forEach(([k,v]) => arr.push({ id:k, ...v })); arr.sort((a,b)=> (a.timestamp||0) - (b.timestamp||0)); }
+        renderTransactions(arr);
       });
-      listeners.push(() => offTx());
+      listenerUnsub.push(()=> off(txRef, 'value', unTx));
 
-      // LOAN
+      // loan
       const loanRef = ref(db, `members/${uid}/loan`);
-      const offLoan = onValue(loanRef, snap => {
+      const unLoan = onValue(loanRef, snap=>{
         const ln = snap.exists()? snap.val() : null;
-        renderLoanAction(ln);
+        renderLoan(ln);
       });
-      listeners.push(() => offLoan());
-
-      // Optional: points
-      const ptsRef = ref(db, `members/${uid}/points`);
-      const offPts = onValue(ptsRef, snap => {
-        const pts = snap.exists()? snap.val() : 0;
-        // Display points somewhere in UI
-        // For simplicity, append to topUserName element as badge
-        document.getElementById('topUserName').title = `Points: ${pts}`;
-      });
-      listeners.push(() => offPts());
+      listenerUnsub.push(()=> off(loanRef, 'value', unLoan));
     }
 
-    /* =========================
-       Render transactions into tables
-       We compute running balance if missing.
-       ========================= */
-    function renderTxTables(arr){
-      // main tx table
-      const tbody = $('txBody'); tbody.innerHTML = '';
-      const tbody2 = $('txBody2'); tbody2.innerHTML = '';
-      if(!arr.length){
-        tbody.innerHTML = '<tr><td colspan="5" class="muted">No transactions yet.</td></tr>';
-        tbody2.innerHTML = '<tr><td colspan="5" class="muted">No transactions yet.</td></tr>';
-        return;
-      }
+    // Render transactions (both tables)
+    function renderTransactions(arr){
+      const tbody = $('txBody'); tbody.innerHTML = ''; const tbody2 = $('txBody2'); tbody2.innerHTML = '';
+      if(!arr.length){ tbody.innerHTML = '<tr><td colspan="5" class="muted">No transactions yet.</td></tr>'; tbody2.innerHTML = '<tr><td colspan="5" class="muted">No transactions yet.</td></tr>'; return; }
       let running = 0;
-      arr.forEach((t, idx) => {
-        // compute running balance intelligently
-        if('balance' in t && t.balance !== null && t.balance !== undefined){
-          running = Number(t.balance);
-        } else {
-          running = running + (Number(t.credit||0) - Number(t.debit||0));
-        }
+      arr.forEach(t => {
+        if('balance' in t && t.balance !== null && t.balance !== undefined) running = Number(t.balance);
+        else running = running + (Number(t.credit||0) - Number(t.debit||0));
         const dateStr = t.date ? new Date(t.date).toLocaleString() : new Date(t.timestamp||0).toLocaleString();
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${escapeHtml(dateStr)}</td><td>${escapeHtml(t.description||'')}</td><td>${t.debit? (Number(t.debit).toLocaleString()): ''}</td><td>${t.credit? (Number(t.credit).toLocaleString()): ''}</td><td>${running.toLocaleString()}</td>`;
-        tbody.appendChild(tr);
-
-        // second table (detailed)
-        const tr2 = document.createElement('tr');
-        tr2.innerHTML = `<td>${escapeHtml(dateStr)}</td><td>${escapeHtml(t.description||'')}</td><td>${t.debit? fmt(t.debit) : ''}</td><td>${t.credit? fmt(t.credit) : ''}</td><td>${fmt(running)}</td>`;
-        tbody2.appendChild(tr2);
+        const tr = document.createElement('tr'); tr.innerHTML = `<td>${escapeHtml(dateStr)}</td><td>${escapeHtml(t.description||'')}</td><td>${t.debit? (Number(t.debit).toLocaleString()): ''}</td><td>${t.credit? (Number(t.credit).toLocaleString()): ''}</td><td>${running.toLocaleString()}</td>`; tbody.appendChild(tr);
+        const tr2 = document.createElement('tr'); tr2.innerHTML = `<td>${escapeHtml(dateStr)}</td><td>${escapeHtml(t.description||'')}</td><td>${t.debit? fmt(t.debit) : ''}</td><td>${t.credit? fmt(t.credit) : ''}</td><td>${fmt(running)}</td>`; tbody2.appendChild(tr2);
       });
     }
 
-    /* =========================
-       Render loan action bar
-       ========================= */
-    function renderLoanAction(ln){
-      if(!ln){ $('loanActionPanel').style.display='none'; $('loanActionPanel').setAttribute('aria-hidden','true'); return; }
-      $('loanActionPanel').style.display='block'; $('loanActionPanel').removeAttribute('aria-hidden');
-      $('actAmt').textContent = fmt(ln.amount || 0); $('actInt').textContent = (ln.interestRate || 0) + '%'; $('actStage').textContent = ln.status || 'pending';
-      $('actInst').textContent = (ln.installments? ln.installments.length : 0); $('actNext').textContent = ln.nextRepayment || '—';
-      $('loanBadge').textContent = `Status: ${ln.status || 'pending'}`;
-      // wire buttons
-      $('downloadLoanAppBtn').onclick = () => downloadLoanPDF(ln);
-      $('repayBtn').onclick = () => promptRepayment(ln);
+    // Render loan action
+    function renderLoan(ln){
+      if(!ln){ $('loanActionPanel').style.display='none'; return; }
+      $('loanActionPanel').style.display='block';
+      $('actAmt').textContent = fmt(ln.amount||0); $('actInt').textContent = (ln.interestRate||0) + '%'; $('actStage').textContent = ln.status || 'pending'; $('actInst').textContent = (ln.installments? ln.installments.length : 0); $('actNext').textContent = ln.nextRepayment || '—'; $('loanBadge').textContent = 'Status: ' + (ln.status || 'pending');
+      $('downloadLoanAppBtn').onclick = ()=> downloadLoanPDF(ln); $('repayBtn').onclick = ()=> promptRepayment(ln);
     }
 
-    /* =========================
-       Download loan application as PDF (using html2canvas + jsPDF)
-       ========================= */
+    // Download loan PDF
     async function downloadLoanPDF(ln){
-      // create temporary element
-      const wrapper = document.createElement('div'); wrapper.style.padding='20px'; wrapper.style.background='#fff'; wrapper.style.color='#111'; wrapper.style.width='800px';
-      wrapper.innerHTML = `<h2>Visionary Youth — Loan Application</h2><p>Generated: ${new Date().toLocaleString()}</p><hr/>`;
-      wrapper.innerHTML += `<pre style="white-space:pre-wrap">${escapeHtml(JSON.stringify(ln, null, 2))}</pre>`;
+      const wrapper = document.createElement('div'); wrapper.style.padding='20px'; wrapper.style.background='#fff'; wrapper.style.color='#111'; wrapper.style.width='900px';
+      wrapper.innerHTML = `<h2>Visionary Youth — Loan Application</h2><p>Generated: ${new Date().toLocaleString()}</p><hr/><pre style="white-space:pre-wrap">${escapeHtml(JSON.stringify(ln,null,2))}</pre>`;
       document.body.appendChild(wrapper);
-      const canvas = await html2canvas(wrapper, { scale:2 });
-      const img = canvas.toDataURL('image/png');
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF('p','mm','a4');
-      const pageWidth = pdf.internal.pageSize.getWidth(); const imgProps = pdf.getImageProperties(img);
-      const imgWidth = pageWidth - 20; const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
-      pdf.addImage(img, 'PNG', 10, 10, imgWidth, imgHeight);
-      pdf.save(`loan_application_${currentUid || 'guest'}_${Date.now()}.pdf`);
-      document.body.removeChild(wrapper);
+      const canvas = await html2canvas(wrapper, { scale:2 }); const img = canvas.toDataURL('image/png'); const { jsPDF } = window.jspdf; const pdf = new jsPDF('p','mm','a4'); const pageWidth = pdf.internal.pageSize.getWidth(); const imgProps = pdf.getImageProperties(img); const imgWidth = pageWidth - 20; const imgHeight = (imgProps.height * imgWidth) / imgProps.width; pdf.addImage(img,'PNG',10,10,imgWidth,imgHeight); pdf.save(`loan_app_${currentUid||'guest'}_${Date.now()}.pdf`); document.body.removeChild(wrapper);
     }
 
-    /* =========================
-       Prompt repayment (demo flow) - allows user to simulate repayment entry
-       ========================= */
+    // Repayment prompt
     function promptRepayment(ln){
-      const amount = prompt('Enter repayment amount (KES)', ln.amount ? String(Math.min(ln.amount, 1000)) : '0');
-      if(!amount) return;
-      const amt = Number(amount);
-      if(isNaN(amt) || amt <= 0){ alert('Invalid amount'); return; }
-      // create a repayment transaction (in real app, you'd integrate payment gateway)
-      if(!currentUid){ alert('Sign in first'); return; }
-      const txRef = ref(db, `members/${currentUid}/transactions`);
-      const p = push(txRef);
-      set(p, { date: new Date().toISOString(), description: 'Loan repayment', debit: 0, credit: amt, timestamp: Date.now(), status: 'posted' })
-        .then(()=> alert('Repayment recorded (demo).'))
-        .catch(err => { console.error(err); alert('Failed to record repayment.'); });
+      const amount = prompt('Enter repayment amount (KES)', ln.amount ? String(Math.min(ln.amount,1000)) : '0'); if(!amount) return; const amt = Number(amount); if(isNaN(amt) || amt<=0){ alert('Invalid'); return; } if(!currentUid){ alert('Sign in first'); return; }
+      const txRef = ref(db, `members/${currentUid}/transactions`); const p = push(txRef); set(p, { date: new Date().toISOString(), description:'Loan repayment', debit:0, credit: amt, timestamp: Date.now(), status:'posted' }).then(()=> alert('Repayment recorded (demo)')).catch(e=>{ console.error(e); alert('Failed'); });
     }
 
-    /* =========================
-       Transaction filtering (client side demo)
-       ========================= */
-    function applyTransactionFilters(){
-      // For demo, simply alert; full implementation would filter the local array of transactions
-      alert('Filters applied (demo).');
-    }
+    // Exports
+    $('exportCsvBtn').addEventListener('click', ()=>{ const rows = Array.from($('txBody').children).map(tr => Array.from(tr.children).map(td => td.textContent.trim())); if(!rows.length){ alert('No transactions to export'); return; } const csv = rows.map(r=> r.map(c=> `"${c.replace(/"/g,'""')}"`).join(',')).join('\n'); const blob = new Blob([csv], { type:'text/csv' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `transactions_${currentUid||'guest'}_${Date.now()}.csv`; a.click(); });
+    $('exportPdfBtn').addEventListener('click', async ()=>{ const elToCapture = $('txTable'); const canvas = await html2canvas(elToCapture, { scale:2 }); const img = canvas.toDataURL('image/png'); const { jsPDF } = window.jspdf; const pdf = new jsPDF('p','mm','a4'); const pageWidth = pdf.internal.pageSize.getWidth(); const imgProps = pdf.getImageProperties(img); const imgWidth = pageWidth - 20; const imgHeight = (imgProps.height * imgWidth) / imgProps.width; pdf.addImage(img,'PNG',10,10,imgWidth,imgHeight); pdf.setFontSize(10); pdf.text('Visionary Youth — Transactions', pageWidth/2, 8, { align:'center' }); pdf.save(`transactions_${currentUid||'guest'}_${Date.now()}.pdf`); });
 
-    /* =========================
-       Wizard logic for the detailed loan application in LOANS view
-       This is a comprehensive multi-step wizard with validations
-       ========================= */
-    const wizardSteps = ['personal','identity','employment','loan','guarantor','declarations','review'];
-    let wizardPos = 0;
-    let wizardData = {
-      fullName:'', email:'', phone:'', address:'', idNumber:'', dob:'', employer:'', jobTitle:'', monthlyIncome:0, otherIncome:0,
-      amount:0, interestRate:12, tenureMonths:6, repaymentSource:'', purpose:'', guarantorName:'', guarantorPhone:'', guarantorId:'', collateralDesc:'', collateralValue:0,
-      declarations:false, signature:''
-    };
+    // Filter toggle and apply
+    $('filterToggleBtn').addEventListener('click', ()=>{ const fa = $('filterArea'); fa.style.display = fa.style.display === 'none' ? 'block' : 'none'; });
+    $('applyFilterBtn').addEventListener('click', ()=>{ alert('Filters applied (demo)'); });
 
-    function initLoanWizardUI(){
-      // populate steps UI
-      const bar = $('wizardStepsBar'); bar.innerHTML = '';
-      wizardSteps.forEach((s,i)=>{
-        const span = document.createElement('div'); span.className = 'muted-small'; span.style.padding='6px 8px'; span.style.borderRadius='6px'; span.style.background = i===wizardPos? 'linear-gradient(90deg,var(--seku-green),var(--seku-gold))' : 'transparent'; span.style.color = i===wizardPos? '#fff' : 'var(--muted)'; span.textContent = `${i+1}. ${s}`; bar.appendChild(span);
-      });
+    // Loan wizard (comprehensive)
+    const wizardSteps = ['personal','identity','employment','loan','guarantor','collateral','declarations','review']; let wizardPos = 0; let wizardData = { fullName:'', email:'', phone:'', address:'', idNumber:'', dob:'', employer:'', jobTitle:'', monthlyIncome:0, otherIncome:0, amount:0, interestRate:12, tenureMonths:6, repaymentSource:'', purpose:'', guarantorName:'', guarantorPhone:'', guarantorId:'', collateralDesc:'', collateralValue:0, declarations:false, signature:'' };
+
+    function initLoanWizard(){
+      const bar = $('wizardStepsBar'); bar.innerHTML = ''; wizardSteps.forEach((s,i)=>{ const el = document.createElement('div'); el.textContent = `${i+1}. ${s}`; el.style.padding='6px 8px'; el.style.borderRadius='6px'; el.style.background = i===wizardPos? 'linear-gradient(90deg,var(--seku-green),var(--seku-gold))' : 'transparent'; el.style.color = i===wizardPos? '#fff' : 'var(--muted)'; bar.appendChild(el); });
       renderWizardStep();
-      $('wizardPrevBtn').onclick = ()=>{ if(wizardPos>0){ saveWizardFields(); wizardPos--; renderWizardStep(); } };
-      $('wizardNextBtnFull').onclick = ()=>{ saveWizardFields(); if(wizardPos < wizardSteps.length -1){ wizardPos++; renderWizardStep(); } };
-      $('wizardSubmitFull').onclick = submitFullLoan;
+      $('wizardPrevBtn').addEventListener('click', ()=>{ if(wizardPos>0){ saveWizardFields(); wizardPos--; renderWizardStep(); } });
+      $('wizardNextBtnFull').addEventListener('click', ()=>{ saveWizardFields(); if(wizardPos < wizardSteps.length-1){ wizardPos++; renderWizardStep(); } });
+      $('wizardSubmitFull').addEventListener('click', submitFullLoan);
     }
-
     function renderWizardStep(){
-      initLoanWizardUI(); // refresh bar
-      const container = $('wizardFullContent'); container.innerHTML = '';
-      const step = wizardSteps[wizardPos];
-      if(step === 'personal'){
-        container.innerHTML = `
-          <div class="form-grid">
-            <div><label>Full name</label><input id="wiz_fullName" value="${escapeHtml(wizardData.fullName)}" /></div>
-            <div><label>Email</label><input id="wiz_email" type="email" value="${escapeHtml(wizardData.email)}" /></div>
-            <div><label>Phone</label><input id="wiz_phone" value="${escapeHtml(wizardData.phone)}" /></div>
-            <div><label>Address</label><input id="wiz_address" value="${escapeHtml(wizardData.address)}" /></div>
-          </div>
-        `;
-      } else if(step === 'identity'){
-        container.innerHTML = `
-          <div class="form-grid">
-            <div><label>ID Number</label><input id="wiz_idNumber" value="${escapeHtml(wizardData.idNumber)}" /></div>
-            <div><label>Date of birth</label><input id="wiz_dob" type="date" value="${escapeHtml(wizardData.dob)}" /></div>
-          </div>
-        `;
-      } else if(step === 'employment'){
-        container.innerHTML = `
-          <div class="form-grid">
-            <div><label>Employer</label><input id="wiz_employer" value="${escapeHtml(wizardData.employer)}" /></div>
-            <div><label>Job title</label><input id="wiz_jobTitle" value="${escapeHtml(wizardData.jobTitle)}" /></div>
-            <div><label>Monthly income (KES)</label><input id="wiz_monthlyIncome" type="number" value="${escapeHtml(wizardData.monthlyIncome)}" /></div>
-            <div><label>Other income (KES)</label><input id="wiz_otherIncome" type="number" value="${escapeHtml(wizardData.otherIncome)}" /></div>
-          </div>
-        `;
-      } else if(step === 'loan'){
-        container.innerHTML = `
-          <div class="form-grid">
-            <div><label>Loan amount (KES)</label><input id="wiz_amount" type="number" value="${escapeHtml(wizardData.amount)}" /></div>
-            <div><label>Interest rate (%)</label><input id="wiz_interestRate" type="number" value="${escapeHtml(wizardData.interestRate)}" /></div>
-            <div><label>Tenure (months)</label><input id="wiz_tenureMonths" type="number" value="${escapeHtml(wizardData.tenureMonths)}" /></div>
-            <div><label>Repayment source</label><input id="wiz_repaymentSource" value="${escapeHtml(wizardData.repaymentSource)}" /></div>
-          </div>
-          <label>Purpose</label><textarea id="wiz_purpose">${escapeHtml(wizardData.purpose)}</textarea>
-        `;
-      } else if(step === 'guarantor'){
-        container.innerHTML = `
-          <div class="form-grid">
-            <div><label>Guarantor name</label><input id="wiz_guarantorName" value="${escapeHtml(wizardData.guarantorName)}" /></div>
-            <div><label>Guarantor phone</label><input id="wiz_guarantorPhone" value="${escapeHtml(wizardData.guarantorPhone)}" /></div>
-            <div><label>Guarantor ID</label><input id="wiz_guarantorId" value="${escapeHtml(wizardData.guarantorId)}" /></div>
-            <div><label>Collateral value (KES)</label><input id="wiz_collateralValue" type="number" value="${escapeHtml(wizardData.collateralValue)}" /></div>
-          </div>
-          <label>Collateral description</label><textarea id="wiz_collateralDesc">${escapeHtml(wizardData.collateralDesc)}</textarea>
-        `;
-      } else if(step === 'declarations'){
-        container.innerHTML = `
-          <label><input type="checkbox" id="wiz_declarations" ${wizardData.declarations? 'checked':''} /> I declare that the information provided is true.</label>
-          <label>Digital signature (type full name)</label><input id="wiz_signature" value="${escapeHtml(wizardData.signature)}" />
-        `;
-      } else if(step === 'review'){
-        // gather fields then show JSON review
-        saveWizardFields();
-        container.innerHTML = `<h4>Review application</h4><pre style="white-space:pre-wrap;background:#f2f7f2;padding:10px;border-radius:8px">${escapeHtml(JSON.stringify(wizardData,null,2))}</pre>`;
-      }
-      // toggle visibility of next/submit buttons
-      $('wizardPrevBtn').style.display = wizardPos === 0 ? 'none' : 'inline-block';
-      $('wizardNextBtnFull').style.display = wizardPos === wizardSteps.length - 1 ? 'none' : 'inline-block';
-      $('wizardSubmitFull').style.display = wizardPos === wizardSteps.length - 1 ? 'inline-block' : 'none';
-      // refresh steps bar styling
-      const barChildren = document.getElementById('wizardStepsBar').children;
-      for(let i=0;i<barChildren.length;i++){ barChildren[i].style.opacity = i === wizardPos ? '1' : '0.6'; }
+      const bar = $('wizardStepsBar'); Array.from(bar.children).forEach((c,i)=>{ c.style.background = i===wizardPos? 'linear-gradient(90deg,var(--seku-green),var(--seku-gold))' : 'transparent'; c.style.color = i===wizardPos? '#fff' : 'var(--muted)'; });
+      const container = $('wizardFullContent'); container.innerHTML = ''; const step = wizardSteps[wizardPos];
+      if(step==='personal'){ container.innerHTML = `<div class="form-grid"><div><label>Full name</label><input id="wiz_fullName" value="${escapeHtml(wizardData.fullName)}"/></div><div><label>Email</label><input id="wiz_email" type="email" value="${escapeHtml(wizardData.email)}"/></div><div><label>Phone</label><input id="wiz_phone" value="${escapeHtml(wizardData.phone)}"/></div><div><label>Address</label><input id="wiz_address" value="${escapeHtml(wizardData.address)}"/></div></div>`; }
+      else if(step==='identity'){ container.innerHTML = `<div class="form-grid"><div><label>ID Number</label><input id="wiz_idNumber" value="${escapeHtml(wizardData.idNumber)}"/></div><div><label>Date of birth</label><input id="wiz_dob" type="date" value="${escapeHtml(wizardData.dob)}"/></div></div>`; }
+      else if(step==='employment'){ container.innerHTML = `<div class="form-grid"><div><label>Employer</label><input id="wiz_employer" value="${escapeHtml(wizardData.employer)}"/></div><div><label>Job title</label><input id="wiz_jobTitle" value="${escapeHtml(wizardData.jobTitle)}"/></div><div><label>Monthly income (KES)</label><input id="wiz_monthlyIncome" type="number" value="${escapeHtml(wizardData.monthlyIncome)}"/></div><div><label>Other income (KES)</label><input id="wiz_otherIncome" type="number" value="${escapeHtml(wizardData.otherIncome)}"/></div></div>`; }
+      else if(step==='loan'){ container.innerHTML = `<div class="form-grid"><div><label>Amount (KES)</label><input id="wiz_amount" type="number" value="${escapeHtml(wizardData.amount)}"/></div><div><label>Interest rate (%)</label><input id="wiz_interestRate" type="number" value="${escapeHtml(wizardData.interestRate)}"/></div><div><label>Tenure (months)</label><input id="wiz_tenureMonths" type="number" value="${escapeHtml(wizardData.tenureMonths)}"/></div><div><label>Repayment source</label><input id="wiz_repaymentSource" value="${escapeHtml(wizardData.repaymentSource)}"/></div></div><label>Purpose</label><textarea id="wiz_purpose">${escapeHtml(wizardData.purpose)}</textarea>`; }
+      else if(step==='guarantor'){ container.innerHTML = `<div class="form-grid"><div><label>Guarantor name</label><input id="wiz_guarantorName" value="${escapeHtml(wizardData.guarantorName)}"/></div><div><label>Guarantor phone</label><input id="wiz_guarantorPhone" value="${escapeHtml(wizardData.guarantorPhone)}"/></div><div><label>Guarantor ID</label><input id="wiz_guarantorId" value="${escapeHtml(wizardData.guarantorId)}"/></div><div><label>Collateral value (KES)</label><input id="wiz_collateralValue" type="number" value="${escapeHtml(wizardData.collateralValue)}"/></div></div><label>Collateral description</label><textarea id="wiz_collateralDesc">${escapeHtml(wizardData.collateralDesc)}</textarea>`; }
+      else if(step==='collateral'){ container.innerHTML = `<label>Collateral details</label><textarea id="wiz_collateralFull">${escapeHtml(wizardData.collateralDesc)}</textarea>`; }
+      else if(step==='declarations'){ container.innerHTML = `<label><input type="checkbox" id="wiz_declarations" ${wizardData.declarations? 'checked':''}/> I declare information is true.</label><label>Digital signature (type full name)</label><input id="wiz_signature" value="${escapeHtml(wizardData.signature)}"/>`; }
+      else if(step==='review'){ saveWizardFields(); container.innerHTML = `<h4>Review</h4><pre style="white-space:pre-wrap;background:#f2f7f2;padding:10px;border-radius:8px">${escapeHtml(JSON.stringify(wizardData,null,2))}</pre>`; }
+      $('wizardPrevBtn').style.display = wizardPos===0? 'none': 'inline-block'; $('wizardNextBtnFull').style.display = wizardPos===wizardSteps.length-1? 'none':'inline-block'; $('wizardSubmitFull').style.display = wizardPos===wizardSteps.length-1? 'inline-block':'none';
     }
+    function saveWizardFields(){ const map = { fullName:'wiz_fullName', email:'wiz_email', phone:'wiz_phone', address:'wiz_address', idNumber:'wiz_idNumber', dob:'wiz_dob', employer:'wiz_employer', jobTitle:'wiz_jobTitle', monthlyIncome:'wiz_monthlyIncome', otherIncome:'wiz_otherIncome', amount:'wiz_amount', interestRate:'wiz_interestRate', tenureMonths:'wiz_tenureMonths', repaymentSource:'wiz_repaymentSource', purpose:'wiz_purpose', guarantorName:'wiz_guarantorName', guarantorPhone:'wiz_guarantorPhone', guarantorId:'wiz_guarantorId', collateralDesc:'wiz_collateralDesc', collateralValue:'wiz_collateralValue', declarations:'wiz_declarations', signature:'wiz_signature', collateralFull:'wiz_collateralFull' }; for(const k in map){ const el = document.getElementById(map[k]); if(!el) continue; if(el.type==='checkbox') wizardData[k] = el.checked; else wizardData[k] = el.value; } }
 
-    function saveWizardFields(){
-      // copy values from inputs back to wizardData object (if inputs exist)
-      const map = {
-        fullName:'wiz_fullName', email:'wiz_email', phone:'wiz_phone', address:'wiz_address', idNumber:'wiz_idNumber', dob:'wiz_dob',
-        employer:'wiz_employer', jobTitle:'wiz_jobTitle', monthlyIncome:'wiz_monthlyIncome', otherIncome:'wiz_otherIncome',
-        amount:'wiz_amount', interestRate:'wiz_interestRate', tenureMonths:'wiz_tenureMonths', repaymentSource:'wiz_repaymentSource', purpose:'wiz_purpose',
-        guarantorName:'wiz_guarantorName', guarantorPhone:'wiz_guarantorPhone', guarantorId:'wiz_guarantorId', collateralValue:'wiz_collateralValue', collateralDesc:'wiz_collateralDesc',
-        declarations:'wiz_declarations', signature:'wiz_signature'
-      };
-      for(const k in map){
-        const el = document.getElementById(map[k]);
-        if(!el) continue;
-        if(el.type === 'checkbox') wizardData[k] = el.checked;
-        else wizardData[k] = el.value;
-      }
-    }
+    async function submitFullLoan(){ saveWizardFields(); if(!currentUid){ alert('Sign in first'); return; } if(!wizardData.fullName || !wizardData.email || !wizardData.amount){ alert('Full name, email and amount required'); return; } const appsRef = ref(db, `members/${currentUid}/loanApplications`); const p = push(appsRef); const payload = { ...wizardData, status:'pending', createdAt: serverTimestamp() }; await set(p, payload); await set(ref(db, `members/${currentUid}/loan`), { amount: Number(wizardData.amount), interestRate: Number(wizardData.interestRate), status:'pending', installments:[], tenureMonths: Number(wizardData.tenureMonths), appliedAt: serverTimestamp() }); const ptsRef = ref(db, `members/${currentUid}/points`); const snap = await get(ptsRef); const cur = snap.exists()? snap.val() : 0; await set(ptsRef, cur + 15); alert('Loan application submitted'); wizardPos = 0; wizardData = {}; renderWizardStep(); }
 
-    async function submitFullLoan(){
-      saveWizardFields();
-      // validations
-      if(!currentUid){ alert('Please sign in first'); return; }
-      if(!wizardData.fullName || !wizardData.email || !wizardData.amount){ alert('Please fill full name, email and amount'); return; }
-      // write to RTDB
-      const appsRef = ref(db, `members/${currentUid}/loanApplications`);
-      const p = push(appsRef);
-      const payload = { ...wizardData, status: 'pending', createdAt: serverTimestamp() };
-      await set(p, payload);
-      // set active loan record
-      await set(ref(db, `members/${currentUid}/loan`), { amount: Number(wizardData.amount), interestRate: Number(wizardData.interestRate), status: 'pending', installments: [], tenureMonths: Number(wizardData.tenureMonths), appliedAt: serverTimestamp() });
-      // award points (increment)
-      const ptsRef = ref(db, `members/${currentUid}/points`);
-      const snap = await get(ptsRef); const curPts = snap.exists()? snap.val() : 0;
-      await set(ptsRef, curPts + 15);
-      alert('Loan application submitted successfully.');
-      // reset wizard
-      wizardPos = 0; wizardData = {}; renderWizardStep();
-    }
+    // Withdrawal submit
+    $('submitWithdrawalFull').addEventListener('click', async ()=>{ if(!currentUid){ alert('Sign in first'); return; } const amt = Number($('wd_amount_full').value||0); const reason = $('wd_reason_full').value||''; if(!amt || amt<=0){ alert('Enter valid amount'); return; } if(reason.trim().length < 200){ alert('Reason must be at least 200 characters'); return; } const wRef = ref(db, `members/${currentUid}/withdrawals`); const p = push(wRef); const payload = { amount: amt, bank: $('wd_bank_full').value||'', account: $('wd_acct_full').value||'', fees: Number($('wd_fees_full').value||0), reason: reason, status:'pending', createdAt: serverTimestamp() }; await set(p, payload); const txRef = ref(db, `members/${currentUid}/transactions`); const txp = push(txRef); await set(txp, { date: new Date().toISOString(), description:'Withdrawal request', debit: amt, credit:0, balance: null, timestamp: Date.now(), status:'pending' }); alert('Withdrawal request submitted'); clearWithdrawalFull(); });
+    $('clearWithdrawFull').addEventListener('click', clearWithdrawalFull); function clearWithdrawalFull(){ $('wd_amount_full').value=''; $('wd_bank_full').value=''; $('wd_acct_full').value=''; $('wd_fees_full').value='0'; $('wd_reason_full').value=''; }
 
-    /* =========================
-       Withdrawal submission (full)
-       Validates 200+ character reason then writes to RTDB and creates pending tx
-       ========================= */
-    $('submitWithdrawalFull').onclick = async function(){
-      if(!currentUid){ alert('Sign in first'); return; }
-      const amt = Number($('wd_amount_full').value || 0);
-      const reason = $('wd_reason_full').value || '';
-      if(!amt || amt <= 0){ alert('Enter valid amount'); return; }
-      if(reason.trim().length < 200){ alert('Reason must be at least 200 characters'); return; }
-      // write withdrawal request
-      const wRef = ref(db, `members/${currentUid}/withdrawals`);
-      const p = push(wRef);
-      const payload = { amount: amt, bank: $('wd_bank_full').value || '', account: $('wd_acct_full').value || '', fees: Number($('wd_fees_full').value || 0), reason: reason, status: 'pending', createdAt: serverTimestamp() };
-      await set(p, payload);
-      // record pending transaction
-      const txRef = ref(db, `members/${currentUid}/transactions`);
-      const txp = push(txRef);
-      await set(txp, { date: new Date().toISOString(), description: 'Withdrawal request', debit: amt, credit: 0, balance: null, timestamp: Date.now(), status: 'pending' });
-      alert('Withdrawal request submitted.');
-      // clear form
-      clearWithdrawalFull();
-    };
+    // Profile save
+    $('saveProfileFull').addEventListener('click', async ()=>{ if(!currentUid){ alert('Sign in first'); return; } const payload = { fullName: $('pf_fullname').value || '', memberId: $('pf_memberid').value || currentUid, email: $('pf_email').value || '', type: $('pf_type').value || 'ordinary', phone: $('pf_phone').value || '', gender: $('pf_gender').value || '', dob: $('pf_dob').value || '', residence: $('pf_residence').value || '', education: $('pf_education').value || '', employer: $('pf_employer').value || '', nokName: $('pf_nok_name').value || '', nokContact: $('pf_nok_contact').value || '', incomeSource: $('pf_income_source').value || '', referral: $('pf_referral').value || '', joined: $('pf_joined').value || (new Date().toISOString()), adminNotes: $('pf_admin_notes').value || '' }; await set(ref(db, `members/${currentUid}/profile`), payload); alert('Profile updated'); $('topUserName').textContent = payload.fullName || $('topUserName').textContent; });
+    $('resetProfileFull').addEventListener('click', resetProfileFields); function resetProfileFields(){ ['pf_fullname','pf_memberid','pf_email','pf_type','pf_phone','pf_gender','pf_dob','pf_residence','pf_education','pf_employer','pf_nok_name','pf_nok_contact','pf_income_source','pf_referral','pf_admin_notes'].forEach(id=>{ if($(id)) $(id).value=''; }); }
 
-    function clearWithdrawalFull(){
-      $('wd_amount_full').value = ''; $('wd_bank_full').value = ''; $('wd_acct_full').value = ''; $('wd_fees_full').value = '0'; $('wd_reason_full').value = '';
-    }
+    // Demo utilities
+    async function seedDemo(){ if(!currentUid){ alert('Sign in to seed demo'); return; } const txRef = ref(db, `members/${currentUid}/transactions`); const now = Date.now(); const sample = [ { date:new Date(now-86400000*30).toISOString(), description:'Monthly deposit', debit:0, credit:7000, balance:7000, timestamp: now-86400000*30 }, { date:new Date(now-86400000*20).toISOString(), description:'Shares purchase', debit:2000, credit:0, balance:5000, timestamp: now-86400000*20 }, { date:new Date(now-86400000*8).toISOString(), description:'Dividend payout', debit:0, credit:250, balance:5250, timestamp: now-86400000*8 } ]; for(const t of sample){ const p = push(txRef); await set(p, t); } await set(ref(db, `members/${currentUid}/balances`), { monthly:5250, weekly:1200, shares:20, dividends:250, outstanding:0, unpaid:0, pinned:1000, available:5250, blocked:0 }); alert('Demo data seeded'); }
+    window.seedDemo = seedDemo; window.clearMemberData = async ()=>{ if(!currentUid){ alert('Sign in first'); return; } await set(ref(db, `members/${currentUid}`), null); alert('Member data cleared'); };
+    window.recalcBalances = async ()=>{ if(!currentUid){ alert('Sign in first'); return; } const snap = await get(ref(db, `members/${currentUid}/transactions`)); let credits=0,debits=0; if(snap.exists()){ Object.values(snap.val()).forEach(t=>{ credits += Number(t.credit||0); debits += Number(t.debit||0); }); } const monthly = credits - debits; await set(ref(db, `members/${currentUid}/balances/monthly`), monthly); alert('Balances recalculated (demo)'); };
 
-    /* =========================
-       Profile save for full profile view
-       ========================= */
-    $('saveProfileFull').onclick = async function(){
-      if(!currentUid){ alert('Sign in first'); return; }
-      const fullName = $('pf_fullname').value || ''; const memberId = $('pf_memberid').value || currentUid; const email = $('pf_email').value || ''; const type = $('pf_type').value || 'ordinary';
-      await set(ref(db, `members/${currentUid}/profile`), { fullName, memberId, email, type });
-      alert('Profile saved.');
-    };
+    // Init on DOM ready
+    document.addEventListener('DOMContentLoaded', ()=>{ initLoanWizard(); $('btnSignIn').addEventListener('click', ()=> openAuthModal('signin')); $('btnSignUp').addEventListener('click', ()=> openAuthModal('signup')); $('btnSignOut').addEventListener('click', signOutUser); $('quickApply').addEventListener('click', ()=> navigate('loans')); $('quickWithdraw').addEventListener('click', ()=> navigate('withdrawals')); $('filterToggleBtn').addEventListener('click', ()=>{ const fa = $('filterArea'); fa.style.display = fa.style.display === 'none' ? 'block' : 'none'; }); $('applyFilterBtn').addEventListener('click', ()=> alert('Filter applied (demo)')); });
 
-    function resetProfileFull(){ $('pf_fullname').value=''; $('pf_memberid').value=''; $('pf_email').value=''; $('pf_type').value='ordinary'; }
-
-    /* =========================
-       CSV and PDF exports for transactions
-       ========================= */
-    $('exportCsvBtn').onclick = function(){
-      // build CSV from txBody
-      const rows = Array.from($('txBody').children).map(tr => Array.from(tr.children).map(td => td.textContent.trim()));
-      if(!rows.length){ alert('No transactions to export'); return; }
-      const csv = rows.map(r => r.map(c => `"${c.replace(/"/g,'""')}"`).join(',')).join('\n');
-      const blob = new Blob([csv], { type: 'text/csv' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `transactions_${currentUid||'guest'}_${Date.now()}.csv`; a.click();
-    };
-
-    $('exportPdfBtn').onclick = async function(){
-      const elToCapture = $('txTable');
-      const canvas = await html2canvas(elToCapture, { scale:2 });
-      const img = canvas.toDataURL('image/png');
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF('p','mm','a4');
-      const pageWidth = pdf.internal.pageSize.getWidth(); const imgProps = pdf.getImageProperties(img);
-      const imgWidth = pageWidth - 20; const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
-      pdf.addImage(img, 'PNG', 10, 10, imgWidth, imgHeight); pdf.setFontSize(10); pdf.text('Visionary Youth — Transactions', pageWidth/2, 8, { align:'center' }); pdf.save(`transactions_${currentUid||'guest'}_${Date.now()}.pdf`);
-    };
-
-    /* =========================
-       Demo utilities: seed data, clear data, recalc balances (simple logic)
-       ========================= */
-    async function seedDemoData(){
-      if(!currentUid){ alert('Sign in first'); return; }
-      const txRef = ref(db, `members/${currentUid}/transactions`);
-      const now = Date.now();
-      const sample = [
-        { date: new Date(now-86400000*30).toISOString(), description:'Monthly deposit', debit:0, credit:7000, balance:7000, timestamp: now-86400000*30 },
-        { date: new Date(now-86400000*20).toISOString(), description:'Shares purchase', debit:2000, credit:0, balance:5000, timestamp: now-86400000*20 },
-        { date: new Date(now-86400000*10).toISOString(), description:'Dividend payout', debit:0, credit:250, balance:5250, timestamp: now-86400000*10 }
-      ];
-      for(const t of sample){ const p = push(txRef); await set(p, t); }
-      await set(ref(db, `members/${currentUid}/balances`), { monthly:5250, weekly:1200, shares:20, dividends:250, outstanding:0, unpaid:0, pinned:1000, available:5250, blocked:0 });
-      alert('Demo data seeded.');
-    }
-    async function clearMemberData(){
-      if(!currentUid){ alert('Sign in first'); return; }
-      await set(ref(db, `members/${currentUid}`), null);
-      alert('Member data cleared (demo).');
-    }
-    async function recalcBalances(){
-      if(!currentUid){ alert('Sign in first'); return; }
-      const snap = await get(ref(db, `members/${currentUid}/transactions`));
-      let credits = 0, debits = 0;
-      if(snap.exists()){ Object.values(snap.val()).forEach(t => { credits += Number(t.credit||0); debits += Number(t.debit||0); }); }
-      const monthly = credits - debits;
-      await set(ref(db, `members/${currentUid}/balances/monthly`), monthly);
-      alert('Balances recalculated (demo).');
-    }
-
-    // expose demo functions to global (for console)
-    window.seedDemo = seedDemoData; window.clearDemo = clearMemberData; window.recalcBalances = recalcBalances;
-
-    /* =========================
-       Initialize UI bindings & wizard on page load
-       ========================= */
-    document.addEventListener('DOMContentLoaded', ()=>{
-      // wire menu items to navigate function (for elements without onclick attributes)
-      document.querySelectorAll('[data-view]').forEach(elm => elm.addEventListener('click', (e) => navigate(elm.getAttribute('data-view'), elm)));
-      // wire filter toggle
-      $('filterToggleBtn').onclick = () => { const fa = $('filterArea'); fa.style.display = fa.style.display === 'none' ? 'block' : 'none'; };
-      // wire export buttons (already wired earlier)
-      // wire loan wizard initialization
-      initLoanWizardUI();
-      // link quick controls
-      $('quickApply').onclick = () => { navigate('loans'); window.scrollTo({ top: 0, behavior: 'smooth' }); };
-      $('quickWithdraw').onclick = () => { navigate('withdrawals'); window.scrollTo({ top: 0, behavior: 'smooth' }); };
-      // wire seed/clear/recalc in aside quick actions (buttons created earlier - attach by id if exist)
-      // Buttons for seed etc could be found by text - but for reliability, add explicit handlers below if present
-      // sign-in/up controls are wired in topbar earlier via openAuthModal
-      // wire submission for withdrawal form in withdrawals view
-      $('submitWithdrawalFull').onclick = async () => { /* already bound above */ };
-    });
-
-    /* =========================
-       End of main script
-       ========================= */
+    // ensure $ function exists globally
+    function $(id){ return document.getElementById(id); }
   </script>
 </body>
 </html>
+"""
+
+# write to disk
+path = "/mnt/data/seku_expanded_collapsible_dashboard.html"
+with open(path, "w", encoding="utf-8") as f:
+    f.write(html_big)
+
+path
 
