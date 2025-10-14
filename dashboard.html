@@ -159,7 +159,7 @@ textarea{min-height:120px;resize:vertical}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getDatabase, ref, onValue, set, push, get, child, serverTimestamp, update } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+import { getDatabase, ref, onValue, set, push, get, child, serverTimestamp, update, remove } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 import { jsPDF } from "https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js";
 
@@ -193,12 +193,37 @@ showView('dashboard');
 // Hamburger (small screens)
 $('hamburger').addEventListener('click', ()=>{ const sb = $('sidebar'); if(sb) sb.style.display = sb.style.display === 'block' ? 'none' : 'block'; });
 
-// Apply loan opens wizard (handled earlier; here we ensure view loans open)
-$('applyLoanBtn').addEventListener('click', ()=>{ showView('loans'); setTimeout(()=>{ // scroll
-  const loansSection = $('view-loans'); if(loansSection) window.scrollTo({top:loansSection.offsetTop, behavior:'smooth'}); },200); });
+// Apply loan single click (quick prompt flow) — preserved behavior but now single click works
+$('applyLoanBtn').addEventListener('click', async (e)=>{
+  if(!currentUser){ alert('Sign in to apply'); return; }
+  try{
+    const fullName = prompt('Full name', currentUser.displayName || '');
+    if(fullName === null) return; // cancelled
+    const email = prompt('Email', currentUser.email || '');
+    if(email === null) return;
+    const amount = Number(prompt('Loan amount (KES)','10000'));
+    if(isNaN(amount) || amount <= 0){ alert('Invalid amount'); return; }
+    const interestRate = Number(prompt('Interest rate (%)','12'));
+    if(isNaN(interestRate)) { alert('Invalid interest rate'); return; }
+    const tenure = Number(prompt('Tenure (months)','6'));
+    if(isNaN(tenure) || tenure <= 0){ alert('Invalid tenure'); return; }
+    const purpose = prompt('Purpose','Business capital');
+    if(purpose === null) return;
+
+    const loansRef = ref(db, `members/${currentUser.uid}/loans`);
+    const p = push(loansRef);
+    const createdAt = Date.now();
+    const payload = { id: p.key, fullName, email, amount, interestRate, tenureMonths: tenure, purpose, status:'pending', stage:'applied', createdAt };
+    await set(p, payload);
+    // synchronize a single 'current loan' node for quick access if you want
+    await set(ref(db, `members/${currentUser.uid}/loan`), { amount, interestRate, status:'pending', tenureMonths: tenure, appliedAt: createdAt });
+    alert('Loan application saved.'); awardPoints(10,'loan_application');
+  }catch(e){ console.error(e); alert('Failed to apply loan: ' + e.message); }
+});
 
 // AUTH + RTDB listeners
 onAuthStateChanged(auth, async user => {
+  // cleanup previous listeners
   listeners.forEach(un=> typeof un==='function' && un()); listeners = [];
   currentUser = user;
   if(user){
@@ -224,7 +249,7 @@ onAuthStateChanged(auth, async user => {
     // transactions listener
     const txRef = ref(db, `members/${user.uid}/transactions`);
     const unTx = onValue(txRef, snap => {
-      const arr = []; if(snap.exists()){ const val = snap.val(); Object.entries(val).forEach(([k,v])=> arr.push({ id:k, ...v })); arr.sort((a,b)=> (a.timestamp||0) - (b.timestamp||0)); } renderTransactions(arr);
+      const arr = []; if(snap.exists()){ const val = snap.val(); Object.entries(val).forEach(([k,v])=> arr.push({ id:k, ...v })); arr.sort((a,b)=> (a.timestamp||a.date||0) - (b.timestamp||b.date||0)); } renderTransactions(arr);
     });
     listeners.push(()=> unTx());
 
@@ -236,19 +261,21 @@ onAuthStateChanged(auth, async user => {
       if(snap.exists()){
         const data = snap.val();
         Object.entries(data).forEach(([k,v])=> rows.push({ id:k, ...v }));
+        // ensure we have numeric createdAt for sorting fallback
         rows.sort((a,b)=> (b.createdAt||0) - (a.createdAt||0));
         rows.forEach(r => {
           const tr = document.createElement('tr');
-          const applied = r.createdAt ? new Date(r.createdAt).toLocaleString() : '—';
+          const applied = r.createdAt ? new Date(Number(r.createdAt)).toLocaleString() : '—';
           const amt = r.amount ? fmt(r.amount) : '—';
           const int = (r.interestRate? r.interestRate + '%' : '—');
-          const tenure = r.tenureMonths ? r.tenureMonths + ' mo' : '—';
+          const tenure = r.tenureMonths ? r.tenureMonths + ' mo' : (r.tenure ? r.tenure + ' mo' : '—');
           const status = r.status || 'pending';
           const statusHtml = `<span class="status-pill ${status==='pending'?'status-pending': status==='approved'?'status-approved':'status-rejected'}">${esc(status)}</span>`;
+          // Use r.id safely
           tr.innerHTML = `<td>${esc(applied)}</td><td>${esc(amt)}</td><td>${esc(int)}</td><td>${esc(tenure)}</td><td>${statusHtml}</td><td><button class="btn" data-id="${esc(r.id)}" data-action="view">View</button> <button class="btn ghost" data-id="${esc(r.id)}" data-action="download">PDF</button></td>`;
           body.appendChild(tr);
         });
-        // set loan action panel to latest active loan (choose first pending or approved)
+        // set loan action panel to latest active loan (choose first approved, else pending, else latest)
         const active = rows.find(rr => rr.status === 'approved') || rows.find(rr => rr.status === 'pending') || rows[0];
         if(active){ populateLoanAction(active); selectedLoanId = active.id; } else { hideLoanAction(); selectedLoanId = null; }
       } else {
@@ -264,10 +291,15 @@ onAuthStateChanged(auth, async user => {
 
     // award login points
     awardPoints(5,'login_bonus');
+
+    // start inactivity timer
+    resetInactivityTimer();
   } else {
     // guest state
     $('monthlyBalance').textContent = 'KES 0'; $('weeklyBalance').textContent = 'KES 0'; $('sharesCount').textContent = '0 units'; $('dividendsBalance').textContent = 'KES 0'; $('outstandingBalance').textContent = 'KES 0'; $('unpaidBalance').textContent = 'KES 0'; $('pointsValue').textContent = '0';
     hideLoanAction();
+    // clear inactivity timers
+    if(typeof resetInactivityTimer === 'function') { /* no-op */ }
   }
 });
 
@@ -278,8 +310,19 @@ function populateLoanAction(loan){
   $('actAmt').textContent = loan.amount ? fmt(loan.amount) : 'KES 0';
   $('actInt').textContent = loan.interestRate ? loan.interestRate + '%' : '—';
   $('actStage').textContent = loan.stage || loan.status || 'pending';
-  $('actInst').textContent = (loan.installments ? loan.installments.length : loan.tenureMonths || 0);
-  $('actNext').textContent = loan.nextRepayment || '—';
+  // count installments (object or array)
+  let instCount = 0;
+  if(loan.installments){
+    if(Array.isArray(loan.installments)) instCount = loan.installments.length;
+    else instCount = Object.keys(loan.installments).length;
+  } else instCount = loan.tenureMonths || 0;
+  $('actInst').textContent = instCount;
+  // next repayment formatting
+  let nextRep = '—';
+  if(loan.nextRepayment){
+    try{ nextRep = new Date(Number(loan.nextRepayment)).toLocaleString(); }catch(e){ nextRep = loan.nextRepayment; }
+  }
+  $('actNext').textContent = nextRep;
   // badge
   const badge = $('loanBadge'); badge.innerHTML = loan.status ? `<span class="status-pill ${loan.status==='pending'?'status-pending': loan.status==='approved'?'status-approved':'status-rejected'}">${esc(loan.status)}</span>` : '—';
   // set selectedLoanId
@@ -297,18 +340,93 @@ document.addEventListener('click', async (e)=>{
   const action = btn.getAttribute('data-action');
   if(action === 'view'){ // open loan details in modal view (simple)
     try{
+      if(!currentUser){ alert('Sign in to view'); return; }
       const snap = await get(child(ref(db), `members/${currentUser.uid}/loans/${id}`));
       if(!snap.exists()){ alert('Loan not found'); return; }
       const loan = snap.val();
-      alert('Loan details:\\n' + JSON.stringify(loan, null, 2));
+      // show a nicer details dialog (simple but clearer than raw JSON)
+      const lines = [];
+      lines.push(`Loan ID: ${loan.id || id}`);
+      lines.push(`Member: ${loan.fullName || loan.memberName || currentUser.displayName || currentUser.email}`);
+      lines.push(`Amount: ${loan.amount ? 'KES ' + Number(loan.amount).toLocaleString() : '—'}`);
+      lines.push(`Interest: ${loan.interestRate? loan.interestRate + '%' : '—'}`);
+      lines.push(`Tenure: ${loan.tenureMonths || '—'} months`);
+      lines.push(`Status: ${loan.status || 'pending'}`);
+      lines.push(`Purpose: ${loan.purpose || '—'}`);
+      if(loan.installments) lines.push(`Installments: ${Array.isArray(loan.installments)? loan.installments.length : Object.keys(loan.installments||{}).length}`);
+      alert(lines.join('\n'));
     }catch(err){ console.error(err); alert('Failed to fetch loan'); }
   } else if(action === 'download'){
+    if(!id){ alert('Loan id missing'); return; }
     await downloadLoanPdfById(id);
   }
 });
 
 // download loan PDF for currently selected loan via action panel
 $('downloadLoanAppBtn').addEventListener('click', async ()=>{ if(!selectedLoanId){ alert('No active loan to download'); return; } await downloadLoanPdfById(selectedLoanId); });
+
+// repay button behavior
+$('repayBtn').addEventListener('click', async ()=>{
+  if(!currentUser){ alert('Sign in to repay'); return; }
+  if(!selectedLoanId){ alert('No active loan selected'); return; }
+  const amount = Number(prompt('Enter repayment amount (KES)','0'));
+  if(!amount || isNaN(amount) || amount <=0){ alert('Invalid'); return; }
+  try{
+    const txRef = ref(db, `members/${currentUser.uid}/transactions`); const p = push(txRef); await set(p, { date: new Date().toISOString(), description: 'Loan repayment', debit:0, credit: amount, timestamp: Date.now(), status: 'posted' });
+    // update loan installments simple approach
+    const instRef = ref(db, `members/${currentUser.uid}/loans/${selectedLoanId}/installments`);
+    const pi = push(instRef); await set(pi, { amount, paidAt: Date.now() });
+    // optionally reduce outstanding node if present
+    awardPoints(15,'repayment');
+    alert('Repayment recorded');
+  }catch(e){ console.error(e); alert('Repayment failed: ' + e.message); }
+});
+
+// Export CSV/PDF for transactions
+$('exportCsvBtn').addEventListener('click', ()=>{ 
+  const rows = Array.from($('txBody').children).map(tr => Array.from(tr.children).map(td=> td.textContent.trim())); 
+  if(!rows.length){ alert('No transactions to export'); return; } 
+  const csv = rows.map(r => r.map(c=> `"${c.replace(/"/g,'""')}"`).join(',')).join('\n'); 
+  const blob = new Blob([csv], { type:'text/csv' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `transactions_${currentUser? currentUser.uid : 'guest'}_${Date.now()}.csv`; a.click(); awardPoints(3,'export_csv'); 
+});
+$('exportPdfBtn').addEventListener('click', async ()=>{ 
+  const el = $('txTable'); 
+  html2canvas(el, { scale:2 }).then(canvas => {
+    const img = canvas.toDataURL('image/png');
+    const doc = new jsPDF('p','mm','a4');
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const imgProps = doc.getImageProperties(img);
+    const imgWidth = pageWidth - 20;
+    const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
+    doc.addImage(img,'PNG',10,10,imgWidth,imgHeight);
+    doc.setFontSize(10); doc.text('Visionary Youth — Transactions', pageWidth/2, 8, { align:'center' });
+    doc.save(`transactions_${currentUser? currentUser.uid : 'guest'}_${Date.now()}.pdf`);
+    awardPoints(3,'export_pdf');
+  }).catch(e=> { console.error(e); alert('Failed to export PDF: ' + e.message); });
+});
+
+// refresh loans button (manual)
+$('refreshLoansBtn').addEventListener('click', ()=>{ if(currentUser) { alert('Loans refreshed (live listener will update view)'); } else alert('Sign in to refresh'); });
+
+// withdrawal request button simple flow
+$('requestWithdrawBtn').addEventListener('click', async ()=>{
+  if(!currentUser){ alert('Sign in to request withdrawal'); return; }
+  try{
+    const amount = Number(prompt('Withdrawal amount (KES)','0'));
+    if(!amount || isNaN(amount) || amount <=0){ alert('Invalid amount'); return; }
+    const reason = prompt('Reason for withdrawal','Personal use');
+    if(reason === null) return;
+    const wRef = ref(db, `members/${currentUser.uid}/withdrawals`);
+    const p = push(wRef);
+    const payload = { id: p.key, amount, reason, status: 'pending', requestedAt: Date.now() };
+    await set(p, payload);
+    alert('Withdrawal request submitted.');
+    awardPoints(5,'withdraw_request');
+  }catch(e){ console.error(e); alert('Failed to request withdrawal: ' + e.message); }
+});
+
+// award points
+async function awardPoints(amount, reason='action'){ if(!currentUser) return; try{ const pRef = ref(db, `members/${currentUser.uid}/points`); const snap = await get(pRef); const current = snap.exists() ? Number(snap.val()) : 0; await set(pRef, current + Number(amount)); const logRef = ref(db, `members/${currentUser.uid}/pointsLog`); const p = push(logRef); await set(p, { change: Number(amount), reason, at: Date.now() }); }catch(e){ console.error('awardPoints err', e); } }
 
 // download loan PDF by loan id (creates a stylish PDF using jsPDF)
 async function downloadLoanPdfById(loanId){
@@ -323,7 +441,8 @@ async function downloadLoanPdfById(loanId){
     // watermark
     doc.setTextColor(200,200,200);
     doc.setFontSize(60);
-    doc.text('VisionDVD Group 2024', pageWidth/2, 120, { align:'center', angle: 45, opacity: 0.08 });
+    // jsPDF doesn't support opacity in text easily; keep subtle by light color & angle
+    doc.text('Visionary Youth', pageWidth/2, 120, { align:'center', angle: 45 });
     // header
     doc.setTextColor(0,80,0);
     doc.setFontSize(18);
@@ -367,79 +486,30 @@ async function downloadLoanPdfById(loanId){
     const filename = `loan_${loanId}_${currentUser.uid}_${Date.now()}.pdf`;
     doc.save(filename);
     awardPoints(2,'download_loan_pdf');
-  }catch(e){ console.error(e); alert('Failed to generate PDF: ' + e.message); }
+  }catch(e){ console.error(e); alert('Failed to generate PDF: ' + (e.message || e)); }
 }
+
+// expose for debug if needed
+window.downloadLoanPdfById = downloadLoanPdfById;
 
 // render transactions to table
 function renderTransactions(arr){ const tbody = $('txBody'); const tbody2 = $('txBody2'); tbody.innerHTML = ''; if(tbody2) tbody2.innerHTML=''; if(!arr || !arr.length){ tbody.innerHTML = '<tr><td colspan="5" class="subtitle">No transactions yet.</td></tr>'; if(tbody2) tbody2.innerHTML = '<tr><td colspan="5" class="subtitle">No transactions yet.</td></tr>'; return; } let running = 0; arr.forEach(t => { if('balance' in t && t.balance !== null && t.balance !== undefined) running = Number(t.balance); else running = running + (Number(t.credit||0) - Number(t.debit||0)); const dateStr = t.date ? new Date(t.date).toLocaleString() : new Date(t.timestamp||0).toLocaleString(); const tr = document.createElement('tr'); tr.innerHTML = `<td>${esc(dateStr)}</td><td>${esc(t.description||'')}</td><td>${t.debit? (Number(t.debit).toLocaleString()): ''}</td><td>${t.credit? (Number(t.credit).toLocaleString()): ''}</td><td>${running.toLocaleString()}</td>`; tbody.appendChild(tr); if(tbody2){ const tr2 = document.createElement('tr'); tr2.innerHTML = `<td>${esc(dateStr)}</td><td>${esc(t.description||'')}</td><td>${t.debit? fmt(t.debit) : ''}</td><td>${t.credit? fmt(t.credit) : ''}</td><td>${fmt(running)}</td>`; tbody2.appendChild(tr2); } }); }
 
-// award points (same as before)
-async function awardPoints(amount, reason='action'){ if(!currentUser) return; try{ const pRef = ref(db, `members/${currentUser.uid}/points`); const snap = await get(pRef); const current = snap.exists() ? Number(snap.val()) : 0; await set(pRef, current + Number(amount)); const logRef = ref(db, `members/${currentUser.uid}/pointsLog`); const p = push(logRef); await set(p, { change: Number(amount), reason, at: serverTimestamp() }); }catch(e){ console.error('awardPoints err', e); } }
-
-// Export CSV/PDF for transactions
-$('exportCsvBtn').addEventListener('click', ()=>{ const rows = Array.from($('txBody').children).map(tr => Array.from(tr.children).map(td=> td.textContent.trim())); if(!rows.length){ alert('No transactions to export'); return; } const csv = rows.map(r => r.map(c=> `"${c.replace(/"/g,'""')}"`).join(',')).join('\n'); const blob = new Blob([csv], { type:'text/csv' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `transactions_${currentUser? currentUser.uid : 'guest'}_${Date.now()}.csv`; a.click(); awardPoints(3,'export_csv'); });
-$('exportPdfBtn').addEventListener('click', async ()=>{ const el = $('txTable'); const canvas = await html2canvas(el, { scale:2 }); const img = canvas.toDataURL('image/png'); const doc = new jsPDF('p','mm','a4'); const pageWidth = doc.internal.pageSize.getWidth(); const imgProps = doc.getImageProperties(img); const imgWidth = pageWidth - 20; const imgHeight = (imgProps.height * imgWidth) / imgProps.width; doc.addImage(img,'PNG',10,10,imgWidth,imgHeight); doc.setFontSize(10); doc.text('Visionary Youth — Transactions', pageWidth/2, 8, { align:'center' }); doc.save(`transactions_${currentUser? currentUser.uid : 'guest'}_${Date.now()}.pdf`); awardPoints(3,'export_pdf'); });
-
-// wizard functions (kept compact) - same as earlier but ensure loans written to /members/{uid}/loans and /members/{uid}/loan
-const wizardSteps = ['personal','identity','employment','loan','guarantor','collateral','declarations','review']; let wizardPos=0; let wizardData={};
-function initWizard(){ /* simplified: open loans form inline - for this build we'll mock a small modal via prompt flow if needed */ }
-// For quickness, allow applying loan via a simple prompt flow when user clicks Apply for Loan in this fixed build
-document.getElementById('applyLoanBtn').addEventListener('dblclick', async ()=>{
-  if(!currentUser){ alert('Sign in to apply'); return; }
-  try{
-    const fullName = prompt('Full name', currentUser.displayName || '');
-    const email = prompt('Email', currentUser.email || '');
-    const amount = Number(prompt('Loan amount (KES)','10000'));
-    const interestRate = Number(prompt('Interest rate (%)','12'));
-    const tenure = Number(prompt('Tenure (months)','6'));
-    const purpose = prompt('Purpose','Business capital');
-    if(!fullName || !email || !amount){ alert('Required fields missing'); return; }
-    const loansRef = ref(db, `members/${currentUser.uid}/loans`);
-    const p = push(loansRef);
-    const payload = { fullName, email, amount, interestRate, tenureMonths: tenure, purpose, status:'pending', stage:'applied', createdAt: serverTimestamp() };
-    await set(p, payload);
-    await set(ref(db, `members/${currentUser.uid}/loan`), { amount, interestRate, status:'pending', tenureMonths: tenure, appliedAt: serverTimestamp() });
-    alert('Loan application saved (double-click Apply to use prompt quick-apply).'); awardPoints(10,'loan_application');
-  }catch(e){ console.error(e); alert('Failed to apply loan: ' + e.message); }
-});
-
-// refresh loans button (manual)
-$('refreshLoansBtn').addEventListener('click', ()=>{ if(currentUser) { /* listener will update automatically */ alert('Loans refreshed'); } else alert('Sign in to refresh'); });
-
-// download by id helper defined earlier - allow repay and view actions attached
-$('repayBtn').addEventListener('click', async ()=>{
-  if(!currentUser){ alert('Sign in to repay'); return; }
-  if(!selectedLoanId){ alert('No active loan selected'); return; }
-  const amount = Number(prompt('Enter repayment amount (KES)','0'));
-  if(!amount || isNaN(amount) || amount <=0){ alert('Invalid'); return; }
-  try{
-    const txRef = ref(db, `members/${currentUser.uid}/transactions`); const p = push(txRef); await set(p, { date: new Date().toISOString(), description: 'Loan repayment', debit:0, credit: amount, timestamp: Date.now(), status: 'posted' });
-    // optionally update loan installments or outstanding - simple approach: push to loan installments
-    const instRef = ref(db, `members/${currentUser.uid}/loans/${selectedLoanId}/installments`); const pi = push(instRef); await set(pi, { amount, paidAt: serverTimestamp() });
-    awardPoints(15,'repayment');
-    alert('Repayment recorded');
-  }catch(e){ console.error(e); alert('Repayment failed: ' + e.message); }
-});
-
-// helper: download loan by id already above - make accessible here by name
-async function downloadLoanPdfById(loanId){ return await window.downloadLoanPdfById?.(loanId) ?? (async ()=>{ alert('PDF download helper missing'); })(); }
-
-// Note: to keep this single-file final, we expose downloadLoanPdfById for earlier use
-window.downloadLoanPdfById = downloadLoanPdfById;
-
-// Auto logout (same) - redirect to index.html after signOut
+// Auto logout (redirect to index.html after signOut)
 let AUTO_LOGOUT_MIN = 3; let inactivityTimer = null; let warningTimer = null;
-function resetInactivityTimer(){ if(inactivityTimer) clearTimeout(inactivityTimer); if(warningTimer) clearTimeout(warningTimer); if(!currentUser) return; warningTimer = setTimeout(()=>{ $('logoutWarning').style.display = 'flex'; }, (AUTO_LOGOUT_MIN * 60 - 60) * 1000); inactivityTimer = setTimeout(()=>{ signOut(auth).then(()=> window.location.href='index.html').catch(()=> window.location.href='index.html'); $('logoutWarning').style.display = 'none'; }, AUTO_LOGOUT_MIN * 60 * 1000); }
+function resetInactivityTimer(){ if(inactivityTimer) clearTimeout(inactivityTimer); if(warningTimer) clearTimeout(warningTimer); if(!currentUser) return; // warning 60s before signout
+  warningTimer = setTimeout(()=>{ $('logoutWarning').style.display = 'flex'; }, Math.max((AUTO_LOGOUT_MIN * 60 - 60) * 1000, 0));
+  inactivityTimer = setTimeout(()=>{ signOut(auth).then(()=> window.location.href='index.html').catch(()=> window.location.href='index.html'); $('logoutWarning').style.display = 'none'; }, AUTO_LOGOUT_MIN * 60 * 1000);
+}
 ['click','mousemove','keydown','scroll','touchstart'].forEach(evt => window.addEventListener(evt, ()=> { if(currentUser) resetInactivityTimer(); }, { passive:true }));
 $('logoutCancel').addEventListener('click', ()=>{ $('logoutWarning').style.display='none'; resetInactivityTimer(); }); $('logoutNow').addEventListener('click', ()=>{ $('logoutWarning').style.display='none'; signOut(auth).then(()=> window.location.href='index.html').catch(()=> window.location.href='index.html'); });
 
 // append sign out button to top-right
 document.addEventListener('DOMContentLoaded', ()=>{ const signOutBtn = document.createElement('button'); signOutBtn.className='btn ghost'; signOutBtn.textContent='Sign out'; signOutBtn.addEventListener('click', ()=>{ if(!currentUser){ window.location.href='index.html'; return; } signOut(auth).then(()=> window.location.href='index.html').catch(()=> window.location.href='index.html'); }); document.querySelector('.top-right')?.appendChild(signOutBtn); });
 
+// Prevent accidental double-add listeners or memory leaks on hot reload (dev)
+window.addEventListener('beforeunload', ()=> { listeners.forEach(un=> typeof un==='function' && un()); });
+
 </script>
 </body>
 </html>
-
-
-
-
