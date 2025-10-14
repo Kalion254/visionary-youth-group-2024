@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Visionary Youth Group — SEKU Dashboard (Final)</title>
-<meta name="description" content="Final SEKU-styled dashboard: all buttons fixed, loan action bar, PDF generation, balances & points from RTDB." />
+<meta name="description" content="Visionary Youth Group dashboard — final working build: all buttons fixed, balances & points live, loans and PDFs." />
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <style>
@@ -57,7 +57,7 @@ textarea{min-height:120px;resize:vertical}
 <div class="app">
   <div class="topbar" role="banner">
     <div class="left-controls">
-      <div class="hamburger" id="hamburger" title="Open menu" aria-label="Open menu"><svg width="20" height="14" viewBox="0 0 20 14" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="20" height="2" rx="1" fill="#274733"/><rect y="6" width="20" height="2" rx="1" fill="#274733"/><rect y="12" width="20" height="2" rx="1" fill="#274733"/></svg></div>
+      <div class="hamburger" id="hamburger" title="Open menu" aria-label="Open menu">☰</div>
       <div class="brand"><div class="logo">VY</div><div><div class="title">Visionary Youth Group</div><div class="subtitle">Member dashboard — SEKU</div></div></div>
     </div>
     <div class="top-right">
@@ -78,31 +78,28 @@ textarea{min-height:120px;resize:vertical}
     <main class="content" id="mainContent">
       <section id="view-dashboard">
         <div class="grid-cards">
-          <div class="card" id="cardMonthly"><div class="icon-wrap"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 12v2a2 2 0 0 1-2 2h-1" stroke="#006400" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 12h1a2 2 0 0 0 2-2V8a2 2 0 0 1 2-2h3" stroke="#006400" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="11.5" cy="13.5" r="1" fill="#006400"/></svg></div><div class="meta"><div class="label">Monthly Savings</div><div class="value" id="monthlyBalance">KES 0</div></div></div>
-          <div class="card" id="cardWeekly"><div class="icon-wrap"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="4" width="18" height="18" rx="2" stroke="#006400" stroke-width="1.4"/><path d="M16 2v4" stroke="#006400" stroke-width="1.4"/><path d="M8 2v4" stroke="#006400" stroke-width="1.4"/></svg></div><div class="meta"><div class="label">Weekly Savings</div><div class="value" id="weeklyBalance">KES 0</div></div></div>
-          <div class="card" id="cardShares"><div class="icon-wrap"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17 21v-2a4 4 0 0 0-3-3.87" stroke="#006400" stroke-width="1.4"/><path d="M8 21v-2a4 4 0 0 1 3-3.87" stroke="#006400" stroke-width="1.4"/><circle cx="12" cy="7" r="3" stroke="#006400" stroke-width="1.4"/></svg></div><div class="meta"><div class="label">Shares</div><div class="value" id="sharesCount">0 units</div></div></div>
+          <div class="card"><div class="icon-wrap">M</div><div class="meta"><div class="label">Monthly Savings</div><div class="value" id="monthlyBalance">KES 0</div></div></div>
+          <div class="card"><div class="icon-wrap">W</div><div class="meta"><div class="label">Weekly Savings</div><div class="value" id="weeklyBalance">KES 0</div></div></div>
+          <div class="card"><div class="icon-wrap">S</div><div class="meta"><div class="label">Shares</div><div class="value" id="sharesCount">0 units</div></div></div>
         </div>
 
         <div class="grid-cards" style="margin-top:12px">
-          <div class="card" id="cardDividends"><div class="icon-wrap"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2v6" stroke="#006400" stroke-width="1.4"/><path d="M8 12h8" stroke="#006400" stroke-width="1.4"/><path d="M10 16h4" stroke="#006400" stroke-width="1.4"/></svg></div><div class="meta"><div class="label">Dividends</div><div class="value" id="dividendsBalance">KES 0</div></div></div>
-          <div class="card" id="cardOutstanding"><div class="icon-wrap"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 10h18" stroke="#006400" stroke-width="1.4"/><path d="M7 6v8" stroke="#006400" stroke-width="1.4"/><path d="M17 6v8" stroke="#006400" stroke-width="1.4"/></svg></div><div class="meta"><div class="label">Outstanding</div><div class="value" id="outstandingBalance">KES 0</div></div></div>
-          <div class="card" id="cardUnpaid"><div class="icon-wrap"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 9v4" stroke="#006400" stroke-width="1.4"/><path d="M12 17h.01" stroke="#006400" stroke-width="1.4"/><path d="M10.29 3.86l-8.29 14.28A2 2 0 0 0 3.86 21h16.28a2 2 0 0 0 1.86-2.86L15.71 3.86A2 2 0 0 0 13.86 2H10.14a2 2 0 0 0-1.85 1.86z" stroke="#006400" stroke-width="1.2" fill="none"/></svg></div><div class="meta"><div class="label">Unpaid / Fees</div><div class="value" id="unpaidBalance">KES 0</div></div></div>
+          <div class="card"><div class="icon-wrap">D</div><div class="meta"><div class="label">Dividends</div><div class="value" id="dividendsBalance">KES 0</div></div></div>
+          <div class="card"><div class="icon-wrap">O</div><div class="meta"><div class="label">Outstanding</div><div class="value" id="outstandingBalance">KES 0</div></div></div>
+          <div class="card"><div class="icon-wrap">U</div><div class="meta"><div class="label">Unpaid / Fees</div><div class="value" id="unpaidBalance">KES 0</div></div></div>
         </div>
 
-        <!-- loan action bar (shows when a loan exists) -->
         <div class="panel" id="loanActionPanel" style="display:none;margin-top:18px">
           <div style="display:flex;justify-content:space-between;align-items:center">
             <div><strong>Loan Action</strong><div class="subtitle">Live loan status & quick actions</div></div>
             <div id="loanBadge" class="subtitle">Status —</div>
           </div>
-
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center">
             <div style="min-width:140px"><div class="subtitle">Amount</div><div id="actAmt" style="font-weight:800">KES 0</div></div>
             <div style="min-width:120px"><div class="subtitle">Interest</div><div id="actInt" style="font-weight:800">0%</div></div>
             <div style="min-width:100px"><div class="subtitle">Stage</div><div id="actStage">—</div></div>
             <div style="min-width:120px"><div class="subtitle">Installments</div><div id="actInst">0</div></div>
             <div style="min-width:160px"><div class="subtitle">Next Repayment</div><div id="actNext">—</div></div>
-
             <div style="margin-left:auto;display:flex;gap:8px">
               <button class="btn" id="viewLoanDetailsBtn">View Details</button>
               <button class="btn" id="downloadLoanAppBtn">Download Loan PDF</button>
@@ -111,13 +108,14 @@ textarea{min-height:120px;resize:vertical}
           </div>
         </div>
 
-        <!-- loans list -->
         <div class="panel" style="margin-top:18px">
           <div style="display:flex;justify-content:space-between;align-items:center">
             <div><strong>Your Loan Applications</strong><div class="subtitle">All applications and statuses</div></div>
             <div><button class="btn" id="refreshLoansBtn">Refresh</button></div>
           </div>
-          <div id="loanList" style="margin-top:12px" class="table-wrap"><table id="loanTable"><thead><tr><th>Applied</th><th>Amount</th><th>Interest</th><th>Tenure</th><th>Status</th><th>Actions</th></tr></thead><tbody id="loanBody"><tr><td colspan="6" class="subtitle">No applications yet.</td></tr></tbody></table></div>
+          <div id="loanList" style="margin-top:12px" class="table-wrap">
+            <table id="loanTable"><thead><tr><th>Applied</th><th>Amount</th><th>Interest</th><th>Tenure</th><th>Status</th><th>Actions</th></tr></thead><tbody id="loanBody"><tr><td colspan="6" class="subtitle">No applications yet.</td></tr></tbody></table>
+          </div>
         </div>
 
         <div class="panel" style="margin-top:18px">
@@ -125,22 +123,18 @@ textarea{min-height:120px;resize:vertical}
             <div><strong>Transaction History</strong><div class="subtitle">Debits, credits and running balances</div></div>
             <div style="display:flex;gap:8px;align-items:center"><button class="btn" id="exportCsvBtn">Export CSV</button><button class="btn" id="exportPdfBtn">Export PDF</button></div>
           </div>
-          <div style="margin-top:12px" class="table-wrap"><table id="txTable"><thead><tr><th>Date</th><th>Particulars</th><th>Debit (KES)</th><th>Credit (KES)</th><th>Balance (KES)</th></tr></thead><tbody id="txBody"><tr><td colspan="5" class="subtitle">No transactions yet.</td></tr></tbody></table></div>
+          <div style="margin-top:12px" class="table-wrap">
+            <table id="txTable"><thead><tr><th>Date</th><th>Particulars</th><th>Debit (KES)</th><th>Credit (KES)</th><th>Balance (KES)</th></tr></thead><tbody id="txBody"><tr><td colspan="5" class="subtitle">No transactions yet.</td></tr></tbody></table>
+          </div>
         </div>
-
       </section>
 
-      <!-- other sections kept minimal for brevity -->
-      <section id="view-transactions" style="display:none"><div class="panel"><h4>Transactions</h4><div class="subtitle">Full ledger</div><div style="height:8px"></div><div style="overflow:auto;max-height:600px"><table id="txTable2"><thead><tr><th>Date</th><th>Description</th><th>Debit</th><th>Credit</th><th>Balance</th></tr></thead><tbody id="txBody2"><tr><td colspan="5" class="subtitle">No transactions.</td></tr></tbody></table></div></div></section>
-
-      <section id="view-loans" style="display:none"><div class="panel"><h4>Loans</h4><div class="subtitle">Apply or view status</div></div></section>
-
-      <section id="view-withdrawals" style="display:none"><div class="panel"><h4>Withdrawals</h4><div class="subtitle">Request withdrawal</div></div></section>
-
-      <section id="view-profile" style="display:none"><div class="panel"><h4>Profile</h4><div class="subtitle">Edit details</div></div></section>
-
-      <section id="view-settings" style="display:none"><div class="panel"><h4>Settings</h4><div class="subtitle">Preferences</div></div></section>
-
+      <!-- minimal other sections -->
+      <section id="view-transactions" style="display:none"><div class="panel"><h4>Transactions</h4></div></section>
+      <section id="view-loans" style="display:none"><div class="panel"><h4>Loans</h4></div></section>
+      <section id="view-withdrawals" style="display:none"><div class="panel"><h4>Withdrawals</h4></div></section>
+      <section id="view-profile" style="display:none"><div class="panel"><h4>Profile</h4></div></section>
+      <section id="view-settings" style="display:none"><div class="panel"><h4>Settings</h4></div></section>
     </main>
   </div>
 </div>
@@ -149,7 +143,7 @@ textarea{min-height:120px;resize:vertical}
 <div id="logoutWarning" style="display:none;position:fixed;inset:0;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);z-index:60">
   <div style="background:#fff;padding:18px;border-radius:10px;max-width:420px;width:90%">
     <h3 style="margin-top:0">You're inactive</h3>
-    <p class="subtitle">You will be signed out soon due to inactivity. Click "Stay signed in" to continue your session.</p>
+    <p class="subtitle">You will be signed out soon due to inactivity. Click "Stay signed in" to continue.</p>
     <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
       <button class="btn ghost" id="logoutCancel">Stay signed in</button>
       <button class="btn" id="logoutNow">Sign out now</button>
@@ -158,18 +152,12 @@ textarea{min-height:120px;resize:vertical}
 </div>
 
 <script type="module">
-/* FINAL WORKING DASHBOARD JS
-   - All buttons wired
-   - Balances & points read from members/{uid}/balances and members/{uid}/points
-   - Simplified unsubscribe handling
-   - Preserves your Firebase config
-*/
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import { getDatabase, ref, onValue, set, push, get, child } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 import { jsPDF } from "https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js";
 
+/* === KEEP YOUR REAL FIREBASE CONFIG BELOW === */
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
   authDomain: "visionary-youth-grou-2024.firebaseapp.com",
@@ -179,6 +167,7 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "372978592717",
   appId: "1:372978592717:web:1c15aec728ee5f854f3284"
 };
+/* ============================================ */
 
 const app = initializeApp(FIREBASE_CONFIG);
 const db = getDatabase(app);
@@ -189,84 +178,211 @@ function fmt(v){ return 'KES ' + (Number(v||0)).toLocaleString(); }
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 let currentUser = null;
-let unsubscribers = []; // store unsubscribe functions directly
+let unsubscribers = [];
 let selectedLoanId = null;
 
-// NAV
-document.querySelectorAll('.side-item').forEach(el=> el.addEventListener('click', ()=>{ document.querySelectorAll('.side-item').forEach(s=> s.classList.remove('active')); el.classList.add('active'); const view = el.getAttribute('data-view'); showView(view); }));
-function showView(view){ const sections = ['dashboard','transactions','loans','withdrawals','profile','statements','settings']; sections.forEach(s=>{ const node = $('view-' + s); if(node) node.style.display = s===view ? 'block' : 'none'; }); if(view==='dashboard') awardPoints(5,'view_dashboard'); window.scrollTo({top:0,behavior:'smooth'}); }
-showView('dashboard');
+// ensure DOM ready before attaching event handlers that rely on elements
+document.addEventListener('DOMContentLoaded', () => {
+  // simple nav handling
+  document.querySelectorAll('.side-item').forEach(el=> el.addEventListener('click', ()=> {
+    document.querySelectorAll('.side-item').forEach(s=> s.classList.remove('active'));
+    el.classList.add('active');
+    const view = el.getAttribute('data-view');
+    showView(view);
+  }));
+  showView('dashboard');
 
-// Hamburger (small screens)
-$('hamburger').addEventListener('click', ()=>{ const sb = $('sidebar'); if(sb) sb.style.display = sb.style.display === 'block' ? 'none' : 'block'; });
+  // hamburger
+  $('hamburger')?.addEventListener('click', ()=> { const sb = $('sidebar'); if(sb) sb.style.display = sb.style.display === 'block' ? 'none' : 'block'; });
 
-// Apply loan (single click quick-flow)
-$('applyLoanBtn').addEventListener('click', async ()=>{
-  if(!currentUser){ alert('Sign in to apply'); return; }
-  try{
-    const fullName = prompt('Full name', currentUser.displayName || '');
-    if(fullName === null) return;
-    const email = prompt('Email', currentUser.email || '');
-    if(email === null) return;
-    const amount = Number(prompt('Loan amount (KES)','10000'));
-    if(isNaN(amount) || amount <= 0){ alert('Invalid amount'); return; }
-    const interestRate = Number(prompt('Interest rate (%)','12'));
-    if(isNaN(interestRate)) { alert('Invalid interest rate'); return; }
-    const tenure = Number(prompt('Tenure (months)','6'));
-    if(isNaN(tenure) || tenure <= 0){ alert('Invalid tenure'); return; }
-    const purpose = prompt('Purpose','Business capital');
-    if(purpose === null) return;
-
-    const loansRef = ref(db, `members/${currentUser.uid}/loans`);
-    const p = push(loansRef);
-    const createdAt = Date.now();
-    const payload = { id: p.key, fullName, email, amount, interestRate, tenureMonths: tenure, purpose, status:'pending', stage:'applied', createdAt };
-    await set(p, payload);
-    await set(ref(db, `members/${currentUser.uid}/loan`), { amount, interestRate, status:'pending', tenureMonths: tenure, appliedAt: createdAt });
-    alert('Loan application saved.');
-    awardPoints(10,'loan_application');
-  }catch(e){ console.error(e); alert('Failed to apply loan: ' + e.message); }
+  // attach top-level button handlers (these are safe to attach now)
+  attachTopButtons();
+  // sign out button appended
+  appendSignOutButton();
 });
 
-// AUTH + RTDB listeners
+// show/hide view
+function showView(view){
+  const sections = ['dashboard','transactions','loans','withdrawals','profile','statements','settings'];
+  sections.forEach(s=>{ const node = $('view-' + s); if(node) node.style.display = s===view ? 'block' : 'none'; });
+  if(view==='dashboard') awardPoints(5,'view_dashboard'); window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// Attach top-level button event handlers
+function attachTopButtons(){
+  // Apply loan (quick prompt)
+  $('applyLoanBtn')?.addEventListener('click', async ()=>{
+    if(!currentUser){ alert('Sign in to apply'); return; }
+    try{
+      const fullName = prompt('Full name', currentUser.displayName || '');
+      if(fullName === null) return;
+      const email = prompt('Email', currentUser.email || '');
+      if(email === null) return;
+      const amount = Number(prompt('Loan amount (KES)','10000'));
+      if(isNaN(amount) || amount <= 0){ alert('Invalid amount'); return; }
+      const interestRate = Number(prompt('Interest rate (%)','12'));
+      if(isNaN(interestRate)) { alert('Invalid interest rate'); return; }
+      const tenure = Number(prompt('Tenure (months)','6'));
+      if(isNaN(tenure) || tenure <= 0){ alert('Invalid tenure'); return; }
+      const purpose = prompt('Purpose','Business capital');
+      if(purpose === null) return;
+
+      const loansRef = ref(db, `members/${currentUser.uid}/loans`);
+      const p = push(loansRef);
+      const createdAt = Date.now();
+      const payload = { id: p.key, fullName, email, amount, interestRate, tenureMonths: tenure, purpose, status:'pending', stage:'applied', createdAt };
+      await set(p, payload);
+      await set(ref(db, `members/${currentUser.uid}/loan`), { id: p.key, amount, interestRate, status:'pending', tenureMonths: tenure, appliedAt: createdAt });
+      alert('Loan application saved.');
+      awardPoints(10,'loan_application');
+    }catch(e){ console.error('apply loan err', e); alert('Failed to apply loan: ' + e.message); }
+  });
+
+  // withdraw
+  $('requestWithdrawBtn')?.addEventListener('click', async ()=>{
+    if(!currentUser){ alert('Sign in to request withdrawal'); return; }
+    try{
+      const amount = Number(prompt('Withdrawal amount (KES)','0'));
+      if(!amount || isNaN(amount) || amount <=0){ alert('Invalid amount'); return; }
+      const reason = prompt('Reason for withdrawal','Personal use');
+      if(reason === null) return;
+      const wRef = ref(db, `members/${currentUser.uid}/withdrawals`);
+      const p = push(wRef);
+      const payload = { id: p.key, amount, reason, status: 'pending', requestedAt: Date.now() };
+      await set(p, payload);
+      alert('Withdrawal request submitted.');
+      awardPoints(5,'withdraw_request');
+    }catch(e){ console.error('withdraw err', e); alert('Failed to request withdrawal: ' + e.message); }
+  });
+
+  // export CSV / PDF
+  $('exportCsvBtn')?.addEventListener('click', () => {
+    const rows = Array.from($('txBody').children).map(tr => Array.from(tr.children).map(td=> td.textContent.trim()));
+    if(!rows.length){ alert('No transactions to export'); return; }
+    const csv = rows.map(r => r.map(c=> `"${c.replace(/"/g,'""')}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type:'text/csv' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `transactions_${currentUser? currentUser.uid : 'guest'}_${Date.now()}.csv`; a.click();
+    awardPoints(3,'export_csv');
+  });
+
+  $('exportPdfBtn')?.addEventListener('click', async () => {
+    const el = $('txTable');
+    if(!el){ alert('No transactions table available'); return; }
+    html2canvas(el, { scale:2 }).then(canvas => {
+      const img = canvas.toDataURL('image/png');
+      const doc = new jsPDF('p','mm','a4');
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const imgProps = doc.getImageProperties(img);
+      const imgWidth = pageWidth - 20;
+      const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
+      doc.addImage(img,'PNG',10,10,imgWidth,imgHeight);
+      doc.setFontSize(10); doc.text('Visionary Youth — Transactions', pageWidth/2, 8, { align:'center' });
+      doc.save(`transactions_${currentUser? currentUser.uid : 'guest'}_${Date.now()}.pdf`);
+      awardPoints(3,'export_pdf');
+    }).catch(e => { console.error('export pdf err', e); alert('Failed to export PDF: ' + e.message); });
+  });
+
+  // refresh loans
+  $('refreshLoansBtn')?.addEventListener('click', ()=>{ if(currentUser) alert('Loans refreshed (listeners are live)'); else alert('Sign in to refresh'); });
+
+  // repay (action)
+  $('repayBtn')?.addEventListener('click', async ()=>{
+    if(!currentUser){ alert('Sign in to repay'); return; }
+    if(!selectedLoanId){ alert('No active loan selected'); return; }
+    const amount = Number(prompt('Enter repayment amount (KES)','0'));
+    if(!amount || isNaN(amount) || amount <=0){ alert('Invalid'); return; }
+    try{
+      const txRef = ref(db, `members/${currentUser.uid}/transactions`);
+      const p = push(txRef); await set(p, { date: new Date().toISOString(), description: 'Loan repayment', debit:0, credit: amount, timestamp: Date.now(), status: 'posted' });
+      const instRef = ref(db, `members/${currentUser.uid}/loans/${selectedLoanId}/installments`);
+      const pi = push(instRef); await set(pi, { amount, paidAt: Date.now() });
+      awardPoints(15,'repayment');
+      alert('Repayment recorded.');
+    }catch(e){ console.error('repay err', e); alert('Repayment failed: ' + e.message); }
+  });
+
+  // action bar view details
+  $('viewLoanDetailsBtn')?.addEventListener('click', async ()=>{
+    if(!currentUser){ alert('Sign in to view'); return; }
+    if(!selectedLoanId){ alert('No active loan selected'); return; }
+    try{
+      const snap = await get(child(ref(db), `members/${currentUser.uid}/loans/${selectedLoanId}`));
+      if(!snap.exists()){ alert('Loan not found'); return; }
+      const loan = snap.val();
+      alert(`Loan details:\n\nID: ${loan.id || selectedLoanId}\nAmount: ${loan.amount? fmt(loan.amount): '—'}\nInterest: ${loan.interestRate? loan.interestRate + '%' : '—'}\nTenure: ${loan.tenureMonths || '—'} months\nStatus: ${loan.status || 'pending'}`);
+    }catch(e){ console.error('view loan details err', e); alert('Failed to load loan details'); }
+  });
+
+  // download from action bar
+  $('downloadLoanAppBtn')?.addEventListener('click', async ()=>{ if(!selectedLoanId){ alert('No active loan to download'); return; } await downloadLoanPdfById(selectedLoanId); });
+
+  // sign out controls in logout dialog
+  $('logoutCancel')?.addEventListener('click', ()=>{ $('logoutWarning').style.display='none'; resetInactivityTimer(); });
+  $('logoutNow')?.addEventListener('click', ()=>{ $('logoutWarning').style.display='none'; signOut(auth).then(()=> window.location.href='index.html').catch(()=> window.location.href='index.html'); });
+}
+
+// Append Sign out button in top-right
+function appendSignOutButton(){
+  const btn = document.createElement('button'); btn.className='btn ghost'; btn.textContent='Sign out';
+  btn.addEventListener('click', ()=>{ if(!currentUser){ window.location.href='index.html'; return; } signOut(auth).then(()=> window.location.href='index.html').catch(()=> window.location.href='index.html'); });
+  document.querySelector('.top-right')?.appendChild(btn);
+}
+
+/* === AUTH & RTDB LISTENERS ===
+   - Reads balances and points robustly:
+     tries members/{uid}/balances and members/{uid}/points first
+     falls back to balances/{uid} and points/{uid} if members path missing
+*/
 onAuthStateChanged(auth, async user => {
-  // cleanup previous listeners
+  // cleanup previous
   unsubscribers.forEach(un => { try{ if(typeof un === 'function') un(); }catch(e){} });
   unsubscribers = [];
   currentUser = user;
 
   if(user){
-    // populate UI identity
+    // set UI identity
     $('topUserName').textContent = user.displayName || user.email || 'Member';
     $('topUserEmail').textContent = user.email || '';
     $('sideName').textContent = user.displayName || user.email || 'Member';
     $('sideEmail').textContent = user.email || '';
     $('topAvatar').textContent = (user.displayName || 'Member').split(' ').map(s=>s[0]).slice(0,2).join('').toUpperCase();
 
-    // balances listener (members/{uid}/balances)
-    const balRef = ref(db, `members/${user.uid}/balances`);
-    const unBal = onValue(balRef, snap => {
-      const b = snap.exists() ? snap.val() : {};
-      $('monthlyBalance').textContent = fmt(b.monthly);
-      $('weeklyBalance').textContent = fmt(b.weekly);
-      $('sharesCount').textContent = (b.shares||0) + ' units';
-      $('dividendsBalance').textContent = fmt(b.dividends);
-      $('outstandingBalance').textContent = fmt(b.outstanding);
-      $('unpaidBalance').textContent = fmt(b.pending || b.unpaid || 0);
-    }, err => { console.error('balances onValue err', err); });
-    unsubscribers.push(unBal);
+    // balances - try members/{uid}/balances then fallback to balances/{uid}
+    const memberBalancesRef = ref(db, `members/${user.uid}/balances`);
+    const topBalancesRef = ref(db, `balances/${user.uid}`);
+    const balancesUnsub = onValue(memberBalancesRef, snap => {
+      if(snap.exists()){
+        const b = snap.val();
+        updateBalancesUI(b);
+      } else {
+        // fallback to top-level balances/{uid}
+        get(topBalancesRef).then(snap2 => {
+          if(snap2.exists()){
+            updateBalancesUI(snap2.val());
+          } else {
+            // if nothing, clear to zeros
+            updateBalancesUI({});
+          }
+        }).catch(e => { console.error('fallback balances get err', e); updateBalancesUI({}); });
+      }
+    }, err => { console.error('memberBalances onValue err', err); updateBalancesUI({}); });
+    unsubscribers.push(balancesUnsub);
 
-    // points listener (members/{uid}/points)
-    const pRef = ref(db, `members/${user.uid}/points`);
-    const unP = onValue(pRef, snap => {
-      const pts = snap.exists() ? Number(snap.val()) : 0;
-      $('pointsValue').textContent = pts;
-    }, err => { console.error('points onValue err', err); });
-    unsubscribers.push(unP);
+    // points - try members/{uid}/points then points/{uid}
+    const memberPointsRef = ref(db, `members/${user.uid}/points`);
+    const topPointsRef = ref(db, `points/${user.uid}`);
+    const pointsUnsub = onValue(memberPointsRef, snap => {
+      if(snap.exists()){
+        $('pointsValue').textContent = Number(snap.val()) || 0;
+      } else {
+        get(topPointsRef).then(snap2 => { $('pointsValue').textContent = snap2.exists() ? Number(snap2.val()) : 0; }).catch(e=> { console.error('fallback points err', e); $('pointsValue').textContent = 0; });
+      }
+    }, err => { console.error('memberPoints onValue err', err); $('pointsValue').textContent = 0; });
+    unsubscribers.push(pointsUnsub);
 
-    // transactions listener
+    // transactions
     const txRef = ref(db, `members/${user.uid}/transactions`);
-    const unTx = onValue(txRef, snap => {
+    const txUnsub = onValue(txRef, snap => {
       const arr = [];
       if(snap.exists()){
         const val = snap.val();
@@ -274,12 +390,12 @@ onAuthStateChanged(auth, async user => {
         arr.sort((a,b)=> (a.timestamp||a.date||0) - (b.timestamp||b.date||0));
       }
       renderTransactions(arr);
-    }, err => { console.error('transactions onValue err', err); });
-    unsubscribers.push(unTx);
+    }, err => { console.error('transactions onValue err', err); renderTransactions([]); });
+    unsubscribers.push(txUnsub);
 
-    // loans list listener
+    // loans
     const loansRef = ref(db, `members/${user.uid}/loans`);
-    const unLoans = onValue(loansRef, snap => {
+    const loansUnsub = onValue(loansRef, snap => {
       const body = $('loanBody'); body.innerHTML = '';
       const rows = [];
       if(snap.exists()){
@@ -303,21 +419,35 @@ onAuthStateChanged(auth, async user => {
         body.innerHTML = '<tr><td colspan="6" class="subtitle">No applications yet.</td></tr>'; hideLoanAction(); selectedLoanId = null;
       }
     }, err => { console.error('loans onValue err', err); });
-    unsubscribers.push(unLoans);
+    unsubscribers.push(loansUnsub);
 
-    // login points and start inactivity timer
+    // award login points
     awardPoints(5,'login_bonus');
+
+    // reset inactivity timers
     resetInactivityTimer();
   } else {
-    // guest state
-    $('monthlyBalance').textContent = 'KES 0'; $('weeklyBalance').textContent = 'KES 0'; $('sharesCount').textContent = '0 units'; $('dividendsBalance').textContent = 'KES 0'; $('outstandingBalance').textContent = 'KES 0'; $('unpaidBalance').textContent = 'KES 0'; $('pointsValue').textContent = '0';
+    // guest state cleanup UI
+    updateBalancesUI({});
+    $('pointsValue').textContent = 0;
     hideLoanAction();
-    // clear inactivity timers if any
     clearTimeout(inactivityTimer); clearTimeout(warningTimer);
   }
 });
 
-// helper: populate loan action panel with loan object
+// update balances UI helper
+function updateBalancesUI(b = {}){
+  try{
+    $('monthlyBalance').textContent = fmt(b.monthly || b.monthlySavings || 0);
+    $('weeklyBalance').textContent = fmt(b.weekly || b.weeklySavings || 0);
+    $('sharesCount').textContent = (b.shares || b.sharesCount || 0) + ' units';
+    $('dividendsBalance').textContent = fmt(b.dividends || 0);
+    $('outstandingBalance').textContent = fmt(b.outstanding || 0);
+    $('unpaidBalance').textContent = fmt(b.pending || b.unpaid || 0);
+  }catch(e){ console.error('updateBalancesUI err', e); }
+}
+
+// populate loan action panel
 function populateLoanAction(loan){
   if(!loan) return hideLoanAction();
   $('loanActionPanel').style.display = 'block';
@@ -331,9 +461,7 @@ function populateLoanAction(loan){
   } else instCount = loan.tenureMonths || 0;
   $('actInst').textContent = instCount;
   let nextRep = '—';
-  if(loan.nextRepayment) {
-    try{ nextRep = new Date(Number(loan.nextRepayment)).toLocaleString(); }catch(e){ nextRep = loan.nextRepayment; }
-  }
+  if(loan.nextRepayment) { try{ nextRep = new Date(Number(loan.nextRepayment)).toLocaleString(); }catch(e){ nextRep = loan.nextRepayment; } }
   $('actNext').textContent = nextRep;
   $('loanBadge').innerHTML = loan.status ? `<span class="status-pill ${loan.status==='pending'?'status-pending': loan.status==='approved'?'status-approved':'status-rejected'}">${esc(loan.status)}</span>` : '—';
   selectedLoanId = loan.id || selectedLoanId;
@@ -341,8 +469,8 @@ function populateLoanAction(loan){
 
 function hideLoanAction(){ $('loanActionPanel').style.display = 'none'; selectedLoanId = null; }
 
-// table delegation for view / download actions
-document.addEventListener('click', async (e)=>{
+// delegated click handler for loan table buttons (view/download)
+document.addEventListener('click', async (e) => {
   const btn = e.target.closest('button[data-action]');
   if(!btn) return;
   const id = btn.getAttribute('data-id');
@@ -363,90 +491,28 @@ document.addEventListener('click', async (e)=>{
       lines.push(`Purpose: ${loan.purpose || '—'}`);
       if(loan.installments) lines.push(`Installments: ${Array.isArray(loan.installments)? loan.installments.length : Object.keys(loan.installments||{}).length}`);
       alert(lines.join('\n'));
-    }catch(err){ console.error(err); alert('Failed to fetch loan'); }
+    }catch(err){ console.error('view loan err', err); alert('Failed to fetch loan'); }
   } else if(action === 'download'){
     if(!id){ alert('Loan id missing'); return; }
     await downloadLoanPdfById(id);
   }
 });
 
-// view loan details from action bar (optional nicer UI later)
-$('viewLoanDetailsBtn').addEventListener('click', async ()=>{
-  if(!currentUser){ alert('Sign in to view'); return; }
-  if(!selectedLoanId){ alert('No active loan selected'); return; }
+// award points helper
+async function awardPoints(amount, reason='action'){
+  if(!currentUser) return;
   try{
-    const snap = await get(child(ref(db), `members/${currentUser.uid}/loans/${selectedLoanId}`));
-    if(!snap.exists()) { alert('Loan not found'); return; }
-    const loan = snap.val();
-    alert(`Loan details:\n\nID: ${loan.id || selectedLoanId}\nAmount: ${loan.amount? fmt(loan.amount): '—'}\nInterest: ${loan.interestRate? loan.interestRate + '%' : '—'}\nTenure: ${loan.tenureMonths || '—'} months\nStatus: ${loan.status || 'pending'}`);
-  }catch(e){ console.error(e); alert('Failed to load loan details'); }
-});
+    const pRef = ref(db, `members/${currentUser.uid}/points`);
+    const snap = await get(pRef);
+    const current = snap.exists() ? Number(snap.val()) : 0;
+    await set(pRef, current + Number(amount));
+    const logRef = ref(db, `members/${currentUser.uid}/pointsLog`);
+    const p = push(logRef);
+    await set(p, { change: Number(amount), reason, at: Date.now() });
+  }catch(e){ console.error('awardPoints err', e); }
+}
 
-// download loan PDF (action panel)
-$('downloadLoanAppBtn').addEventListener('click', async ()=>{ if(!selectedLoanId){ alert('No active loan to download'); return; } await downloadLoanPdfById(selectedLoanId); });
-
-// repay button
-$('repayBtn').addEventListener('click', async ()=>{
-  if(!currentUser){ alert('Sign in to repay'); return; }
-  if(!selectedLoanId){ alert('No active loan selected'); return; }
-  const amount = Number(prompt('Enter repayment amount (KES)','0'));
-  if(!amount || isNaN(amount) || amount <=0){ alert('Invalid'); return; }
-  try{
-    const txRef = ref(db, `members/${currentUser.uid}/transactions`); const p = push(txRef); await set(p, { date: new Date().toISOString(), description: 'Loan repayment', debit:0, credit: amount, timestamp: Date.now(), status: 'posted' });
-    const instRef = ref(db, `members/${currentUser.uid}/loans/${selectedLoanId}/installments`);
-    const pi = push(instRef); await set(pi, { amount, paidAt: Date.now() });
-    awardPoints(15,'repayment');
-    alert('Repayment recorded.');
-  }catch(e){ console.error(e); alert('Repayment failed: ' + e.message); }
-});
-
-// export CSV/PDF
-$('exportCsvBtn').addEventListener('click', ()=>{ 
-  const rows = Array.from($('txBody').children).map(tr => Array.from(tr.children).map(td=> td.textContent.trim())); 
-  if(!rows.length){ alert('No transactions to export'); return; } 
-  const csv = rows.map(r => r.map(c=> `"${c.replace(/"/g,'""')}"`).join(',')).join('\n'); 
-  const blob = new Blob([csv], { type:'text/csv' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `transactions_${currentUser? currentUser.uid : 'guest'}_${Date.now()}.csv`; a.click(); awardPoints(3,'export_csv'); 
-});
-$('exportPdfBtn').addEventListener('click', async ()=>{ 
-  const el = $('txTable'); 
-  html2canvas(el, { scale:2 }).then(canvas => {
-    const img = canvas.toDataURL('image/png');
-    const doc = new jsPDF('p','mm','a4');
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const imgProps = doc.getImageProperties(img);
-    const imgWidth = pageWidth - 20;
-    const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
-    doc.addImage(img,'PNG',10,10,imgWidth,imgHeight);
-    doc.setFontSize(10); doc.text('Visionary Youth — Transactions', pageWidth/2, 8, { align:'center' });
-    doc.save(`transactions_${currentUser? currentUser.uid : 'guest'}_${Date.now()}.pdf`);
-    awardPoints(3,'export_pdf');
-  }).catch(e=> { console.error(e); alert('Failed to export PDF: ' + e.message); });
-});
-
-// refresh loans
-$('refreshLoansBtn').addEventListener('click', ()=>{ if(currentUser) { alert('Loans refreshed (live listener updates automatically)'); } else alert('Sign in to refresh'); });
-
-// withdrawal request
-$('requestWithdrawBtn').addEventListener('click', async ()=>{
-  if(!currentUser){ alert('Sign in to request withdrawal'); return; }
-  try{
-    const amount = Number(prompt('Withdrawal amount (KES)','0'));
-    if(!amount || isNaN(amount) || amount <=0){ alert('Invalid amount'); return; }
-    const reason = prompt('Reason for withdrawal','Personal use');
-    if(reason === null) return;
-    const wRef = ref(db, `members/${currentUser.uid}/withdrawals`);
-    const p = push(wRef);
-    const payload = { id: p.key, amount, reason, status: 'pending', requestedAt: Date.now() };
-    await set(p, payload);
-    alert('Withdrawal request submitted.');
-    awardPoints(5,'withdraw_request');
-  }catch(e){ console.error(e); alert('Failed to request withdrawal: ' + e.message); }
-});
-
-// award points
-async function awardPoints(amount, reason='action'){ if(!currentUser) return; try{ const pRef = ref(db, `members/${currentUser.uid}/points`); const snap = await get(pRef); const current = snap.exists() ? Number(snap.val()) : 0; await set(pRef, current + Number(amount)); const logRef = ref(db, `members/${currentUser.uid}/pointsLog`); const p = push(logRef); await set(p, { change: Number(amount), reason, at: Date.now() }); }catch(e){ console.error('awardPoints err', e); } }
-
-// download loan PDF by id
+// download loan PDF using jsPDF
 async function downloadLoanPdfById(loanId){
   if(!currentUser) { alert('Sign in to download'); return; }
   try{
@@ -455,17 +521,22 @@ async function downloadLoanPdfById(loanId){
     const loan = snap.val();
     const doc = new jsPDF('p','mm','a4');
     const pageWidth = doc.internal.pageSize.getWidth();
-    doc.setTextColor(200,200,200); doc.setFontSize(60); doc.text('Visionary Youth', pageWidth/2, 120, { align:'center', angle: 45 });
+    // watermark header
+    doc.setTextColor(200,200,200); doc.setFontSize(60);
+    // angle/opacity not available reliably; use light color and position
+    doc.text('Visionary Youth', pageWidth/2, 120, { align:'center' });
+    // header
     doc.setTextColor(0,80,0); doc.setFontSize(18); doc.text('Visionary Youth Group', 14, 20);
     doc.setFontSize(11); doc.setTextColor(80,80,80); doc.text(`Loan Application — ${loanId}`, 14, 28);
     doc.setFontSize(10); doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 34);
-    doc.setDrawColor(0,100,0); doc.setFillColor(240, 255, 240); doc.rect(14, 38, pageWidth-28, 30, 'F');
+    // member info box
+    doc.setDrawColor(0,100,0); doc.setFillColor(240,255,240); doc.rect(14,38, pageWidth-28, 30, 'F');
     doc.setTextColor(0,70,0); doc.setFontSize(11);
     doc.text(`Member: ${loan.fullName || currentUser.displayName || currentUser.email}`, 16, 46);
     doc.text(`Email: ${loan.email || currentUser.email || ''}`, 16, 52);
     doc.text(`Member ID: ${loan.memberId || currentUser.uid}`, 16, 58);
-    doc.setDrawColor(0,0,0); doc.setFontSize(12); doc.setTextColor(0,0,0);
-    const yStart = 80; doc.text('Loan details', 14, yStart); doc.setFontSize(10);
+    // details
+    doc.setFontSize(12); doc.setTextColor(0,0,0); doc.text('Loan details', 14, 80); doc.setFontSize(10);
     const lines = [
       `Amount: ${loan.amount ? 'KES ' + Number(loan.amount).toLocaleString() : '—'}`,
       `Interest rate: ${loan.interestRate ? loan.interestRate + '%' : '—'}`,
@@ -474,22 +545,19 @@ async function downloadLoanPdfById(loanId){
       `Purpose: ${loan.purpose || '—'}`,
       `Guarantor: ${loan.guarantorName || '—'} (${loan.guarantorPhone || '—'})`
     ];
-    let y = yStart + 8; lines.forEach(l => { doc.text(l, 16, y); y += 7; });
+    let y = 88;
+    lines.forEach(l => { doc.text(l, 16, y); y += 7; });
     doc.setFontSize(9); doc.setTextColor(100,100,100); doc.text('Visionary Youth Group — Loan Application (Generated PDF)', 14, 280);
     const filename = `loan_${loanId}_${currentUser.uid}_${Date.now()}.pdf`;
     doc.save(filename);
     awardPoints(2,'download_loan_pdf');
-  }catch(e){ console.error(e); alert('Failed to generate PDF: ' + (e.message || e)); }
+  }catch(e){ console.error('downloadLoanPdf err', e); alert('Failed to generate PDF: ' + (e.message || e)); }
 }
-
-// expose for debug
-window.downloadLoanPdfById = downloadLoanPdfById;
 
 // render transactions
 function renderTransactions(arr){
-  const tbody = $('txBody'); const tbody2 = $('txBody2');
-  tbody.innerHTML = ''; if(tbody2) tbody2.innerHTML = '';
-  if(!arr || !arr.length){ tbody.innerHTML = '<tr><td colspan="5" class="subtitle">No transactions yet.</td></tr>'; if(tbody2) tbody2.innerHTML = '<tr><td colspan="5" class="subtitle">No transactions yet.</td></tr>'; return; }
+  const tbody = $('txBody'); tbody.innerHTML = '';
+  if(!arr || !arr.length){ tbody.innerHTML = '<tr><td colspan="5" class="subtitle">No transactions yet.</td></tr>'; return; }
   let running = 0;
   arr.forEach(t => {
     if('balance' in t && t.balance !== null && t.balance !== undefined) running = Number(t.balance);
@@ -498,21 +566,16 @@ function renderTransactions(arr){
     const tr = document.createElement('tr');
     tr.innerHTML = `<td>${esc(dateStr)}</td><td>${esc(t.description||'')}</td><td>${t.debit? (Number(t.debit).toLocaleString()): ''}</td><td>${t.credit? (Number(t.credit).toLocaleString()): ''}</td><td>${running.toLocaleString()}</td>`;
     tbody.appendChild(tr);
-    if(tbody2){ const tr2 = document.createElement('tr'); tr2.innerHTML = `<td>${esc(dateStr)}</td><td>${esc(t.description||'')}</td><td>${t.debit? fmt(t.debit) : ''}</td><td>${t.credit? fmt(t.credit) : ''}</td><td>${fmt(running)}</td>`; tbody2.appendChild(tr2); }
   });
 }
 
-// Auto logout
+// inactivity auto-logout
 let AUTO_LOGOUT_MIN = 3; let inactivityTimer = null; let warningTimer = null;
 function resetInactivityTimer(){ if(inactivityTimer) clearTimeout(inactivityTimer); if(warningTimer) clearTimeout(warningTimer); if(!currentUser) return; warningTimer = setTimeout(()=>{ $('logoutWarning').style.display = 'flex'; }, Math.max((AUTO_LOGOUT_MIN * 60 - 60) * 1000, 0)); inactivityTimer = setTimeout(()=>{ signOut(auth).then(()=> window.location.href='index.html').catch(()=> window.location.href='index.html'); $('logoutWarning').style.display = 'none'; }, AUTO_LOGOUT_MIN * 60 * 1000); }
 ['click','mousemove','keydown','scroll','touchstart'].forEach(evt => window.addEventListener(evt, ()=> { if(currentUser) resetInactivityTimer(); }, { passive:true }));
-$('logoutCancel').addEventListener('click', ()=>{ $('logoutWarning').style.display='none'; resetInactivityTimer(); }); $('logoutNow').addEventListener('click', ()=>{ $('logoutWarning').style.display='none'; signOut(auth).then(()=> window.location.href='index.html').catch(()=> window.location.href='index.html'); });
-
-// sign out button
-document.addEventListener('DOMContentLoaded', ()=>{ const signOutBtn = document.createElement('button'); signOutBtn.className='btn ghost'; signOutBtn.textContent='Sign out'; signOutBtn.addEventListener('click', ()=>{ if(!currentUser){ window.location.href='index.html'; return; } signOut(auth).then(()=> window.location.href='index.html').catch(()=> window.location.href='index.html'); }); document.querySelector('.top-right')?.appendChild(signOutBtn); });
 
 // cleanup on unload
-window.addEventListener('beforeunload', ()=> { unsubscribers.forEach(un => { try{ if(typeof un === 'function') un(); }catch(e){} }); });
+window.addEventListener('beforeunload', ()=> { unsubscribers.forEach(u => { try{ if(typeof u === 'function') u(); }catch(e){} }); });
 
 </script>
 </body>
