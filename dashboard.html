@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Visionary Youth Group — SEKU Dashboard (Final Fix)</title>
-<meta name="description" content="Final SEKU-styled dashboard: loan action bar, loans list, appealing PDF generation, loan status live, balances from RTDB." />
+<title>Visionary Youth Group — SEKU Dashboard (Final)</title>
+<meta name="description" content="Final SEKU-styled dashboard: all buttons fixed, loan action bar, PDF generation, balances & points from RTDB." />
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <style>
@@ -130,7 +130,7 @@ textarea{min-height:120px;resize:vertical}
 
       </section>
 
-      <!-- other sections omitted for brevity but present in final file (transactions, loans view, profile, withdrawals, settings) -->
+      <!-- other sections kept minimal for brevity -->
       <section id="view-transactions" style="display:none"><div class="panel"><h4>Transactions</h4><div class="subtitle">Full ledger</div><div style="height:8px"></div><div style="overflow:auto;max-height:600px"><table id="txTable2"><thead><tr><th>Date</th><th>Description</th><th>Debit</th><th>Credit</th><th>Balance</th></tr></thead><tbody id="txBody2"><tr><td colspan="5" class="subtitle">No transactions.</td></tr></tbody></table></div></div></section>
 
       <section id="view-loans" style="display:none"><div class="panel"><h4>Loans</h4><div class="subtitle">Apply or view status</div></div></section>
@@ -158,8 +158,15 @@ textarea{min-height:120px;resize:vertical}
 </div>
 
 <script type="module">
+/* FINAL WORKING DASHBOARD JS
+   - All buttons wired
+   - Balances & points read from members/{uid}/balances and members/{uid}/points
+   - Simplified unsubscribe handling
+   - Preserves your Firebase config
+*/
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getDatabase, ref, onValue, set, push, get, child, serverTimestamp, update, remove } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+import { getDatabase, ref, onValue, set, push, get, child } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 import { jsPDF } from "https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js";
 
@@ -182,7 +189,7 @@ function fmt(v){ return 'KES ' + (Number(v||0)).toLocaleString(); }
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 let currentUser = null;
-let listeners = [];
+let unsubscribers = []; // store unsubscribe functions directly
 let selectedLoanId = null;
 
 // NAV
@@ -193,12 +200,12 @@ showView('dashboard');
 // Hamburger (small screens)
 $('hamburger').addEventListener('click', ()=>{ const sb = $('sidebar'); if(sb) sb.style.display = sb.style.display === 'block' ? 'none' : 'block'; });
 
-// Apply loan single click (quick prompt flow) — preserved behavior but now single click works
-$('applyLoanBtn').addEventListener('click', async (e)=>{
+// Apply loan (single click quick-flow)
+$('applyLoanBtn').addEventListener('click', async ()=>{
   if(!currentUser){ alert('Sign in to apply'); return; }
   try{
     const fullName = prompt('Full name', currentUser.displayName || '');
-    if(fullName === null) return; // cancelled
+    if(fullName === null) return;
     const email = prompt('Email', currentUser.email || '');
     if(email === null) return;
     const amount = Number(prompt('Loan amount (KES)','10000'));
@@ -215,25 +222,28 @@ $('applyLoanBtn').addEventListener('click', async (e)=>{
     const createdAt = Date.now();
     const payload = { id: p.key, fullName, email, amount, interestRate, tenureMonths: tenure, purpose, status:'pending', stage:'applied', createdAt };
     await set(p, payload);
-    // synchronize a single 'current loan' node for quick access if you want
     await set(ref(db, `members/${currentUser.uid}/loan`), { amount, interestRate, status:'pending', tenureMonths: tenure, appliedAt: createdAt });
-    alert('Loan application saved.'); awardPoints(10,'loan_application');
+    alert('Loan application saved.');
+    awardPoints(10,'loan_application');
   }catch(e){ console.error(e); alert('Failed to apply loan: ' + e.message); }
 });
 
 // AUTH + RTDB listeners
 onAuthStateChanged(auth, async user => {
   // cleanup previous listeners
-  listeners.forEach(un=> typeof un==='function' && un()); listeners = [];
+  unsubscribers.forEach(un => { try{ if(typeof un === 'function') un(); }catch(e){} });
+  unsubscribers = [];
   currentUser = user;
+
   if(user){
+    // populate UI identity
     $('topUserName').textContent = user.displayName || user.email || 'Member';
     $('topUserEmail').textContent = user.email || '';
     $('sideName').textContent = user.displayName || user.email || 'Member';
     $('sideEmail').textContent = user.email || '';
     $('topAvatar').textContent = (user.displayName || 'Member').split(' ').map(s=>s[0]).slice(0,2).join('').toUpperCase();
 
-    // balances listener from /members/{uid}/balances
+    // balances listener (members/{uid}/balances)
     const balRef = ref(db, `members/${user.uid}/balances`);
     const unBal = onValue(balRef, snap => {
       const b = snap.exists() ? snap.val() : {};
@@ -243,17 +253,31 @@ onAuthStateChanged(auth, async user => {
       $('dividendsBalance').textContent = fmt(b.dividends);
       $('outstandingBalance').textContent = fmt(b.outstanding);
       $('unpaidBalance').textContent = fmt(b.pending || b.unpaid || 0);
-    });
-    listeners.push(()=> unBal());
+    }, err => { console.error('balances onValue err', err); });
+    unsubscribers.push(unBal);
+
+    // points listener (members/{uid}/points)
+    const pRef = ref(db, `members/${user.uid}/points`);
+    const unP = onValue(pRef, snap => {
+      const pts = snap.exists() ? Number(snap.val()) : 0;
+      $('pointsValue').textContent = pts;
+    }, err => { console.error('points onValue err', err); });
+    unsubscribers.push(unP);
 
     // transactions listener
     const txRef = ref(db, `members/${user.uid}/transactions`);
     const unTx = onValue(txRef, snap => {
-      const arr = []; if(snap.exists()){ const val = snap.val(); Object.entries(val).forEach(([k,v])=> arr.push({ id:k, ...v })); arr.sort((a,b)=> (a.timestamp||a.date||0) - (b.timestamp||b.date||0)); } renderTransactions(arr);
-    });
-    listeners.push(()=> unTx());
+      const arr = [];
+      if(snap.exists()){
+        const val = snap.val();
+        Object.entries(val).forEach(([k,v])=> arr.push({ id:k, ...v }));
+        arr.sort((a,b)=> (a.timestamp||a.date||0) - (b.timestamp||b.date||0));
+      }
+      renderTransactions(arr);
+    }, err => { console.error('transactions onValue err', err); });
+    unsubscribers.push(unTx);
 
-    // loans list listener -> populate loan table and set action bar if active loan
+    // loans list listener
     const loansRef = ref(db, `members/${user.uid}/loans`);
     const unLoans = onValue(loansRef, snap => {
       const body = $('loanBody'); body.innerHTML = '';
@@ -261,7 +285,6 @@ onAuthStateChanged(auth, async user => {
       if(snap.exists()){
         const data = snap.val();
         Object.entries(data).forEach(([k,v])=> rows.push({ id:k, ...v }));
-        // ensure we have numeric createdAt for sorting fallback
         rows.sort((a,b)=> (b.createdAt||0) - (a.createdAt||0));
         rows.forEach(r => {
           const tr = document.createElement('tr');
@@ -271,35 +294,26 @@ onAuthStateChanged(auth, async user => {
           const tenure = r.tenureMonths ? r.tenureMonths + ' mo' : (r.tenure ? r.tenure + ' mo' : '—');
           const status = r.status || 'pending';
           const statusHtml = `<span class="status-pill ${status==='pending'?'status-pending': status==='approved'?'status-approved':'status-rejected'}">${esc(status)}</span>`;
-          // Use r.id safely
           tr.innerHTML = `<td>${esc(applied)}</td><td>${esc(amt)}</td><td>${esc(int)}</td><td>${esc(tenure)}</td><td>${statusHtml}</td><td><button class="btn" data-id="${esc(r.id)}" data-action="view">View</button> <button class="btn ghost" data-id="${esc(r.id)}" data-action="download">PDF</button></td>`;
           body.appendChild(tr);
         });
-        // set loan action panel to latest active loan (choose first approved, else pending, else latest)
         const active = rows.find(rr => rr.status === 'approved') || rows.find(rr => rr.status === 'pending') || rows[0];
         if(active){ populateLoanAction(active); selectedLoanId = active.id; } else { hideLoanAction(); selectedLoanId = null; }
       } else {
         body.innerHTML = '<tr><td colspan="6" class="subtitle">No applications yet.</td></tr>'; hideLoanAction(); selectedLoanId = null;
       }
-    });
-    listeners.push(()=> unLoans);
+    }, err => { console.error('loans onValue err', err); });
+    unsubscribers.push(unLoans);
 
-    // points listener
-    const pRef = ref(db, `members/${user.uid}/points`);
-    const unP = onValue(pRef, snap => { const pts = snap.exists() ? Number(snap.val()) : 0; $('pointsValue').textContent = pts; });
-    listeners.push(()=> unP);
-
-    // award login points
+    // login points and start inactivity timer
     awardPoints(5,'login_bonus');
-
-    // start inactivity timer
     resetInactivityTimer();
   } else {
     // guest state
     $('monthlyBalance').textContent = 'KES 0'; $('weeklyBalance').textContent = 'KES 0'; $('sharesCount').textContent = '0 units'; $('dividendsBalance').textContent = 'KES 0'; $('outstandingBalance').textContent = 'KES 0'; $('unpaidBalance').textContent = 'KES 0'; $('pointsValue').textContent = '0';
     hideLoanAction();
-    // clear inactivity timers
-    if(typeof resetInactivityTimer === 'function') { /* no-op */ }
+    // clear inactivity timers if any
+    clearTimeout(inactivityTimer); clearTimeout(warningTimer);
   }
 });
 
@@ -310,41 +324,35 @@ function populateLoanAction(loan){
   $('actAmt').textContent = loan.amount ? fmt(loan.amount) : 'KES 0';
   $('actInt').textContent = loan.interestRate ? loan.interestRate + '%' : '—';
   $('actStage').textContent = loan.stage || loan.status || 'pending';
-  // count installments (object or array)
   let instCount = 0;
   if(loan.installments){
     if(Array.isArray(loan.installments)) instCount = loan.installments.length;
-    else instCount = Object.keys(loan.installments).length;
+    else instCount = Object.keys(loan.installments||{}).length;
   } else instCount = loan.tenureMonths || 0;
   $('actInst').textContent = instCount;
-  // next repayment formatting
   let nextRep = '—';
-  if(loan.nextRepayment){
+  if(loan.nextRepayment) {
     try{ nextRep = new Date(Number(loan.nextRepayment)).toLocaleString(); }catch(e){ nextRep = loan.nextRepayment; }
   }
   $('actNext').textContent = nextRep;
-  // badge
-  const badge = $('loanBadge'); badge.innerHTML = loan.status ? `<span class="status-pill ${loan.status==='pending'?'status-pending': loan.status==='approved'?'status-approved':'status-rejected'}">${esc(loan.status)}</span>` : '—';
-  // set selectedLoanId
+  $('loanBadge').innerHTML = loan.status ? `<span class="status-pill ${loan.status==='pending'?'status-pending': loan.status==='approved'?'status-approved':'status-rejected'}">${esc(loan.status)}</span>` : '—';
   selectedLoanId = loan.id || selectedLoanId;
 }
 
-// hide action panel
 function hideLoanAction(){ $('loanActionPanel').style.display = 'none'; selectedLoanId = null; }
 
-// loan table button actions (delegation)
+// table delegation for view / download actions
 document.addEventListener('click', async (e)=>{
   const btn = e.target.closest('button[data-action]');
   if(!btn) return;
   const id = btn.getAttribute('data-id');
   const action = btn.getAttribute('data-action');
-  if(action === 'view'){ // open loan details in modal view (simple)
+  if(action === 'view'){
+    if(!currentUser){ alert('Sign in to view'); return; }
     try{
-      if(!currentUser){ alert('Sign in to view'); return; }
       const snap = await get(child(ref(db), `members/${currentUser.uid}/loans/${id}`));
       if(!snap.exists()){ alert('Loan not found'); return; }
       const loan = snap.val();
-      // show a nicer details dialog (simple but clearer than raw JSON)
       const lines = [];
       lines.push(`Loan ID: ${loan.id || id}`);
       lines.push(`Member: ${loan.fullName || loan.memberName || currentUser.displayName || currentUser.email}`);
@@ -362,10 +370,22 @@ document.addEventListener('click', async (e)=>{
   }
 });
 
-// download loan PDF for currently selected loan via action panel
+// view loan details from action bar (optional nicer UI later)
+$('viewLoanDetailsBtn').addEventListener('click', async ()=>{
+  if(!currentUser){ alert('Sign in to view'); return; }
+  if(!selectedLoanId){ alert('No active loan selected'); return; }
+  try{
+    const snap = await get(child(ref(db), `members/${currentUser.uid}/loans/${selectedLoanId}`));
+    if(!snap.exists()) { alert('Loan not found'); return; }
+    const loan = snap.val();
+    alert(`Loan details:\n\nID: ${loan.id || selectedLoanId}\nAmount: ${loan.amount? fmt(loan.amount): '—'}\nInterest: ${loan.interestRate? loan.interestRate + '%' : '—'}\nTenure: ${loan.tenureMonths || '—'} months\nStatus: ${loan.status || 'pending'}`);
+  }catch(e){ console.error(e); alert('Failed to load loan details'); }
+});
+
+// download loan PDF (action panel)
 $('downloadLoanAppBtn').addEventListener('click', async ()=>{ if(!selectedLoanId){ alert('No active loan to download'); return; } await downloadLoanPdfById(selectedLoanId); });
 
-// repay button behavior
+// repay button
 $('repayBtn').addEventListener('click', async ()=>{
   if(!currentUser){ alert('Sign in to repay'); return; }
   if(!selectedLoanId){ alert('No active loan selected'); return; }
@@ -373,16 +393,14 @@ $('repayBtn').addEventListener('click', async ()=>{
   if(!amount || isNaN(amount) || amount <=0){ alert('Invalid'); return; }
   try{
     const txRef = ref(db, `members/${currentUser.uid}/transactions`); const p = push(txRef); await set(p, { date: new Date().toISOString(), description: 'Loan repayment', debit:0, credit: amount, timestamp: Date.now(), status: 'posted' });
-    // update loan installments simple approach
     const instRef = ref(db, `members/${currentUser.uid}/loans/${selectedLoanId}/installments`);
     const pi = push(instRef); await set(pi, { amount, paidAt: Date.now() });
-    // optionally reduce outstanding node if present
     awardPoints(15,'repayment');
-    alert('Repayment recorded');
+    alert('Repayment recorded.');
   }catch(e){ console.error(e); alert('Repayment failed: ' + e.message); }
 });
 
-// Export CSV/PDF for transactions
+// export CSV/PDF
 $('exportCsvBtn').addEventListener('click', ()=>{ 
   const rows = Array.from($('txBody').children).map(tr => Array.from(tr.children).map(td=> td.textContent.trim())); 
   if(!rows.length){ alert('No transactions to export'); return; } 
@@ -405,10 +423,10 @@ $('exportPdfBtn').addEventListener('click', async ()=>{
   }).catch(e=> { console.error(e); alert('Failed to export PDF: ' + e.message); });
 });
 
-// refresh loans button (manual)
-$('refreshLoansBtn').addEventListener('click', ()=>{ if(currentUser) { alert('Loans refreshed (live listener will update view)'); } else alert('Sign in to refresh'); });
+// refresh loans
+$('refreshLoansBtn').addEventListener('click', ()=>{ if(currentUser) { alert('Loans refreshed (live listener updates automatically)'); } else alert('Sign in to refresh'); });
 
-// withdrawal request button simple flow
+// withdrawal request
 $('requestWithdrawBtn').addEventListener('click', async ()=>{
   if(!currentUser){ alert('Sign in to request withdrawal'); return; }
   try{
@@ -428,46 +446,26 @@ $('requestWithdrawBtn').addEventListener('click', async ()=>{
 // award points
 async function awardPoints(amount, reason='action'){ if(!currentUser) return; try{ const pRef = ref(db, `members/${currentUser.uid}/points`); const snap = await get(pRef); const current = snap.exists() ? Number(snap.val()) : 0; await set(pRef, current + Number(amount)); const logRef = ref(db, `members/${currentUser.uid}/pointsLog`); const p = push(logRef); await set(p, { change: Number(amount), reason, at: Date.now() }); }catch(e){ console.error('awardPoints err', e); } }
 
-// download loan PDF by loan id (creates a stylish PDF using jsPDF)
+// download loan PDF by id
 async function downloadLoanPdfById(loanId){
   if(!currentUser) { alert('Sign in to download'); return; }
   try{
     const snap = await get(child(ref(db), `members/${currentUser.uid}/loans/${loanId}`));
     if(!snap.exists()){ alert('Loan not found'); return; }
     const loan = snap.val();
-    // create PDF
     const doc = new jsPDF('p','mm','a4');
     const pageWidth = doc.internal.pageSize.getWidth();
-    // watermark
-    doc.setTextColor(200,200,200);
-    doc.setFontSize(60);
-    // jsPDF doesn't support opacity in text easily; keep subtle by light color & angle
-    doc.text('Visionary Youth', pageWidth/2, 120, { align:'center', angle: 45 });
-    // header
-    doc.setTextColor(0,80,0);
-    doc.setFontSize(18);
-    doc.text('Visionary Youth Group', 14, 20);
-    doc.setFontSize(11);
-    doc.setTextColor(80,80,80);
-    doc.text(`Loan Application — ${loanId}`, 14, 28);
-    doc.setFontSize(10);
-    doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 34);
-    // member info box
-    doc.setDrawColor(0,100,0);
-    doc.setFillColor(240, 255, 240);
-    doc.rect(14, 38, pageWidth-28, 30, 'F');
-    doc.setTextColor(0,70,0);
-    doc.setFontSize(11);
+    doc.setTextColor(200,200,200); doc.setFontSize(60); doc.text('Visionary Youth', pageWidth/2, 120, { align:'center', angle: 45 });
+    doc.setTextColor(0,80,0); doc.setFontSize(18); doc.text('Visionary Youth Group', 14, 20);
+    doc.setFontSize(11); doc.setTextColor(80,80,80); doc.text(`Loan Application — ${loanId}`, 14, 28);
+    doc.setFontSize(10); doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 34);
+    doc.setDrawColor(0,100,0); doc.setFillColor(240, 255, 240); doc.rect(14, 38, pageWidth-28, 30, 'F');
+    doc.setTextColor(0,70,0); doc.setFontSize(11);
     doc.text(`Member: ${loan.fullName || currentUser.displayName || currentUser.email}`, 16, 46);
     doc.text(`Email: ${loan.email || currentUser.email || ''}`, 16, 52);
     doc.text(`Member ID: ${loan.memberId || currentUser.uid}`, 16, 58);
-    // loan details box
-    doc.setDrawColor(0,0,0);
-    doc.setFontSize(12);
-    doc.setTextColor(0,0,0);
-    const yStart = 80;
-    doc.text('Loan details', 14, yStart);
-    doc.setFontSize(10);
+    doc.setDrawColor(0,0,0); doc.setFontSize(12); doc.setTextColor(0,0,0);
+    const yStart = 80; doc.text('Loan details', 14, yStart); doc.setFontSize(10);
     const lines = [
       `Amount: ${loan.amount ? 'KES ' + Number(loan.amount).toLocaleString() : '—'}`,
       `Interest rate: ${loan.interestRate ? loan.interestRate + '%' : '—'}`,
@@ -476,39 +474,45 @@ async function downloadLoanPdfById(loanId){
       `Purpose: ${loan.purpose || '—'}`,
       `Guarantor: ${loan.guarantorName || '—'} (${loan.guarantorPhone || '—'})`
     ];
-    let y = yStart + 8;
-    lines.forEach(l => { doc.text(l, 16, y); y += 7; });
-    // footer with small note
-    doc.setFontSize(9);
-    doc.setTextColor(100,100,100);
-    doc.text('Visionary Youth Group — Loan Application (Generated PDF)', 14, 280);
-    // save PDF
+    let y = yStart + 8; lines.forEach(l => { doc.text(l, 16, y); y += 7; });
+    doc.setFontSize(9); doc.setTextColor(100,100,100); doc.text('Visionary Youth Group — Loan Application (Generated PDF)', 14, 280);
     const filename = `loan_${loanId}_${currentUser.uid}_${Date.now()}.pdf`;
     doc.save(filename);
     awardPoints(2,'download_loan_pdf');
   }catch(e){ console.error(e); alert('Failed to generate PDF: ' + (e.message || e)); }
 }
 
-// expose for debug if needed
+// expose for debug
 window.downloadLoanPdfById = downloadLoanPdfById;
 
-// render transactions to table
-function renderTransactions(arr){ const tbody = $('txBody'); const tbody2 = $('txBody2'); tbody.innerHTML = ''; if(tbody2) tbody2.innerHTML=''; if(!arr || !arr.length){ tbody.innerHTML = '<tr><td colspan="5" class="subtitle">No transactions yet.</td></tr>'; if(tbody2) tbody2.innerHTML = '<tr><td colspan="5" class="subtitle">No transactions yet.</td></tr>'; return; } let running = 0; arr.forEach(t => { if('balance' in t && t.balance !== null && t.balance !== undefined) running = Number(t.balance); else running = running + (Number(t.credit||0) - Number(t.debit||0)); const dateStr = t.date ? new Date(t.date).toLocaleString() : new Date(t.timestamp||0).toLocaleString(); const tr = document.createElement('tr'); tr.innerHTML = `<td>${esc(dateStr)}</td><td>${esc(t.description||'')}</td><td>${t.debit? (Number(t.debit).toLocaleString()): ''}</td><td>${t.credit? (Number(t.credit).toLocaleString()): ''}</td><td>${running.toLocaleString()}</td>`; tbody.appendChild(tr); if(tbody2){ const tr2 = document.createElement('tr'); tr2.innerHTML = `<td>${esc(dateStr)}</td><td>${esc(t.description||'')}</td><td>${t.debit? fmt(t.debit) : ''}</td><td>${t.credit? fmt(t.credit) : ''}</td><td>${fmt(running)}</td>`; tbody2.appendChild(tr2); } }); }
-
-// Auto logout (redirect to index.html after signOut)
-let AUTO_LOGOUT_MIN = 3; let inactivityTimer = null; let warningTimer = null;
-function resetInactivityTimer(){ if(inactivityTimer) clearTimeout(inactivityTimer); if(warningTimer) clearTimeout(warningTimer); if(!currentUser) return; // warning 60s before signout
-  warningTimer = setTimeout(()=>{ $('logoutWarning').style.display = 'flex'; }, Math.max((AUTO_LOGOUT_MIN * 60 - 60) * 1000, 0));
-  inactivityTimer = setTimeout(()=>{ signOut(auth).then(()=> window.location.href='index.html').catch(()=> window.location.href='index.html'); $('logoutWarning').style.display = 'none'; }, AUTO_LOGOUT_MIN * 60 * 1000);
+// render transactions
+function renderTransactions(arr){
+  const tbody = $('txBody'); const tbody2 = $('txBody2');
+  tbody.innerHTML = ''; if(tbody2) tbody2.innerHTML = '';
+  if(!arr || !arr.length){ tbody.innerHTML = '<tr><td colspan="5" class="subtitle">No transactions yet.</td></tr>'; if(tbody2) tbody2.innerHTML = '<tr><td colspan="5" class="subtitle">No transactions yet.</td></tr>'; return; }
+  let running = 0;
+  arr.forEach(t => {
+    if('balance' in t && t.balance !== null && t.balance !== undefined) running = Number(t.balance);
+    else running = running + (Number(t.credit||0) - Number(t.debit||0));
+    const dateStr = t.date ? new Date(t.date).toLocaleString() : new Date(t.timestamp||0).toLocaleString();
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${esc(dateStr)}</td><td>${esc(t.description||'')}</td><td>${t.debit? (Number(t.debit).toLocaleString()): ''}</td><td>${t.credit? (Number(t.credit).toLocaleString()): ''}</td><td>${running.toLocaleString()}</td>`;
+    tbody.appendChild(tr);
+    if(tbody2){ const tr2 = document.createElement('tr'); tr2.innerHTML = `<td>${esc(dateStr)}</td><td>${esc(t.description||'')}</td><td>${t.debit? fmt(t.debit) : ''}</td><td>${t.credit? fmt(t.credit) : ''}</td><td>${fmt(running)}</td>`; tbody2.appendChild(tr2); }
+  });
 }
+
+// Auto logout
+let AUTO_LOGOUT_MIN = 3; let inactivityTimer = null; let warningTimer = null;
+function resetInactivityTimer(){ if(inactivityTimer) clearTimeout(inactivityTimer); if(warningTimer) clearTimeout(warningTimer); if(!currentUser) return; warningTimer = setTimeout(()=>{ $('logoutWarning').style.display = 'flex'; }, Math.max((AUTO_LOGOUT_MIN * 60 - 60) * 1000, 0)); inactivityTimer = setTimeout(()=>{ signOut(auth).then(()=> window.location.href='index.html').catch(()=> window.location.href='index.html'); $('logoutWarning').style.display = 'none'; }, AUTO_LOGOUT_MIN * 60 * 1000); }
 ['click','mousemove','keydown','scroll','touchstart'].forEach(evt => window.addEventListener(evt, ()=> { if(currentUser) resetInactivityTimer(); }, { passive:true }));
 $('logoutCancel').addEventListener('click', ()=>{ $('logoutWarning').style.display='none'; resetInactivityTimer(); }); $('logoutNow').addEventListener('click', ()=>{ $('logoutWarning').style.display='none'; signOut(auth).then(()=> window.location.href='index.html').catch(()=> window.location.href='index.html'); });
 
-// append sign out button to top-right
+// sign out button
 document.addEventListener('DOMContentLoaded', ()=>{ const signOutBtn = document.createElement('button'); signOutBtn.className='btn ghost'; signOutBtn.textContent='Sign out'; signOutBtn.addEventListener('click', ()=>{ if(!currentUser){ window.location.href='index.html'; return; } signOut(auth).then(()=> window.location.href='index.html').catch(()=> window.location.href='index.html'); }); document.querySelector('.top-right')?.appendChild(signOutBtn); });
 
-// Prevent accidental double-add listeners or memory leaks on hot reload (dev)
-window.addEventListener('beforeunload', ()=> { listeners.forEach(un=> typeof un==='function' && un()); });
+// cleanup on unload
+window.addEventListener('beforeunload', ()=> { unsubscribers.forEach(un => { try{ if(typeof un === 'function') un(); }catch(e){} }); });
 
 </script>
 </body>
