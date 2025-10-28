@@ -484,7 +484,7 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     topEmail.textContent = user.email || '—';
     welcomeName.textContent = (user.email || 'Member').split('@')[0];
     resetLogoutTimer();
-    awardPoints(10, 'Logged in'); // small login bonus
+    awardPoints(3, 'Logged in'); // small login bonus
 
     // load profile
     onValue(ref(db, `members/${currentUid}/profile`), snap=>{
@@ -517,8 +517,8 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     const weeklyRef = ref(db, `members/${currentUid}/savings/weekly`);
     const sharesRef = ref(db, `members/${currentUid}/shares/total`);
     const dividendsRef = ref(db, `members/${currentUid}/shares/dividends`);
-    const unpaidRef = ref(db, `members/${currentUid}/shares/unpaidBalances`);
-    const loansTotalsRef = ref(db, `members/${currentUid}/savings/total loans`);
+    const unpaidRef = ref(db, `members/${currentUid}/unpaidBalances`);
+    const loansTotalsRef = ref(db, `members/${currentUid}/loans/total`);
     const outstandingLoansRef = ref(db, `members/${currentUid}/outstandingLoans`);
 
     async function snapToAmount(snap){
@@ -640,7 +640,7 @@ Please read the full terms on the system: you must have 6 consecutive months sav
       const data = Object.fromEntries(formData.entries());
       const doc = buildLoanPdfDoc(data, {preview:true});
       doc.save(`Loan_Application_PREVIEW.pdf`);
-      awardPoints(2, 'Previewed loan PDF');
+      awardPoints(1, 'Previewed loan PDF');
     });
   }
 
@@ -673,7 +673,7 @@ Please read the full terms on the system: you must have 6 consecutive months sav
         const appId = appRef.key;
         await set(appRef, data);
         showToast('Application saved — downloading PDF');
-        awardPoints(10, 'Submitted loan application');
+        awardPoints(2, 'Submitted loan application');
         const doc = buildLoanPdfDoc(data, {id: appId});
         doc.save(`Loan_Application_${(data.memberName || data.name || currentUid).replace(/\s+/g,'_')}_${appId}.pdf`);
       }catch(err){
@@ -890,25 +890,25 @@ Please read the full terms on the system: you must have 6 consecutive months sav
   if(downloadStatementTopBtn) downloadStatementTopBtn.addEventListener('click', async ()=>{
     const doc = await buildAccountStatementPdf();
     doc.save(`Account_Statement_${(topEmail.textContent||'member').replace(/[^\w@.-]/g,'')}.pdf`);
-    awardPoints(4, 'Downloaded account statement');
+    awardPoints(1, 'Downloaded account statement');
   });
   const downloadStatementBtn = document.getElementById('downloadStatement');
   if(downloadStatementBtn) downloadStatementBtn.addEventListener('click', async ()=>{
     const doc = await buildAccountStatementPdf();
     doc.save(`Account_Statement_${(topEmail.textContent||'member').replace(/[^\w@.-]/g,'')}.pdf`);
-    awardPoints(4, 'Downloaded account statement');
+    awardPoints(2, 'Downloaded account statement');
   });
   const profileStatementBtn = document.getElementById('profileStatement');
   if(profileStatementBtn) profileStatementBtn.addEventListener('click', async ()=>{
     const doc = await buildAccountStatementPdf();
     doc.save(`Account_Statement_${(topEmail.textContent||'member').replace(/[^\w@.-]/g,'')}.pdf`);
-    awardPoints(4, 'Downloaded account statement');
+    awardPoints(1, 'Downloaded account statement');
   });
   const quickStatementBtn = document.getElementById('quickStatement');
   if(quickStatementBtn) quickStatementBtn.addEventListener('click', async ()=>{
     const doc = await buildAccountStatementPdf();
     doc.save(`Account_Statement_${(topEmail.textContent||'member').replace(/[^\w@.-]/g,'')}.pdf`);
-    awardPoints(4, 'Downloaded account statement');
+    awardPoints(1, 'Downloaded account statement');
   });
 
   // downloadApplications (compile user's apps)
@@ -935,7 +935,7 @@ Please read the full terms on the system: you must have 6 consecutive months sav
       if(y > 720){ doc.addPage(); y=40; }
     }
     doc.save(`Loan_Applications_${(topEmail.textContent||'member').replace(/[^\w@.-]/g,'')}.pdf`);
-    awardPoints(6, 'Downloaded applications PDF');
+    awardPoints(2, 'Downloaded applications PDF');
   });
 
   // preview / quick apply handlers
@@ -958,7 +958,7 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     await set(ref(db, `members/${currentUid}/profile`), payload);
     profileSavedOnce = true;
     showToast('Profile updated');
-    awardPoints(5, 'Updated profile');
+    awardPoints(3, 'Updated profile');
   });
 
   // choose photo button
@@ -983,7 +983,7 @@ Please read the full terms on the system: you must have 6 consecutive months sav
         await set(ref(db, `members/${currentUid}/photoURL`), url);
         setAvatar(url);
         showToast('Photo uploaded');
-        awardPoints(4, 'Uploaded profile photo');
+        awardPoints(2, 'Uploaded profile photo');
       }catch(err){
         console.error(err); alert('Photo upload failed');
       }
