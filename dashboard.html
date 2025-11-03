@@ -163,6 +163,12 @@
       </div>
     </div>
 
+    <!-- 🔹 DOWNLOAD BUTTON -->
+<div class="card" style="text-align:center; margin-top:20px;">
+  <button id="downloadBtn" class="btn-download">📥 Download Statement</button>
+</div>
+
+
     <!-- balances summary -->
     <div class="card big" id="balancesCard">
       <h2>Balances</h2>
@@ -476,6 +482,13 @@ Please read the full terms on the system: you must have 6 consecutive months sav
     showToast(`+${n} points`);
     logActivity(`Points +${n} (${reason})`);
   }
+
+  // 🔹 DOWNLOAD BUTTON REDIRECT
+document.getElementById("downloadBtn").addEventListener("click", () => {
+  // Redirect to your downloads page
+  window.location.href = "/downloads.html"; // Change path if needed
+});
+
 
   // ----- AUTH STATE -----
   onAuthStateChanged(auth, async user => {
