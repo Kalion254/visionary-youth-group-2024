@@ -183,6 +183,15 @@
       </div>
     </div>
 
+    <!-- 🔔 Notifications Center -->
+<div class="card" id="notificationsCard" style="margin-top:20px;">
+  <h3 class="text-xl font-semibold mb-3">🔔 Notifications & Updates</h3>
+  <ul id="notificationsList" class="space-y-2 text-sm text-gray-700">
+    <li>Loading updates...</li>
+  </ul>
+</div>
+
+
     <!-- loan application big form -->
     <section class="card big" id="loan-section" aria-labelledby="loanHeading">
       <h2 id="loanHeading"><i class="fas fa-file-signature"></i> Loan Application (Official Form)</h2>
@@ -566,6 +575,32 @@ document.getElementById("downloadBtn").addEventListener("click", () => {
       const v = s.exists() ? (typeof s.val() === 'number' ? s.val() : 0) : 0;
       const outEl = document.getElementById('outstandingLoansVal'); if(outEl) outEl.textContent = formatKsh(v);
     });
+
+    
+  // 🧩 Real-time notifications listener
+  const notificationsRef = collection(db, "notifications");
+  const q = query(notificationsRef, orderBy("timestamp", "desc"));
+  const list = document.getElementById("notificationsList");
+
+  onSnapshot(q, (snapshot) => {
+    list.innerHTML = "";
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      const li = document.createElement("li");
+      li.className = "border-b pb-2";
+      li.innerHTML = `
+        <strong class="text-green-700">${data.title}</strong><br>
+        ${data.message}<br>
+        <small class="text-gray-500">${new Date(data.timestamp).toLocaleString()}</small>
+      `;
+      list.appendChild(li);
+    });
+
+    if (snapshot.empty) {
+      list.innerHTML = "<li>No new notifications</li>";
+    }
+  });
+
 
     // load applications and render with status update dropdown
     const appsRef = ref(db, `members/${currentUid}/loans/applications`);
