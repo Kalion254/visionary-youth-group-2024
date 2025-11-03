@@ -1,126 +1,130 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Visionary Youth Group — Member Dashboard (Full)</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Visionary Youth Group — Dashboard (Full)</title>
 
-  <!-- Fonts & Icons -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<!-- Fonts & Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-  <!-- jsPDF -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- Chart.js for analytics -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <style>
-    :root{
-      --dark:#164e2a;
-      --accent:#2e7d32;
-      --gold:#ffcc00;
-      --bg1:#e9ffec;
-      --card:#ffffff;
-      --muted:#6b7280;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;font-family:'Poppins',sans-serif;background:linear-gradient(120deg,var(--bg1),#f6fff6);color:#123;
-      -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
-    }
+<style>
+  /* --- SEKU-like theme variables --- */
+  :root{
+    --dark:#164e2a;
+    --accent:#2e7d32;
+    --gold:#ffcc00;
+    --bg1:#e9ffec;
+    --card:#ffffff;
+    --muted:#6b7280;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;font-family:'Poppins',sans-serif;background:linear-gradient(120deg,var(--bg1),#f6fff6);color:#123;
+    -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  }
 
-    /* Top bar */
-    .topbar{
-      position:fixed;left:0;right:0;top:0;height:64px;background:linear-gradient(90deg,var(--dark),#26734d);color:#fff;
-      display:flex;align-items:center;justify-content:space-between;padding:0 18px;z-index:1200;
-      box-shadow:0 6px 20px rgba(6,50,20,0.12);
-    }
-    .brand{display:flex;align-items:center;gap:12px}
-    .brand h1{font-size:1.05rem;margin:0;font-weight:700}
-    .hamburger{font-size:1.6rem;cursor:pointer}
-    .user-area{display:flex;align-items:center;gap:12px}
-    .avatar-wrap{width:44px;height:44px;border-radius:8px;overflow:hidden;background:#fff;display:flex;align-items:center;justify-content:center}
-    .avatar-wrap img{width:100%;height:100%;object-fit:cover;display:block}
-    .user-info{text-align:right;font-size:0.95rem}
-    .user-info small{display:block;color:rgba(255,255,255,0.85)}
+  /* --- Topbar --- */
+  .topbar{
+    position:fixed;left:0;right:0;top:0;height:64px;background:linear-gradient(90deg,var(--dark),#26734d);color:#fff;
+    display:flex;align-items:center;justify-content:space-between;padding:0 18px;z-index:1200;
+    box-shadow:0 6px 20px rgba(6,50,20,0.12);
+  }
+  .brand{display:flex;align-items:center;gap:12px}
+  .brand h1{font-size:1.05rem;margin:0;font-weight:700}
+  .hamburger{font-size:1.6rem;cursor:pointer}
+  .user-area{display:flex;align-items:center;gap:12px}
+  .avatar-wrap{width:44px;height:44px;border-radius:8px;overflow:hidden;background:#fff;display:flex;align-items:center;justify-content:center}
+  .avatar-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+  .user-info{text-align:right;font-size:0.95rem}
+  .user-info small{display:block;color:rgba(255,255,255,0.85)}
 
-    /* Menu overlay (slightly offset from left for mobile) */
-    .menu{
-      position:fixed;top:64px;left:12px;background:rgba(255,255,255,0.98);max-width:320px;border-radius:8px;padding:8px;
-      box-shadow:0 8px 30px rgba(0,0,0,0.12);display:none;z-index:1199;
-      transform-origin:top left;
-    }
-    .menu a{display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;color:#123;text-decoration:none}
-    .menu a:hover{background:#f1fff1}
+  /* --- Menu --- */
+  .menu{
+    position:fixed;top:64px;left:12px;background:rgba(255,255,255,0.98);max-width:320px;border-radius:8px;padding:8px;
+    box-shadow:0 8px 30px rgba(0,0,0,0.12);display:none;z-index:1199;
+    transform-origin:top left;
+  }
+  .menu a{display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;color:#123;text-decoration:none}
+  .menu a:hover{background:#f1fff1}
 
-    /* Layout */
-    .page{
-      max-width:1200px;margin:92px auto 48px;padding:0 18px;
-      display:grid;grid-template-columns:repeat(12,1fr);gap:18px;
-    }
+  /* --- Layout --- */
+  .page{
+    max-width:1200px;margin:92px auto 48px;padding:0 18px;
+    display:grid;grid-template-columns:repeat(12,1fr);gap:18px;
+  }
+  .card{background:var(--card);border-radius:12px;padding:14px;box-shadow:0 8px 20px rgba(6,50,20,0.05);}
 
-    /* Hero / summary */
-    .hero{grid-column:span 12;background:var(--card);border-radius:12px;padding:16px;display:flex;justify-content:space-between;align-items:center;gap:16px;box-shadow:0 8px 20px rgba(6,50,20,0.03)}
-    .welcome{display:flex;flex-direction:column}
-    .welcome h2{margin:0;color:var(--dark)}
-    .quick-actions{display:flex;gap:10px}
+  /* --- Hero / summary --- */
+  .hero{grid-column:span 12;display:flex;justify-content:space-between;align-items:center;gap:16px}
+  .quick-actions{display:flex;gap:10px}
 
-    /* cards */
-    .card{background:var(--card);border-radius:12px;padding:14px;box-shadow:0 8px 20px rgba(6,50,20,0.05);}
-    .balances-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
-    .balance{background:linear-gradient(180deg,#f3fff3,#ffffff);padding:12px;border-radius:10px;text-align:center}
-    .balance .label{color:var(--muted);font-size:0.95rem}
-    .balance .value{font-weight:700;font-size:1.25rem;color:var(--accent);margin-top:8px}
+  /* --- balances --- */
+  .balances-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+  .balance{background:linear-gradient(180deg,#f3fff3,#ffffff);padding:12px;border-radius:10px;text-align:center}
+  .balance .label{color:var(--muted);font-size:0.95rem}
+  .balance .value{font-weight:700;font-size:1.25rem;color:var(--accent);margin-top:8px}
 
-    /* action bar (loan table) */
-    .action-bar{grid-column:span 12;background:transparent;margin-top:6px}
-    .loan-table{width:100%;border-collapse:collapse;background:var(--card);border-radius:10px;overflow:hidden;box-shadow:0 8px 20px rgba(6,50,20,0.03)}
-    .loan-table th, .loan-table td{padding:12px;border-bottom:1px solid #eef6ee;text-align:left;font-size:0.95rem}
-    .loan-table thead th{background:linear-gradient(90deg,#f7fff7,#ffffff);font-weight:700}
-    .loan-stage {padding:6px 8px;border-radius:6px;font-weight:700;font-size:0.85rem}
-    .stage-pending{background:#fffbe6;color:#8a6d00}
-    .stage-active{background:#e6f8ec;color:#145c2e}
-    .stage-closed{background:#e8f0ff;color:#254188}
+  /* --- grid areas --- */
+  .big{grid-column:span 8}
+  .side{grid-column:span 4}
 
-    /* transactions */
-    .transactions-card{grid-column:span 12;margin-top:8px}
-    .tx-table{width:100%;border-collapse:collapse}
-    .tx-table th, .tx-table td{padding:10px;border-bottom:1px solid #eef6ee;text-align:left;font-size:0.9rem}
-    .tx-table thead th{background:#fbfff9}
+  /* --- forms --- */
+  .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .form-grid .full{grid-column:1/-1}
+  input, select, textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #d1d5db;font-size:0.95rem}
+  textarea{min-height:100px;resize:vertical}
+  .btn{background:var(--accent);color:white;padding:10px 14px;border:none;border-radius:8px;cursor:pointer;font-weight:700}
+  .btn.secondary{background:#fff;color:var(--accent);border:1px solid #e3f1e3}
 
-    /* split grid */
-    .big{grid-column:span 8}
-    .side{grid-column:span 4}
+  .muted{color:var(--muted)}
+  .wizard-step{display:none} .wizard-step.active{display:block}
+  .wizard-header{display:flex;gap:8px;margin-bottom:12px}
+  .wizard-step-indicator{flex:1;padding:8px;border-radius:8px;text-align:center;background:#f3fff3;color:var(--muted);font-weight:700}
+  .wizard-step-indicator.active{background:var(--accent);color:white}
 
-    /* form */
-    .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-    .form-grid .full{grid-column:1/-1}
-    input, select, textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #d1d5db;font-size:0.95rem}
-    textarea{min-height:100px;resize:vertical}
-    .btn{background:var(--accent);color:white;padding:10px 14px;border:none;border-radius:8px;cursor:pointer;font-weight:700}
-    .btn.secondary{background:#fff;color:var(--accent);border:1px solid #e3f1e3}
-    .muted{color:var(--muted)}
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:8px;border:1px solid #e6f0ea;font-size:0.9rem;text-align:left}
 
-    /* wizard */
-    .wizard-step{display:none}
-    .wizard-step.active{display:block}
-    .wizard-header{display:flex;gap:8px;margin-bottom:12px}
-    .wizard-step-indicator{flex:1;padding:8px;border-radius:8px;text-align:center;background:#f3fff3;color:var(--muted);font-weight:700}
-    .wizard-step-indicator.active{background:var(--accent);color:white}
+  .tx-table th,.tx-table td{padding:10px;border-bottom:1px solid #eef6ee}
+  .loan-table th,.loan-table td{padding:12px;border-bottom:1px solid #eef6ee}
+  .stage-badge{padding:6px 8px;border-radius:6px;font-weight:700;font-size:0.85rem}
+  .stage-pending{background:#fffbe6;color:#8a6d00} .stage-active{background:#e6f8ec;color:#145c2e} .stage-closed{background:#e8f0ff;color:#254188}
 
-    /* small screens adjustments */
-    @media (max-width:1000px){
-      .big{grid-column:span 12}
-      .side{grid-column:span 12}
-      .form-grid{grid-template-columns:1fr}
-      .menu{left:8px;right:8px;max-width:unset}
-    }
+  @media (max-width:1000px){
+    .big{grid-column:span 12}
+    .side{grid-column:span 12}
+    .form-grid{grid-template-columns:1fr}
+    .menu{left:8px;right:8px;max-width:unset}
+  }
 
-    /* toast */
-    #toast{position:fixed;right:18px;bottom:18px;background:#28a745;color:#fff;padding:10px 14px;border-radius:8px;display:none;z-index:2000}
-  </style>
+  .watermark{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);opacity:0.06;font-size:72px;color:#2e7d32;pointer-events:none;white-space:nowrap}
+  #toast{position:fixed;right:18px;bottom:18px;background:#28a745;color:#fff;padding:10px 14px;border-radius:8px;display:none;z-index:2000}
+  .small{font-size:0.9rem}
+  .flex{display:flex;gap:8px;align-items:center}
+  .center{display:flex;align-items:center;justify-content:center}
+  .badge{background:#eef6ee;padding:4px 8px;border-radius:8px;font-weight:700}
+  .left-col{grid-column:span 8} .right-col{grid-column:span 4}
+  .section-title{display:flex;justify-content:space-between;align-items:center}
+  .chart-wrap{height:220px}
+  .discussion-list{max-height:200px;overflow:auto;padding:6px}
+  .referral-box{background:#fbfff9;padding:8px;border-radius:8px}
+
+  /* small helpers */
+  .hidden{display:none}
+  .muted-small{color:var(--muted);font-size:0.9rem}
+</style>
 </head>
 <body>
 
+  <!-- TOPBAR -->
   <div class="topbar">
     <div class="brand">
       <i class="fas fa-seedling" style="font-size:1.25rem;color:var(--gold)"></i>
@@ -128,7 +132,9 @@
     </div>
 
     <div class="user-area">
-      <div class="avatar-wrap" id="topAvatar" title="Profile photo"></div>
+      <div class="avatar-wrap" id="topAvatar" title="Profile photo">
+        <!-- avatar inserted by JS -->
+      </div>
       <div class="user-info">
         <div id="topEmail">—</div>
         <small id="topStatus">Status: <strong style="color:#9ff2b8">Active</strong></small>
@@ -141,20 +147,23 @@
     </div>
   </div>
 
+  <!-- MENU -->
   <div class="menu" id="menu" aria-hidden="true">
     <a href="#" data-target="overview"><i class="fas fa-home"></i> Overview</a>
     <a href="#" data-target="balancesCard"><i class="fas fa-wallet"></i> Balances</a>
-    <a href="#" data-target="loan-section"><i class="fas fa-file-signature"></i> Loan Application</a>
+    <a href="#" data-target="forms-section"><i class="fas fa-file-signature"></i> Apply (Wizard)</a>
+    <a href="#" data-target="transactions"><i class="fas fa-history"></i> Transactions</a>
     <a href="#" data-target="loansListFull"><i class="fas fa-money-bill-wave"></i> Loans (Manage)</a>
     <a href="#" data-target="withdraw-section"><i class="fas fa-hand-holding-usd"></i> Withdrawals</a>
     <a href="#" data-target="profile-area"><i class="fas fa-user-edit"></i> Update Profile</a>
     <a href="#" id="menuLogout"><i class="fas fa-sign-out-alt"></i> Logout</a>
   </div>
 
+  <!-- PAGE -->
   <main class="page" id="pageRoot">
-    <!-- hero -->
+    <!-- HERO -->
     <div class="hero card" id="overview">
-      <div class="welcome">
+      <div>
         <h2 id="welcomeName">Welcome, Member</h2>
         <div style="color:var(--muted);margin-top:6px">Quick snapshot — all amounts shown in <strong>Ksh</strong></div>
         <div style="margin-top:6px;font-size:0.9rem">Points: <strong id="pointsDisplay">0</strong></div>
@@ -165,10 +174,15 @@
       </div>
     </div>
 
-    <!-- balances summary -->
-    <div class="card big" id="balancesCard">
+    <!-- DOWNLOAD redirect button (keeps your earlier button) -->
+    <div class="card" style="text-align:center; margin-top:20px;">
+      <button id="downloadBtn" class="btn-download btn secondary">📥 Downloads</button>
+    </div>
+
+    <!-- BALANCES CARD (left big) -->
+    <div class="card big left-col" id="balancesCard">
       <h2>Balances</h2>
-      <div class="balances-grid">
+      <div class="balances-grid" style="margin-top:12px">
         <div class="balance"><div class="label">Monthly Savings</div><div class="value" id="monthlyVal">Ksh 0</div></div>
         <div class="balance"><div class="label">Weekly Savings</div><div class="value" id="weeklyVal">Ksh 0</div></div>
         <div class="balance"><div class="label">Shares</div><div class="value" id="sharesVal">Ksh 0</div></div>
@@ -177,216 +191,160 @@
         <div class="balance"><div class="label">Unpaid Balances</div><div class="value" id="unpaidVal">Ksh 0</div></div>
         <div class="balance"><div class="label">Outstanding Loans</div><div class="value" id="outstandingLoansVal">Ksh 0</div></div>
       </div>
-    </div>
 
-    <!-- loan action bar (table) -->
-    <div class="action-bar card">
-      <h3 style="margin-top:0">Loan Action Bar</h3>
-      <table class="loan-table">
-        <thead>
-          <tr>
-            <th>Loan Date</th>
-            <th>Amount</th>
-            <th>Interest</th>
-            <th>Installment</th>
-            <th>Due Date</th>
-            <th>Stage</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody id="loanActionBody">
-          <tr><td colspan="7" style="padding:14px">Loading loan summary...</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Transactions (history) -->
-    <div class="transactions-card card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <h3 style="margin:0">Transaction History</h3>
-        <div style="display:flex;gap:8px;align-items:center">
-          <select id="txFilterType" class="muted" style="padding:6px;border-radius:6px;border:1px solid #e6f0ea">
-            <option value="all">All</option>
-            <option value="credit">Credit</option>
-            <option value="debit">Debit</option>
-          </select>
-          <button id="downloadTxBtn" class="btn secondary"><i class="fas fa-file-download"></i> Download</button>
+      <!-- Goals tracker -->
+      <div style="margin-top:12px" id="goalsCard">
+        <h4 style="margin:0">🎯 Goals</h4>
+        <div id="goalsList" style="margin-top:10px">Loading goals...</div>
+        <div style="margin-top:8px;display:flex;gap:8px">
+          <button id="newGoalBtn" class="btn secondary">Create Goal</button>
+          <button id="refreshGoals" class="btn">Refresh</button>
         </div>
       </div>
-      <div style="overflow:auto;max-height:420px">
-        <table class="tx-table" id="txTable">
-          <thead>
-            <tr>
-              <th>Date</th><th>Description</th><th>Debit</th><th>Credit</th><th>Balance</th>
-            </tr>
-          </thead>
-          <tbody id="txBody">
-            <tr><td colspan="5" style="padding:12px">Loading transactions...</td></tr>
-          </tbody>
-        </table>
-      </div>
     </div>
 
-    <!-- Wizard forms: Loan / Membership / Shares -->
-    <section class="card big" id="forms-section">
-      <h2>Forms (Wizard)</h2>
-
-      <!-- Tabs / step indicators -->
-      <div class="wizard-header" style="margin-bottom:12px">
-        <div class="wizard-step-indicator active" data-step="member">Member Info</div>
-        <div class="wizard-step-indicator" data-step="loan">Loan Application</div>
-        <div class="wizard-step-indicator" data-step="shares">Shares Plan</div>
+    <!-- LOAN FORM & WIZARD area (main) -->
+    <section class="card big left-col" id="forms-section">
+      <h2>Apply — Multi-step Wizard</h2>
+      <!-- wizard step indicators -->
+      <div class="wizard-header">
+        <div class="wizard-step-indicator active" data-step="1">1. Membership</div>
+        <div class="wizard-step-indicator" data-step="2">2. Loan Details</div>
+        <div class="wizard-step-indicator" data-step="3">3. Guarantors & Review</div>
       </div>
 
-      <!-- Member wizard -->
-      <form id="memberWizard" class="wizard-step active" data-step="member">
-        <h3>Step 1 — Membership Details</h3>
-        <div class="form-grid">
-          <input class="full" name="m_name" id="m_name" placeholder="Full name" required>
-          <input name="m_membershipNumber" id="m_membershipNumber" placeholder="Membership Number (M/No)" required>
-          <input name="m_id" id="m_id" placeholder="National ID / Passport No" required>
-          <input name="m_phone" id="m_phone" placeholder="Phone" required>
-          <input name="m_email" id="m_email" type="email" placeholder="Email" required>
-          <input name="m_county" id="m_county" placeholder="County" required>
-          <input name="m_town" id="m_town" placeholder="Town / City" required>
-          <input class="full" name="m_residence" id="m_residence" placeholder="Area of Residence" required>
-        </div>
-        <div style="display:flex;justify-content:space-between;margin-top:12px">
-          <div></div>
-          <div>
-            <button type="button" class="btn" id="memberNext">Next →</button>
+      <!-- Step 1: Membership -->
+      <form id="wizardForm">
+        <div class="wizard-step active" data-step="1">
+          <h3>Membership / Personal Info</h3>
+          <div class="form-grid">
+            <input class="full" name="selfHelpGroup" placeholder="Name of Self-Help Group" required>
+            <input name="memberName" placeholder="Name of Applicant" required>
+            <input name="membershipNumber" placeholder="Membership Number (M/No)" required>
+            <input name="nationalId" placeholder="National ID / Passport No" required>
+            <select name="maritalStatus" required>
+              <option value="">Marital Status</option>
+              <option>Single</option><option>Married</option><option>Widow</option><option>Others</option>
+            </select>
+            <input name="dob" type="date" placeholder="Date of Birth" required>
+            <input name="county" placeholder="County" required>
+            <input name="town" placeholder="City / Town" required>
+            <input name="currentAddress" placeholder="Current Address" required>
+            <input name="areaResidence" placeholder="Area of Residence" required>
+            <input name="phone" placeholder="Phone" required>
+            <input name="email" type="email" placeholder="E-mail" required>
+            <select name="ownedRented">
+              <option value="">Owned / Rented</option>
+              <option>Owned</option><option>Rented</option>
+            </select>
+            <input name="monthlyRent" placeholder="Monthly payment or rent">
+          </div>
+          <div style="margin-top:10px;display:flex;justify-content:flex-end;gap:8px">
+            <button type="button" class="btn secondary" id="wizardNext1">Next</button>
           </div>
         </div>
-      </form>
 
-      <!-- Loan wizard -->
-      <form id="loanWizard" class="wizard-step" data-step="loan">
-        <h3>Step 2 — Loan Application</h3>
-        <div class="form-grid">
-          <input class="full" name="loan_selfHelpGroup" id="loan_selfHelpGroup" placeholder="Name of Self-Help Group" required>
-          <input name="loan_memberName" id="loan_memberName" placeholder="Name of Applicant" required>
-          <input name="loan_membershipNumber" id="loan_membershipNumber" placeholder="Membership Number (M/No)" required>
-          <input name="loan_nationalId" id="loan_nationalId" placeholder="National ID / Passport No" required>
-          <select name="loan_maritalStatus" id="loan_maritalStatus" required>
-            <option value="">Marital Status</option>
-            <option>Single</option><option>Married</option><option>Widow</option><option>Others</option>
-          </select>
-          <input name="loan_dob" id="loan_dob" type="date" placeholder="Date of Birth" required>
-          <input name="loan_monthlyIncome" id="loan_monthlyIncome" placeholder="Monthly Income (Ksh)" required>
-        </div>
+        <!-- Step 2: Employment & Loan details -->
+        <div class="wizard-step" data-step="2">
+          <h3>Employment & Loan Details</h3>
+          <div class="form-grid">
+            <input name="employer" placeholder="Current Employer">
+            <input name="position" placeholder="Position">
+            <input name="periodEmployment" placeholder="Period in Current Employment">
+            <input name="employerAddress" placeholder="Employer Address">
+            <input name="monthlyIncome" placeholder="Monthly Income (Ksh)" required>
 
-        <h4 style="margin-top:12px">Loan Request</h4>
-        <div class="form-grid">
-          <input name="loan_amountFigures" id="loan_amountFigures" placeholder="Amount Requested (Figures, Ksh)" required>
-          <input name="loan_amountWords" id="loan_amountWords" placeholder="Amount in words" required>
-          <input name="loan_purpose" id="loan_purpose" placeholder="Purpose of the Loan" required>
-          <input name="loan_repayableMonths" id="loan_repayableMonths" placeholder="Repayable in months" required>
-        </div>
-
-        <div style="display:flex;justify-content:space-between;margin-top:12px">
-          <button type="button" class="btn secondary" id="loanBack">← Back</button>
-          <div>
-            <button type="button" class="btn" id="loanNext">Next →</button>
+            <input name="amountFigures" placeholder="Amount Requested (Figures, Ksh)" required>
+            <input name="amountWords" placeholder="Amount in words" required>
+            <input name="purpose" placeholder="Purpose of the Loan" required>
+            <input name="repayableMonths" placeholder="Repayable in monthly instalments (months)" required>
+            <input name="otherLoan1" placeholder="Other Loan 1 (Institution / Amount)">
+            <input name="otherLoan2" placeholder="Other Loan 2 (Institution / Amount)">
+          </div>
+          <div style="margin-top:10px;display:flex;justify-content:space-between;gap:8px">
+            <button type="button" class="btn secondary" id="wizardPrev2">Previous</button>
+            <button type="button" class="btn" id="wizardNext2">Next</button>
           </div>
         </div>
-      </form>
 
-      <!-- Shares wizard -->
-      <form id="sharesWizard" class="wizard-step" data-step="shares">
-        <h3>Step 3 — Shares Plan</h3>
-        <div class="form-grid">
-          <label class="full">Target shares
-            <input id="s_targetShares" type="number" min="1" value="10" />
-          </label>
-          <label>Start date
-            <input id="s_startDate" type="date" />
-          </label>
-          <label>Installment (Ksh)
-            <input id="s_installment" type="number" min="1" value="100" />
-          </label>
-          <label class="full">Notes
-            <input id="s_notes" placeholder="E.g., monthly contribution description" />
-          </label>
-        </div>
+        <!-- Step 3: Guarantors & Terms -->
+        <div class="wizard-step" data-step="3">
+          <h3>Guarantors & Terms</h3>
+          <table>
+            <thead>
+              <tr><th>M No.</th><th>Name in Full</th><th>Cell Phone</th><th>ID No.</th><th>Group Name</th><th>Amount Offered (Ksh)</th></tr>
+            </thead>
+            <tbody id="guarantorRows">
+              <tr>
+                <td><input name="g_mno_1" placeholder="MNo"></td>
+                <td><input name="g_name_1" placeholder="Full name"></td>
+                <td><input name="g_phone_1" placeholder="Phone"></td>
+                <td><input name="g_id_1" placeholder="ID No"></td>
+                <td><input name="g_group_1" placeholder="SHG Name"></td>
+                <td><input name="g_amount_1" placeholder="Ksh"></td>
+              </tr>
+              <tr>
+                <td><input name="g_mno_2" placeholder="MNo"></td>
+                <td><input name="g_name_2" placeholder="Full name"></td>
+                <td><input name="g_phone_2" placeholder="Phone"></td>
+                <td><input name="g_id_2" placeholder="ID No"></td>
+                <td><input name="g_group_2" placeholder="SHG Name"></td>
+                <td><input name="g_amount_2" placeholder="Ksh"></td>
+              </tr>
+              <tr>
+                <td><input name="g_mno_3" placeholder="MNo"></td>
+                <td><input name="g_name_3" placeholder="Full name"></td>
+                <td><input name="g_phone_3" placeholder="Phone"></td>
+                <td><input name="g_id_3" placeholder="ID No"></td>
+                <td><input name="g_group_3" placeholder="SHG Name"></td>
+                <td><input name="g_amount_3" placeholder="Ksh"></td>
+              </tr>
+            </tbody>
+          </table>
 
-        <div style="display:flex;justify-content:space-between;margin-top:12px">
-          <button type="button" class="btn secondary" id="sharesBack">← Back</button>
-          <div>
-            <button type="button" class="btn" id="sharesSubmit">Submit & Save</button>
+          <h4 style="margin-top:10px">TERMS &amp; CONDITIONS — Applicant Commitment</h4>
+          <textarea name="terms" readonly>
+Please read the full terms on the system: you must have 6 consecutive months savings, savings cover a third of guarantorship, loans above Ksh 10,000 require bank statements, school fees loan evidence required, cancellations fee may apply, CRB checks permitted.
+          </textarea>
+
+          <div style="margin-top:12px;display:flex;gap:10px;align-items:center">
+            <label style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="agreeTerms" required> I have read and agree to the Terms & Conditions</label>
+            <div style="margin-left:auto;display:flex;gap:8px">
+              <button class="btn secondary" type="button" id="previewLoanPdf">Preview PDF</button>
+              <button class="btn" type="submit" id="submitLoanBtn">Submit Application & Download PDF</button>
+            </div>
           </div>
         </div>
       </form>
     </section>
 
-    <!-- right side: payments, notifications, downloads, profile -->
-    <aside class="card side">
-      <h3>Pay / Quick Actions</h3>
+    <!-- WITHDRAW FORM -->
+    <section class="card big left-col" id="withdraw-section">
+      <h2><i class="fas fa-hand-holding-usd"></i> Voluntary Withdrawable Savings Form (Wizardable)</h2>
 
-      <!-- M-Pesa general payment -->
-      <div style="margin-top:8px">
-        <label class="muted">Pay via M-Pesa (General)</label>
-        <input id="mpesaPhone" placeholder="07XXXXXXXX" />
-        <input id="mpesaAmount" placeholder="Amount (Ksh)" type="number" />
-        <input id="mpesaAccount" placeholder="Account / Remarks (optional)" />
-        <div style="display:flex;gap:8px;margin-top:8px">
-          <button id="mpesaPayBtn" class="btn">Pay (M-Pesa)</button>
-          <button id="mpesaLogBtn" class="btn secondary">Log Payment</button>
+      <form id="withdrawForm">
+        <div class="form-grid">
+          <input class="full" name="memberNameW" placeholder="Member Name" required>
+          <input name="membershipNumberW" placeholder="Membership Number" required>
+          <input name="idNumberW" placeholder="ID / Passport Number" required>
+          <input name="phoneW" placeholder="Phone Number" required>
+          <input name="amountFiguresW" placeholder="Amount Requested (Figures, Ksh)" required>
+          <input name="amountWordsW" placeholder="Amount in Words" required>
+          <input class="full" name="reasonW" placeholder="Reason for Withdrawal" required>
         </div>
-      </div>
 
-      <!-- notifications -->
-      <div style="margin-top:14px">
-        <h4 style="margin:0 0 8px 0">🔔 Notifications</h4>
-        <div id="notifWrapper" style="max-height:220px;overflow:auto;border-radius:8px;padding:6px;background:#fbfff9">
-          <ul id="notifList" style="list-style:none;margin:0;padding:0">
-            <li>Loading notifications...</li>
-          </ul>
+        <div style="margin-top:12px;display:flex;gap:10px;align-items:center">
+          <button class="btn secondary" type="button" id="previewWithdrawPdf">Preview PDF</button>
+          <button class="btn" type="submit" id="submitWithdrawBtn">Submit & Download PDF</button>
         </div>
-        <div style="margin-top:8px;display:flex;gap:8px">
-          <button id="markAllRead" class="btn secondary">Mark all read</button>
-        </div>
-      </div>
+      </form>
+    </section>
 
-      <!-- downloads area (files stored in Firebase Storage under folder 'downloads' and referenced in RTDB /downloads/) -->
-      <div style="margin-top:14px">
-        <h4 style="margin:0 0 8px 0">📁 Downloads</h4>
-        <div id="downloadsList" style="max-height:220px;overflow:auto;padding:6px;background:#fff;border-radius:8px">
-          <div>Loading available downloads...</div>
-        </div>
-      </div>
-
-      <!-- points -->
-      <div style="margin-top:14px">
-        <h4 style="margin:0 0 6px 0">🎯 Points</h4>
-        <div id="pointsBox" style="padding:10px;background:#fff;border-radius:8px">
-          <div style="font-size:1.5rem;font-weight:700" id="pointsBoxValue">0</div>
-          <div class="muted" style="font-size:0.9rem">Member activity score</div>
-        </div>
-      </div>
-
-      <!-- small profile quick -->
-      <div style="margin-top:14px">
-        <h4 style="margin:0 0 6px 0">Profile</h4>
-        <div style="display:flex;gap:8px;align-items:center">
-          <div class="avatar-wrap" id="miniAvatar"></div>
-          <div>
-            <div id="miniName">—</div>
-            <small id="miniEmail" class="muted">—</small>
-          </div>
-        </div>
-        <div style="margin-top:8px;display:flex;gap:8px">
-          <button id="saveProfile" class="btn">Save profile</button>
-          <button id="choosePhotoBtn" class="btn secondary">Upload photo</button>
-          <input id="photoUploadInput" type="file" accept="image/*" style="display:none" />
-        </div>
-      </div>
-    </aside>
-
-    <!-- loans manage + profile expanded -->
-    <section class="card side" id="loansListFull">
+    <!-- LOANS MANAGEMENT sidebar -->
+    <section class="card side right-col" id="loansListFull">
       <h2>Loans — Manage Applications</h2>
       <div id="loansListArea">Loading loans…</div>
-      <div id="loansListFullInner" style="margin-top:12px"></div>
+      <div id="loansListFullArea" style="margin-top:12px"></div>
 
       <hr style="margin:12px 0">
       <div style="display:flex;gap:8px">
@@ -395,640 +353,934 @@
       </div>
     </section>
 
+    <!-- TRANSACTIONS -->
+    <section class="card left-col" id="transactions">
+      <div class="section-title">
+        <h3 style="margin:0">📜 Recent Activities & Transactions</h3>
+        <div style="display:flex;gap:8px;align-items:center">
+          <select id="activityFilter" class="muted-small">
+            <option value="all">All</option>
+            <option value="loan">Loans</option>
+            <option value="share">Shares</option>
+            <option value="deposit">Deposits</option>
+            <option value="withdrawal">Withdrawals</option>
+          </select>
+          <select id="txFilterType">
+            <option value="all">All Tx</option>
+            <option value="credit">Credits</option>
+            <option value="debit">Debits</option>
+          </select>
+          <button id="downloadTxBtn" class="btn secondary">Download Tx PDF</button>
+        </div>
+      </div>
+
+      <div style="overflow:auto;max-height:360px;margin-top:8px">
+        <table class="tx-table" id="txTable">
+          <thead><tr><th>Date</th><th>Description</th><th>Debit</th><th>Credit</th><th>Balance</th></tr></thead>
+          <tbody id="txBody"><tr><td colspan="5">Loading transactions...</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Profile area -->
+    <section class="card right-col" id="profile-area">
+      <h2><i class="fas fa-user-edit"></i> Update Profile</h2>
+      <div class="profile-grid" style="margin-top:10px;display:grid;grid-template-columns:repeat(2,1fr);gap:10px">
+        <input class="full" id="profile_fullName" placeholder="Full name">
+        <input id="profile_phone" placeholder="Phone">
+        <input id="profile_id" placeholder="ID Number">
+        <input id="profile_yearJoined" placeholder="Year Joined (e.g. 2021)">
+        <input id="profile_dob" type="date" placeholder="Date of Birth">
+      </div>
+
+      <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+        <input type="file" id="photoUploadInput" accept="image/*" style="display:none">
+        <button id="choosePhotoBtn" class="btn secondary"><i class="fas fa-camera"></i>&nbsp;Upload Photo</button>
+        <button id="saveProfile" class="btn">Save Profile</button>
+        <button id="profileStatement" class="btn secondary">Account Statement</button>
+      </div>
+
+      <div style="margin-top:12px;font-size:0.9rem;color:var(--muted)">
+        <strong>Note:</strong> Your photo will be visible at the top when uploaded. Profile changes are saved to the server.
+      </div>
+    </section>
+
+    <!-- Community & support -->
+    <section class="card right-col" style="margin-top:12px">
+      <h3 style="margin:0">Community & Support</h3>
+      <div style="margin-top:8px">
+        <h4 style="margin:6px 0">Discussion Board</h4>
+        <div id="discussionList" class="discussion-list">Loading discussion...</div>
+        <textarea id="discussionMsg" placeholder="Write message..." style="width:100%;margin-top:8px"></textarea>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button id="postDiscussion" class="btn">Post</button>
+          <button id="refreshDiscussion" class="btn secondary">Refresh</button>
+        </div>
+      </div>
+
+      <div style="margin-top:12px">
+        <h4 style="margin:6px 0">Support Chat</h4>
+        <div id="chatList" class="discussion-list">Loading chat...</div>
+        <input id="chatInput" placeholder="Type message..." />
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button id="sendChat" class="btn">Send</button>
+        </div>
+      </div>
+
+      <div style="margin-top:12px">
+        <h4 style="margin:6px 0">Referrals</h4>
+        <div class="referral-box">
+          <div>Your referral code: <strong id="refCode">—</strong></div>
+          <div style="margin-top:8px"><button id="copyRef" class="btn secondary">Copy</button> <button id="viewReferrals" class="btn">My Referrals</button></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right column payments / downloads / kyc -->
+    <aside class="card right-col" style="display:flex;flex-direction:column;gap:12px;margin-top:12px">
+      <div>
+        <h3 style="margin:0">Quick Pay / Wallet</h3>
+        <div style="margin-top:8px">
+          <input id="mpesaPhone" placeholder="07XXXXXXXX" />
+          <input id="mpesaAmount" placeholder="Amount (Ksh)" type="number" />
+          <input id="mpesaAccount" placeholder="Account / Remarks (optional)" />
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button id="mpesaPayBtn" class="btn">Pay (M-Pesa)</button>
+            <button id="mpesaLogBtn" class="btn secondary">Log Payment</button>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h3 style="margin:0">Downloads</h3>
+        <div id="downloadsList" style="max-height:180px;overflow:auto;padding:8px">Loading downloads...</div>
+      </div>
+
+      <div>
+        <h3 style="margin:0">KYC Verification</h3>
+        <div style="margin-top:8px">
+          <input id="kycIdUpload" type="file" accept="image/*,application/pdf" />
+          <input id="kycProofUpload" type="file" accept="image/*,application/pdf" />
+          <div style="margin-top:8px;display:flex;gap:8px">
+            <button id="uploadKycBtn" class="btn">Upload KYC</button>
+            <button id="viewKycBtn" class="btn secondary">View Status</button>
+          </div>
+          <div id="kycStatus" class="muted small" style="margin-top:8px">Status: Unknown</div>
+        </div>
+      </div>
+
+      <div>
+        <h3 style="margin:0">Notifications</h3>
+        <div id="notifList" style="max-height:160px;overflow:auto;padding:6px">Loading...</div>
+        <div style="display:flex;gap:8px;margin-top:8px"><button id="markAllRead" class="btn secondary">Mark all read</button></div>
+      </div>
+    </aside>
+
+    <!-- Admin panel area (client-visible; server must restrict) -->
+    <section class="card left-col" id="adminPanel" style="margin-top:12px">
+      <h3 style="margin:0">Admin Panel</h3>
+      <div style="margin-top:8px">
+        <button id="broadcastBtn" class="btn">Broadcast Notification</button>
+        <button id="dividendBtn" class="btn secondary">Run Dividend Distribution</button>
+        <button id="exportReportBtn" class="btn">Export Monthly Report</button>
+      </div>
+      <div id="adminLog" style="margin-top:12px;max-height:180px;overflow:auto;padding:6px">Admin actions log...</div>
+    </section>
+
+    <!-- Footer notes -->
+    <section style="grid-column:span 12;margin-top:12px">
+      <div class="card">
+        <h4 style="margin:0">Notes & Recommendations</h4>
+        <ul style="margin-top:8px">
+          <li>Storage folder used: <code>downloads/</code> for member files and KYC uploads.</li>
+          <li>Move M-Pesa secrets to server. This client calls a backend STK endpoint (example included in JS).</li>
+          <li>Harden Firebase rules (auth.uid must equal path uid) before production.</li>
+        </ul>
+      </div>
+    </section>
   </main>
 
-  <div id="toast">Toast</div>
+  <div id="toast">...</div>
 
-  <!-- Firebase (modular v9) -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-    import { getDatabase, ref, onValue, get, push, set, update, child, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
-    import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, listAll } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
+<!-- FULL FIREBASE + APP LOGIC -->
+<script type="module">
+/* ------------------------------------------------------------------------
+   Visionary Youth Group — Combined Full Dashboard
+   - Combined and expanded from user's two parts
+   - RTDB structure used (convention):
+       members/{uid}/profile
+       members/{uid}/savings
+       members/{uid}/shares
+       members/{uid}/loans
+       members/{uid}/notifications
+       transactions/{uid}
+       downloads/{fileId} -> {name, storagePath, uploadedAt}
+       goals/{uid}
+       discussions/general
+       support/general/messages
+       referrals/{uid}
+       payments/{uid}
+       dividends/{uid}
+   - Storage folder: downloads/
+   - IMPORTANT: Move STK and secret operations server-side (we call example endpoint).
+   ------------------------------------------------------------------------ */
 
-    // jsPDF
-    const { jsPDF } = window.jspdf;
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+import { getDatabase, ref, onValue, get, push, set, update, remove } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, listAll } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
 
-    // ===== Replace with your config (kept from earlier posts) =====
-    const firebaseConfig = {
-      apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
-      authDomain: "visionary-youth-grou-2024.firebaseapp.com",
-      databaseURL: "https://visionary-youth-grou-2024-default-rtdb.firebaseio.com",
-      projectId: "visionary-youth-grou-2024",
-      storageBucket: "visionary-youth-grou-2024.appspot.com",
-      messagingSenderId: "372978592717",
-      appId: "1:372978592717:web:1c15aec728ee5f854f3284"
-    };
+const { jsPDF } = window.jspdf;
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getDatabase(app);
-    const storage = getStorage(app);
+// ---------- Use the Firebase config you pasted earlier ----------
+const firebaseConfig = {
+  apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
+  authDomain: "visionary-youth-grou-2024.firebaseapp.com",
+  databaseURL: "https://visionary-youth-grou-2024-default-rtdb.firebaseio.com",
+  projectId: "visionary-youth-grou-2024",
+  storageBucket: "visionary-youth-grou-2024.appspot.com",
+  messagingSenderId: "372978592717",
+  appId: "1:372978592717:web:1c15aec728ee5f854f3284"
+};
 
-    // UI refs
-    const menu = document.getElementById('menu');
-    const toast = document.getElementById('toast');
-    const topEmail = document.getElementById('topEmail');
-    const welcomeName = document.getElementById('welcomeName');
-    const pointsDisplay = document.getElementById('pointsDisplay');
-    const topAvatar = document.getElementById('topAvatar');
-    const miniAvatar = document.getElementById('miniAvatar');
-    const miniName = document.getElementById('miniName');
-    const miniEmail = document.getElementById('miniEmail');
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+const storage = getStorage(app);
 
-    const loanActionBody = document.getElementById('loanActionBody');
-    const txBody = document.getElementById('txBody');
-    const txFilterType = document.getElementById('txFilterType');
-    const downloadTxBtn = document.getElementById('downloadTxBtn');
+// UI refs
+const toast = document.getElementById('toast');
+const topEmail = document.getElementById('topEmail');
+const welcomeName = document.getElementById('welcomeName');
+const pointsDisplay = document.getElementById('pointsDisplay');
+const topAvatar = document.getElementById('topAvatar');
+const downloadsList = document.getElementById('downloadsList');
+const notifList = document.getElementById('notifList');
+const goalsList = document.getElementById('goalsList');
+const discussionList = document.getElementById('discussionList');
+const chatList = document.getElementById('chatList');
+const refCodeEl = document.getElementById('refCode');
+const adminLog = document.getElementById('adminLog');
+const loansListArea = document.getElementById('loansListArea');
+const loansListFullArea = document.getElementById('loansListFullArea');
+const txBody = document.getElementById('txBody');
 
-    const notifList = document.getElementById('notifList');
-    const markAllReadBtn = document.getElementById('markAllRead');
+function showToast(msg, t=3000){ toast.textContent = msg; toast.style.display='block'; setTimeout(()=> toast.style.display='none', t); }
+function formatKsh(n){ const num = Number(n||0); return 'Ksh ' + (isNaN(num)? 0 : num.toLocaleString('en-KE')); }
+function safeText(s){ return String(s||''); }
 
-    const mpesaPhone = document.getElementById('mpesaPhone');
-    const mpesaAmount = document.getElementById('mpesaAmount');
-    const mpesaAccount = document.getElementById('mpesaAccount');
-    const mpesaPayBtn = document.getElementById('mpesaPayBtn');
-    const mpesaLogBtn = document.getElementById('mpesaLogBtn');
+let currentUid = null;
+let isAdmin = false;
+let profileSavedOnce = false;
 
-    const choosePhotoBtn = document.getElementById('choosePhotoBtn');
-    const photoInput = document.getElementById('photoUploadInput');
-    const saveProfileBtn = document.getElementById('saveProfile');
+// --- Helpers for UI toggles ---
+document.querySelectorAll('.hamburgerAction').forEach(h=> h.addEventListener('click', ()=> {
+  const menu = document.getElementById('menu'); menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+}));
+document.getElementById('downloadBtn')?.addEventListener('click', ()=> window.location.href = '/admin.html');
 
-    const downloadsList = document.getElementById('downloadsList');
+// Auto-logout after 3 minutes of inactivity
+let logoutTimer;
+function resetLogoutTimer(){ clearTimeout(logoutTimer); logoutTimer = setTimeout(()=>{ try{ signOut(auth); }catch(e){} alert('Logged out due to inactivity'); location.href='index.html'; }, 3*60*1000); }
+['mousemove','keydown','click','touchstart'].forEach(ev=> window.addEventListener(ev, resetLogoutTimer));
 
-    // wizard elements
-    const stepIndicators = document.querySelectorAll('.wizard-step-indicator');
-    const wizardSteps = document.querySelectorAll('.wizard-step');
+// Points and activity
+async function getPoints(){ if(!currentUid) return 0; const s = await get(ref(db, `members/${currentUid}/points`)); return s.exists()? Number(s.val()||0) : 0; }
+async function setPoints(n){ if(!currentUid) return; await set(ref(db, `members/${currentUid}/points`), Number(n||0)); pointsDisplay.textContent = String(Number(n||0)); }
+async function logActivity(msg){ if(!currentUid) return; const r = push(ref(db, `members/${currentUid}/activityLog`)); await set(r, { text: msg, ts: Date.now() }); }
+async function awardPoints(n, reason){ if(!currentUid || !n) return; const cur = await getPoints(); const upd = Number(cur||0) + Number(n); await setPoints(upd); showToast(`+${n} points`); await logActivity(`Points +${n} (${reason})`); }
 
-    // small helpers
-    function showToast(msg, t=3000){ toast.textContent = msg; toast.style.display='block'; setTimeout(()=> toast.style.display='none', t); }
-    function formatKsh(n){ const num = Number(n||0); return 'Ksh ' + num.toLocaleString('en-KE'); }
-    function safeText(s){ return String(s || ''); }
-
-    // menu toggle
-    document.querySelectorAll('.hamburgerAction').forEach(h=> h.addEventListener('click', ()=> menu.style.display = menu.style.display === 'block'? 'none':'block'));
-    document.querySelectorAll('.menu a[data-target]').forEach(a=> a.addEventListener('click', e=> { e.preventDefault(); const t = a.dataset.target; const el = document.getElementById(t); if(el) el.scrollIntoView({behavior:'smooth', block:'start'}); menu.style.display='none'; }));
-
-    // global state
-    let currentUid = null;
-
-    // auto logout (3 minutes)
-    let logoutTimer;
-    function resetLogoutTimer(){ clearTimeout(logoutTimer); logoutTimer = setTimeout(()=>{ try{ signOut(auth); }catch(e){} alert('Logged out due to inactivity'); location.href='index.html'; }, 3*60*1000); }
-    ['mousemove','keydown','click','touchstart'].forEach(ev=> window.addEventListener(ev, resetLogoutTimer));
-
-    // points functions
-    async function getPoints(){ if(!currentUid) return 0; const s = await get(ref(db, `points/${currentUid}`)); return s.exists()? Number(s.val()||0) : 0; }
-    async function setPoints(n){ if(!currentUid) return; await set(ref(db, `points/${currentUid}`), Number(n||0)); document.getElementById('pointsBoxValue').textContent = String(Number(n||0)); if(pointsDisplay) pointsDisplay.textContent = String(Number(n||0)); }
-    async function logActivity(msg){ if(!currentUid) return; const r = push(ref(db, `members/${currentUid}/activityLog`)); await set(r, {text: msg, ts: Date.now()}); }
-    async function awardPoints(n, reason){ if(!currentUid || !n) return; const cur = await getPoints(); const upd = Number(cur||0) + Number(n); await setPoints(upd); showToast(`+${n} points`); await logActivity(`Points +${n} (${reason})`); }
-
-    // wizard helpers
-    function showStep(stepName){
-      wizardSteps.forEach(s => s.classList.toggle('active', s.dataset.step === stepName));
-      stepIndicators.forEach(ind => ind.classList.toggle('active', ind.dataset.step === stepName));
-      // scroll to forms
-      document.getElementById('forms-section').scrollIntoView({behavior:'smooth'});
-    }
-
-    // attach wizard navigation
-    document.getElementById('memberNext').addEventListener('click', async ()=>{
-      // validate required fields in memberWizard
-      const name = document.getElementById('m_name').value.trim();
-      const phone = document.getElementById('m_phone').value.trim();
-      if(!name || !phone) return alert('Please fill name and phone');
-      showStep('loan');
+// Render activities timeline (using RTDB simple path)
+function renderActivities(filterType='all'){
+  // For convenience, read from /members/{uid}/activityLog
+  if(!currentUid) return;
+  onValue(ref(db, `members/${currentUid}/activityLog`), snap => {
+    const el = document.getElementById('activity-timeline');
+    if(!el) return;
+    el.innerHTML = '';
+    if(!snap.exists()) { el.innerHTML = '<li class="text-gray-500">No recent activity</li>'; return; }
+    const rows = Object.values(snap.val()).sort((a,b)=> b.ts - a.ts);
+    rows.forEach(r=>{
+      if(filterType !== 'all' && r.type !== filterType) return;
+      const li = document.createElement('li');
+      li.style.marginBottom = '8px';
+      li.innerHTML = `<div style="font-weight:600">${safeText(r.text)}</div><div class="muted-small">${new Date(r.ts).toLocaleString()}</div>`;
+      el.appendChild(li);
     });
-    document.getElementById('loanBack').addEventListener('click', ()=> showStep('member'));
-    document.getElementById('loanNext').addEventListener('click', ()=> {
-      // basic validation
-      const amount = document.getElementById('loan_amountFigures').value.trim();
-      const memberName = document.getElementById('loan_memberName').value.trim();
-      if(!amount || !memberName) return alert('Please enter amount and applicant name');
-      showStep('shares');
-    });
-    document.getElementById('sharesBack').addEventListener('click', ()=> showStep('loan'));
+  });
+}
 
-    // when sharesSubmit clicked -> save all data (member, loan, shares) to RTDB
-    document.getElementById('sharesSubmit').addEventListener('click', async ()=>{
-      if(!currentUid) return alert('Not signed in');
-      // collect member
-      const memberPayload = {
-        name: document.getElementById('m_name').value.trim(),
-        membershipNumber: document.getElementById('m_membershipNumber').value.trim(),
-        id: document.getElementById('m_id').value.trim(),
-        phone: document.getElementById('m_phone').value.trim(),
-        email: document.getElementById('m_email').value.trim(),
-        county: document.getElementById('m_county').value.trim(),
-        town: document.getElementById('m_town').value.trim(),
-        residence: document.getElementById('m_residence').value.trim(),
-        updatedAt: Date.now()
-      };
-      // collect loan
-      const loanPayload = {
-        selfHelpGroup: document.getElementById('loan_selfHelpGroup').value.trim(),
-        memberName: document.getElementById('loan_memberName').value.trim(),
-        membershipNumber: document.getElementById('loan_membershipNumber').value.trim(),
-        nationalId: document.getElementById('loan_nationalId').value.trim(),
-        maritalStatus: document.getElementById('loan_maritalStatus').value.trim(),
-        dob: document.getElementById('loan_dob').value,
-        monthlyIncome: document.getElementById('loan_monthlyIncome').value.trim(),
-        amountFigures: document.getElementById('loan_amountFigures').value.trim(),
-        amountWords: document.getElementById('loan_amountWords').value.trim(),
-        purpose: document.getElementById('loan_purpose').value.trim(),
-        repayableMonths: document.getElementById('loan_repayableMonths').value.trim(),
-        appliedAt: Date.now(),
-        status: 'Pending'
-      };
-      // collect shares
-      const sharesPayload = {
-        targetShares: Number(document.getElementById('s_targetShares').value || 0),
-        startDate: document.getElementById('s_startDate').value || new Date().toISOString().slice(0,10),
-        installment: Number(document.getElementById('s_installment').value || 0),
-        notes: document.getElementById('s_notes').value || '',
-        progress: 0,
-        createdAt: Date.now()
-      };
+// Render activities default
+if(document.getElementById('activity-timeline')) renderActivities();
 
-      try{
-        // save profile under members/{uid}/profile
-        await set(ref(db, `members/${currentUid}/profile`), memberPayload);
+// --- AUTH & REALTIME BINDINGS ---
+onAuthStateChanged(auth, async user => {
+  if(!user){ location.href='index.html'; return; }
+  currentUid = user.uid;
+  topEmail.textContent = user.email || '—';
+  welcomeName.textContent = user.displayName || (user.email||'Member').split('@')[0];
+  resetLogoutTimer();
+  awardPoints(3, 'Logged in');
 
-        // push loan application to members/{uid}/loans/applications and loans/{uid}/{loanId} for action bar
-        const loanAppRef = push(ref(db, `members/${currentUid}/loans/applications`));
-        const loanId = loanAppRef.key;
-        await set(loanAppRef, { ...loanPayload, loanId });
+  // Check profile role
+  const profSnap = await get(ref(db, `members/${currentUid}/profile`));
+  if(profSnap.exists() && profSnap.val().role === 'admin'){ isAdmin = true; } else { isAdmin = false; }
 
-        // store in main loans collection for lookup
-        await set(ref(db, `loans/${currentUid}/${loanId}`), { ...loanPayload, loanDate: new Date().toISOString(), id: loanId, stage: 'Pending' });
+  // profile photo
+  onValue(ref(db, `members/${currentUid}/photoURL`), s => {
+    if(s.exists()){ const url = s.val(); topAvatar.innerHTML = `<img src="${url}" alt="avatar">`; }
+    else topAvatar.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--dark)"><i class="fas fa-user"></i></div>';
+  });
 
-        // set shares plan under members
-        await set(ref(db, `members/${currentUid}/shares/plan`), sharesPayload);
-
-        showToast('Member, loan application, and shares plan saved');
-        awardPoints(5, 'Completed wizard');
-        showStep('member'); // go back to first
-      }catch(err){
-        console.error(err);
-        alert('Failed to save wizard data. See console.');
+  // balances listeners
+  const snapToAmount = async snap => {
+    if(!snap.exists()) return 0;
+    const val = snap.val();
+    if(typeof val === 'number' || typeof val === 'string') return Number(val) || 0;
+    let total = 0;
+    Object.values(val).forEach(child => {
+      if(child && typeof child === 'object' && ('amount' in child)) total += Number(child.amount||0);
+      else if(typeof child === 'number') total += child;
+      else if(typeof child === 'object') {
+        Object.values(child).forEach(c2 => { if(c2 && typeof c2 === 'object' && ('amount' in c2)) total += Number(c2.amount||0); });
       }
     });
+    return total;
+  };
 
-    // ===== Authentication state ======
-    onAuthStateChanged(auth, async user => {
-      if(!user){ location.href='index.html'; return; }
-      currentUid = user.uid;
-      topEmail.textContent = user.email || '—';
-      welcomeName.textContent = (user.displayName || user.email || 'Member').split('@')[0];
-      miniEmail.textContent = user.email || '—';
-      resetLogoutTimer();
-      awardPoints(3, 'Logged in');
+  onValue(ref(db, `members/${currentUid}/savings/monthly`), async s => { const v = await snapToAmount(s); document.getElementById('monthlyVal').textContent = formatKsh(v); });
+  onValue(ref(db, `members/${currentUid}/savings/weekly`), async s => { const v = await snapToAmount(s); document.getElementById('weeklyVal').textContent = formatKsh(v); });
+  onValue(ref(db, `members/${currentUid}/shares/total`), s => { document.getElementById('sharesVal').textContent = formatKsh(s.exists()? s.val() : 0); });
+  onValue(ref(db, `members/${currentUid}/shares/dividends`), s => { document.getElementById('dividendsVal').textContent = formatKsh(s.exists()? s.val() : 0); });
+  onValue(ref(db, `members/${currentUid}/unpaidBalances`), s => { document.getElementById('unpaidVal').textContent = formatKsh(s.exists()? s.val() : 0); });
 
-      // load profile
-      onValue(ref(db, `members/${currentUid}/profile`), snap => {
-        if(!snap.exists()) return;
-        const p = snap.val();
-        if(p.name) { welcomeName.textContent = p.name; miniName.textContent = p.name; document.getElementById('m_name') && (document.getElementById('m_name').value = p.name); }
-        if(p.phone) document.getElementById('m_phone') && (document.getElementById('m_phone').value = p.phone);
-        if(p.id) document.getElementById('m_id') && (document.getElementById('m_id').value = p.id);
-        if(p.membershipNumber) document.getElementById('m_membershipNumber') && (document.getElementById('m_membershipNumber').value = p.membershipNumber);
-        if(p.email) document.getElementById('m_email') && (document.getElementById('m_email').value = p.email);
-      });
+  // loans totals and outstanding
+  onValue(ref(db, `members/${currentUid}/loans/summary`), s => {
+    const obj = s.exists()? s.val() : { total:0, unpaid:0 };
+    document.getElementById('totalLoansVal').textContent = formatKsh(obj.total || 0);
+    document.getElementById('unpaidVal').textContent = formatKsh(obj.unpaid || 0);
+  });
 
-      // profile photo
-      onValue(ref(db, `members/${currentUid}/photoURL`), snap => {
-        const url = snap.exists()? snap.val() : null;
-        if(url){ topAvatar.innerHTML = `<img src="${url}" alt="avatar">`; miniAvatar.innerHTML = `<img src="${url}" alt="avatar">`; }
-        else { topAvatar.innerHTML = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--dark)"><i class="fas fa-user"></i></div>`; miniAvatar.innerHTML = topAvatar.innerHTML; }
-      });
+  // notifications (member)
+  onValue(ref(db, `members/${currentUid}/notifications`), snap => {
+    notifList.innerHTML = '';
+    if(!snap.exists()){ notifList.innerHTML = '<div class="muted">No notifications</div>'; return; }
+    const notes = Object.entries(snap.val()).map(([id,n]) => ({ id, ...n })).sort((a,b)=> (b.timestamp||b.ts||0)-(a.timestamp||a.ts||0));
+    notes.forEach(n => {
+      const d = document.createElement('div'); d.style.padding='8px'; d.style.borderBottom='1px solid #eef6ee';
+      d.innerHTML = `<strong style="color:${n.read? '#6b7280' : '#145c2e'}">${safeText(n.title)}</strong><div class="muted-small">${safeText(n.message)}</div><div class="muted-small">${new Date(n.timestamp||n.ts||Date.now()).toLocaleString()}</div><div style="margin-top:6px"><button class="btn secondary mark-notif" data-id="${n.id}">${n.read? 'Read' : 'Mark read'}</button></div>`;
+      notifList.appendChild(d);
+    });
+    document.querySelectorAll('.mark-notif').forEach(b => b.addEventListener('click', async ()=> {
+      const id = b.dataset.id;
+      await update(ref(db, `members/${currentUid}/notifications/${id}`), { read: true });
+      showToast('Marked read');
+    }));
+  });
 
-      // balances listeners
-      onValue(ref(db, `members/${currentUid}/savings/monthly`), s => { document.getElementById('monthlyVal').textContent = formatKsh(s.exists()? s.val() : 0); });
-      onValue(ref(db, `members/${currentUid}/savings/weekly`), s => { document.getElementById('weeklyVal').textContent = formatKsh(s.exists()? s.val() : 0); });
-      onValue(ref(db, `members/${currentUid}/shares/total`), s => { document.getElementById('sharesVal').textContent = formatKsh(s.exists()? s.val() : 0); });
-      onValue(ref(db, `members/${currentUid}/shares/dividends`), s => { document.getElementById('dividendsVal').textContent = formatKsh(s.exists()? s.val() : 0); });
-      onValue(ref(db, `members/${currentUid}/unpaidBalances`), s => { document.getElementById('unpaidVal').textContent = formatKsh(s.exists()? s.val() : 0); });
-      onValue(ref(db, `members/${currentUid}/loans/total`), s => { const val = s.exists()? s.val() : {}; document.getElementById('totalLoansVal').textContent = formatKsh(val.total || 0); });
-
-      // outstanding loans
-      onValue(ref(db, `members/${currentUid}/outstandingLoans`), s => { document.getElementById('outstandingLoansVal').textContent = formatKsh(s.exists()? s.val() : 0); });
-
-      // ===== Loan action bar =====
-      onValue(ref(db, `loans/${currentUid}`), snap => {
-        const body = loanActionBody;
-        body.innerHTML = '';
-        if(!snap.exists()){ body.innerHTML = '<tr><td colspan="7" style="padding:12px">No loan records</td></tr>'; return; }
-        const loansObj = snap.val();
-        let loansArray = [];
-        if(typeof loansObj === 'object' && !Array.isArray(loansObj)) {
-          loansArray = Object.entries(loansObj).map(([id, l]) => ({ id, ...l }));
-        } else if(Array.isArray(loansObj)) {
-          loansArray = loansObj;
-        } else {
-          loansArray = [{ id: 'current', ...loansObj }];
-        }
-        loansArray.sort((a,b)=> (new Date(b.loanDate||b.disbursedAt||0)) - (new Date(a.loanDate||a.disbursedAt||0)));
-        loansArray.forEach(loan => {
-          const tr = document.createElement('tr');
-          const stageLower = (loan.stage || loan.status || '').toLowerCase();
-          const stageClass = stageLower.includes('paid') || stageLower.includes('closed') ? 'stage-closed' : (stageLower.includes('active') ? 'stage-active' : 'stage-pending');
-          tr.innerHTML = `
-            <td>${safeText(loan.loanDate ? new Date(loan.loanDate).toLocaleDateString() : loan.loanDate || '-') }</td>
-            <td>${formatKsh(loan.amount || loan.amountFigures || 0)}</td>
-            <td>${safeText(loan.interest || loan.interestRate || loan.rate || '-')}</td>
-            <td>${formatKsh(loan.installment || loan.monthlyInstallment || 0)}</td>
-            <td>${safeText(loan.dueDate ? new Date(loan.dueDate).toLocaleDateString() : loan.dueDate || '-') }</td>
-            <td><span class="loan-stage ${stageClass}">${safeText(loan.stage || loan.status || 'Pending')}</span></td>
-            <td>
-              <button class="btn secondary btn-view-loan" data-loan-id="${loan.id}"><i class="fas fa-eye"></i> View</button>
-              <button class="btn btn-repay" data-amount="${loan.outstanding || loan.amount || 0}">Repay</button>
-            </td>
-          `;
-          body.appendChild(tr);
-        });
-      });
-
-      // repay button click (opens STK flow)
-      document.body.addEventListener('click', (e)=>{
-        if(e.target.closest('.btn-repay')){
-          const btn = e.target.closest('.btn-repay');
-          const amount = Number(btn.dataset.amount||0);
-          mpesaAmount.value = amount>0? amount : '';
-          mpesaPhone.scrollIntoView({behavior:'smooth', block:'center'});
-          showToast('Filled amount for repayment — complete phone & press Pay');
-        }
-      });
-
-      // ===== Transactions (history) =====
-      function renderTransactions(snap) {
-        const tbody = txBody;
-        tbody.innerHTML = '';
-        if(!snap.exists()){ tbody.innerHTML = '<tr><td colspan="5" style="padding:12px">No transactions</td></tr>'; return; }
-        const txsObj = snap.val();
-        const txs = Object.entries(txsObj).map(([id, t]) => ({ id, ...t }));
-        txs.sort((a,b)=> (new Date(b.date||b.ts||b.timestamp).getTime()) - (new Date(a.date||a.ts||a.timestamp).getTime()));
-        const filter = txFilterType.value;
-        txs.forEach(t=>{
-          const isDebit = (t.debit && Number(t.debit)>0) || (t.type && t.type.toLowerCase()==='debit');
-          const isCredit = (t.credit && Number(t.credit)>0) || (t.type && t.type.toLowerCase()==='credit');
-          if(filter === 'debit' && !isDebit) return;
-          if(filter === 'credit' && !isCredit) return;
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td>${new Date(t.date || t.ts || t.timestamp || Date.now()).toLocaleString()}</td>
-            <td>${safeText(t.description || t.details || t.note || '')}</td>
-            <td>${t.debit ? formatKsh(t.debit) : '-'}</td>
-            <td>${t.credit ? formatKsh(t.credit) : '-'}</td>
-            <td>${t.balance ? formatKsh(t.balance) : '-'}</td>
-          `;
-          tbody.appendChild(tr);
-        });
-      }
-      onValue(ref(db, `transactions/${currentUid}`), snap => renderTransactions(snap));
-      txFilterType.addEventListener('change', ()=> get(ref(db, `transactions/${currentUid}`)).then(snap => renderTransactions(snap)));
-      downloadTxBtn.addEventListener('click', async ()=>{
-        const snap = await get(ref(db, `transactions/${currentUid}`));
-        if(!snap.exists()) return alert('No transactions to download');
-        const txs = snap.val();
-        const doc = new jsPDF();
-        doc.setFontSize(12);
-        doc.text('Transactions', 20, 20);
-        let y=40;
-        Object.values(txs).sort((a,b)=> (new Date(b.date||b.ts||0) - new Date(a.date||a.ts||0))).forEach(t=>{
-          const line = `${new Date(t.date||t.ts||Date.now()).toLocaleString()} - ${t.description||''} - D:${t.debit||'-'} C:${t.credit||'-'} Bal:${t.balance||'-'}`;
-          const wrap = doc.splitTextToSize(line, 520);
-          doc.text(wrap, 20, y); y += wrap.length*8;
-          if(y>750){ doc.addPage(); y=40; }
-        });
-        doc.save(`transactions_${currentUid}.pdf`);
-        awardPoints(1, 'Downloaded transactions');
-      });
-
-      // ===== Notifications (members/{uid}/notifications) =====
-      async function renderNotifSnapshot(snap) {
-        notifList.innerHTML = '';
-        if(!snap.exists()){ notifList.innerHTML = '<li class="muted">No notifications</li>'; return; }
-        const obj = snap.val();
-        const items = Object.entries(obj).map(([id, n]) => ({ id, ...n })).sort((a,b)=> (b.timestamp || b.ts || 0) - (a.timestamp || a.ts || 0));
-        items.forEach(item => {
-          const li = document.createElement('li');
-          li.style.padding = '8px';
-          li.style.borderBottom = '1px solid #eef6ee';
-          li.innerHTML = `
-            <div style="display:flex;justify-content:space-between;gap:8px">
-              <div>
-                <strong style="color:${item.read ? '#6b7280' : '#146c2b'}">${safeText(item.title)}</strong><br>
-                <small class="muted">${new Date(item.timestamp || item.ts || Date.now()).toLocaleString()}</small>
-                <div style="margin-top:6px">${safeText(item.message || item.body || '')}</div>
-              </div>
-              <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
-                <button class="btn secondary mark-read" data-id="${item.id}">${item.read ? 'Read' : 'Mark read'}</button>
-              </div>
-            </div>
-          `;
-          notifList.appendChild(li);
-        });
-
-        document.querySelectorAll('.mark-read').forEach(btn => {
-          btn.addEventListener('click', async (e) => {
-            const id = btn.dataset.id;
-            if(!id) return;
-            await update(ref(db, `members/${currentUid}/notifications/${id}`), { read: true });
-            showToast('Marked read');
-            awardPoints(1, 'Read notification');
-          });
-        });
-      }
-      onValue(ref(db, `members/${currentUid}/notifications`), snap => renderNotifSnapshot(snap));
-      markAllReadBtn.addEventListener('click', async ()=>{
-        const s = await get(ref(db, `members/${currentUid}/notifications`));
-        if(!s.exists()) return showToast('No notifications');
-        const updates = {};
-        Object.keys(s.val()).forEach(id => updates[`members/${currentUid}/notifications/${id}/read`] = true);
-        await update(ref(db), updates);
-        showToast('All marked read');
-      });
-
-      // ===== Downloads area (RTDB references & Firebase Storage) =====
-      // Structure used: RTDB node /downloads/{fileId} => { name, storagePath, uploadedAt }
-      onValue(ref(db, `downloads`), async snap => {
-        downloadsList.innerHTML = '';
-        if(!snap.exists()){ downloadsList.innerHTML = '<div class="muted">No downloads available</div>'; return; }
-        const list = document.createElement('div');
-        const files = snap.val();
-        Object.entries(files).forEach(([id, f])=>{
-          const row = document.createElement('div');
-          row.style.display='flex'; row.style.justifyContent='space-between'; row.style.alignItems='center'; row.style.padding='8px'; row.style.borderBottom='1px solid #eef6ee';
-          const name = f.name || id;
-          const storagePath = f.storagePath || `downloads/${id}`;
-          const uploadedAt = f.uploadedAt ? new Date(f.uploadedAt).toLocaleString() : '';
-          row.innerHTML = `<div><strong>${name}</strong><div class="muted" style="font-size:0.85rem">${uploadedAt}</div></div>
-            <div style="display:flex;gap:8px"><button class="btn secondary download-file" data-path="${storagePath}" data-name="${name}">Download</button></div>`;
-          list.appendChild(row);
-        });
-        downloadsList.appendChild(list);
-
-        // attach download handlers
-        document.querySelectorAll('.download-file').forEach(btn => {
-          btn.addEventListener('click', async ()=> {
-            const path = btn.dataset.path;
-            const name = btn.dataset.name;
-            try{
-              const sRef = storageRef(storage, path);
-              const url = await getDownloadURL(sRef);
-              // open in new tab
-              window.open(url, '_blank');
-              awardPoints(1, `Downloaded ${name}`);
-            }catch(err){
-              console.error(err); alert('Failed to download file (check storage path and security rules).');
-            }
-          });
-        });
-      });
-
-      // ===== M-Pesa: STK Push general payment =====
-      mpesaPayBtn.addEventListener('click', async () => {
-        if(!currentUid) return alert('Not signed in');
-        const phone = mpesaPhone.value.trim();
-        const amount = Number(mpesaAmount.value || 0);
-        const account = mpesaAccount.value.trim();
-        if(!phone || !/^\d{9,12}$/.test(phone.replace(/^0/,'').replace(/\D/g,''))) return alert('Enter valid phone (e.g. 07XXXXXXXX)');
-        if(!amount || amount <= 0) return alert('Enter valid amount');
-        showToast('Initiating STK Push…');
+  // downloads list (global downloads node referencing Storage paths)
+  onValue(ref(db, `downloads`), snap => {
+    downloadsList.innerHTML = '';
+    if(!snap.exists()){ downloadsList.innerHTML = '<div class="muted">No downloads</div>'; return; }
+    const files = Object.entries(snap.val());
+    files.forEach(([id,f]) => {
+      const div = document.createElement('div'); div.style.padding='6px'; div.style.borderBottom='1px solid #eef6ee';
+      div.innerHTML = `<div style="display:flex;justify-content:space-between"><div><strong>${safeText(f.name||id)}</strong><div class="muted-small">${f.uploadedAt? new Date(f.uploadedAt).toLocaleString() : ''}</div></div><div><button class="btn secondary dl-btn" data-path="${f.storagePath}" data-name="${f.name||id}">Download</button></div></div>`;
+      downloadsList.appendChild(div);
+    });
+    document.querySelectorAll('.dl-btn').forEach(btn => {
+      btn.addEventListener('click', async ()=> {
+        const path = btn.dataset.path; const name = btn.dataset.name;
         try{
-          const payload = { phone, amount, account, memberId: currentUid, description: account || 'General payment' };
-          const resp = await fetch('https://mpesa-stk-y093.onrender.com/stkpush', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          });
-          const json = await resp.json();
-          const pRef = push(ref(db, `payments/${currentUid}`));
-          await set(pRef, { phone, amount, account, ts: Date.now(), status: json.status || 'requested', response: json });
-          showToast('STK Push requested. Check phone to confirm.');
-          await logActivity(`STK Push requested: Ksh ${amount}`);
-        }catch(err){
-          console.error(err);
-          alert('Failed to send STK Push. See console.');
-        }
-      });
-
-      mpesaLogBtn.addEventListener('click', async ()=>{
-        if(!currentUid) return alert('Not signed in');
-        const phone = mpesaPhone.value.trim();
-        const amount = Number(mpesaAmount.value || 0);
-        const account = mpesaAccount.value.trim();
-        if(!amount || amount <= 0) return alert('Enter amount to log');
-        const pRef = push(ref(db, `payments/${currentUid}`));
-        await set(pRef, { phone, amount, account, ts: Date.now(), status: 'logged' });
-        showToast('Payment logged');
-        logActivity(`Payment logged: Ksh ${amount}`);
-        awardPoints(4, 'Logged payment');
-      });
-
-      // ===== Photo upload =====
-      choosePhotoBtn.addEventListener('click', ()=> photoInput.click());
-      photoInput.addEventListener('change', async (e) => {
-        const file = e.target.files && e.target.files[0];
-        if(!file) return;
-        if(!currentUid) return alert('Not signed in');
-        const path = `downloads/${currentUid}/photo_${Date.now()}`;
-        const sRef = storageRef(storage, path);
-        try{
-          await uploadBytes(sRef, file);
+          const sRef = storageRef(storage, path);
           const url = await getDownloadURL(sRef);
-          await set(ref(db, `members/${currentUid}/photoURL`), url);
-          showToast('Photo uploaded');
-          awardPoints(2, 'Uploaded profile photo');
-
-          // Also add a download reference in /downloads for admins/members
-          const dRef = push(ref(db, `downloads`));
-          await set(dRef, { name: `Profile photo - ${currentUid}`, storagePath: path, uploadedAt: Date.now(), uploadedBy: currentUid });
-        }catch(err){ console.error(err); alert('Photo upload failed'); }
+          window.open(url, '_blank');
+          awardPoints(1, `Downloaded ${name}`);
+        }catch(err){ console.error(err); alert('Download failed (check storage/security).'); }
       });
+    });
+  });
 
-      // ===== Save profile quick (right side) =====
-      saveProfileBtn.addEventListener('click', async ()=>{
-        if(!currentUid) return alert('Not signed in');
-        const payload = {
-          name: document.getElementById('m_name')?.value || miniName.textContent || '',
-          phone: document.getElementById('m_phone')?.value || '',
-          id: document.getElementById('m_id')?.value || '',
-          membershipNumber: document.getElementById('m_membershipNumber')?.value || '',
-          email: document.getElementById('m_email')?.value || '',
-          status: 'Active',
-          updatedAt: Date.now()
-        };
-        await set(ref(db, `members/${currentUid}/profile`), payload);
-        showToast('Profile saved');
-        awardPoints(3, 'Updated profile');
+  // loans list for member (applications)
+  onValue(ref(db, `members/${currentUid}/loans/applications`), snap => {
+    loansListArea.innerHTML = ''; loansListFullArea.innerHTML = '';
+    if(!snap.exists()){ loansListArea.innerHTML = '<div class="muted">No applications yet</div>'; loansListFullArea.innerHTML = ''; return; }
+    const apps = snap.val();
+    const shortList = document.createElement('div');
+    const fullList = document.createElement('div');
+    Object.entries(apps).forEach(([id,app])=>{
+      const short = document.createElement('div'); short.style.padding='8px'; short.style.borderBottom='1px solid #eef6ee';
+      short.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center"><div><strong>${app.memberName||app.name||'(Applicant)'}</strong><div class="muted-small">Amount: ${formatKsh(app.amountFigures || app.amount || 0)} • Status: ${app.status||'Pending'}</div></div><div style="text-align:right"><small>${new Date(app.appliedAt||0).toLocaleString()}</small></div></div>`;
+      shortList.appendChild(short);
+
+      const fullEntry = document.createElement('div'); fullEntry.style.padding='8px'; fullEntry.style.borderBottom='1px solid #eef6ee';
+      const status = app.status || 'Pending';
+      fullEntry.innerHTML = `<div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><div style="flex:1"><div style="font-weight:700">${app.memberName || app.name || '(Applicant)'}</div><div class="muted-small">Amount: ${formatKsh(app.amountFigures || app.amount || 0)} • Applied: ${new Date(app.appliedAt||0).toLocaleString()}</div><div style="margin-top:6px">${safeText(app.purpose||'')}</div></div><div style="min-width:220px;display:flex;flex-direction:column;gap:6px;align-items:flex-end"><select class="status-select" data-app-id="${id}"><option ${status==='Pending'?'selected':''}>Pending</option><option ${status==='Approved'?'selected':''}>Approved</option><option ${status==='Disbursed'?'selected':''}>Disbursed</option><option ${status==='Paid'?'selected':''}>Paid</option><option ${status==='Rejected'?'selected':''}>Rejected</option></select><small class="muted-small">Change status (updates RTDB)</small></div></div>`;
+      fullList.appendChild(fullEntry);
+    });
+    loansListArea.appendChild(shortList);
+    loansListFullArea.appendChild(fullList);
+
+    // attach change listeners
+    document.querySelectorAll('.status-select').forEach(sel => {
+      sel.addEventListener('change', async () => {
+        const appId = sel.dataset.appId;
+        const newStatus = sel.value;
+        try{
+          await set(ref(db, `members/${currentUid}/loans/applications/${appId}/status`), newStatus);
+          showToast('Status updated');
+          logActivity(`Application ${appId} status -> ${newStatus}`);
+          awardPoints(3, 'Updated application status');
+        }catch(err){ console.error(err); alert('Failed to update status'); }
       });
+    });
+  });
 
-      // ===== Loans list & status updates (members/{uid}/loans/applications) =====
-      onValue(ref(db, `members/${currentUid}/loans/applications`), snap => {
-        const area = document.getElementById('loansListArea');
-        const areaFull = document.getElementById('loansListFullInner');
-        area.innerHTML = ''; areaFull.innerHTML = '';
-        if(!snap.exists()){ area.innerHTML = '<div class="muted">No applications found</div>'; return; }
-        const apps = snap.val();
-        Object.entries(apps).forEach(([id, app])=>{
-          const short = document.createElement('div');
-          short.style.padding='8px'; short.style.borderBottom='1px solid #eef6ee';
-          short.innerHTML = `<div style="display:flex;justify-content:space-between"><div><strong>${app.memberName || app.name || '(Applicant)'}</strong><div class="muted">Amount: ${formatKsh(app.amountFigures || app.amount || 0)} • Status: ${app.status||'Pending'}</div></div><div><small>${new Date(app.appliedAt || app.appliedAt || 0).toLocaleString()}</small></div></div>`;
-          area.appendChild(short);
+  // display points
+  const ptsSnap = await get(ref(db, `members/${currentUid}/points`));
+  pointsDisplay.textContent = ptsSnap.exists()? String(ptsSnap.val()||0) : '0';
 
-          const fullEntry = document.createElement('div');
-          fullEntry.style.padding='8px'; fullEntry.style.borderBottom='1px solid #eef6ee';
-          fullEntry.innerHTML = `
-            <div style="display:flex;justify-content:space-between;gap:12px;align-items:center">
-              <div style="flex:1">
-                <div style="font-weight:700">${app.memberName || app.name || '(Applicant)'}</div>
-                <div class="muted" style="font-size:0.9rem">Amount: ${formatKsh(app.amountFigures || app.amount || 0)} • Applied: ${new Date(app.appliedAt || 0).toLocaleString()}</div>
-                <div style="margin-top:6px">${safeText(app.purpose||'')}</div>
-              </div>
-              <div style="min-width:220px;display:flex;flex-direction:column;gap:6px;align-items:flex-end">
-                <select class="status-select" data-app-id="${id}">
-                  <option ${app.status==='Pending'?'selected':''}>Pending</option>
-                  <option ${app.status==='Approved'?'selected':''}>Approved</option>
-                  <option ${app.status==='Disbursed'?'selected':''}>Disbursed</option>
-                  <option ${app.status==='Paid'?'selected':''}>Paid</option>
-                  <option ${app.status==='Rejected'?'selected':''}>Rejected</option>
-                </select>
-                <small class="muted">Change status (updates RTDB)</small>
-              </div>
-            </div>
-          `;
-          areaFull.appendChild(fullEntry);
-        });
+  // transaction listener
+  onValue(ref(db, `transactions/${currentUid}`), snap => {
+    txBody.innerHTML = '';
+    if(!snap.exists()){ txBody.innerHTML = '<tr><td colspan="5">No transactions</td></tr>'; return; }
+    const txs = Object.entries(snap.val()).map(([id,t]) => ({ id, ...t })).sort((a,b)=> (b.date||b.ts||0) - (a.date||a.ts||0));
+    const filter = document.getElementById('txFilterType')?.value || 'all';
+    txs.forEach(t => {
+      const isDebit = (t.debit && Number(t.debit)>0) || (t.type && t.type.toLowerCase()==='debit');
+      const isCredit = (t.credit && Number(t.credit)>0) || (t.type && t.type.toLowerCase()==='credit');
+      if(filter==='debit' && !isDebit) return;
+      if(filter==='credit' && !isCredit) return;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${new Date(t.date||t.ts||Date.now()).toLocaleString()}</td><td>${safeText(t.description||t.details||'')}</td><td>${t.debit? formatKsh(t.debit): '-'}</td><td>${t.credit? formatKsh(t.credit): '-'}</td><td>${t.balance? formatKsh(t.balance) : '-'}</td>`;
+      txBody.appendChild(tr);
+    });
+  });
 
-        // attach change listeners
-        document.querySelectorAll('.status-select').forEach(sel=>{
-          sel.addEventListener('change', async (e)=>{
-            const appId = sel.dataset.appId;
-            const newStatus = sel.value;
-            try{
-              await set(ref(db, `members/${currentUid}/loans/applications/${appId}/status`), newStatus);
-              showToast('Status updated');
-              logActivity(`Application ${appId} status -> ${newStatus}`);
-              awardPoints(3, 'Updated application status');
-            }catch(err){ console.error(err); alert('Failed to update status'); }
-          });
-        });
-      });
+  // goals listener (members can create goals at /goals/{uid})
+  onValue(ref(db, `goals/${currentUid}`), snap => {
+    goalsList.innerHTML = '';
+    if(!snap.exists()){ goalsList.innerHTML = '<div class="muted">No goals</div>'; return; }
+    const goals = Object.entries(snap.val()).map(([id,g])=>({ id, ...g }));
+    goals.forEach(g=>{
+      const percent = Math.min(100, Math.round(((g.progress||0) / (g.targetAmount||1))*100));
+      const div = document.createElement('div'); div.style.padding='8px'; div.style.borderBottom='1px solid #eef6ee';
+      div.innerHTML = `<div><strong>${safeText(g.title)}</strong> <span class="muted-small">(${safeText(g.dueDate||'no due')})</span><div style="margin-top:6px">Target: ${formatKsh(g.targetAmount||0)} • Progress: ${formatKsh(g.progress||0)} • ${percent}%</div><div style="background:#f3fff3;border-radius:8px;margin-top:6px;height:8px"><div style="width:${percent}%;height:100%;background:var(--accent);border-radius:8px"></div></div></div>`;
+      goalsList.appendChild(div);
+    });
+  });
 
-      // ===== Account statement and PDFs =====
-      async function buildAccountStatementPdf(){
-        if(!currentUid) return alert('Not signed in');
-        const snapMember = await get(ref(db, `members/${currentUid}`));
-        const snapshotMonthly = await get(ref(db, `members/${currentUid}/savings/monthly`));
-        const snapshotWeekly = await get(ref(db, `members/${currentUid}/savings/weekly`));
-        const loansSnap = await get(ref(db, `members/${currentUid}/loans`));
-        const sharesSnap = await get(ref(db, `members/${currentUid}/shares`));
-        const txSnap = await get(ref(db, `transactions/${currentUid}`));
+  // discussions
+  onValue(ref(db, `discussions/general`), snap => {
+    discussionList.innerHTML = '';
+    if(!snap.exists()){ discussionList.innerHTML = '<div class="muted">No discussion posts</div>'; return; }
+    const posts = Object.entries(snap.val()).map(([id,p])=>({ id, ...p })).sort((a,b)=> (b.ts||0)-(a.ts||0));
+    posts.forEach(p=>{
+      const div = document.createElement('div'); div.style.padding='8px'; div.style.borderBottom='1px solid #eef6ee';
+      div.innerHTML = `<div><strong>${safeText(p.authorName||p.author||'Member')}</strong> <small class="muted-small">${new Date(p.ts||0).toLocaleString()}</small><div style="margin-top:6px">${safeText(p.text)}</div></div>`;
+      discussionList.appendChild(div);
+    });
+  });
 
-        const doc = new jsPDF({unit:'pt', format:'a4'});
-        let left = 36, y = 40;
-        doc.setFillColor(46,125,50); doc.rect(0,0,595,56,'F');
-        doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(16);
-        doc.text('ACCOUNT STATEMENT', 300, 36, {align:'center'});
-        doc.setTextColor(0,0,0);
-        y = 80;
-        const profile = snapMember.exists() && snapMember.val().profile ? snapMember.val().profile : (snapMember.exists()? snapMember.val().profile : {});
-        doc.setFontSize(10); doc.setFont('helvetica','normal');
-        doc.text(`Member: ${profile.name || profile.fullName || topEmail.textContent}`, left, y); y+=12;
-        doc.text(`Email: ${topEmail.textContent}`, left, y); y+=12;
-        doc.text(`Date: ${new Date().toLocaleDateString()}`, left, y); y+=18;
+  // support chat
+  onValue(ref(db, `support/general/messages`), snap => {
+    chatList.innerHTML = '';
+    if(!snap.exists()){ chatList.innerHTML = '<div class="muted">No messages</div>'; return; }
+    const msgs = Object.entries(snap.val()).map(([id,m])=>({ id, ...m })).sort((a,b)=> (a.ts||0)-(b.ts||0));
+    msgs.forEach(m=>{
+      const div = document.createElement('div'); div.style.padding='6px'; div.style.borderBottom='1px solid #eef6ee';
+      div.innerHTML = `<div><strong>${safeText(m.senderName||m.sender)}</strong> <small class="muted-small">${new Date(m.ts||0).toLocaleTimeString()}</small><div style="margin-top:6px">${safeText(m.text)}</div></div>`;
+      chatList.appendChild(div);
+    });
+  });
 
-        function calcSnap(snap){ if(!snap.exists()) return 0; const val = snap.val(); if(typeof val === 'number' || typeof val === 'string') return Number(val)||0; let total = 0; Object.values(val).forEach(child=>{ if(child && typeof child === 'object' && ('amount' in child)) total += Number(child.amount||0); else if(typeof child === 'number') total += child; }); return total; }
-        const monthly = calcSnap(snapshotMonthly);
-        const weekly = calcSnap(snapshotWeekly);
-        const shares = sharesSnap.exists()? (sharesSnap.val().total || sharesSnap.val() || 0) : 0;
-        const dividends = sharesSnap.exists()? (sharesSnap.val().dividends || 0) : 0;
+  // referral code display
+  onValue(ref(db, `referrals/${currentUid}`), snap => {
+    if(!snap.exists()){ refCodeEl.textContent = '—'; return; }
+    const profile = snap.val().profile || {};
+    const code = profile.code || (profile.email? profile.email.split('@')[0] : currentUid.slice(0,6));
+    refCodeEl.textContent = code;
+  });
 
-        let totalLoans = 0, unpaid = 0, appsList = [];
-        if(loansSnap.exists()){
-          const loansObj = loansSnap.val();
-          if(loansObj.summary){
-            totalLoans = loansObj.summary.total || 0; unpaid = loansObj.summary.unpaid || 0;
-          } else {
-            Object.values(loansObj).forEach(v=>{
-              if(v && typeof v === 'object' && v.amountFigures) { totalLoans += Number(v.amountFigures||0); if((v.status||'').toLowerCase() !== 'paid') unpaid += Number(v.amountFigures||0); appsList.push(v); }
-            });
-          }
-        }
+  // Build a savings trend chart from transactions
+  function buildSavingsChart(transactions){
+    const ctx = document.getElementById('savingsChart')?.getContext('2d');
+    if(!ctx) return;
+    const txs = transactions.slice().sort((a,b)=> (a.date||a.ts||0) - (b.date||b.ts||0));
+    let running = 0; const labels=[], data=[];
+    txs.forEach(t=>{ running += Number(t.credit||0) - Number(t.debit||0); labels.push(new Date(t.date||t.ts||Date.now()).toLocaleDateString()); data.push(running); });
+    if(window.savingsChart) window.savingsChart.destroy();
+    window.savingsChart = new Chart(ctx, { type:'line', data:{ labels, datasets:[{ label:'Balance', data, fill:true, tension:0.2 }] }, options:{ responsive:true, maintainAspectRatio:false } });
+  }
+  // build chart when transactions update
+  onValue(ref(db, `transactions/${currentUid}`), snap => {
+    if(!snap.exists()){ buildSavingsChart([]); return; }
+    const txs = Object.values(snap.val());
+    buildSavingsChart(txs);
+  });
 
-        doc.setFont('helvetica','bold'); doc.text('Financial Summary', left, y); y+=14;
-        doc.setFont('helvetica','normal');
-        doc.text(`Weekly Savings: ${formatKsh(weekly)}`, left, y); y+=12;
-        doc.text(`Monthly Savings: ${formatKsh(monthly)}`, left, y); y+=12;
-        doc.text(`Shares: ${formatKsh(shares)}`, left, y); y+=12;
-        doc.text(`Dividends: ${formatKsh(dividends)}`, left, y); y+=12;
-        doc.text(`Total Loans: ${formatKsh(totalLoans)}`, left, y); y+=12;
-        doc.text(`Unpaid Balances: ${formatKsh(unpaid)}`, left, y); y+=18;
-
-        if(txSnap.exists()){
-          doc.setFont('helvetica','bold'); doc.text('Recent Transactions', left, y); y+=14;
-          doc.setFont('helvetica','normal');
-          const txs = Object.values(txSnap.val()).sort((a,b)=> (new Date(b.date||b.ts||0) - new Date(a.date||a.ts||0))).slice(0,20);
-          txs.forEach(t=>{
-            const line = `${new Date(t.date||t.ts||Date.now()).toLocaleDateString()} — ${t.description || t.details || ''} — D:${t.debit||'-'} C:${t.credit||'-'} Bal:${t.balance||'-'}`;
-            const wr = doc.splitTextToSize(line, 500); doc.text(wr,left,y); y += wr.length*12;
-            if(y>720){ doc.addPage(); y=40; }
-          });
-        }
-
-        if(y > 700){ doc.addPage(); y=40; }
-        doc.line(left, y+20, left+240, y+20); doc.text('Prepared by / Signature', left, y+34);
-        return doc;
+  // ------- FILE / KYC UPLOADS -------
+  document.getElementById('uploadKycBtn')?.addEventListener('click', async () => {
+    if(!currentUid) return alert('Sign in required');
+    const idFile = document.getElementById('kycIdUpload').files[0];
+    const proofFile = document.getElementById('kycProofUpload').files[0];
+    if(!idFile && !proofFile) return alert('Select at least one file');
+    try{
+      if(idFile){
+        const path = `downloads/${currentUid}/kyc_id_${Date.now()}`;
+        const sRef = storageRef(storage, path);
+        await uploadBytes(sRef, idFile);
+        const url = await getDownloadURL(sRef);
+        const r = push(ref(db, `members/${currentUid}/kyc`));
+        await set(r, { type:'id', url, storagePath: path, uploadedAt: Date.now(), status:'pending' });
       }
+      if(proofFile){
+        const path = `downloads/${currentUid}/kyc_proof_${Date.now()}`;
+        const sRef = storageRef(storage, path);
+        await uploadBytes(sRef, proofFile);
+        const url = await getDownloadURL(sRef);
+        const r = push(ref(db, `members/${currentUid}/kyc`));
+        await set(r, { type:'proof', url, storagePath: path, uploadedAt: Date.now(), status:'pending' });
+      }
+      showToast('KYC files uploaded. Awaiting verification.');
+      await set(ref(db, `members/${currentUid}/profile/kycStatus`), 'pending');
+      awardPoints(2, 'Uploaded KYC');
+    }catch(err){ console.error(err); alert('KYC upload failed'); }
+  });
 
-      document.getElementById('downloadStatementTop')?.addEventListener('click', async ()=>{ const d = await buildAccountStatementPdf(); d.save(`Account_Statement_${(topEmail.textContent||'member').replace(/[^\w@.-]/g,'')}.pdf`); awardPoints(1, 'Downloaded account statement'); });
-      document.getElementById('downloadStatement')?.addEventListener('click', async ()=>{ const d = await buildAccountStatementPdf(); d.save(`Account_Statement_${(topEmail.textContent||'member').replace(/[^\w@.-]/g,'')}.pdf`); awardPoints(2, 'Downloaded account statement'); });
-      document.getElementById('downloadApplications')?.addEventListener('click', async ()=>{
-        if(!currentUid) return alert('Not signed in');
-        const snap = await get(ref(db, `members/${currentUid}/loans/applications`));
-        if(!snap.exists()) return alert('No applications found');
-        const apps = snap.val();
-        const doc = new jsPDF({unit:'pt',format:'a4'}); let y=40; const left=36;
-        doc.setFontSize(16); doc.text('Loan Applications',300,y,{align:'center'}); y+=20;
-        doc.setFontSize(10);
-        for(const [id,app] of Object.entries(apps)){
-          const title = `${app.memberName || app.name || ''} — ${formatKsh(app.amountFigures || 0)} — ${app.status||''}`;
-          const wrapped = doc.splitTextToSize(title, 520);
-          doc.text(wrapped, left, y); y += wrapped.length * 12;
-          const details = [
-            `Applied: ${new Date(app.appliedAt || 0).toLocaleString()}`,
-            `Purpose: ${app.purpose || ''}`,
-            `Guarantors: ${ (app.guarantors || []).map(g=>g.name).filter(Boolean).join('; ') }`
-          ];
-          details.forEach(d => { const w = doc.splitTextToSize(d,520); doc.text(w, left+8, y); y += w.length * 12; });
-          y += 8;
-          if(y > 720){ doc.addPage(); y=40; }
-        }
-        doc.save(`Loan_Applications_${(topEmail.textContent||'member').replace(/[^\w@.-]/g,'')}.pdf`);
-        awardPoints(2, 'Downloaded applications PDF');
+  document.getElementById('viewKycBtn')?.addEventListener('click', async () => {
+    const s = await get(ref(db, `members/${currentUid}/kyc`));
+    if(!s.exists()){ document.getElementById('kycStatus').textContent = 'Status: No documents uploaded'; return; }
+    const items = Object.values(s.val());
+    const statuses = items.map(i => i.status || 'pending');
+    const final = statuses.includes('rejected') ? 'rejected' : (statuses.includes('pending') ? 'pending' : 'approved');
+    document.getElementById('kycStatus').textContent = `Status: ${final}`;
+  });
+
+  // Post discussion
+  document.getElementById('postDiscussion')?.addEventListener('click', async ()=>{
+    if(!currentUid) return alert('Sign in');
+    const text = document.getElementById('discussionMsg').value.trim();
+    if(!text) return alert('Enter message');
+    const p = push(ref(db, `discussions/general`));
+    const profile = (await get(ref(db, `members/${currentUid}/profile`))).val() || {};
+    await set(p, { text, author: currentUid, authorName: profile.name || profile.fullName || (topEmail.textContent||''), ts: Date.now() });
+    document.getElementById('discussionMsg').value = '';
+    awardPoints(2, 'Posted discussion');
+  });
+
+  // Send chat
+  document.getElementById('sendChat')?.addEventListener('click', async ()=>{
+    if(!currentUid) return alert('Sign in');
+    const text = document.getElementById('chatInput').value.trim();
+    if(!text) return alert('Enter message');
+    const p = push(ref(db, `support/general/messages`));
+    const profile = (await get(ref(db, `members/${currentUid}/profile`))).val() || {};
+    await set(p, { text, sender: currentUid, senderName: profile.name || profile.fullName || (topEmail.textContent||''), ts: Date.now() });
+    document.getElementById('chatInput').value = '';
+    awardPoints(1, 'Sent support message');
+  });
+
+  // Referrals
+  document.getElementById('copyRef')?.addEventListener('click', ()=>{
+    const v = document.getElementById('refCode').textContent;
+    navigator.clipboard.writeText(v).then(()=> showToast('Referral code copied'));
+  });
+  document.getElementById('viewReferrals')?.addEventListener('click', async ()=>{
+    if(!currentUid) return alert('Sign in');
+    const s = await get(ref(db, `referrals/${currentUid}/list`));
+    if(!s.exists()) return alert('No referrals');
+    const arr = Object.values(s.val());
+    alert(`Referrals:\n${arr.map(a=> `${a.name||a.email||a}`).join('\n')}`);
+  });
+
+  // Download transactions to PDF
+  document.getElementById('downloadTxBtn')?.addEventListener('click', async ()=>{
+    if(!currentUid) return alert('Sign in');
+    const s = await get(ref(db, `transactions/${currentUid}`));
+    if(!s.exists()) return alert('No transactions');
+    const txs = Object.values(s.val()).sort((a,b)=> (b.date||b.ts||0)-(a.date||a.ts||0));
+    const doc = new jsPDF(); doc.setFontSize(12); doc.text('Transactions', 20, 20); let y=40;
+    txs.forEach(t=>{
+      const line = `${new Date(t.date||t.ts||Date.now()).toLocaleString()} - ${t.description||''} - D:${t.debit||'-'} C:${t.credit||'-'} Bal:${t.balance||'-'}`;
+      const wrap = doc.splitTextToSize(line, 520);
+      doc.text(wrap, 20, y); y += wrap.length*8;
+      if(y>760){ doc.addPage(); y=40; }
+    });
+    doc.save(`transactions_${currentUid}.pdf`); awardPoints(1, 'Downloaded transactions');
+  });
+
+  // MPESA STK push (client-side trigger to your server)
+  document.getElementById('mpesaPayBtn')?.addEventListener('click', async ()=>{
+    if(!currentUid) return alert('Sign in');
+    const phone = document.getElementById('mpesaPhone').value.trim();
+    const amount = Number(document.getElementById('mpesaAmount').value || 0);
+    const account = document.getElementById('mpesaAccount').value.trim();
+    if(!phone || !amount) return alert('Phone and amount required');
+    showToast('Requesting STK Push...');
+    try{
+      const payload = { phone, amount, account, memberId: currentUid };
+      // IMPORTANT: replace URL with your server endpoint that holds M-Pesa credentials
+      const resp = await fetch('https://mpesa-stk-y093.onrender.com/stkpush', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
       });
+      const json = await resp.json();
+      const p = push(ref(db, `payments/${currentUid}`));
+      await set(p, { phone, amount, account, ts: Date.now(), status: json.status || 'REQUESTED', response: json });
+      showToast('STK push requested. Confirm on your phone.');
+      await logActivity(`STK push requested (${amount})`);
+    }catch(err){ console.error(err); alert('STK request failed'); }
+  });
 
-      // initial small activity
-      await logActivity('Dashboard loaded');
-    }); // end onAuthStateChanged
+  // Manual MPESA log
+  document.getElementById('mpesaLogBtn')?.addEventListener('click', async ()=>{
+    if(!currentUid) return alert('Sign in');
+    const phone = document.getElementById('mpesaPhone').value.trim();
+    const amount = Number(document.getElementById('mpesaAmount').value || 0);
+    const account = document.getElementById('mpesaAccount').value.trim();
+    if(!amount) return alert('Enter amount');
+    const p = push(ref(db, `payments/${currentUid}`));
+    await set(p, { phone, amount, account, ts: Date.now(), status: 'LOGGED' });
+    showToast('Payment logged (manual)');
+    awardPoints(3, 'Logged payment');
+  });
 
-    // logout via menu
-    document.getElementById('menuLogout')?.addEventListener('click', ()=> { try{ signOut(auth); }catch(e){} window.location.href='index.html'; });
+  // Mark all notifications read
+  document.getElementById('markAllRead')?.addEventListener('click', async ()=>{
+    const s = await get(ref(db, `members/${currentUid}/notifications`));
+    if(!s.exists()) return showToast('No notifications');
+    const updates = {};
+    Object.keys(s.val()).forEach(k => updates[`members/${currentUid}/notifications/${k}/read`] = true);
+    await update(ref(db), updates);
+    showToast('All marked read');
+  });
 
-    // Small nav helpers
-    document.getElementById('quickApply')?.addEventListener('click', ()=> document.getElementById('forms-section')?.scrollIntoView({behavior:'smooth'}));
-    document.getElementById('quickStatement')?.addEventListener('click', async ()=> { const d = await (typeof buildAccountStatementPdf === 'function' ? buildAccountStatementPdf() : null); if(d) { d.save(`Account_Statement_${(topEmail.textContent||'member').replace(/[^\w@.-]/g,'')}.pdf`); awardPoints(1,'Downloaded statement'); } });
+  // ADMIN actions (client triggers — should be server/cloud function)
+  document.getElementById('broadcastBtn')?.addEventListener('click', async ()=>{
+    if(!isAdmin) return alert('Admin only');
+    const title = prompt('Notification title'); if(!title) return;
+    const message = prompt('Message'); if(!message) return;
+    const aRef = push(ref(db, `announcements`));
+    await set(aRef, { title, message, ts: Date.now(), by: currentUid });
+    // Fan-out to members (note: large fan-outs should be handled by Cloud Functions)
+    const membersSnap = await get(ref(db, `members`));
+    if(membersSnap.exists()){
+      Object.keys(membersSnap.val()).forEach(uid => {
+        const n = push(ref(db, `members/${uid}/notifications`));
+        set(n, { title, message, timestamp: Date.now(), read: false });
+      });
+    }
+    adminLog.innerHTML += `<div>${new Date().toLocaleString()} - Broadcast "${title}"</div>`;
+    showToast('Broadcast sent');
+  });
 
-    // ===== Additional Recommendations (console and in-file comments) =====
-    console.info('Recommendations:');
-    console.info('1) Secure RTDB rules: allow read/write only to authenticated and authorized users (members/{uid} => auth.uid == uid).');
-    console.info('2) Move STK credentials to server-side; server should call M-Pesa and not expose secrets to client.');
-    console.info('3) Handle M-Pesa callback on server: update /payments/{memberId}/{paymentId} with final status.');
-    console.info('4) Consider server-side PDF generation for officially signed statements if needed.');
-    console.info('5) Add input validation & rate limiting on server endpoints (prevent duplicate STK pushes).');
+  // Dividend distribution (demo algorithm)
+  document.getElementById('dividendBtn')?.addEventListener('click', async ()=>{
+    if(!isAdmin) return alert('Admin only');
+    const pool = Number(prompt('Enter total dividend pool (Ksh)') || 0);
+    if(!pool || pool<=0) return;
+    const membersSnap = await get(ref(db, `members`));
+    if(!membersSnap.exists()) return alert('No members found');
+    // calculate total shares
+    let totalShares = 0;
+    const members = membersSnap.val();
+    Object.keys(members).forEach(uid => { const s = members[uid].shares && members[uid].shares.total? Number(members[uid].shares.total) : 0; totalShares += s; });
+    if(totalShares <= 0) return alert('Total shares zero');
+    const distRef = push(ref(db, 'dividends/distributions'));
+    await set(distRef, { pool, ts: Date.now(), totalShares });
+    Object.keys(members).forEach(async uid => {
+      const memberShares = members[uid].shares && members[uid].shares.total? Number(members[uid].shares.total) : 0;
+      const shareAmount = (memberShares / totalShares) * pool;
+      const d = push(ref(db, `dividends/${uid}`));
+      await set(d, { amount: shareAmount, source: 'distribution', ts: Date.now() });
+      const currentDivSnap = await get(ref(db, `members/${uid}/shares/dividends`));
+      const newDiv = (currentDivSnap.exists()? Number(currentDivSnap.val()||0):0) + shareAmount;
+      await set(ref(db, `members/${uid}/shares/dividends`), newDiv);
+    });
+    showToast('Dividends distributed (example)');
+    adminLog.innerHTML += `<div>${new Date().toLocaleString()} - Dividend distributed Ksh ${pool}</div>`;
+  });
 
-  </script>
+  // Export report CSV
+  document.getElementById('exportReportBtn')?.addEventListener('click', async ()=>{
+    if(!isAdmin) return alert('Admin only');
+    const month = prompt('Enter month (YYYY-MM) e.g., 2025-11'); if(!month) return;
+    const membersSnap = await get(ref(db, 'members'));
+    const lines = [['Member','Email','Total Shares','Dividends']];
+    if(membersSnap.exists()){
+      const mems = membersSnap.val();
+      for(const [uid,m] of Object.entries(mems)){
+        lines.push([m.profile?.name || uid, m.profile?.email || '-', m.shares?.total || 0, m.shares?.dividends || 0]);
+      }
+    }
+    const csv = lines.map(r => r.map(c=> `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type:'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = `report_${month}.csv`; a.click(); URL.revokeObjectURL(url);
+    showToast('Report exported');
+  });
+
+  // Save profile (profile area)
+  document.getElementById('saveProfile')?.addEventListener('click', async ()=>{
+    if(!currentUid) return alert('Not authenticated');
+    if(profileSavedOnce){ showToast('Profile already updated in this session'); return; }
+    const payload = {
+      name: document.getElementById('profile_fullName').value,
+      phone: document.getElementById('profile_phone').value,
+      id: document.getElementById('profile_id').value,
+      yearJoined: document.getElementById('profile_yearJoined').value,
+      dob: document.getElementById('profile_dob').value,
+      status: 'Active'
+    };
+    await set(ref(db, `members/${currentUid}/profile`), payload);
+    profileSavedOnce = true;
+    showToast('Profile updated');
+    awardPoints(3, 'Updated profile');
+  });
+
+  // Photo upload
+  const photoInput = document.getElementById('photoUploadInput');
+  document.getElementById('choosePhotoBtn')?.addEventListener('click', ()=> photoInput.click());
+  photoInput?.addEventListener('change', async (e)=>{
+    const file = e.target.files && e.target.files[0];
+    if(!file) return;
+    if(!currentUid) return alert('Not signed in');
+    const path = `members/${currentUid}/photo_${Date.now()}`;
+    const sRef = storageRef(storage, path);
+    try{
+      await uploadBytes(sRef, file);
+      const url = await getDownloadURL(sRef);
+      await set(ref(db, `members/${currentUid}/photoURL`), url);
+      topAvatar.innerHTML = `<img src="${url}" alt="avatar">`;
+      showToast('Photo uploaded');
+      awardPoints(2, 'Uploaded profile photo');
+    }catch(err){ console.error(err); alert('Photo upload failed'); }
+  });
+
+  // Wizard navigation (loan/membership/guarantors)
+  const wizardSteps = document.querySelectorAll('.wizard-step');
+  const stepIndicators = document.querySelectorAll('.wizard-step-indicator');
+  let currentStep = 1;
+  function showStep(n){
+    wizardSteps.forEach(s => s.classList.remove('active'));
+    document.querySelector(`.wizard-step[data-step="${n}"]`)?.classList.add('active');
+    stepIndicators.forEach(si => si.classList.remove('active'));
+    document.querySelector(`.wizard-step-indicator[data-step="${n}"]`)?.classList.add('active');
+    currentStep = n;
+    window.scrollTo({ top: 200, behavior: 'smooth' });
+  }
+  document.getElementById('wizardNext1')?.addEventListener('click', ()=> showStep(2));
+  document.getElementById('wizardPrev2')?.addEventListener('click', ()=> showStep(1));
+  document.getElementById('wizardNext2')?.addEventListener('click', ()=> showStep(3));
+
+  // Preview loan PDF
+  document.getElementById('previewLoanPdf')?.addEventListener('click', (e)=>{
+    e.preventDefault();
+    const form = document.getElementById('wizardForm');
+    const data = Object.fromEntries(new FormData(form).entries());
+    const doc = buildLoanPdfDoc(data, { preview:true });
+    doc.save(`Loan_Application_PREVIEW.pdf`);
+    awardPoints(1, 'Previewed loan PDF');
+  });
+
+  // Submit loan (writes to RTDB and generates PDF)
+  document.getElementById('wizardForm')?.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    if(!currentUid) return alert('Not authenticated');
+    const agree = document.getElementById('agreeTerms');
+    if(!agree || !agree.checked) return alert('Please agree to the terms');
+    const formData = new FormData(document.getElementById('wizardForm'));
+    const data = Object.fromEntries(formData.entries());
+    const guarantors = [];
+    for(let i=1;i<=3;i++){
+      guarantors.push({ mno: data[`g_mno_${i}`]||'', name: data[`g_name_${i}`]||'', phone: data[`g_phone_${i}`]||'', id: data[`g_id_${i}`]||'', group: data[`g_group_${i}`]||'', amount: data[`g_amount_${i}`]||'' });
+    }
+    data.guarantors = guarantors;
+    data.appliedAt = Date.now();
+    data.status = 'Pending';
+    try{
+      const appRef = push(ref(db, `members/${currentUid}/loans/applications`));
+      const appId = appRef.key;
+      await set(appRef, data);
+      showToast('Application saved — downloading PDF');
+      awardPoints(2, 'Submitted loan application');
+      const doc = buildLoanPdfDoc(data, { id: appId });
+      doc.save(`Loan_Application_${(data.memberName || data.name || currentUid).replace(/\s+/g,'_')}_${appId}.pdf`);
+    }catch(err){
+      console.error(err);
+      alert('Failed to save application to DB. PDF will be generated locally.');
+      const doc = buildLoanPdfDoc(data, {});
+      doc.save(`Loan_Application_${(data.memberName || data.name || currentUid).replace(/\s+/g,'_')}.pdf`);
+    }
+  });
+
+  // Loan PDF builder (modern)
+  function buildLoanPdfDoc(data, opts={}){
+    const doc = new jsPDF({ unit:'pt', format:'a4' });
+    let y = 40, left = 36;
+    doc.setFillColor(46,125,50); doc.rect(0,0,595,60,'F');
+    doc.setFont('helvetica','bold'); doc.setTextColor(255,255,255); doc.setFontSize(16);
+    doc.text('VISIONARY YOUTH GROUP', 300, 36, { align:'center' });
+    doc.setTextColor(0,0,0);
+    doc.setFontSize(12); doc.setFont('helvetica','bold');
+    doc.text('LOAN APPLICATION FORM', 300, 80, { align:'center' });
+    y = 110;
+    doc.setFontSize(10); doc.setFont('helvetica','normal');
+    const info = [
+      `Self-help group: ${data.selfHelpGroup||document.getElementById('groupNameDisplay')?.textContent||''}`,
+      `Name: ${data.memberName||''}`,
+      `Membership No: ${data.membershipNumber||''}`,
+      `National ID: ${data.nationalId||''}`,
+      `Marital Status: ${data.maritalStatus||''} • DOB: ${data.dob||''}`,
+      `County/Town: ${data.county||''} / ${data.town||''}`,
+      `Address: ${data.currentAddress||''}`,
+      `Phone: ${data.phone||''} • Email: ${data.email||''}`
+    ];
+    info.forEach(line => { const wrap = doc.splitTextToSize(line, 520); doc.text(wrap, left, y); y += wrap.length*12; });
+    y += 6;
+    doc.setFont('helvetica','bold'); doc.text('LOAN DETAILS', left, y); y += 12;
+    doc.setFont('helvetica','normal'); const loanLines = [`Amount: Ksh ${data.amountFigures||''} (${data.amountWords||''})`, `Purpose: ${data.purpose||''}`, `Repayable (months): ${data.repayableMonths||''}`];
+    loanLines.forEach(line => { const wr = doc.splitTextToSize(line,520); doc.text(wr,left,y); y += wr.length*12; });
+    y += 8;
+    doc.setFont('helvetica','bold'); doc.text('GUARANTORS', left, y); y += 10; doc.setFontSize(9);
+    const guars = data.guarantors || [];
+    guars.forEach(g => { const row = `${g.mno||''} • ${g.name||''} • ${g.phone||''} • ID:${g.id||''} • ${g.group||''} • Ksh ${g.amount||''}`; const wr = doc.splitTextToSize(row,520); doc.text(wr,left,y); y += wr.length*12; if(y>720){ doc.addPage(); y=40; } });
+    y += 8;
+    doc.setFontSize(9); const terms = (data.terms||'').trim() || 'Applicant confirms they have read and agree to terms described in the system.'; const tw = doc.splitTextToSize(terms,520); doc.text(tw,left,y); y += tw.length*12;
+    if(y>700){ doc.addPage(); y=40; }
+    doc.setFont('helvetica','bold'); doc.text('Applicant Signature: ______________________   Date: ___________', left, y);
+    const pageCount = doc.getNumberOfPages();
+    for(let i=1;i<=pageCount;i++){ doc.setPage(i); doc.setFontSize(8); doc.setTextColor(120); doc.text(`Visionary Youth Group • Official Loan Application • Page ${i} of ${pageCount}`, 300, 820, { align:'center' }); }
+    return doc;
+  }
+
+  // Withdraw PDF
+  document.getElementById('previewWithdrawPdf')?.addEventListener('click', (e)=>{
+    e.preventDefault();
+    const fd = Object.fromEntries(new FormData(document.getElementById('withdrawForm')).entries());
+    const doc = buildWithdrawPdfDoc(fd);
+    doc.save('Withdrawal_PREVIEW.pdf');
+    awardPoints(2, 'Previewed withdrawal PDF');
+  });
+  document.getElementById('withdrawForm')?.addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const fd = Object.fromEntries(new FormData(document.getElementById('withdrawForm')).entries());
+    const doc = buildWithdrawPdfDoc(fd);
+    doc.save(`Withdrawal_${(fd.memberNameW||'Member').replace(/\s+/g,'_')}.pdf`);
+    awardPoints(6, 'Submitted withdrawal');
+  });
+
+  function buildWithdrawPdfDoc(data, opts={}){
+    const doc = new jsPDF({ unit:'pt', format:'a4' });
+    let y = 50, left = 40;
+    doc.setFillColor(46,125,50); doc.rect(0,0,595,56,'F');
+    doc.setFont('helvetica','bold'); doc.setTextColor(255,255,255); doc.setFontSize(14);
+    doc.text('VOLUNTARY WITHDRAWABLE SAVINGS FORM', 300, 36, { align:'center' });
+    doc.setTextColor(0,0,0);
+    y = 80;
+    doc.setFont('helvetica','bold'); doc.text('Member Information', left, y); y += 14;
+    doc.setFont('helvetica','normal'); const lines = [`Name: ${data.memberNameW||''}`, `Membership Number: ${data.membershipNumberW||''}`, `ID/Passport: ${data.idNumberW||''}`, `Phone: ${data.phoneW||''}`, `Amount in figures: Ksh ${data.amountFiguresW||''}`, `Amount in words: ${data.amountWordsW||''}`, `Reason: ${data.reasonW||''}`];
+    lines.forEach(line => { const wrap = doc.splitTextToSize(line,520); doc.text(wrap,left,y); y += wrap.length*14; });
+    y += 18;
+    doc.setFont('helvetica','bold'); doc.text('Member Signature: ________________________   Date: ____________', left, y);
+    doc.setFontSize(8); doc.setTextColor(120);
+    doc.text(`Visionary Youth Group • Voluntary Withdrawal Form`, 300, 820, { align:'center' });
+    return doc;
+  }
+
+  // Download account statement buttons
+  async function buildAccountStatementPdf(){
+    if(!currentUid) return alert('Not signed in');
+    const snapMember = await get(ref(db, `members/${currentUid}`));
+    const snapshotMonthly = await get(ref(db, `members/${currentUid}/savings/monthly`));
+    const snapshotWeekly = await get(ref(db, `members/${currentUid}/savings/weekly`));
+    const loansSnap = await get(ref(db, `members/${currentUid}/loans`));
+    const sharesSnap = await get(ref(db, `members/${currentUid}/shares`));
+    const doc = new jsPDF({ unit:'pt', format:'a4' });
+    let left = 36, y = 40;
+    doc.setFillColor(46,125,50); doc.rect(0,0,595,56,'F');
+    doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(16);
+    doc.text('ACCOUNT STATEMENT', 300, 36, { align:'center' });
+    doc.setTextColor(0,0,0);
+    y = 80;
+    const profile = snapMember.exists() && snapMember.val().profile ? snapMember.val().profile : {};
+    doc.setFontSize(10); doc.setFont('helvetica','normal');
+    doc.text(`Member: ${profile.name || profile.fullName || topEmail.textContent}`, left, y); y += 12;
+    doc.text(`Email: ${topEmail.textContent}`, left, y); y += 12;
+    doc.text(`Date: ${new Date().toLocaleDateString()}`, left, y); y += 18;
+    function calcSnap(snap){ if(!snap.exists()) return 0; const val = snap.val(); if(typeof val === 'number' || typeof val === 'string') return Number(val)||0; let total = 0; Object.values(val).forEach(child=>{ if(child && typeof child==='object' && ('amount' in child)) total += Number(child.amount||0); else if(typeof child === 'number') total += child; }); return total; }
+    const monthly = calcSnap(snapshotMonthly);
+    const weekly = calcSnap(snapshotWeekly);
+    const shares = sharesSnap.exists()? (sharesSnap.val().total || sharesSnap.val() || 0) : 0;
+    const dividends = sharesSnap.exists()? (sharesSnap.val().dividends || 0) : 0;
+    let totalLoans = 0, unpaid = 0, appsList = [];
+    if(loansSnap.exists()){
+      const loansObj = loansSnap.val();
+      if(loansObj.summary){ totalLoans = loansObj.summary.total || 0; unpaid = loansObj.summary.unpaid || 0; }
+      else { Object.values(loansObj).forEach(v=>{ if(v && typeof v === 'object' && v.amountFigures) { totalLoans += Number(v.amountFigures||0); if((v.status||'').toLowerCase() !== 'paid') unpaid += Number(v.amountFigures||0); appsList.push(v); } }); }
+    }
+    doc.setFont('helvetica','bold'); doc.text('Financial Summary', left, y); y += 14;
+    doc.setFont('helvetica','normal');
+    doc.text(`Weekly Savings: ${formatKsh(weekly)}`, left, y); y += 12;
+    doc.text(`Monthly Savings: ${formatKsh(monthly)}`, left, y); y += 12;
+    doc.text(`Shares: ${formatKsh(shares)}`, left, y); y += 12;
+    doc.text(`Dividends: ${formatKsh(dividends)}`, left, y); y += 12;
+    doc.text(`Total Loans: ${formatKsh(totalLoans)}`, left, y); y += 12;
+    doc.text(`Unpaid Balances: ${formatKsh(unpaid)}`, left, y); y += 18;
+    if(appsList.length){ doc.setFont('helvetica','bold'); doc.text('Loan Applications (recent)', left, y); y += 14; doc.setFont('helvetica','normal'); appsList.slice(-10).forEach(app=>{ const line = `${app.memberName || app.name || ''} — ${formatKsh(app.amountFigures || 0)} — ${app.status || 'Pending'}`; const wr = doc.splitTextToSize(line, 500); doc.text(wr,left,y); y += wr.length*12; if(y>720){ doc.addPage(); y=40; } }); y += 8; }
+    if(y > 700){ doc.addPage(); y = 40; }
+    doc.line(left, y+20, left+240, y+20); doc.text('Prepared by / Signature', left, y+34);
+    return doc;
+  }
+
+  // Statement buttons
+  document.getElementById('downloadStatementTop')?.addEventListener('click', async ()=>{
+    const doc = await buildAccountStatementPdf();
+    doc.save(`Account_Statement_${(topEmail.textContent||'member').replace(/[^\w@.-]/g,'')}.pdf`);
+    awardPoints(1, 'Downloaded account statement');
+  });
+  document.getElementById('downloadStatement')?.addEventListener('click', async ()=>{
+    const doc = await buildAccountStatementPdf();
+    doc.save(`Account_Statement_${(topEmail.textContent||'member').replace(/[^\w@.-]/g,'')}.pdf`);
+    awardPoints(2, 'Downloaded account statement');
+  });
+  document.getElementById('profileStatement')?.addEventListener('click', async ()=>{
+    const doc = await buildAccountStatementPdf();
+    doc.save(`Account_Statement_${(topEmail.textContent||'member').replace(/[^\w@.-]/g,'')}.pdf`);
+    awardPoints(1, 'Downloaded account statement');
+  });
+  document.getElementById('quickStatement')?.addEventListener('click', async ()=>{
+    const doc = await buildAccountStatementPdf();
+    doc.save(`Account_Statement_${(topEmail.textContent||'member').replace(/[^\w@.-]/g,'')}.pdf`);
+    awardPoints(1, 'Downloaded account statement');
+  });
+
+  // downloadApplications compile
+  document.getElementById('downloadApplications')?.addEventListener('click', async ()=>{
+    if(!currentUid) return alert('Not signed in');
+    const snap = await get(ref(db, `members/${currentUid}/loans/applications`));
+    if(!snap.exists()) return alert('No applications found');
+    const apps = snap.val();
+    const doc = new jsPDF({ unit:'pt', format:'a4' }); let y=40; const left=36;
+    doc.setFontSize(16); doc.text('Loan Applications',300,y,{align:'center'}); y+=20; doc.setFontSize(10);
+    for(const [id,app] of Object.entries(apps)){
+      const title = `${app.memberName || app.name || ''} — ${formatKsh(app.amountFigures || 0)} — ${app.status||''}`;
+      const wrapped = doc.splitTextToSize(title, 520);
+      doc.text(wrapped, left, y); y += wrapped.length * 12;
+      const details = [`Applied: ${new Date(app.appliedAt || 0).toLocaleString()}`, `Purpose: ${app.purpose || ''}`, `Guarantors: ${ (app.guarantors || []).map(g=>g.name).filter(Boolean).join('; ') }`];
+      details.forEach(d => { const w = doc.splitTextToSize(d,520); doc.text(w, left+8, y); y += w.length * 12; });
+      y += 8;
+      if(y > 720){ doc.addPage(); y=40; }
+    }
+    doc.save(`Loan_Applications_${(topEmail.textContent||'member').replace(/[^\w@.-]/g,'')}.pdf`);
+    awardPoints(2, 'Downloaded applications PDF');
+  });
+
+  // Save initial activity
+  (async()=>{ try{ await logActivity('Dashboard loaded — full'); }catch(e){} })();
+
+}); // end onAuthStateChanged & main script
+</script>
 
 </body>
 </html>
