@@ -191,6 +191,21 @@
   </ul>
 </div>
 
+    <div class="bg-white shadow-lg rounded-2xl p-4 mt-4">
+  <div class="flex justify-between items-center mb-3">
+    <h2 class="text-lg font-semibold text-gray-800">📜 Recent Activities</h2>
+    <select id="activityFilter" class="border border-gray-300 rounded-md px-2 py-1 text-sm">
+      <option value="all">All</option>
+      <option value="loan">Loans</option>
+      <option value="share">Shares</option>
+      <option value="deposit">Deposits</option>
+      <option value="withdrawal">Withdrawals</option>
+    </select>
+  </div>
+  <ul id="activity-timeline" class="border-l-2 border-green-500 pl-4 space-y-3"></ul>
+</div>
+
+
 
 
     <!-- loan application big form -->
@@ -498,6 +513,53 @@ document.getElementById("downloadBtn").addEventListener("click", () => {
   // Redirect to your downloads page
   window.location.href = "/admin.html"; // Change path if needed
 });
+
+  
+  const activityTimeline = document.getElementById("activity-timeline");
+  const activityFilter = document.getElementById("activityFilter");
+
+  function renderActivities(filterType = "all") {
+    let query = db.collection("activities").orderBy("timestamp", "desc").limit(20);
+    if (filterType !== "all") query = query.where("type", "==", filterType);
+
+    query.onSnapshot((snapshot) => {
+      activityTimeline.innerHTML = "";
+
+      if (snapshot.empty) {
+        activityTimeline.innerHTML = `<li class="text-gray-500">No recent activity</li>`;
+        return;
+      }
+
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        const time = new Date(data.timestamp?.toDate?.() || Date.now()).toLocaleString();
+
+        const li = document.createElement("li");
+        li.className = "relative pl-4 before:content-[''] before:absolute before:left-[-10px] before:top-2 before:w-3 before:h-3 before:bg-green-500 before:rounded-full";
+        li.innerHTML = `
+          <div>
+            <p class="font-medium text-gray-800">${data.action}</p>
+            <p class="text-sm text-gray-500">${data.details || ""}</p>
+            <small class="text-gray-400">${time}</small>
+          </div>
+        `;
+        activityTimeline.appendChild(li);
+      });
+    });
+  }
+
+  // Default load
+  renderActivities();
+
+  // When user selects filter
+  activityFilter.addEventListener("change", (e) => {
+    renderActivities(e.target.value);
+  });
+
+
+  
+
+
 
 
   // ----- AUTH STATE -----
