@@ -100,6 +100,13 @@
     .btn.secondary{background:#fff;color:var(--accent);border:1px solid #e3f1e3}
     .muted{color:var(--muted)}
 
+    /* wizard */
+    .wizard-step{display:none}
+    .wizard-step.active{display:block}
+    .wizard-header{display:flex;gap:8px;margin-bottom:12px}
+    .wizard-step-indicator{flex:1;padding:8px;border-radius:8px;text-align:center;background:#f3fff3;color:var(--muted);font-weight:700}
+    .wizard-step-indicator.active{background:var(--accent);color:white}
+
     /* small screens adjustments */
     @media (max-width:1000px){
       .big{grid-column:span 12}
@@ -173,7 +180,8 @@
     </div>
 
     <!-- loan action bar (table) -->
-    <div class="action-bar">
+    <div class="action-bar card">
+      <h3 style="margin-top:0">Loan Action Bar</h3>
       <table class="loan-table">
         <thead>
           <tr>
@@ -219,19 +227,98 @@
       </div>
     </div>
 
-    <!-- left: loan form + withdraw -->
-    <section class="card big" id="loan-section" aria-labelledby="loanHeading">
-      <h2 id="loanHeading"><i class="fas fa-file-signature"></i> Loan Application (Official Form)</h2>
+    <!-- Wizard forms: Loan / Membership / Shares -->
+    <section class="card big" id="forms-section">
+      <h2>Forms (Wizard)</h2>
 
-      <!-- form content (unchanged) -->
-      <!-- ... (keep the loan form fields from your part) -->
-      <!-- reusing existing form id: fullLoanForm -->
-      <!-- NOTE: the form markup is the same as provided earlier (omitted here for brevity in this snippet)
-           In the delivered file below it's included in full exactly as you posted. -->
-      <!-- For readability here the loan form will be present in the full file. -->
+      <!-- Tabs / step indicators -->
+      <div class="wizard-header" style="margin-bottom:12px">
+        <div class="wizard-step-indicator active" data-step="member">Member Info</div>
+        <div class="wizard-step-indicator" data-step="loan">Loan Application</div>
+        <div class="wizard-step-indicator" data-step="shares">Shares Plan</div>
+      </div>
+
+      <!-- Member wizard -->
+      <form id="memberWizard" class="wizard-step active" data-step="member">
+        <h3>Step 1 — Membership Details</h3>
+        <div class="form-grid">
+          <input class="full" name="m_name" id="m_name" placeholder="Full name" required>
+          <input name="m_membershipNumber" id="m_membershipNumber" placeholder="Membership Number (M/No)" required>
+          <input name="m_id" id="m_id" placeholder="National ID / Passport No" required>
+          <input name="m_phone" id="m_phone" placeholder="Phone" required>
+          <input name="m_email" id="m_email" type="email" placeholder="Email" required>
+          <input name="m_county" id="m_county" placeholder="County" required>
+          <input name="m_town" id="m_town" placeholder="Town / City" required>
+          <input class="full" name="m_residence" id="m_residence" placeholder="Area of Residence" required>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:12px">
+          <div></div>
+          <div>
+            <button type="button" class="btn" id="memberNext">Next →</button>
+          </div>
+        </div>
+      </form>
+
+      <!-- Loan wizard -->
+      <form id="loanWizard" class="wizard-step" data-step="loan">
+        <h3>Step 2 — Loan Application</h3>
+        <div class="form-grid">
+          <input class="full" name="loan_selfHelpGroup" id="loan_selfHelpGroup" placeholder="Name of Self-Help Group" required>
+          <input name="loan_memberName" id="loan_memberName" placeholder="Name of Applicant" required>
+          <input name="loan_membershipNumber" id="loan_membershipNumber" placeholder="Membership Number (M/No)" required>
+          <input name="loan_nationalId" id="loan_nationalId" placeholder="National ID / Passport No" required>
+          <select name="loan_maritalStatus" id="loan_maritalStatus" required>
+            <option value="">Marital Status</option>
+            <option>Single</option><option>Married</option><option>Widow</option><option>Others</option>
+          </select>
+          <input name="loan_dob" id="loan_dob" type="date" placeholder="Date of Birth" required>
+          <input name="loan_monthlyIncome" id="loan_monthlyIncome" placeholder="Monthly Income (Ksh)" required>
+        </div>
+
+        <h4 style="margin-top:12px">Loan Request</h4>
+        <div class="form-grid">
+          <input name="loan_amountFigures" id="loan_amountFigures" placeholder="Amount Requested (Figures, Ksh)" required>
+          <input name="loan_amountWords" id="loan_amountWords" placeholder="Amount in words" required>
+          <input name="loan_purpose" id="loan_purpose" placeholder="Purpose of the Loan" required>
+          <input name="loan_repayableMonths" id="loan_repayableMonths" placeholder="Repayable in months" required>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;margin-top:12px">
+          <button type="button" class="btn secondary" id="loanBack">← Back</button>
+          <div>
+            <button type="button" class="btn" id="loanNext">Next →</button>
+          </div>
+        </div>
+      </form>
+
+      <!-- Shares wizard -->
+      <form id="sharesWizard" class="wizard-step" data-step="shares">
+        <h3>Step 3 — Shares Plan</h3>
+        <div class="form-grid">
+          <label class="full">Target shares
+            <input id="s_targetShares" type="number" min="1" value="10" />
+          </label>
+          <label>Start date
+            <input id="s_startDate" type="date" />
+          </label>
+          <label>Installment (Ksh)
+            <input id="s_installment" type="number" min="1" value="100" />
+          </label>
+          <label class="full">Notes
+            <input id="s_notes" placeholder="E.g., monthly contribution description" />
+          </label>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;margin-top:12px">
+          <button type="button" class="btn secondary" id="sharesBack">← Back</button>
+          <div>
+            <button type="button" class="btn" id="sharesSubmit">Submit & Save</button>
+          </div>
+        </div>
+      </form>
     </section>
 
-    <!-- right side: payments, notifications, profile -->
+    <!-- right side: payments, notifications, downloads, profile -->
     <aside class="card side">
       <h3>Pay / Quick Actions</h3>
 
@@ -257,6 +344,14 @@
         </div>
         <div style="margin-top:8px;display:flex;gap:8px">
           <button id="markAllRead" class="btn secondary">Mark all read</button>
+        </div>
+      </div>
+
+      <!-- downloads area (files stored in Firebase Storage under folder 'downloads' and referenced in RTDB /downloads/) -->
+      <div style="margin-top:14px">
+        <h4 style="margin:0 0 8px 0">📁 Downloads</h4>
+        <div id="downloadsList" style="max-height:220px;overflow:auto;padding:6px;background:#fff;border-radius:8px">
+          <div>Loading available downloads...</div>
         </div>
       </div>
 
@@ -300,9 +395,6 @@
       </div>
     </section>
 
-    <!-- full loan + withdraw forms repeated as in your original parts -->
-    <!-- For brevity this combined file includes your original loan and withdraw forms unchanged (kept identically) -->
-
   </main>
 
   <div id="toast">Toast</div>
@@ -312,12 +404,12 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
     import { getDatabase, ref, onValue, get, push, set, update, child, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
-    import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
+    import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, listAll } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
 
     // jsPDF
     const { jsPDF } = window.jspdf;
 
-    // ===== Replace with your config (I used the one you provided) =====
+    // ===== Replace with your config (kept from earlier posts) =====
     const firebaseConfig = {
       apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
       authDomain: "visionary-youth-grou-2024.firebaseapp.com",
@@ -362,6 +454,12 @@
     const photoInput = document.getElementById('photoUploadInput');
     const saveProfileBtn = document.getElementById('saveProfile');
 
+    const downloadsList = document.getElementById('downloadsList');
+
+    // wizard elements
+    const stepIndicators = document.querySelectorAll('.wizard-step-indicator');
+    const wizardSteps = document.querySelectorAll('.wizard-step');
+
     // small helpers
     function showToast(msg, t=3000){ toast.textContent = msg; toast.style.display='block'; setTimeout(()=> toast.style.display='none', t); }
     function formatKsh(n){ const num = Number(n||0); return 'Ksh ' + num.toLocaleString('en-KE'); }
@@ -385,7 +483,98 @@
     async function logActivity(msg){ if(!currentUid) return; const r = push(ref(db, `members/${currentUid}/activityLog`)); await set(r, {text: msg, ts: Date.now()}); }
     async function awardPoints(n, reason){ if(!currentUid || !n) return; const cur = await getPoints(); const upd = Number(cur||0) + Number(n); await setPoints(upd); showToast(`+${n} points`); await logActivity(`Points +${n} (${reason})`); }
 
-    // ====== Authentication state ======
+    // wizard helpers
+    function showStep(stepName){
+      wizardSteps.forEach(s => s.classList.toggle('active', s.dataset.step === stepName));
+      stepIndicators.forEach(ind => ind.classList.toggle('active', ind.dataset.step === stepName));
+      // scroll to forms
+      document.getElementById('forms-section').scrollIntoView({behavior:'smooth'});
+    }
+
+    // attach wizard navigation
+    document.getElementById('memberNext').addEventListener('click', async ()=>{
+      // validate required fields in memberWizard
+      const name = document.getElementById('m_name').value.trim();
+      const phone = document.getElementById('m_phone').value.trim();
+      if(!name || !phone) return alert('Please fill name and phone');
+      showStep('loan');
+    });
+    document.getElementById('loanBack').addEventListener('click', ()=> showStep('member'));
+    document.getElementById('loanNext').addEventListener('click', ()=> {
+      // basic validation
+      const amount = document.getElementById('loan_amountFigures').value.trim();
+      const memberName = document.getElementById('loan_memberName').value.trim();
+      if(!amount || !memberName) return alert('Please enter amount and applicant name');
+      showStep('shares');
+    });
+    document.getElementById('sharesBack').addEventListener('click', ()=> showStep('loan'));
+
+    // when sharesSubmit clicked -> save all data (member, loan, shares) to RTDB
+    document.getElementById('sharesSubmit').addEventListener('click', async ()=>{
+      if(!currentUid) return alert('Not signed in');
+      // collect member
+      const memberPayload = {
+        name: document.getElementById('m_name').value.trim(),
+        membershipNumber: document.getElementById('m_membershipNumber').value.trim(),
+        id: document.getElementById('m_id').value.trim(),
+        phone: document.getElementById('m_phone').value.trim(),
+        email: document.getElementById('m_email').value.trim(),
+        county: document.getElementById('m_county').value.trim(),
+        town: document.getElementById('m_town').value.trim(),
+        residence: document.getElementById('m_residence').value.trim(),
+        updatedAt: Date.now()
+      };
+      // collect loan
+      const loanPayload = {
+        selfHelpGroup: document.getElementById('loan_selfHelpGroup').value.trim(),
+        memberName: document.getElementById('loan_memberName').value.trim(),
+        membershipNumber: document.getElementById('loan_membershipNumber').value.trim(),
+        nationalId: document.getElementById('loan_nationalId').value.trim(),
+        maritalStatus: document.getElementById('loan_maritalStatus').value.trim(),
+        dob: document.getElementById('loan_dob').value,
+        monthlyIncome: document.getElementById('loan_monthlyIncome').value.trim(),
+        amountFigures: document.getElementById('loan_amountFigures').value.trim(),
+        amountWords: document.getElementById('loan_amountWords').value.trim(),
+        purpose: document.getElementById('loan_purpose').value.trim(),
+        repayableMonths: document.getElementById('loan_repayableMonths').value.trim(),
+        appliedAt: Date.now(),
+        status: 'Pending'
+      };
+      // collect shares
+      const sharesPayload = {
+        targetShares: Number(document.getElementById('s_targetShares').value || 0),
+        startDate: document.getElementById('s_startDate').value || new Date().toISOString().slice(0,10),
+        installment: Number(document.getElementById('s_installment').value || 0),
+        notes: document.getElementById('s_notes').value || '',
+        progress: 0,
+        createdAt: Date.now()
+      };
+
+      try{
+        // save profile under members/{uid}/profile
+        await set(ref(db, `members/${currentUid}/profile`), memberPayload);
+
+        // push loan application to members/{uid}/loans/applications and loans/{uid}/{loanId} for action bar
+        const loanAppRef = push(ref(db, `members/${currentUid}/loans/applications`));
+        const loanId = loanAppRef.key;
+        await set(loanAppRef, { ...loanPayload, loanId });
+
+        // store in main loans collection for lookup
+        await set(ref(db, `loans/${currentUid}/${loanId}`), { ...loanPayload, loanDate: new Date().toISOString(), id: loanId, stage: 'Pending' });
+
+        // set shares plan under members
+        await set(ref(db, `members/${currentUid}/shares/plan`), sharesPayload);
+
+        showToast('Member, loan application, and shares plan saved');
+        awardPoints(5, 'Completed wizard');
+        showStep('member'); // go back to first
+      }catch(err){
+        console.error(err);
+        alert('Failed to save wizard data. See console.');
+      }
+    });
+
+    // ===== Authentication state ======
     onAuthStateChanged(auth, async user => {
       if(!user){ location.href='index.html'; return; }
       currentUid = user.uid;
@@ -399,12 +588,11 @@
       onValue(ref(db, `members/${currentUid}/profile`), snap => {
         if(!snap.exists()) return;
         const p = snap.val();
-        if(p.name) { welcomeName.textContent = p.name; miniName.textContent = p.name; document.getElementById('profile_fullName') && (document.getElementById('profile_fullName').value = p.name); }
-        if(p.phone) document.getElementById('profile_phone') && (document.getElementById('profile_phone').value = p.phone);
-        if(p.id) document.getElementById('profile_id') && (document.getElementById('profile_id').value = p.id);
-        if(p.yearJoined) document.getElementById('profile_yearJoined') && (document.getElementById('profile_yearJoined').value = p.yearJoined);
-        if(p.dob) document.getElementById('profile_dob') && (document.getElementById('profile_dob').value = p.dob);
-        if(p.status) document.getElementById('topStatus') && (document.getElementById('topStatus').innerHTML = `Status: <strong style="color:#9ff2b8">${p.status}</strong>`);
+        if(p.name) { welcomeName.textContent = p.name; miniName.textContent = p.name; document.getElementById('m_name') && (document.getElementById('m_name').value = p.name); }
+        if(p.phone) document.getElementById('m_phone') && (document.getElementById('m_phone').value = p.phone);
+        if(p.id) document.getElementById('m_id') && (document.getElementById('m_id').value = p.id);
+        if(p.membershipNumber) document.getElementById('m_membershipNumber') && (document.getElementById('m_membershipNumber').value = p.membershipNumber);
+        if(p.email) document.getElementById('m_email') && (document.getElementById('m_email').value = p.email);
       });
 
       // profile photo
@@ -426,14 +614,11 @@
       onValue(ref(db, `members/${currentUid}/outstandingLoans`), s => { document.getElementById('outstandingLoansVal').textContent = formatKsh(s.exists()? s.val() : 0); });
 
       // ===== Loan action bar =====
-      // expecting loans/{memberId}/ (object of loans) OR loans/{memberId}/current
       onValue(ref(db, `loans/${currentUid}`), snap => {
         const body = loanActionBody;
         body.innerHTML = '';
         if(!snap.exists()){ body.innerHTML = '<tr><td colspan="7" style="padding:12px">No loan records</td></tr>'; return; }
         const loansObj = snap.val();
-
-        // if object with child keys, choose latest by loanDate or key
         let loansArray = [];
         if(typeof loansObj === 'object' && !Array.isArray(loansObj)) {
           loansArray = Object.entries(loansObj).map(([id, l]) => ({ id, ...l }));
@@ -442,14 +627,7 @@
         } else {
           loansArray = [{ id: 'current', ...loansObj }];
         }
-
-        // sort by loanDate (most recent first)
-        loansArray.sort((a,b)=> {
-          const da = a.loanDate ? new Date(a.loanDate).getTime() : 0;
-          const db_ = b.loanDate ? new Date(b.loanDate).getTime() : 0;
-          return db_ - da;
-        });
-
+        loansArray.sort((a,b)=> (new Date(b.loanDate||b.disbursedAt||0)) - (new Date(a.loanDate||a.disbursedAt||0)));
         loansArray.forEach(loan => {
           const tr = document.createElement('tr');
           const stageLower = (loan.stage || loan.status || '').toLowerCase();
@@ -476,14 +654,12 @@
           const btn = e.target.closest('.btn-repay');
           const amount = Number(btn.dataset.amount||0);
           mpesaAmount.value = amount>0? amount : '';
-          // scroll to payment area
           mpesaPhone.scrollIntoView({behavior:'smooth', block:'center'});
           showToast('Filled amount for repayment — complete phone & press Pay');
         }
       });
 
       // ===== Transactions (history) =====
-      // Listen to /transactions/{uid} and render
       function renderTransactions(snap) {
         const tbody = txBody;
         tbody.innerHTML = '';
@@ -492,7 +668,6 @@
         const txs = Object.entries(txsObj).map(([id, t]) => ({ id, ...t }));
         txs.sort((a,b)=> (new Date(b.date||b.ts||b.timestamp).getTime()) - (new Date(a.date||a.ts||a.timestamp).getTime()));
         const filter = txFilterType.value;
-
         txs.forEach(t=>{
           const isDebit = (t.debit && Number(t.debit)>0) || (t.type && t.type.toLowerCase()==='debit');
           const isCredit = (t.credit && Number(t.credit)>0) || (t.type && t.type.toLowerCase()==='credit');
@@ -509,12 +684,8 @@
           tbody.appendChild(tr);
         });
       }
-
-      // attach listener
       onValue(ref(db, `transactions/${currentUid}`), snap => renderTransactions(snap));
       txFilterType.addEventListener('change', ()=> get(ref(db, `transactions/${currentUid}`)).then(snap => renderTransactions(snap)));
-
-      // download tx as PDF/JSON
       downloadTxBtn.addEventListener('click', async ()=>{
         const snap = await get(ref(db, `transactions/${currentUid}`));
         if(!snap.exists()) return alert('No transactions to download');
@@ -533,7 +704,7 @@
         awardPoints(1, 'Downloaded transactions');
       });
 
-      // ===== Notifications (RTDB under members/{uid}/notifications) =====
+      // ===== Notifications (members/{uid}/notifications) =====
       async function renderNotifSnapshot(snap) {
         notifList.innerHTML = '';
         if(!snap.exists()){ notifList.innerHTML = '<li class="muted">No notifications</li>'; return; }
@@ -558,7 +729,6 @@
           notifList.appendChild(li);
         });
 
-        // attach mark-read
         document.querySelectorAll('.mark-read').forEach(btn => {
           btn.addEventListener('click', async (e) => {
             const id = btn.dataset.id;
@@ -569,7 +739,6 @@
           });
         });
       }
-
       onValue(ref(db, `members/${currentUid}/notifications`), snap => renderNotifSnapshot(snap));
       markAllReadBtn.addEventListener('click', async ()=>{
         const s = await get(ref(db, `members/${currentUid}/notifications`));
@@ -580,8 +749,44 @@
         showToast('All marked read');
       });
 
+      // ===== Downloads area (RTDB references & Firebase Storage) =====
+      // Structure used: RTDB node /downloads/{fileId} => { name, storagePath, uploadedAt }
+      onValue(ref(db, `downloads`), async snap => {
+        downloadsList.innerHTML = '';
+        if(!snap.exists()){ downloadsList.innerHTML = '<div class="muted">No downloads available</div>'; return; }
+        const list = document.createElement('div');
+        const files = snap.val();
+        Object.entries(files).forEach(([id, f])=>{
+          const row = document.createElement('div');
+          row.style.display='flex'; row.style.justifyContent='space-between'; row.style.alignItems='center'; row.style.padding='8px'; row.style.borderBottom='1px solid #eef6ee';
+          const name = f.name || id;
+          const storagePath = f.storagePath || `downloads/${id}`;
+          const uploadedAt = f.uploadedAt ? new Date(f.uploadedAt).toLocaleString() : '';
+          row.innerHTML = `<div><strong>${name}</strong><div class="muted" style="font-size:0.85rem">${uploadedAt}</div></div>
+            <div style="display:flex;gap:8px"><button class="btn secondary download-file" data-path="${storagePath}" data-name="${name}">Download</button></div>`;
+          list.appendChild(row);
+        });
+        downloadsList.appendChild(list);
+
+        // attach download handlers
+        document.querySelectorAll('.download-file').forEach(btn => {
+          btn.addEventListener('click', async ()=> {
+            const path = btn.dataset.path;
+            const name = btn.dataset.name;
+            try{
+              const sRef = storageRef(storage, path);
+              const url = await getDownloadURL(sRef);
+              // open in new tab
+              window.open(url, '_blank');
+              awardPoints(1, `Downloaded ${name}`);
+            }catch(err){
+              console.error(err); alert('Failed to download file (check storage path and security rules).');
+            }
+          });
+        });
+      });
+
       // ===== M-Pesa: STK Push general payment =====
-      // NOTE: Adjust endpoint path if needed. I used POST /stkpush for example.
       mpesaPayBtn.addEventListener('click', async () => {
         if(!currentUid) return alert('Not signed in');
         const phone = mpesaPhone.value.trim();
@@ -589,24 +794,17 @@
         const account = mpesaAccount.value.trim();
         if(!phone || !/^\d{9,12}$/.test(phone.replace(/^0/,'').replace(/\D/g,''))) return alert('Enter valid phone (e.g. 07XXXXXXXX)');
         if(!amount || amount <= 0) return alert('Enter valid amount');
-
         showToast('Initiating STK Push…');
         try{
-          // Example payload — adapt to your server's expected body
           const payload = { phone, amount, account, memberId: currentUid, description: account || 'General payment' };
-
-          // send to your STK service (make sure CORS allowed)
           const resp = await fetch('https://mpesa-stk-y093.onrender.com/stkpush', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
           });
           const json = await resp.json();
-
-          // Log payment attempt to RTDB
           const pRef = push(ref(db, `payments/${currentUid}`));
           await set(pRef, { phone, amount, account, ts: Date.now(), status: json.status || 'requested', response: json });
-
           showToast('STK Push requested. Check phone to confirm.');
           await logActivity(`STK Push requested: Ksh ${amount}`);
         }catch(err){
@@ -615,7 +813,6 @@
         }
       });
 
-      // allow manual logging of payments (if direct M-Pesa was received)
       mpesaLogBtn.addEventListener('click', async ()=>{
         if(!currentUid) return alert('Not signed in');
         const phone = mpesaPhone.value.trim();
@@ -635,7 +832,7 @@
         const file = e.target.files && e.target.files[0];
         if(!file) return;
         if(!currentUid) return alert('Not signed in');
-        const path = `members/${currentUid}/photo_${Date.now()}`;
+        const path = `downloads/${currentUid}/photo_${Date.now()}`;
         const sRef = storageRef(storage, path);
         try{
           await uploadBytes(sRef, file);
@@ -643,6 +840,10 @@
           await set(ref(db, `members/${currentUid}/photoURL`), url);
           showToast('Photo uploaded');
           awardPoints(2, 'Uploaded profile photo');
+
+          // Also add a download reference in /downloads for admins/members
+          const dRef = push(ref(db, `downloads`));
+          await set(dRef, { name: `Profile photo - ${currentUid}`, storagePath: path, uploadedAt: Date.now(), uploadedBy: currentUid });
         }catch(err){ console.error(err); alert('Photo upload failed'); }
       });
 
@@ -650,19 +851,20 @@
       saveProfileBtn.addEventListener('click', async ()=>{
         if(!currentUid) return alert('Not signed in');
         const payload = {
-          name: document.getElementById('profile_fullName')?.value || miniName.textContent || '',
-          phone: document.getElementById('profile_phone')?.value || '',
-          id: document.getElementById('profile_id')?.value || '',
-          yearJoined: document.getElementById('profile_yearJoined')?.value || '',
-          dob: document.getElementById('profile_dob')?.value || '',
-          status: 'Active'
+          name: document.getElementById('m_name')?.value || miniName.textContent || '',
+          phone: document.getElementById('m_phone')?.value || '',
+          id: document.getElementById('m_id')?.value || '',
+          membershipNumber: document.getElementById('m_membershipNumber')?.value || '',
+          email: document.getElementById('m_email')?.value || '',
+          status: 'Active',
+          updatedAt: Date.now()
         };
         await set(ref(db, `members/${currentUid}/profile`), payload);
         showToast('Profile saved');
         awardPoints(3, 'Updated profile');
       });
 
-      // ===== Loans list & status updates =====
+      // ===== Loans list & status updates (members/{uid}/loans/applications) =====
       onValue(ref(db, `members/${currentUid}/loans/applications`), snap => {
         const area = document.getElementById('loansListArea');
         const areaFull = document.getElementById('loansListFullInner');
@@ -714,7 +916,7 @@
         });
       });
 
-      // ===== Account statement and PDFs (reusing earlier functions) =====
+      // ===== Account statement and PDFs =====
       async function buildAccountStatementPdf(){
         if(!currentUid) return alert('Not signed in');
         const snapMember = await get(ref(db, `members/${currentUid}`));
@@ -722,6 +924,7 @@
         const snapshotWeekly = await get(ref(db, `members/${currentUid}/savings/weekly`));
         const loansSnap = await get(ref(db, `members/${currentUid}/loans`));
         const sharesSnap = await get(ref(db, `members/${currentUid}/shares`));
+        const txSnap = await get(ref(db, `transactions/${currentUid}`));
 
         const doc = new jsPDF({unit:'pt', format:'a4'});
         let left = 36, y = 40;
@@ -730,7 +933,7 @@
         doc.text('ACCOUNT STATEMENT', 300, 36, {align:'center'});
         doc.setTextColor(0,0,0);
         y = 80;
-        const profile = snapMember.exists() && snapMember.val().profile ? snapMember.val().profile : {};
+        const profile = snapMember.exists() && snapMember.val().profile ? snapMember.val().profile : (snapMember.exists()? snapMember.val().profile : {});
         doc.setFontSize(10); doc.setFont('helvetica','normal');
         doc.text(`Member: ${profile.name || profile.fullName || topEmail.textContent}`, left, y); y+=12;
         doc.text(`Email: ${topEmail.textContent}`, left, y); y+=12;
@@ -763,16 +966,17 @@
         doc.text(`Total Loans: ${formatKsh(totalLoans)}`, left, y); y+=12;
         doc.text(`Unpaid Balances: ${formatKsh(unpaid)}`, left, y); y+=18;
 
-        if(appsList.length){
-          doc.setFont('helvetica','bold'); doc.text('Loan Applications (recent)', left, y); y += 14;
+        if(txSnap.exists()){
+          doc.setFont('helvetica','bold'); doc.text('Recent Transactions', left, y); y+=14;
           doc.setFont('helvetica','normal');
-          appsList.slice(-10).forEach(app=>{
-            const line = `${app.memberName || app.name || ''} — ${formatKsh(app.amountFigures || 0)} — ${app.status || 'Pending'}`;
+          const txs = Object.values(txSnap.val()).sort((a,b)=> (new Date(b.date||b.ts||0) - new Date(a.date||a.ts||0))).slice(0,20);
+          txs.forEach(t=>{
+            const line = `${new Date(t.date||t.ts||Date.now()).toLocaleDateString()} — ${t.description || t.details || ''} — D:${t.debit||'-'} C:${t.credit||'-'} Bal:${t.balance||'-'}`;
             const wr = doc.splitTextToSize(line, 500); doc.text(wr,left,y); y += wr.length*12;
-            if(y > 720){ doc.addPage(); y=40; }
+            if(y>720){ doc.addPage(); y=40; }
           });
-          y+=8;
         }
+
         if(y > 700){ doc.addPage(); y=40; }
         doc.line(left, y+20, left+240, y+20); doc.text('Prepared by / Signature', left, y+34);
         return doc;
@@ -813,31 +1017,18 @@
     document.getElementById('menuLogout')?.addEventListener('click', ()=> { try{ signOut(auth); }catch(e){} window.location.href='index.html'; });
 
     // Small nav helpers
-    document.getElementById('quickApply')?.addEventListener('click', ()=> document.getElementById('loan-section')?.scrollIntoView({behavior:'smooth'}));
+    document.getElementById('quickApply')?.addEventListener('click', ()=> document.getElementById('forms-section')?.scrollIntoView({behavior:'smooth'}));
     document.getElementById('quickStatement')?.addEventListener('click', async ()=> { const d = await (typeof buildAccountStatementPdf === 'function' ? buildAccountStatementPdf() : null); if(d) { d.save(`Account_Statement_${(topEmail.textContent||'member').replace(/[^\w@.-]/g,'')}.pdf`); awardPoints(1,'Downloaded statement'); } });
 
-    // ===== Additional Recommendations (displayed as console logs for convenience) =====
+    // ===== Additional Recommendations (console and in-file comments) =====
     console.info('Recommendations:');
-    console.info('1) Secure RTDB rules: allow read/write only to authenticated and authorized users.');
+    console.info('1) Secure RTDB rules: allow read/write only to authenticated and authorized users (members/{uid} => auth.uid == uid).');
     console.info('2) Move STK credentials to server-side; server should call M-Pesa and not expose secrets to client.');
-    console.info('3) Add server-side endpoints to verify M-Pesa callbacks and update payment status in RTDB upon confirmation.');
-    console.info('4) Consider generating server-side PDF for official signed statements if required for compliance.');
-    console.info('5) Add input validation & rate limiting on endpoints (prevent accidental duplicate STK pushes).');
+    console.info('3) Handle M-Pesa callback on server: update /payments/{memberId}/{paymentId} with final status.');
+    console.info('4) Consider server-side PDF generation for officially signed statements if needed.');
+    console.info('5) Add input validation & rate limiting on server endpoints (prevent duplicate STK pushes).');
 
   </script>
 
-  <!-- NOTES FOR DEPLOYMENT (human-readable recommendations) -->
-  <section style="max-width:1000px;margin:18px auto;padding:12px;font-size:0.95rem;color:#234">
-    <div style="background:#fff;border-radius:8px;padding:12px;box-shadow:0 6px 20px rgba(0,0,0,0.03)">
-      <h3 style="margin-top:0">Important next steps & recommendations</h3>
-      <ul>
-        <li>Set Realtime Database rules so members can only read/write their own data. Example rule: <code>/members/{uid} => auth.uid == uid</code>.</li>
-        <li>Put M-Pesa credentials on server side. Client should only call your server endpoint which performs the STK push.</li>
-        <li>Handle M-Pesa callback on server: update <code>/payments/{memberId}/{paymentId}</code> with final status.</li>
-        <li>Add server-side logging and idempotency keys for STK push to avoid double-charges.</li>
-        <li>Back up data regularly and consider using Firebase Cloud Functions for scheduled summarization and reconciliation.</li>
-      </ul>
-    </div>
-  </section>
 </body>
 </html>
