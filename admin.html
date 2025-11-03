@@ -1,107 +1,168 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Admin Dashboard</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, signOut, onAuthStateChanged } 
-      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getDatabase, ref, get, update } 
-      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
-      authDomain: "your-app.firebaseapp.com",
-      databaseURL: "https://your-app.firebaseio.com",
-      projectId: "your-app",
-      storageBucket: "your-app.appspot.com",
-      messagingSenderId: "123456789",
-      appId: "1:123456789:web:xxxx"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getDatabase(app);
-
-    const logoutBtn = document.getElementById("logoutBtn");
-    const loanList = document.getElementById("loanList");
-
-    // Check login
-    onAuthStateChanged(auth, (user) => {
-      if (!user) {
-        window.location.href = "index.html";
-      }
-    });
-
-    // Logout
-    logoutBtn.addEventListener("click", () => {
-      signOut(auth).then(() => {
-        window.location.href = "index.html";
-      });
-    });
-
-    // Load Loans
-    get(ref(db, "loans")).then((snapshot) => {
-      if (snapshot.exists()) {
-        loanList.innerHTML = "";
-        snapshot.forEach((child) => {
-          const loan = child.val();
-          const row = `
-            <tr>
-              <td>${loan.userId}</td>
-              <td>${loan.amount}</td>
-              <td>${loan.purpose}</td>
-              <td>${loan.guarantor}</td>
-              <td>${loan.status}</td>
-              <td>
-                <button class="btn btn-success btn-sm" onclick="approveLoan('${child.key}')">Approve</button>
-                <button class="btn btn-danger btn-sm" onclick="rejectLoan('${child.key}')">Reject</button>
-              </td>
-            </tr>
-          `;
-          loanList.innerHTML += row;
-        });
-      }
-    });
-
-    // Approve & Reject
-    window.approveLoan = (key) => {
-      update(ref(db, "loans/" + key), { status: "Approved" });
-      alert("Loan approved!");
-      location.reload();
-    };
-    window.rejectLoan = (key) => {
-      update(ref(db, "loans/" + key), { status: "Rejected" });
-      alert("Loan rejected!");
-      location.reload();
-    };
-  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Downloads | Visionary Youth Group</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script type="module" src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js"></script>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #f5f6fa;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 60px auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      color: #007bff;
+      margin-bottom: 25px;
+    }
+    .search-bar {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .search-bar input {
+      width: 80%;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      text-align: left;
+      padding: 12px;
+      border-bottom: 1px solid #ddd;
+    }
+    th {
+      background-color: #007bff;
+      color: white;
+    }
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+    .btn {
+      background-color: #007bff;
+      color: white;
+      padding: 8px 14px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background-color: #0056b3;
+    }
+    .back-btn {
+      display: inline-block;
+      margin-top: 20px;
+      background-color: #28a745;
+    }
+  </style>
 </head>
-<body class="bg-light">
-  <nav class="navbar navbar-dark bg-dark">
-    <div class="container-fluid">
-      <span class="navbar-brand">Admin Dashboard</span>
-      <button class="btn btn-danger" id="logoutBtn">Logout</button>
-    </div>
-  </nav>
+<body>
+  <div class="container">
+    <h2><i class="fa-solid fa-download"></i> Member Downloads</h2>
 
-  <div class="container mt-4">
-    <h3>Loan Applications</h3>
-    <table class="table table-striped">
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Search files (e.g., statement, receipt, report...)" />
+    </div>
+
+    <table id="filesTable">
       <thead>
         <tr>
-          <th>User ID</th>
-          <th>Amount</th>
-          <th>Purpose</th>
-          <th>Guarantor</th>
-          <th>Status</th>
+          <th>File Name</th>
+          <th>Date Uploaded</th>
           <th>Action</th>
         </tr>
       </thead>
-      <tbody id="loanList"></tbody>
+      <tbody id="filesBody">
+        <tr><td colspan="3" style="text-align:center;">Loading files...</td></tr>
+      </tbody>
     </table>
+
+    <button class="btn back-btn" onclick="window.location.href='dashboard.html'">
+      ⬅ Back to Dashboard
+    </button>
   </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getStorage, ref, listAll, getDownloadURL, getMetadata } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+
+    // 🔹 Your Firebase config
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const storage = getStorage(app);
+
+    const filesRef = ref(storage, "member_files"); // Folder where files are stored
+    const filesBody = document.getElementById("filesBody");
+    const searchInput = document.getElementById("searchInput");
+
+    // 🔹 Fetch Files
+    async function fetchFiles() {
+      filesBody.innerHTML = "<tr><td colspan='3' style='text-align:center;'>Fetching files...</td></tr>";
+      try {
+        const result = await listAll(filesRef);
+        if (result.items.length === 0) {
+          filesBody.innerHTML = "<tr><td colspan='3' style='text-align:center;'>No files found.</td></tr>";
+          return;
+        }
+
+        let rows = [];
+        for (const item of result.items) {
+          const url = await getDownloadURL(item);
+          const meta = await getMetadata(item);
+          const name = item.name;
+          const date = meta.timeCreated ? new Date(meta.timeCreated).toLocaleDateString() : "N/A";
+
+          rows.push(`
+            <tr>
+              <td>${name}</td>
+              <td>${date}</td>
+              <td><a href="${url}" target="_blank" class="btn">Download</a></td>
+            </tr>
+          `);
+        }
+
+        filesBody.innerHTML = rows.join("");
+      } catch (err) {
+        console.error(err);
+        filesBody.innerHTML = "<tr><td colspan='3' style='text-align:center;color:red;'>Error loading files</td></tr>";
+      }
+    }
+
+    // 🔹 Filter Search
+    searchInput.addEventListener("input", () => {
+      const filter = searchInput.value.toLowerCase();
+      document.querySelectorAll("#filesBody tr").forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(filter) ? "" : "none";
+      });
+    });
+
+    fetchFiles();
+  </script>
 </body>
 </html>
