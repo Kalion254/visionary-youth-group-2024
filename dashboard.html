@@ -23,14 +23,15 @@
 
   <style>
     :root{
-      --primary:#006b3c;
+      --primary:#006b3c; /* deep green */
       --accent:#00a86b;
       --bg1:#f2fff6;
       --card:#ffffff;
       --muted:#6b7280;
-      --glass-border: rgba(6,50,20,0.06);
+      --glass: rgba(255,255,255,0.6);
       --radius: 14px;
       --shadow: 0 10px 30px rgba(2,48,22,0.08);
+      --glass-border: rgba(6,50,20,0.06);
     }
     *{box-sizing:border-box}
     html,body{height:100%}
@@ -39,96 +40,145 @@
       color:#122; -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
     }
 
-    /* Basic layout */
+    /* Layout */
+    .app {
+      display:flex;min-height:100vh;gap:18px;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      position:fixed;left:18px;top:84px;width:68px;bottom:24px;border-radius:12px;background:linear-gradient(180deg,#ffffff,#f8fff9);
+      box-shadow:var(--shadow);padding:8px;display:flex;flex-direction:column;align-items:center;gap:8px;z-index:1400;
+      transition:width .28s ease, padding .28s ease;
+      overflow:hidden;
+    }
+    .sidebar.expanded{width:220px;padding:14px}
+    .sidebar .brandMini{display:flex;align-items:center;gap:8px}
+    .sidebar .navBtn{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid var(--glass-border);background:linear-gradient(180deg,#fff,#f6fff6)}
+    .sidebar .navBtn.active{background:var(--primary);color:white;box-shadow:0 6px 18px rgba(0,106,60,0.15)}
+    .sidebar .navLabel{margin-left:12px;font-weight:600;color:var(--primary);display:none}
+    .sidebar.expanded .navLabel{display:inline-block}
+    .toggleSide {margin-top:8px;font-size:0.9rem;cursor:pointer;color:var(--muted)}
+
+    /* Topbar */
     .topbar{
       position:fixed;left:0;right:0;top:0;height:72px;background:linear-gradient(90deg,var(--primary),var(--accent));
       color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 20px;z-index:1200;box-shadow:0 12px 40px rgba(2,48,22,0.12);
     }
-    .brand{display:flex;align-items:center;gap:12px}
+    .brand {display:flex;align-items:center;gap:12px}
     .brand h1{font-size:1.05rem;margin:0;font-weight:700}
     .user-area{display:flex;align-items:center;gap:12px}
+    .avatar{width:44px;height:44px;border-radius:10px;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden}
+    .avatar img{width:100%;height:100%;object-fit:cover}
 
-    .app {display:flex;gap:18px;min-height:100vh;padding-top:92px;}
-    aside.sidebar {
-      position:fixed;left:18px;top:84px;width:68px;bottom:24px;border-radius:12px;background:linear-gradient(180deg,#ffffff,#f8fff9);
-      box-shadow:var(--shadow);padding:8px;display:flex;flex-direction:column;align-items:center;gap:8px;z-index:1400;transition:width .28s;
+    /* Main page grid */
+    .page {
+      margin:92px auto 48px;padding:18px;
+      width:calc(100% - 140px);
+      transition: width .28s ease;
     }
-    aside.sidebar.expanded {width:220px;padding:14px}
-    .sidebar .navBtn{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid var(--glass-border);background:linear-gradient(180deg,#fff,#f6fff6)}
-    .sidebar .navBtn.active{background:var(--primary);color:white}
-    .sidebar .navLabel{display:none;margin-left:10px}
-    .sidebar.expanded .navLabel{display:inline-block}
+    .page-inner {max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 380px;gap:18px;align-items:start}
+    .full-width {grid-column:1/-1}
 
-    main.page{flex:1;margin:0 18px;padding:0 8px}
-    .page-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 380px;gap:18px;align-items:flex-start}
-    .card {background:var(--card);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);transition:transform .18s}
+    /* Cards & look */
+    .card {
+      background:var(--card);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);
+      transition:transform .18s ease, box-shadow .18s ease;
+    }
     .card:hover{transform:translateY(-6px)}
     h2{margin:0 0 10px 0;font-size:1.05rem;color:var(--primary)}
     .muted{color:var(--muted)}
 
-    /* hero */
+    /* Hero */
     .hero{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:18px}
+    .hero .left {display:flex;flex-direction:column}
+    .hero .actions{display:flex;gap:8px;align-items:center}
     .btn{background:var(--primary);color:white;padding:10px 14px;border:none;border-radius:10px;cursor:pointer;font-weight:700}
-    .btn.ghost{background:transparent;border:1px solid rgba(0,0,0,0.06);color:var(--primary)}
-    .balances {display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .btn.ghost{background:transparent;border:1px solid rgba(0,0,0,0.06);color:var(--primary);font-weight:600}
+    .btn.small{padding:6px 10px;font-size:0.95rem}
 
-    .balance {padding:12px;border-radius:12px;background:linear-gradient(180deg,#f7fff8,#ffffff);text-align:left;border:1px solid var(--glass-border)}
+    /* Balances grid */
+    .balances {display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .balance {
+      padding:12px;border-radius:12px;background:linear-gradient(180deg,#f7fff8,#ffffff);text-align:left;border:1px solid var(--glass-border)
+    }
     .balance .label{color:var(--muted);font-size:0.95rem}
     .balance .value{font-weight:800;font-size:1.2rem;color:var(--primary);margin-top:8px}
 
+    /* Action bar */
     .action-bar {display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:12px;border-radius:10px;background:linear-gradient(90deg,#fff,#f6fff6);border:1px solid var(--glass-border)}
     .action-stat{flex:1;min-width:140px}
+    .action-stat h4{margin:0;font-size:0.92rem;color:var(--muted)}
+    .action-stat p{margin:6px 0 0 0;font-weight:800;color:var(--primary)}
 
-    /* wizard */
-    .wizard-step{display:none;animation:fadeIn .36s ease}
-    .wizard-step.active{display:block}
-    .steps{display:flex;gap:8px;margin-bottom:12px}
-    .step{flex:1;padding:8px;border-radius:8px;background:#f5fff8;text-align:center;font-weight:700;color:var(--muted)}
+    /* Wizard form */
+    .wizard {position:relative}
+    .steps {display:flex;gap:8px;margin-bottom:12px}
+    .step {flex:1;padding:8px;border-radius:8px;background:#f5fff8;text-align:center;font-weight:700;color:var(--muted);font-size:0.9rem}
     .step.active{background:linear-gradient(90deg,var(--primary),var(--accent));color:#fff}
-
+    .wizard-step {display:none;animation:fadeIn .36s ease}
+    .wizard-step.active{display:block}
     @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
-    /* table */
-    .table{width:100%;border-collapse:collapse;margin-top:8px}
-    .table th,.table td{padding:10px;border-bottom:1px solid #eef7f0;text-align:left;font-size:0.95rem}
-    .table th{color:var(--muted);font-weight:700}
+    /* Table */
+    .table {width:100%;border-collapse:collapse;margin-top:8px}
+    .table th, .table td {padding:10px;border-bottom:1px solid #eef7f0;text-align:left;font-size:0.95rem}
+    .table th {color:var(--muted);font-weight:700}
 
-    /* downloads grid */
-    .downloads{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
-    .download-card{padding:12px;border-radius:10px;border:1px solid var(--glass-border);display:flex;flex-direction:column;gap:8px}
+    /* Downloads list */
+    .downloads {display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+    .download-card {padding:12px;border-radius:10px;border:1px solid var(--glass-border);display:flex;flex-direction:column;gap:8px;align-items:flex-start}
 
-    /* responsive */
+    /* Notifications */
+    .notif-list {max-height:260px;overflow:auto;padding-right:6px}
+    .notif-item{padding:10px;border-radius:8px;border:1px solid #ecf8ef;margin-bottom:8px;background:linear-gradient(180deg,#fff,#fbfff8)}
+
+    /* small screens */
     @media (max-width:1100px){
-      aside.sidebar{display:none}
+      .sidebar{display:none}
+      .page {width:100%}
       .page-inner{grid-template-columns:1fr}
     }
     @media (max-width:520px){
-      .balances{grid-template-columns:1fr}
+      .balances{grid-template-columns:repeat(1,1fr)}
       .hero{flex-direction:column;align-items:flex-start}
+      h2{font-size:1rem}
     }
 
-    .toast{position:fixed;right:18px;bottom:18px;background:var(--primary);color:#fff;padding:10px 14px;border-radius:10px;display:none;z-index:2200}
+    /* utility */
+    .right{margin-left:auto}
+    .muted-small{color:var(--muted);font-size:0.9rem}
+    .progress {height:8px;background:#f1fff5;border-radius:8px;overflow:hidden}
+    .progress > div{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));width:0;transition:width .6s ease}
+    .toast {position:fixed;right:18px;bottom:18px;background:var(--primary);color:#fff;padding:10px 14px;border-radius:10px;display:none;z-index:2200;box-shadow:0 6px 18px rgba(0,0,0,0.18)}
+    .small-muted{font-size:0.85rem;color:var(--muted)}
+    .countdown{font-weight:800;color:var(--primary)}
+    .chip{background:#f0fff4;padding:6px 8px;border-radius:8px;font-weight:700;color:var(--primary)}
+    .dark-toggle{cursor:pointer;border-radius:8px;padding:6px 8px;border:1px solid rgba(255,255,255,0.12)}
   </style>
 </head>
 <body>
 
   <!-- TOPBAR -->
-  <div class="topbar" id="topbar">
-    <div class="brand">
+  <div class="topbar" data-aos="fade-down">
+    <div class="brand" style="gap:10px">
       <i class="fas fa-seedling" style="font-size:1.25rem;color:#ffcc00"></i>
       <div>
         <h1>Visionary Youth Group</h1>
-        <div style="font-size:0.85rem;color:rgba(255,255,255,0.9)">Member Portal — SEKU NeoPortal</div>
+        <div class="small-muted">Member portal — SEKU NeoPortal</div>
       </div>
     </div>
 
     <div class="user-area">
-      <div style="display:flex;gap:12px;align-items:center">
-        <div id="agmtimer" style="font-size:0.95rem;color:rgba(255,255,255,0.9)">AGM: <span id="agmCountdown">—</span></div>
-        <button class="btn ghost" id="downloadCenterBtn"><i class="fas fa-download"></i>&nbsp;Downloads</button>
-        <div id="topAvatar" style="width:44px;height:44px;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden">
-          <i class="fas fa-user" style="color:var(--primary)"></i>
-        </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div id="agmtimer" class="small-muted" style="margin-right:12px">AGM: <span class="countdown" id="agmCountdown">—</span></div>
+        <div class="dark-toggle" id="darkToggle" title="Toggle dark mode"><i class="fas fa-moon"></i></div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:12px;margin-left:12px">
+        <button class="btn ghost small" id="notifOpenBtn"><i class="fas fa-bell"></i> <span id="notifCount" style="margin-left:8px">0</span></button>
+        <button class="btn ghost small" id="downloadCenterBtn"><i class="fas fa-download"></i> Downloads</button>
+        <div class="avatar" id="topAvatar"><i class="fas fa-user" style="color:var(--primary)"></i></div>
       </div>
     </div>
   </div>
@@ -136,12 +186,12 @@
   <div style="height:72px"></div>
 
   <div class="app">
-    <!-- Sidebar -->
-    <aside class="sidebar expanded" id="sidebar">
-      <div style="display:flex;align-items:center;gap:8px">
-        <i class="fas fa-seedling" style="color:#ffcc00;font-size:1.1rem"></i>
+    <!-- SIDEBAR (collapsible) -->
+    <aside class="sidebar expanded" id="sidebar" data-aos="fade-right">
+      <div class="brandMini">
+        <i class="fas fa-seedling" style="color:#ffcc00;font-size:1.15rem"></i>
         <div style="display:flex;flex-direction:column">
-          <strong style="color:var(--primary)">VYG</strong>
+          <span style="font-weight:800;color:var(--primary);font-size:0.95rem">VYG</span>
           <small class="muted">Member</small>
         </div>
       </div>
@@ -155,88 +205,113 @@
         <div class="navBtn" data-target="profile-area" title="Profile"><i class="fas fa-user-edit"></i><span class="navLabel"> Profile</span></div>
       </div>
 
-      <div style="margin-top:auto;">
-        <div id="toggleSidebarBtn" style="cursor:pointer;color:var(--muted);font-size:0.95rem"><i class="fas fa-chevron-left"></i> Collapse</div>
+      <div style="margin-top:auto;text-align:center">
+        <div class="toggleSide" id="toggleSidebarBtn"><i class="fas fa-chevron-left"></i> Collapse</div>
       </div>
     </aside>
 
-    <!-- Main -->
-    <main class="page">
+    <!-- MAIN PAGE -->
+    <main class="page" id="pageRoot">
       <div class="page-inner">
 
-        <!-- Left column -->
+        <!-- LEFT Column -->
         <div>
-          <div class="card hero" id="overview" data-aos="fade-up">
-            <div>
+
+          <!-- HERO + summary -->
+          <div class="card hero" data-aos="fade-up" id="overview">
+            <div class="left">
               <div style="display:flex;gap:12px;align-items:center">
-                <div id="welcomeName" style="font-weight:800;font-size:1.1rem">Welcome, Member</div>
-                <div id="memberStatus" style="padding:6px 10px;border-radius:8px;background:#f0fff4;color:var(--primary);font-weight:700">Active</div>
+                <div style="font-size:1.1rem;font-weight:800" id="welcomeName">Welcome, Member</div>
+                <div class="chip" id="memberStatus">Active</div>
               </div>
-              <div style="margin-top:6px;color:var(--muted)">Snapshot • All amounts in <strong>Ksh</strong></div>
-              <div style="margin-top:8px;font-size:0.95rem">Points: <strong id="pointsDisplay">0</strong> • <span id="memberSince" style="color:var(--muted)">Joined: —</span></div>
+              <div class="muted-small" style="margin-top:6px">Snapshot • All amounts in <strong>Ksh</strong></div>
+              <div style="margin-top:8px;font-size:0.95rem">Points: <strong id="pointsDisplay">0</strong> • <span class="muted-small" id="memberSince">Joined: —</span></div>
             </div>
-            <div>
+
+            <div class="actions right">
               <button class="btn" id="quickApply"><i class="fas fa-file-signature"></i>&nbsp;Apply Loan</button>
               <button class="btn ghost" id="quickStatement"><i class="fas fa-file-pdf"></i>&nbsp;Statement</button>
             </div>
           </div>
 
+          <!-- Balances -->
           <div class="card" id="balancesCard" data-aos="fade-up">
             <h2>Balances & Accounts</h2>
             <div class="balances" style="margin-top:12px">
-              <div class="balance"><div class="label">Monthly Savings</div><div class="value" id="monthlyVal">Ksh 0</div></div>
-              <div class="balance"><div class="label">Weekly Savings</div><div class="value" id="weeklyVal">Ksh 0</div></div>
-              <div class="balance"><div class="label">Shares</div><div class="value" id="sharesVal">Ksh 0</div></div>
-              <div class="balance"><div class="label">Dividends</div><div class="value" id="dividendsVal">Ksh 0</div></div>
-              <div class="balance"><div class="label">Total Loans</div><div class="value" id="totalLoansVal">Ksh 0</div></div>
-              <div class="balance"><div class="label">Outstanding</div><div class="value" id="outstandingLoansVal">Ksh 0</div></div>
+              <div class="balance">
+                <div class="label">Monthly Savings</div>
+                <div class="value" id="monthlyVal">Ksh 0</div>
+              </div>
+              <div class="balance">
+                <div class="label">Weekly Savings</div>
+                <div class="value" id="weeklyVal">Ksh 0</div>
+              </div>
+              <div class="balance">
+                <div class="label">Shares</div>
+                <div class="value" id="sharesVal">Ksh 0</div>
+              </div>
+              <div class="balance">
+                <div class="label">Dividends</div>
+                <div class="value" id="dividendsVal">Ksh 0</div>
+              </div>
+              <div class="balance">
+                <div class="label">Total Loans</div>
+                <div class="value" id="totalLoansVal">Ksh 0</div>
+              </div>
+              <div class="balance">
+                <div class="label">Outstanding</div>
+                <div class="value" id="outstandingLoansVal">Ksh 0</div>
+              </div>
             </div>
 
-            <div style="display:flex;gap:12px;margin-top:14px;flex-wrap:wrap">
-              <div style="flex:1;min-width:220px" class="card">
-                <div style="display:flex;justify-content:space-between;align-items:center">
+            <!-- mini charts -->
+            <div style="display:flex;gap:12px;margin-top:14px;align-items:center;flex-wrap:wrap">
+              <div style="flex:1;min-width:220px" class="card" data-aos="fade-left">
+                <div style="display:flex;align-items:center;gap:8px">
                   <div style="font-weight:700">Share growth</div>
-                  <div style="color:var(--muted);font-size:0.9rem">Last 6 months</div>
+                  <div class="muted-small right">Last 6 months</div>
                 </div>
                 <canvas id="sharesChart" style="height:110px;margin-top:8px"></canvas>
               </div>
 
-              <div style="min-width:220px;flex:0 0 260px" class="card">
+              <div style="min-width:220px;flex:0 0 260px" class="card" data-aos="fade-left">
                 <div style="display:flex;justify-content:space-between;align-items:center">
-                  <div><strong>Points & Activity</strong><div style="color:var(--muted);font-size:0.9rem">Earned for actions</div></div>
-                  <div id="pointsChip" style="background:#f0fff4;padding:6px 8px;border-radius:8px;font-weight:700;color:var(--primary)">0 pts</div>
+                  <div><strong>Points & Activity</strong><div class="muted-small">Earned for actions</div></div>
+                  <div class="chip" id="pointsChip">0 pts</div>
                 </div>
                 <div style="margin-top:10px">
-                  <div style="height:8px;background:#f1fff5;border-radius:8px;overflow:hidden"><div id="pointsProgress" style="height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));width:0%"></div></div>
-                  <div style="color:var(--muted);font-size:0.9rem;margin-top:6px">Next reward at 100 pts</div>
+                  <div class="progress"><div id="pointsProgress" style="width:0%"></div></div>
+                  <div class="muted-small" style="margin-top:6px">Next reward at 100 pts</div>
                 </div>
               </div>
             </div>
           </div>
 
+          <!-- Action bar -->
           <div class="card action-bar" data-aos="fade-up">
             <div class="action-stat">
-              <h4 style="margin:0">Next Installment</h4>
-              <p id="nextInstallment" style="margin:6px 0 0 0">Ksh 0 • <small id="nextInstallmentDate" style="color:var(--muted)">—</small></p>
+              <h4>Next Installment</h4>
+              <p id="nextInstallment">Ksh 0 • <span class="muted-small" id="nextInstallmentDate">—</span></p>
             </div>
             <div class="action-stat">
-              <h4 style="margin:0">Loan Stage</h4>
-              <p id="loanStage" style="margin:6px 0 0 0">—</p>
+              <h4>Loan Stage</h4>
+              <p id="loanStage">—</p>
             </div>
             <div class="action-stat">
-              <h4 style="margin:0">Interest Rate</h4>
-              <p id="loanInterest" style="margin:6px 0 0 0">—</p>
+              <h4>Interest Rate</h4>
+              <p id="loanInterest">—</p>
             </div>
             <div style="display:flex;gap:8px;align-items:center">
-              <button class="btn" id="makePaymentBtn"><i class="fas fa-money-bill-wave"></i>&nbsp;Pay (M-Pesa)</button>
-              <button class="btn ghost" id="openLoanWizard">Manage Loan</button>
+              <button class="btn small" id="makePaymentBtn"><i class="fas fa-money-bill-wave"></i>&nbsp;Pay (M-Pesa)</button>
+              <button class="btn ghost small" id="openLoanWizard">Manage Loan</button>
             </div>
           </div>
 
+          <!-- Recent activities -->
           <div class="card" data-aos="fade-up">
             <div style="display:flex;justify-content:space-between;align-items:center">
               <h2>Recent Activities</h2>
-              <select id="activityFilter" style="padding:6px;border-radius:8px;border:1px solid var(--glass-border)">
+              <select id="activityFilter" class="muted-small">
                 <option value="all">All</option>
                 <option value="loan">Loans</option>
                 <option value="share">Shares</option>
@@ -244,9 +319,10 @@
                 <option value="withdrawal">Withdrawals</option>
               </select>
             </div>
-            <ul id="activity-timeline" style="margin-top:12px;color:var(--muted)"></ul>
+            <ul id="activity-timeline" style="margin-top:12px" class="muted-small"></ul>
           </div>
 
+          <!-- Transaction history -->
           <div class="card" data-aos="fade-up">
             <h2>Transaction History</h2>
             <div style="overflow:auto;margin-top:8px">
@@ -254,20 +330,22 @@
                 <thead>
                   <tr><th>Date</th><th>Description</th><th>Debit</th><th>Credit</th><th>Balance</th></tr>
                 </thead>
-                <tbody id="transactionsBody"><tr><td colspan="5" class="muted">Loading transactions…</td></tr></tbody>
+                <tbody id="transactionsBody">
+                  <tr><td colspan="5" class="muted">Loading transactions…</td></tr>
+                </tbody>
               </table>
             </div>
             <div style="margin-top:10px;display:flex;gap:8px">
-              <button class="btn ghost" id="exportTransactionsPdf">Download PDF</button>
-              <button class="btn" id="refreshTx">Refresh</button>
+              <button class="btn ghost small" id="exportTransactionsPdf">Download PDF</button>
+              <button class="btn small" id="refreshTx">Refresh</button>
             </div>
           </div>
 
-          <!-- Loan Wizard -->
-          <div class="card" id="loanWizardCard" style="display:none" data-aos="fade-up">
+          <!-- LOAN WIZARD (hidden default) -->
+          <div class="card wizard" id="loanWizardCard" style="display:none" data-aos="fade-up">
             <div style="display:flex;justify-content:space-between;align-items:center">
               <h2>Loan Application — Wizard</h2>
-              <button class="btn ghost" id="closeWizard">Close</button>
+              <button class="btn ghost small" id="closeWizard">Close</button>
             </div>
 
             <div class="steps" id="loanWizardSteps">
@@ -349,7 +427,8 @@
 
               <div class="wizard-step" data-step="5">
                 <h3>Confirm & Submit</h3>
-                <div style="color:var(--muted);margin-top:6px">Review the data then submit. A PDF will be generated and the application saved to RTDB.</div>
+                <div class="muted-small">Review the data then submit. A PDF will be generated and the application saved to RTDB.</div>
+
                 <div style="margin-top:12px;display:flex;gap:8px">
                   <label style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="wizardAgree" required> I agree to the terms</label>
                   <div style="margin-left:auto;display:flex;gap:8px">
@@ -361,26 +440,32 @@
             </form>
           </div>
 
-        </div>
+        </div> <!-- left column -->
 
-        <!-- Right column -->
+        <!-- RIGHT Column -->
         <aside>
+
+          <!-- Notifications -->
           <div class="card" data-aos="fade-left">
             <h2>🔔 Notifications</h2>
-            <div id="notificationsList" style="max-height:260px;overflow:auto;padding-right:6px">
-              <div style="padding:10px;border-radius:8px;border:1px solid #ecf8ef;background:linear-gradient(180deg,#fff,#fbfff8)">Loading notifications…</div>
+            <div class="notif-list" id="notificationsList">
+              <div class="notif-item">Loading notifications…</div>
             </div>
           </div>
 
+          <!-- Downloads -->
           <div class="card" id="downloadsSection" data-aos="fade-left">
             <h2>Downloads</h2>
             <div style="display:flex;gap:8px;margin-bottom:10px">
-              <button class="btn ghost" id="uploadPdfBtn"><i class="fas fa-upload"></i> Upload</button>
-              <button class="btn" id="refreshDownloads">Refresh</button>
+              <button class="btn ghost small" id="uploadPdfBtn"><i class="fas fa-upload"></i> Upload</button>
+              <button class="btn small" id="refreshDownloads">Refresh</button>
             </div>
-            <div class="downloads" id="downloadsList"><div class="muted">Loading files…</div></div>
+            <div class="downloads" id="downloadsList">
+              <div class="muted">Loading files…</div>
+            </div>
           </div>
 
+          <!-- Withdraw & Quick pay -->
           <div class="card" data-aos="fade-left">
             <h2>Quick Actions</h2>
             <div style="display:flex;flex-direction:column;gap:8px">
@@ -390,6 +475,7 @@
             </div>
           </div>
 
+          <!-- Profile -->
           <div class="card" id="profile-area" data-aos="fade-left">
             <h2><i class="fas fa-user-edit"></i> Profile</h2>
             <div style="display:grid;grid-template-columns:1fr;gap:8px;margin-top:8px">
@@ -404,446 +490,644 @@
               <button class="btn ghost" id="choosePhotoBtn"><i class="fas fa-camera"></i>&nbsp;Upload Photo</button>
               <button class="btn" id="saveProfile">Save Profile</button>
             </div>
-            <div style="color:var(--muted);font-size:0.9rem;margin-top:8px">Profile saved to RTDB and photo to Storage.</div>
+            <div class="muted-small" style="margin-top:8px">Profile saved to RTDB and photo to Storage.</div>
           </div>
+
         </aside>
 
-      </div>
+      </div> <!-- page-inner -->
     </main>
   </div>
 
+  <!-- Hidden forms (withdraw wizard / others) -->
+  <div id="withdrawModal" style="display:none">
+    <!-- We'll show a wizard similar to loan wizard via JS -->
+  </div>
+
+  <!-- Toast -->
   <div id="toast" class="toast"></div>
 
-  <!-- Firebase and app logic. Wrapped to run after DOM loads to avoid 'null' errors -->
+  <!-- Firebase & App logic -->
   <script type="module">
-    // Ensure DOM loaded before running
-    window.addEventListener('DOMContentLoaded', async () => {
-      // Modular Firebase imports
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-      import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-      import { getDatabase, ref, onValue, get, push, set, update } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
-      import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, listAll } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
+    // Imports
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import { getDatabase, ref, onValue, get, push, set, update, child, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+    import { getStorage, ref as sRef, uploadBytes, getDownloadURL, listAll } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
 
-      const { jsPDF } = window.jspdf;
+    // jsPDF
+    const { jsPDF } = window.jspdf;
 
-      // Use the Firebase config you pasted earlier (kept intact)
-      const firebaseConfig = {
-        apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
-        authDomain: "visionary-youth-grou-2024.firebaseapp.com",
-        databaseURL: "https://visionary-youth-grou-2024-default-rtdb.firebaseio.com",
-        projectId: "visionary-youth-grou-2024",
-        storageBucket: "visionary-youth-grou-2024.appspot.com",
-        messagingSenderId: "372978592717",
-        appId: "1:372978592717:web:1c15aec728ee5f854f3284"
-      };
+    // Initialize Firebase (your config supplied earlier)
+    const firebaseConfig = {
+      apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
+      authDomain: "visionary-youth-grou-2024.firebaseapp.com",
+      databaseURL: "https://visionary-youth-grou-2024-default-rtdb.firebaseio.com",
+      projectId: "visionary-youth-grou-2024",
+      storageBucket: "visionary-youth-grou-2024.appspot.com",
+      messagingSenderId: "372978592717",
+      appId: "1:372978592717:web:1c15aec728ee5f854f3284"
+    };
 
-      // Initialize
-      const app = initializeApp(firebaseConfig);
-      const auth = getAuth(app);
-      const db = getDatabase(app);
-      const storage = getStorage(app);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+    const storage = getStorage(app);
 
-      // Helpers
-      const toastEl = document.getElementById('toast');
-      function showToast(msg, t=3200){ toastEl.textContent = msg; toastEl.style.display='block'; setTimeout(()=> toastEl.style.display='none', t); }
-      function formatKsh(n){ const num = Number(n||0); return 'Ksh ' + num.toLocaleString('en-KE'); }
-      function computeAmountFromSnap(obj){ if(!obj) return 0; if(typeof obj === 'number') return obj; let total=0; Object.values(obj||{}).forEach(v=>{ if(typeof v === 'number') total += v; else if(v && typeof v === 'object' && 'amount' in v) total += Number(v.amount||0); else if(v && typeof v === 'object') Object.values(v).forEach(c=>{ if(c && typeof c === 'object' && 'amount' in c) total += Number(c.amount||0); }); }); return total; }
+    // UI refs
+    const toastEl = document.getElementById('toast');
+    function showToast(msg, time=3500){
+      toastEl.textContent = msg; toastEl.style.display='block';
+      setTimeout(()=> toastEl.style.display='none', time);
+    }
 
-      // Small confetti
-      function celebrate(){ try{ confetti({particleCount:50,spread:60,origin:{y:0.6}}); }catch(e){} }
+    // Short helpers
+    function formatKsh(n){
+      const num = Number(n||0);
+      return 'Ksh ' + num.toLocaleString('en-KE');
+    }
+    function el(sel){ return document.querySelector(sel); }
+    function qAll(sel){ return Array.from(document.querySelectorAll(sel)); }
 
-      // Chart init
-      let sharesChart;
-      function initCharts(){
-        try{
-          const ctx = document.getElementById('sharesChart').getContext('2d');
-          sharesChart = new Chart(ctx, { type:'line', data:{ labels:['Jan','Feb','Mar','Apr','May','Jun'], datasets:[{label:'Shares',data:[0,0,0,0,0,0],tension:0.4,fill:true}]}, options:{responsive:true,plugins:{legend:{display:false}}} });
-        }catch(e){ console.warn('Chart init failed',e); }
+    // AOS init
+    import('https://unpkg.com/aos@2.3.1/dist/aos.js').then(mod => { AOS.init({ duration:700, once:true }); }).catch(()=>{});
+
+    // State
+    let currentUid = null;
+    let profileLoaded = false;
+
+    // Small confetti wrapper
+    function celebrate(){
+      confetti({particleCount:60,spread:70,origin:{y:0.6}});
+    }
+
+    // Chart placeholders
+    let sharesChart;
+    function initCharts(){
+      const ctx = document.getElementById('sharesChart').getContext('2d');
+      sharesChart = new Chart(ctx, {
+        type:'line',
+        data:{
+          labels:['Jan','Feb','Mar','Apr','May','Jun'],
+          datasets:[{label:'Shares',data:[0,0,0,0,0,0],tension:0.4,fill:true}]
+        },
+        options:{responsive:true,plugins:{legend:{display:false}}}
+      });
+    }
+
+    // Build transaction row
+    function txRow(tx){
+      const tr = document.createElement('tr');
+      const d = new Date(tx.ts||Date.now());
+      tr.innerHTML = `<td>${d.toLocaleString()}</td><td>${tx.desc || ''}</td><td>${tx.debit?formatKsh(tx.debit):'-'}</td><td>${tx.credit?formatKsh(tx.credit):'-'}</td><td>${formatKsh(tx.balance||0)}</td>`;
+      return tr;
+    }
+
+    // Listen auth
+    onAuthStateChanged(auth, async user => {
+      if(!user){
+        // For testing you may comment this redirect
+        // location.href='index.html';
+        // We'll keep using a demo mode if not logged in
+        console.warn('Not authenticated — demo mode.');
+        // For demo, set a demo uid
+        // return;
+      } else {
+        currentUid = user.uid;
       }
-      initCharts();
 
-      // Attach UI interactions that do not depend on auth
-      document.querySelectorAll('.sidebar .navBtn').forEach(btn=>{
-        btn.addEventListener('click', ()=> {
-          document.querySelectorAll('.sidebar .navBtn').forEach(b=>b.classList.remove('active'));
-          btn.classList.add('active');
-          const target = btn.dataset.target;
-          const el = document.getElementById(target);
-          if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+      // For both demo and real, try to read profile if currentUid available
+      if(currentUid){
+        // profile listener
+        onValue(ref(db, `members/${currentUid}/profile`), snap=>{
+          if(!snap.exists()) return;
+          const p = snap.val();
+          if(p.name) document.getElementById('welcomeName').textContent = p.name;
+          if(p.name) document.getElementById('profile_fullName').value = p.name;
+          if(p.phone) document.getElementById('profile_phone').value = p.phone;
+          if(p.id) document.getElementById('profile_id').value = p.id;
+          if(p.yearJoined) document.getElementById('profile_yearJoined').value = p.yearJoined;
+          if(p.dob) document.getElementById('profile_dob').value = p.dob;
+          if(p.status) document.getElementById('memberStatus').textContent = p.status;
+          if(p.joinedAt) document.getElementById('memberSince').textContent = `Joined: ${new Date(p.joinedAt).getFullYear()}`;
+          profileLoaded = true;
         });
-      });
-      document.getElementById('toggleSidebarBtn').addEventListener('click', ()=>{
-        const s = document.getElementById('sidebar');
-        s.classList.toggle('expanded');
-        document.getElementById('toggleSidebarBtn').innerHTML = s.classList.contains('expanded') ? '<i class="fas fa-chevron-left"></i> Collapse' : '<i class="fas fa-chevron-right"></i> Expand';
-      });
 
-      // AGM countdown
-      (function agmCountdown(){
-        const target = new Date('2025-12-14T13:30:00+03:00').getTime();
-        const el = document.getElementById('agmCountdown');
-        setInterval(()=> {
-          const now = Date.now(); const diff = Math.max(0, target - now);
-          const d = Math.floor(diff/(1000*60*60*24)); const h = Math.floor((diff%(1000*60*60*24))/(1000*60*60)); const m = Math.floor((diff%(1000*60*60))/(1000*60));
-          el.textContent = `${d}d ${h}h ${m}m`;
-        },1000);
-      })();
+        // photo
+        onValue(ref(db, `members/${currentUid}/photoURL`), snap=>{
+          if(snap.exists()){
+            const url = snap.val();
+            const a = document.getElementById('topAvatar');
+            a.innerHTML = `<img src="${url}" alt="avatar">`;
+          }
+        });
 
-      // Toast-friendly safe getter
-      function safeGet(elId){ return document.getElementById(elId) || null; }
+        // points
+        onValue(ref(db, `members/${currentUid}/points`), snap=>{
+          const p = snap.exists() ? Number(snap.val()||0) : 0;
+          document.getElementById('pointsDisplay').textContent = p;
+          document.getElementById('pointsChip').textContent = `${p} pts`;
+          const pc = Math.min(100, Math.round((p/100)*100));
+          document.getElementById('pointsProgress').style.width = pc+'%';
+        });
 
-      // Auth: listen and then attach RTDB listeners
-      let currentUid = null;
-      onAuthStateChanged(auth, async (user) => {
-        if(!user){ console.warn('Not authenticated. Dashboard works in demo mode but many features require sign-in.'); /* do not redirect in case of testing */ }
-        currentUid = user ? user.uid : null;
+        // balances
+        onValue(ref(db, `members/${currentUid}/savings/monthly`), snap=>{
+          const v = snap.exists() ? (typeof snap.val() === 'number' ? snap.val() : computeAmountFromSnap(snap.val())) : 0;
+          document.getElementById('monthlyVal').textContent = formatKsh(v);
+        });
+        onValue(ref(db, `members/${currentUid}/savings/weekly`), snap=>{
+          const v = snap.exists() ? (typeof snap.val() === 'number' ? snap.val() : computeAmountFromSnap(snap.val())) : 0;
+          document.getElementById('weeklyVal').textContent = formatKsh(v);
+        });
+        onValue(ref(db, `members/${currentUid}/shares/total`), snap=>{
+          const v = snap.exists()? Number(snap.val()||0) : 0;
+          document.getElementById('sharesVal').textContent = formatKsh(v);
+        });
+        onValue(ref(db, `members/${currentUid}/shares/dividends`), snap=>{
+          const v = snap.exists()? Number(snap.val()||0) : 0;
+          document.getElementById('dividendsVal').textContent = formatKsh(v);
+        });
 
-        // Load profile if exists
-        if(currentUid){
-          onValue(ref(db, `members/${currentUid}/profile`), snap=>{
-            if(!snap.exists()) return;
-            const p = snap.val();
-            if(p.name) safeGet('welcomeName').textContent = p.name;
-            if(p.name) safeGet('profile_fullName').value = p.name;
-            if(p.phone) safeGet('profile_phone').value = p.phone;
-            if(p.id) safeGet('profile_id').value = p.id;
-            if(p.yearJoined) safeGet('profile_yearJoined').value = p.yearJoined;
-            if(p.dob) safeGet('profile_dob').value = p.dob;
-            if(p.status) safeGet('memberStatus').textContent = p.status;
-            if(p.joinedAt) safeGet('memberSince').textContent = `Joined: ${new Date(p.joinedAt).getFullYear()}`;
+        // loans summary
+        onValue(ref(db, `members/${currentUid}/loans/summary`), snap=>{
+          const s = snap.exists()? snap.val() : {};
+          document.getElementById('totalLoansVal').textContent = formatKsh(s.total||0);
+          document.getElementById('outstandingLoansVal').textContent = formatKsh(s.outstanding||0);
+          document.getElementById('loanStage').textContent = s.stage || '—';
+          document.getElementById('loanInterest').textContent = s.interest ? (s.interest + '%') : '—';
+          document.getElementById('nextInstallment').textContent = formatKsh(s.nextInstallment || 0);
+          document.getElementById('nextInstallmentDate').textContent = s.nextDue ? new Date(s.nextDue).toLocaleDateString() : '—';
+        });
+
+        // notifications (rt DB)
+        onValue(ref(db, `notifications`), snap=>{
+          const list = document.getElementById('notificationsList');
+          list.innerHTML = '';
+          if(!snap.exists()){
+            list.innerHTML = '<div class="notif-item">No notifications</div>';
+            document.getElementById('notifCount').textContent = '0';
+            return;
+          }
+          const obj = snap.val();
+          const entries = Object.entries(obj).sort((a,b)=> (b[1].ts||0)-(a[1].ts||0));
+          document.getElementById('notifCount').textContent = entries.length;
+          entries.slice(0,10).forEach(([k,n])=>{
+            const div = document.createElement('div'); div.className='notif-item';
+            div.innerHTML = `<strong style="color:var(--primary)">${n.title||'Update'}</strong><div class="muted-small">${n.message||''}</div><small class="muted-small">${new Date(n.ts||Date.now()).toLocaleString()}</small>`;
+            list.appendChild(div);
           });
+        });
 
-          // Profile photo
-          onValue(ref(db, `members/${currentUid}/photoURL`), snap=>{
-            if(snap.exists()){
-              const url = snap.val();
-              const a = safeGet('topAvatar');
-              if(a) a.innerHTML = `<img src="${url}" alt="avatar" style="width:100%;height:100%;object-fit:cover">`;
-            }
+        // activity log (recent)
+        onValue(ref(db, `members/${currentUid}/activityLog`), snap=>{
+          const el = document.getElementById('activity-timeline');
+          el.innerHTML = '';
+          if(!snap.exists()){ el.innerHTML = '<li class="muted-small">No recent activity</li>'; return; }
+          const arr = Object.values(snap.val()).sort((a,b)=> (b.ts||0)-(a.ts||0)).slice(0,20);
+          arr.forEach(it=>{
+            const li = document.createElement('li');
+            li.className='muted-small';
+            li.innerHTML = `<strong>${it.text}</strong> • <small class="muted-small">${new Date(it.ts||Date.now()).toLocaleString()}</small>`;
+            el.appendChild(li);
           });
+        });
 
-          // Points
-          onValue(ref(db, `members/${currentUid}/points`), snap=>{
-            const p = snap.exists() ? Number(snap.val()||0) : 0;
-            safeGet('pointsDisplay').textContent = p;
-            safeGet('pointsChip').textContent = `${p} pts`;
-            const pc = Math.min(100, Math.round((p/100)*100));
-            safeGet('pointsProgress').style.width = pc+'%';
+        // transactions (listen to last 50)
+        const txRef = ref(db, `members/${currentUid}/transactions`);
+        onValue(txRef, snap=>{
+          const tbody = document.getElementById('transactionsBody');
+          tbody.innerHTML = '';
+          if(!snap.exists()){
+            tbody.innerHTML = '<tr><td colspan="5" class="muted">No transactions yet</td></tr>'; return;
+          }
+          const txs = Object.values(snap.val()).sort((a,b)=> (b.ts||0)-(a.ts||0));
+          txs.slice(0,100).forEach(tx=>{
+            tbody.appendChild(txRow(tx));
           });
+        });
 
-          // Balances listeners
-          onValue(ref(db, `members/${currentUid}/savings/monthly`), snap=>{
-            const v = snap.exists() ? (typeof snap.val()==='number' ? snap.val() : computeAmountFromSnap(snap.val())) : 0;
-            safeGet('monthlyVal').textContent = formatKsh(v);
-          });
-          onValue(ref(db, `members/${currentUid}/savings/weekly`), snap=>{
-            const v = snap.exists() ? (typeof snap.val()==='number' ? snap.val() : computeAmountFromSnap(snap.val())) : 0;
-            safeGet('weeklyVal').textContent = formatKsh(v);
-          });
-          onValue(ref(db, `members/${currentUid}/shares/total`), snap=>{
-            const v = snap.exists()? Number(snap.val()||0) : 0; safeGet('sharesVal').textContent = formatKsh(v);
-          });
-          onValue(ref(db, `members/${currentUid}/shares/dividends`), snap=>{
-            const v = snap.exists()? Number(snap.val()||0) : 0; safeGet('dividendsVal').textContent = formatKsh(v);
-          });
-
-          // loan summary
-          onValue(ref(db, `members/${currentUid}/loans/summary`), snap=>{
-            const s = snap.exists()? snap.val() : {};
-            safeGet('totalLoansVal').textContent = formatKsh(s.total||0);
-            safeGet('outstandingLoansVal').textContent = formatKsh(s.outstanding||0);
-            safeGet('loanStage').textContent = s.stage || '—';
-            safeGet('loanInterest').textContent = s.interest ? `${s.interest}%` : '—';
-            safeGet('nextInstallment').textContent = formatKsh(s.nextInstallment || 0);
-            safeGet('nextInstallmentDate').textContent = s.nextDue ? new Date(s.nextDue).toLocaleDateString() : '—';
-          });
-
-          // notifications (RTDB)
-          onValue(ref(db, `notifications`), snap=>{
-            const list = safeGet('notificationsList');
-            if(!list) return;
-            list.innerHTML = '';
-            if(!snap.exists()){ list.innerHTML = '<div style="padding:10px;border-radius:8px;border:1px solid #ecf8ef;background:linear-gradient(180deg,#fff,#fbfff8)">No notifications</div>'; return; }
-            const obj = snap.val();
-            const entries = Object.entries(obj).sort((a,b)=> (b[1].ts||0)-(a[1].ts||0));
-            entries.slice(0,10).forEach(([k,n])=>{
-              const div = document.createElement('div'); div.style.padding='10px'; div.style.borderRadius='8px'; div.style.border='1px solid #ecf8ef'; div.style.background='linear-gradient(180deg,#fff,#fbfff8)'; div.style.marginBottom='8px';
-              div.innerHTML = `<strong style="color:var(--primary)">${n.title||'Update'}</strong><div style="color:var(--muted);font-size:0.92rem">${n.message||''}</div><small style="color:var(--muted)">${new Date(n.ts||Date.now()).toLocaleString()}</small>`;
-              list.appendChild(div);
-            });
-          });
-
-          // activity log
-          onValue(ref(db, `members/${currentUid}/activityLog`), snap=>{
-            const el = safeGet('activity-timeline');
-            if(!el) return;
-            el.innerHTML = '';
-            if(!snap.exists()){ el.innerHTML = '<li style="color:var(--muted)">No recent activity</li>'; return; }
-            const arr = Object.values(snap.val()).sort((a,b)=> (b.ts||0)-(a.ts||0));
-            arr.slice(0,20).forEach(it=>{
-              const li = document.createElement('li'); li.style.marginBottom='6px'; li.style.color='var(--muted)';
-              li.innerHTML = `<strong>${it.text}</strong> • <small style="color:var(--muted)">${new Date(it.ts||Date.now()).toLocaleString()}</small>`;
-              el.appendChild(li);
-            });
-          });
-
-          // transactions
-          onValue(ref(db, `members/${currentUid}/transactions`), snap=>{
-            const tbody = safeGet('transactionsBody'); if(!tbody) return;
-            tbody.innerHTML = '';
-            if(!snap.exists()){ tbody.innerHTML = '<tr><td colspan="5" class="muted">No transactions yet</td></tr>'; return; }
-            const txs = Object.values(snap.val()).sort((a,b)=> (b.ts||0)-(a.ts||0));
-            txs.slice(0,200).forEach(tx=>{
-              const tr = document.createElement('tr');
-              tr.innerHTML = `<td>${new Date(tx.ts||Date.now()).toLocaleString()}</td><td>${tx.desc||''}</td><td>${tx.debit?formatKsh(tx.debit):'-'}</td><td>${tx.credit?formatKsh(tx.credit):'-'}</td><td>${formatKsh(tx.balance||0)}</td>`;
-              tbody.appendChild(tr);
-            });
-          });
-
-          // downloads / uploads listing: prefer RTDB index; fallback to Storage listAll
-          async function refreshDownloads(){
-            const listEl = safeGet('downloadsList'); if(!listEl) return;
-            listEl.innerHTML = '<div class="muted">Loading files…</div>';
-            try{
-              const idxSnap = await get(ref(db, `members/${currentUid}/uploadsIndex`));
-              listEl.innerHTML = '';
-              if(idxSnap.exists()){
-                const arr = Object.entries(idxSnap.val()).reverse();
-                arr.forEach(([k,v])=>{
-                  const card = document.createElement('div'); card.className='download-card';
-                  card.innerHTML = `<strong>${v.name||k}</strong><div style="color:var(--muted);font-size:0.9rem">${new Date(v.ts||Date.now()).toLocaleString()}</div><div style="margin-top:auto;display:flex;gap:8px"><button class="btn ghost" onclick="window.open('${v.url}','_blank')">Open</button><button class="btn" onclick="window.open('${v.url}','_blank')">Download</button></div>`;
-                  listEl.appendChild(card);
-                });
-                return;
-              }
-              // fallback: storage listAll at members/{uid}/uploads
+        // downloads: read storage root "members/{uid}/files" or RTDB index
+        async function refreshDownloads(){
+          const listEl = document.getElementById('downloadsList');
+          listEl.innerHTML = '<div class="muted">Loading files…</div>';
+          try{
+            // prefer RTDB index if present
+            const idxSnap = await get(ref(db, `members/${currentUid}/uploads`));
+            listEl.innerHTML = '';
+            if(idxSnap.exists()){
+              const files = idxSnap.val();
+              Object.entries(files).reverse().forEach(([k,f])=>{
+                const card = document.createElement('div');
+                card.className='download-card';
+                card.innerHTML = `<strong>${f.name||k}</strong><div class="muted-small">${new Date(f.ts||Date.now()).toLocaleDateString()}</div><div style="margin-top:auto;display:flex;gap:8px"><button class="btn ghost small" data-url="${f.url||''}" onclick="(e=>window.open(e.target.dataset.url,'_blank'))(event)">Open</button><button class="btn small" onclick="(e=>downloadByUrl(e))(event)" data-url="${f.url||''}">Download</button></div>`;
+                listEl.appendChild(card);
+              });
+            } else {
+              // fallback to listing storage path
               const folder = `members/${currentUid}/uploads`;
-              const sRef = storageRef(storage, folder);
-              const res = await listAll(sRef);
+              const storageRef = sRef(storage, folder);
+              const res = await listAll(storageRef);
               listEl.innerHTML = '';
-              if(!res.items.length){ listEl.innerHTML = '<div class="muted">No files uploaded</div>'; return; }
+              if(res.items.length===0){ listEl.innerHTML='<div class="muted">No files uploaded</div>'; return; }
               for(const itemRef of res.items.slice().reverse()){
                 const url = await getDownloadURL(itemRef);
                 const name = itemRef.name;
-                const card = document.createElement('div'); card.className='download-card';
-                card.innerHTML = `<strong>${name}</strong><div style="color:var(--muted);font-size:0.9rem">Uploaded file</div><div style="margin-top:auto;display:flex;gap:8px"><button class="btn ghost" onclick="window.open('${url}','_blank')">Open</button><button class="btn" onclick="window.open('${url}','_blank')">Download</button></div>`;
+                const card = document.createElement('div');
+                card.className='download-card';
+                card.innerHTML = `<strong>${name}</strong><div class="muted-small">Uploaded file</div><div style="margin-top:auto;display:flex;gap:8px"><button class="btn ghost small" onclick="(e=>window.open('${url}','_blank'))(event)">Open</button><button class="btn small" onclick="(e=>downloadByUrl(e))(event)" data-url="${url}">Download</button></div>`;
                 listEl.appendChild(card);
               }
-            }catch(err){
-              console.error('refreshDownloads',err);
-              listEl.innerHTML = '<div class="muted">Failed to load files</div>';
             }
+          }catch(err){
+            listEl.innerHTML = '<div class="muted">Failed to load files</div>'; console.error(err);
           }
-          // bind refresh button
-          safeGet('refreshDownloads') && safeGet('refreshDownloads').addEventListener('click', refreshDownloads);
-          // initial call
-          refreshDownloads();
-
-          // update charts if analytics available
-          onValue(ref(db, `members/${currentUid}/analytics/sharesHistory`), snap=>{
-            if(!snap.exists() || !sharesChart) return;
-            const data = snap.val();
-            const labels = []; const vals = [];
-            Object.entries(data).sort((a,b)=> a[0].localeCompare(b[0])).forEach(([k,v]) => { labels.push(k); vals.push(Number(v||0)); });
-            sharesChart.data.labels = labels; sharesChart.data.datasets[0].data = vals; sharesChart.update();
-          });
-        } // end if currentUid
-      }); // end onAuthStateChanged
-
-      // ---------------- UI Interactions ----------------
-      // Wizard open/close & navigation
-      (function wizard(){
-        const wizardCard = document.getElementById('loanWizardCard');
-        const openBtn = document.getElementById('openLoanWizard');
-        const closeBtn = document.getElementById('closeWizard');
-        const steps = Array.from(document.querySelectorAll('#loanWizardSteps .step'));
-        const stepPanels = Array.from(document.querySelectorAll('.wizard-step'));
-        let current = 0;
-
-        function goTo(idx){
-          if(idx<0||idx>=stepPanels.length) return;
-          current = idx;
-          steps.forEach(s=> s.classList.remove('active'));
-          const activeStep = steps[idx]; if(activeStep) activeStep.classList.add('active');
-          stepPanels.forEach(p=> p.classList.remove('active'));
-          const panel = stepPanels[idx]; if(panel) panel.classList.add('active');
-          window.scrollTo({top:0,behavior:'smooth'});
         }
 
-        openBtn && openBtn.addEventListener('click', ()=>{ wizardCard.style.display='block'; goTo(0); });
-        closeBtn && closeBtn.addEventListener('click', ()=> wizardCard.style.display='none');
-
-        wizardCard && wizardCard.addEventListener('click', (e)=>{
-          const btn = e.target.closest('button[data-action]');
-          if(!btn) return;
-          const action = btn.dataset.action;
-          if(action==='next') goTo(Math.min(stepPanels.length-1, current+1));
-          if(action==='prev') goTo(Math.max(0, current-1));
-        });
-
-        const form = document.getElementById('loanWizardForm');
-        form && form.addEventListener('submit', async (e)=>{
-          e.preventDefault();
-          if(!currentUid) return alert('Please sign in to submit applications');
-          const agreed = document.getElementById('wizardAgree');
-          if(!agreed || !agreed.checked) return alert('Please agree to terms');
-
-          const data = Object.fromEntries(new FormData(form).entries());
-          const guarantors = [];
-          for(let i=1;i<=3;i++) guarantors.push({ mno: data[`g_mno_${i}`]||'', name: data[`g_name_${i}`]||'', phone: data[`g_phone_${i}`]||'', amount: data[`g_amount_${i}`]||'' });
-          data.guarantors = guarantors; data.appliedAt = Date.now(); data.status = 'Pending';
-
-          try{
-            const appRef = push(ref(db, `members/${currentUid}/loans/applications`));
-            await set(appRef, data);
-            // update summary
-            const summaryRef = ref(db, `members/${currentUid}/loans/summary`);
-            const ssnap = await get(summaryRef);
-            const s = ssnap.exists() ? ssnap.val() : { total:0, outstanding:0 };
-            s.total = Number(s.total||0) + Number(data.amountFigures||0);
-            s.outstanding = Number(s.outstanding||0) + Number(data.amountFigures||0);
-            await set(summaryRef, s);
-
-            // activity
-            const actRef = push(ref(db, `members/${currentUid}/activityLog`));
-            await set(actRef, { text: `Submitted loan for ${data.amountFigures}`, ts: Date.now() });
-
-            // PDF
-            const doc = buildLoanPdfDoc(data);
-            doc.save(`Loan_${(data.memberName||'member').replace(/\s+/g,'_')}_${appRef.key}.pdf`);
-
-            showToast('Application submitted');
-            celebrate();
-            form.reset(); wizardCard.style.display = 'none';
-          }catch(err){ console.error(err); alert('Failed to submit application') }
-        });
-
-        function buildLoanPdfDoc(data){
-          const doc = new jsPDF({unit:'pt',format:'a4'}); let y=40,left=36;
-          doc.setFillColor(6,100,60); doc.rect(0,0,595,56,'F'); doc.setTextColor(255,255,255); doc.setFontSize(14); doc.text('VISIONARY YOUTH GROUP',300,36,{align:'center'});
-          doc.setTextColor(0,0,0); y=80; doc.setFontSize(12); doc.setFont('helvetica','bold'); doc.text('LOAN APPLICATION',left,y); y+=14;
-          doc.setFont('helvetica','normal'); const info = [`Name: ${data.memberName||''}`, `Membership No: ${data.membershipNumber||''}`, `Amount: Ksh ${data.amountFigures||''}`, `Purpose: ${data.purpose||''}`, `Applied: ${new Date(data.appliedAt||Date.now()).toLocaleString()}`];
-          info.forEach(line=>{ const wrap = doc.splitTextToSize(line,520); doc.text(wrap,left,y); y += wrap.length*12; });
-          return doc;
-        }
-      })();
-
-      // ---------------- Downloads upload & refresh ----------------
-      (function downloads(){
-        const uploadBtn = safeGet('uploadPdfBtn');
-        uploadBtn && uploadBtn.addEventListener('click', ()=> {
-          const inp = document.createElement('input'); inp.type='file'; inp.accept='application/pdf,image/*';
-          inp.onchange = async (ev)=> {
-            const file = ev.target.files && ev.target.files[0]; if(!file) return;
-            if(!currentUid) return alert('Please sign in');
-            try{
-              const path = `members/${currentUid}/uploads/${Date.now()}_${file.name}`;
-              const sref = storageRef(storage, path);
-              await uploadBytes(sref, file);
-              const url = await getDownloadURL(sref);
-              const recRef = push(ref(db, `members/${currentUid}/uploadsIndex`));
-              await set(recRef, { name: file.name, url, ts: Date.now() });
-              showToast('Upload complete'); celebrate();
-              safeGet('refreshDownloads') && safeGet('refreshDownloads').click();
-            }catch(err){ console.error(err); alert('Upload failed') }
-          };
-          inp.click();
-        });
-      })();
-
-      // ---------------- M-Pesa (STK) placeholder ----------------
-      (function mpesa(){
-        const payBtn = safeGet('makePaymentBtn');
-        payBtn && payBtn.addEventListener('click', async ()=>{
-          const amount = prompt('Enter amount (Ksh):', '100');
-          if(!amount || isNaN(Number(amount))) return alert('Invalid amount');
-          const phone = prompt('Enter phone number (2547xxxxxxxx):', '');
-          if(!phone) return alert('Phone required');
-          try{
-            showToast('Initiating M-Pesa STK push...');
-            // note: backend must implement /mpesa/stk/push and handle Safaricom credentials & callback
-            const res = await fetch('/mpesa/stk/push', {
-              method: 'POST', headers: {'Content-Type':'application/json'},
-              body: JSON.stringify({ amount: Number(amount), phone, uid: currentUid || 'demo' })
-            });
-            if(!res.ok) throw new Error('STK push request failed');
-            await res.json();
-            showToast('STK push requested — check phone');
-            if(currentUid){
-              const txRef = push(ref(db, `members/${currentUid}/transactions`));
-              await set(txRef, { ts: Date.now(), desc: `STK Push request (${amount})`, debit:0, credit: Number(amount), balance:0 });
-            }
-          }catch(err){ console.error(err); alert('M-Pesa initiation failed: ' + (err.message||err)) }
-        });
-      })();
-
-      // ---------------- Profile save & photo upload ----------------
-      safeGet('choosePhotoBtn') && safeGet('choosePhotoBtn').addEventListener('click', ()=> safeGet('photoUploadInput').click());
-      safeGet('photoUploadInput') && safeGet('photoUploadInput').addEventListener('change', async (e)=>{
-        const file = e.target.files && e.target.files[0]; if(!file) return;
-        if(!currentUid) return alert('Not signed in');
-        try{
-          const path = `members/${currentUid}/photo_${Date.now()}`;
-          const sref = storageRef(storage, path);
-          await uploadBytes(sref, file);
-          const url = await getDownloadURL(sref);
-          await set(ref(db, `members/${currentUid}/photoURL`), url);
-          showToast('Photo uploaded'); celebrate();
-        }catch(err){ console.error(err); alert('Photo upload failed') }
-      });
-      safeGet('saveProfile') && safeGet('saveProfile').addEventListener('click', async ()=>{
-        if(!currentUid) return alert('Sign in first');
-        const payload = {
-          name: safeGet('profile_fullName').value,
-          phone: safeGet('profile_phone').value,
-          id: safeGet('profile_id').value,
-          yearJoined: safeGet('profile_yearJoined').value,
-          dob: safeGet('profile_dob').value,
-          status: 'Active',
-          joinedAt: Date.now()
+        // expose helper for inline handlers
+        window.downloadByUrl = function(e){
+          const url = e.target.dataset.url;
+          if(!url) return alert('No file URL');
+          // open in new tab - browser will handle download for PDFs
+          window.open(url,'_blank');
+          celebrate();
         };
-        try{ await set(ref(db, `members/${currentUid}/profile`), payload); showToast('Profile saved'); celebrate(); } catch(err){ console.error(err); alert('Failed to save profile'); }
-      });
 
-      // ---------------- Transactions PDF export ----------------
-      safeGet('exportTransactionsPdf') && safeGet('exportTransactionsPdf').addEventListener('click', async ()=>{
-        if(!currentUid) return alert('Please sign in');
-        const snap = await get(ref(db, `members/${currentUid}/transactions`));
-        if(!snap.exists()) return alert('No transactions to export');
-        const txs = Object.values(snap.val()).sort((a,b)=> (a.ts||0)-(b.ts||0));
-        const doc = new jsPDF({unit:'pt',format:'a4'}); let y=40;
-        doc.setFontSize(16); doc.text('Account Transactions',300,y,{align:'center'}); y+=30; doc.setFontSize(10);
-        txs.forEach(t=>{
-          const date = new Date(t.ts||Date.now()).toLocaleDateString();
-          const line = `${date} • ${t.desc || ''} • Debit: ${t.debit || '-'} • Credit: ${t.credit || '-'} • Bal: ${t.balance||0}`;
-          const wrapped = doc.splitTextToSize(line,520);
-          doc.text(wrapped,36,y); y += wrapped.length*12;
-          if(y>720){ doc.addPage(); y=40; }
+        // attach refresh downloads to button
+        document.getElementById('refreshDownloads').addEventListener('click', refreshDownloads);
+        refreshDownloads();
+
+        // set up charts initial
+        initCharts();
+
+        // populate shares chart from RTDB monthly history if available
+        onValue(ref(db, `members/${currentUid}/analytics/sharesHistory`), snap=>{
+          if(!snap.exists()) return;
+          const data = snap.val(); // expect array or key->value
+          const labels = []; const vals = [];
+          Object.entries(data).sort((a,b)=> a[0].localeCompare(b[0])).forEach(([k,v])=>{ labels.push(k); vals.push(Number(v||0)); });
+          if(sharesChart){
+            sharesChart.data.labels = labels;
+            sharesChart.data.datasets[0].data = vals;
+            sharesChart.update();
+          }
         });
-        doc.save(`Transactions_${(currentUid||'member')}.pdf`);
-        showToast('Transactions PDF ready'); celebrate();
+
+      } // end if currentUid
+    }); // end onAuthStateChanged
+
+    // ----------------- WIZARD LOGIC -----------------
+    (function wizard(){
+      const wizardCard = document.getElementById('loanWizardCard');
+      const openBtn = document.getElementById('openLoanWizard');
+      const closeBtn = document.getElementById('closeWizard');
+      const steps = Array.from(document.querySelectorAll('#loanWizardSteps .step'));
+      const stepPanels = Array.from(document.querySelectorAll('.wizard-step'));
+      let current = 0; // index
+
+      function goTo(idx){
+        if(idx<0||idx>=stepPanels.length) return;
+        current = idx;
+        steps.forEach(s=> s.classList.remove('active'));
+        const activeStep = steps[idx];
+        if(activeStep) activeStep.classList.add('active');
+        stepPanels.forEach(p=> p.classList.remove('active'));
+        const panel = stepPanels[idx];
+        if(panel) panel.classList.add('active');
+        window.scrollTo({top:0,behavior:'smooth'});
+      }
+
+      openBtn && openBtn.addEventListener('click', ()=>{ wizardCard.style.display='block'; wizardCard.scrollIntoView({behavior:'smooth'}); goTo(0); });
+      closeBtn && closeBtn.addEventListener('click', ()=> wizardCard.style.display='none');
+      // step nav
+      wizardCard.addEventListener('click', (e)=>{
+        const btn = e.target.closest('button[data-action]');
+        if(!btn) return;
+        const action = btn.dataset.action;
+        if(action==='next'){ goTo(Math.min(stepPanels.length-1, current+1)); }
+        if(action==='prev'){ goTo(Math.max(0, current-1)); }
       });
 
-      // refresh transactions button (simple feedback; onValue handles actual updates)
-      safeGet('refreshTx') && safeGet('refreshTx').addEventListener('click', ()=> showToast('Transactions refreshed'));
+      // form submit
+      const form = document.getElementById('loanWizardForm');
+      form && form.addEventListener('submit', async (e)=>{
+        e.preventDefault();
+        if(!currentUid) return alert('Not authenticated');
+        const agreed = document.getElementById('wizardAgree');
+        if(!agreed || !agreed.checked) return alert('Please agree to terms');
 
-      // activity quick logging helper
-      function logActivity(msg){ if(!currentUid) return; const aRef = push(ref(db, `members/${currentUid}/activityLog`)); set(aRef, { text: msg, ts: Date.now() }).catch(()=>{}); }
+        const data = Object.fromEntries(new FormData(form).entries());
+        // collect guarantors
+        const guarantors = [];
+        for(let i=1;i<=3;i++){
+          guarantors.push({ mno: data[`g_mno_${i}`]||'', name: data[`g_name_${i}`]||'', phone: data[`g_phone_${i}`]||'', amount: data[`g_amount_${i}`]||'' });
+        }
+        data.guarantors = guarantors;
+        data.appliedAt = Date.now();
+        data.status = 'Pending';
 
-      // award a small point for page load if signed in
-      setTimeout(async ()=>{
-        try{ if(currentUid){ const ptsSnap = await get(ref(db, `members/${currentUid}/points`)); const pts = ptsSnap.exists()? Number(ptsSnap.val()||0) : 0; await set(ref(db, `members/${currentUid}/points`), pts+3); logActivity('Logged in (auto points)'); } } catch(e){ console.warn('award points failed', e); }
-      }, 3000);
+        try{
+          const appRef = push(ref(db, `members/${currentUid}/loans/applications`));
+          await set(appRef, data);
+          // update summary rollup (increment total)
+          const summaryRef = ref(db, `members/${currentUid}/loans/summary`);
+          const ssnap = await get(summaryRef);
+          const s = ssnap.exists()? ssnap.val() : { total:0, outstanding:0 };
+          s.total = Number(s.total||0) + Number(data.amountFigures||0);
+          s.outstanding = Number(s.outstanding||0) + Number(data.amountFigures||0);
+          await set(summaryRef, s);
 
-      // AOS init (animations)
-      try{ if(window.AOS) AOS.init({ duration:700, once:true }); }catch(e){}
+          // add to activity
+          const actRef = push(ref(db, `members/${currentUid}/activityLog`));
+          await set(actRef, { text: `Submitted loan for ${data.amountFigures}`, ts: Date.now() });
 
-      // Ensure at least something renders if console errors happened earlier
-      showToast('Dashboard initialized (UI ready)', 1800);
-    }); // DOMContentLoaded end
+          // PDF generation
+          const doc = buildLoanPdfDoc(data, {id: appRef.key});
+          doc.save(`Loan_${(data.memberName||'member').replace(/\s+/g,'_')}_${appRef.key}.pdf`);
+
+          showToast('Loan submitted and saved');
+          celebrate();
+          // reset wizard
+          form.reset();
+          document.getElementById('loanWizardCard').style.display='none';
+        }catch(err){
+          console.error(err); alert('Failed to submit application');
+        }
+      });
+
+      // helper: PDF builder reused
+      function buildLoanPdfDoc(data, opts={}){
+        const doc = new jsPDF({unit:'pt',format:'a4'});
+        let y=40,left=36;
+        doc.setFillColor(6,100,60); doc.rect(0,0,595,56,'F');
+        doc.setTextColor(255,255,255); doc.setFontSize(14); doc.text('VISIONARY YOUTH GROUP',300,36,{align:'center'});
+        doc.setTextColor(0,0,0); y=80;
+        doc.setFontSize(12); doc.setFont('helvetica','bold'); doc.text('LOAN APPLICATION',left,y); y+=14;
+        doc.setFont('helvetica','normal'); const info = [
+          `Name: ${data.memberName||''}`, `Membership No: ${data.membershipNumber||''}`, `Amount: Ksh ${data.amountFigures||''}`, `Purpose: ${data.purpose||''}`, `Applied: ${new Date(data.appliedAt||Date.now()).toLocaleString()}`
+        ];
+        info.forEach(line => { const wrap = doc.splitTextToSize(line,520); doc.text(wrap,left,y); y+=wrap.length*12; });
+        return doc;
+      }
+
+    })();
+
+    // ----------------- Download / Upload file handlers -----------------
+    (function downloads(){
+      const uploadBtn = document.getElementById('uploadPdfBtn');
+      uploadBtn && uploadBtn.addEventListener('click', ()=> {
+        // open a file picker
+        const inp = document.createElement('input'); inp.type='file'; inp.accept='application/pdf,image/*';
+        inp.onchange = async (ev)=>{
+          const file = ev.target.files[0];
+          if(!file) return;
+          if(!currentUid) return alert('Please sign in');
+          try{
+            const path = `members/${currentUid}/uploads/${Date.now()}_${file.name}`;
+            const sref = sRef(storage, path);
+            await uploadBytes(sref, file);
+            const url = await getDownloadURL(sref);
+            // record in RTDB index
+            const recRef = push(ref(db, `members/${currentUid}/uploadsIndex`));
+            await set(recRef, { name: file.name, url, ts: Date.now() });
+            showToast('Upload complete');
+            celebrate();
+            // refresh
+            document.getElementById('refreshDownloads').click();
+          }catch(err){
+            console.error(err); alert('Upload failed');
+          }
+        };
+        inp.click();
+      });
+
+      // wire refresh on load
+      document.getElementById('refreshDownloads').addEventListener('click', async ()=>{
+        // call the refresh function inside auth listener with currentUid
+        // fallback: call an ad-hoc function that reads RTDB or Storage
+        if(!currentUid) return;
+        const listEl = document.getElementById('downloadsList');
+        listEl.innerHTML = 'Loading…';
+        try{
+          const idx = await get(ref(db, `members/${currentUid}/uploadsIndex`));
+          listEl.innerHTML='';
+          if(idx.exists()){
+            const arr = Object.entries(idx.val()).reverse();
+            arr.forEach(([k,v])=>{
+              const card = document.createElement('div'); card.className='download-card';
+              card.innerHTML = `<strong>${v.name||k}</strong><div class="muted-small">${new Date(v.ts||Date.now()).toLocaleString()}</div><div style="margin-top:auto;display:flex;gap:8px"><button class="btn ghost small" onclick="window.open('${v.url}','_blank')">Open</button><button class="btn small" onclick="window.open('${v.url}','_blank')">Download</button></div>`;
+              listEl.appendChild(card);
+            });
+          } else {
+            listEl.innerHTML = '<div class="muted">No uploads found</div>';
+          }
+        }catch(err){ console.error(err); listEl.innerHTML='<div class="muted">Failed to load</div>'; }
+      });
+
+    })();
+
+    // ----------------- M-Pesa STK push button -----------------
+    (function mpesa(){
+      const payBtn = document.getElementById('makePaymentBtn');
+      payBtn && payBtn.addEventListener('click', async ()=>{
+        // ask amount & phone
+        const amount = prompt('Enter amount (Ksh):', '100');
+        if(!amount || isNaN(Number(amount))) return alert('Invalid amount');
+        const phone = prompt('Enter phone number (2547xxxxxxxx):', '');
+        if(!phone) return alert('Phone required');
+
+        try{
+          showToast('Initiating M-Pesa STK push...');
+          // POST request to your backend which performs the Lipa na M-Pesa STK
+          // Replace endpoint with your real backend
+          const res = await fetch('/mpesa/stk/push', {
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({ amount: Number(amount), phone, uid: currentUid || 'demo' })
+          });
+          if(!res.ok) throw new Error('STK push failed');
+          const data = await res.json();
+          showToast('STK push requested — check phone');
+          // record tentative tx in RTDB
+          if(currentUid) {
+            const txRef = push(ref(db, `members/${currentUid}/transactions`));
+            await set(txRef, { ts: Date.now(), desc: `STK Push: ${amount}`, debit:0, credit: Number(amount), balance:0 });
+          }
+        }catch(err){
+          console.error(err); alert('M-Pesa initiation failed: ' + (err.message||err));
+        }
+      });
+    })();
+
+    // ----------------- Profile save & photo upload -----------------
+    document.getElementById('choosePhotoBtn').addEventListener('click', ()=> document.getElementById('photoUploadInput').click());
+    document.getElementById('photoUploadInput').addEventListener('change', async (e)=>{
+      const file = e.target.files[0];
+      if(!file) return;
+      if(!currentUid) return alert('Not signed in');
+      try{
+        const path = `members/${currentUid}/photo_${Date.now()}`;
+        const sref = sRef(storage, path);
+        await uploadBytes(sref, file);
+        const url = await getDownloadURL(sref);
+        await set(ref(db, `members/${currentUid}/photoURL`), url);
+        showToast('Photo uploaded');
+        celebrate();
+      }catch(err){ console.error(err); alert('Photo upload failed'); }
+    });
+
+    document.getElementById('saveProfile').addEventListener('click', async ()=>{
+      if(!currentUid) return alert('Sign in first');
+      const payload = {
+        name: document.getElementById('profile_fullName').value,
+        phone: document.getElementById('profile_phone').value,
+        id: document.getElementById('profile_id').value,
+        yearJoined: document.getElementById('profile_yearJoined').value,
+        dob: document.getElementById('profile_dob').value,
+        status: 'Active',
+        joinedAt: Date.now()
+      };
+      try{
+        await set(ref(db, `members/${currentUid}/profile`), payload);
+        showToast('Profile saved');
+        celebrate();
+      }catch(err){ console.error(err); alert('Failed to save profile'); }
+    });
+
+    // ----------------- Transactions export (PDF) -----------------
+    document.getElementById('exportTransactionsPdf').addEventListener('click', async ()=>{
+      if(!currentUid) return alert('Please sign in');
+      const snap = await get(ref(db, `members/${currentUid}/transactions`));
+      if(!snap.exists()) return alert('No transactions to export');
+      const txs = Object.values(snap.val()).sort((a,b)=> (a.ts||0)-(b.ts||0));
+      const doc = new jsPDF({unit:'pt',format:'a4'}); let y=40;
+      doc.setFontSize(14); doc.text('Account Transactions',300,y,{align:'center'}); y+=30;
+      doc.setFontSize(10);
+      txs.forEach(t=>{
+        const date = new Date(t.ts||Date.now()).toLocaleDateString();
+        doc.text(`${date} • ${t.desc || ''} • Debit: ${t.debit || '-'} • Credit: ${t.credit || '-'} • Bal: ${t.balance||0}`, 36, y);
+        y += 12;
+        if(y>720){ doc.addPage(); y=40; }
+      });
+      doc.save(`Transactions_${(currentUid||'member')}.pdf`);
+      showToast('Transactions PDF ready');
+    });
+
+    // ----------------- Activity quick actions -----------------
+    function logActivity(msg){
+      if(!currentUid) return;
+      const aRef = push(ref(db, `members/${currentUid}/activityLog`));
+      set(aRef, { text: msg, ts: Date.now() });
+    }
+
+    // sidebar nav click
+    qAll('.sidebar .navBtn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        qAll('.sidebar .navBtn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        const target = btn.dataset.target;
+        const el = document.getElementById(target);
+        if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+      });
+    });
+
+    // toggle sidebar
+    document.getElementById('toggleSidebarBtn').addEventListener('click', ()=>{
+      const s = document.getElementById('sidebar');
+      s.classList.toggle('expanded');
+      document.getElementById('toggleSidebarBtn').innerHTML = s.classList.contains('expanded') ? '<i class="fas fa-chevron-left"></i> Collapse' : '<i class="fas fa-chevron-right"></i> Expand';
+    });
+
+    // notif open
+    document.getElementById('notifOpenBtn').addEventListener('click', ()=>{
+      document.getElementById('notificationsList').scrollIntoView({behavior:'smooth'});
+    });
+
+    // quick statement
+    document.getElementById('quickStatement').addEventListener('click', async ()=>{
+      if(!currentUid) return alert('Sign in first');
+      // build account statement
+      const snapMember = await get(ref(db, `members/${currentUid}/profile`));
+      const monthly = (await get(ref(db, `members/${currentUid}/savings/monthly`))).val() || 0;
+      const weekly = (await get(ref(db, `members/${currentUid}/savings/weekly`))).val() || 0;
+      const doc = new jsPDF({unit:'pt',format:'a4'}); let y=40;
+      doc.setFontSize(16); doc.text('Account Statement',300,y,{align:'center'}); y+=30;
+      doc.setFontSize(10);
+      doc.text(`Member: ${snapMember.exists()? snapMember.val().name : 'Member'}`,36,y); y+=12;
+      doc.text(`Monthly: ${formatKsh(monthly)} • Weekly: ${formatKsh(weekly)}`,36,y); y+=12;
+      doc.save(`Statement_${(snapMember.exists()? snapMember.val().name : 'member')}.pdf`);
+      showToast('Statement generated');
+      celebrate();
+    });
+
+    // AGM countdown
+    (function agmCountdown(){
+      const target = new Date('2025-12-14T13:30:00+03:00').getTime();
+      const el = document.getElementById('agmCountdown');
+      setInterval(()=>{
+        const now = Date.now();
+        const diff = Math.max(0, target - now);
+        const d = Math.floor(diff/(1000*60*60*24));
+        const h = Math.floor((diff%(1000*60*60*24))/(1000*60*60));
+        const m = Math.floor((diff%(1000*60*60))/(1000*60));
+        el.textContent = `${d}d ${h}h ${m}m`;
+      },1000);
+    })();
+
+    // UI extras
+    document.getElementById('refreshTx').addEventListener('click', ()=> {
+      // trigger transactions refresh by re-reading; onValue already listening so just toast
+      showToast('Transactions refreshed');
+    });
+
+    // initial small activity
+    (async ()=> {
+      try{ logActivity('Dashboard loaded'); } catch(e){}
+    })();
+
+    // small improvement: compute sum for nested savings structures
+    function computeAmountFromSnap(obj){
+      if(!obj) return 0;
+      if(typeof obj === 'number') return obj;
+      let total = 0;
+      Object.values(obj || {}).forEach(v=>{
+        if(typeof v === 'number') total += v;
+        else if(v && typeof v === 'object' && ('amount' in v)) total += Number(v.amount||0);
+        else if(v && typeof v === 'object') {
+          Object.values(v).forEach(c=>{ if(c && typeof c === 'object' && 'amount' in c) total += Number(c.amount||0); });
+        }
+      });
+      return total;
+    }
+
+    // Dark mode toggle
+    document.getElementById('darkToggle').addEventListener('click', ()=>{
+      document.body.classList.toggle('dark');
+      if(document.body.classList.contains('dark')){
+        document.body.style.background = 'linear-gradient(135deg,#071b0f,#073a1f)';
+        document.body.style.color = '#ddd';
+      } else {
+        document.body.style.background = 'linear-gradient(135deg,var(--bg1),#e9fff0)';
+        document.body.style.color = '#122';
+      }
+    });
+
+    // Responsive: ensure small screens look good (extra tweak)
+    window.addEventListener('resize', ()=>{
+      if(window.innerWidth < 1100){
+        document.getElementById('sidebar').style.display = 'none';
+      } else {
+        document.getElementById('sidebar').style.display = 'flex';
+      }
+    });
+    // trigger initial
+    if(window.innerWidth < 1100) document.getElementById('sidebar').style.display='none';
+
   </script>
 
-  <!-- AOS script -->
-  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <!-- AOS init (nice fade-onscroll) -->
+  <script>
+    if(window.AOS) AOS.init({ duration:700, once:true });
+  </script>
+
 </body>
 </html>
