@@ -14,411 +14,411 @@
 
   <style>
     :root{
-      --bg1:#05263a; /* deep navy */
-      --bg2:#0f6b66; /* teal */
+      --bg-start:#062a2a;
+      --bg-end:#0a5a39;
       --card:#ffffff;
-      --accent:#2fe0b3;
-      --muted:#9aa6ad;
+      --accent:#2e7d32;
+      --muted:#6b7280;
+      --gold:#ffcc00;
       --glass: rgba(255,255,255,0.06);
     }
     *{box-sizing:border-box}
-    html,body{height:100%;margin:0;font-family:'Poppins',sans-serif;background:linear-gradient(135deg,var(--bg1),var(--bg2));color:#fff}
-    .center-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:28px}
-    .card{
-      width:100%;max-width:980px;background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
-      border-radius:14px;padding:18px 18px 28px 18px;box-shadow:0 20px 60px rgba(0,0,0,0.45);backdrop-filter: blur(6px);
-      border:1px solid rgba(255,255,255,0.04)
+    html,body{height:100%;margin:0;font-family:'Poppins',sans-serif}
+    body{
+      background: linear-gradient(135deg,var(--bg-start),var(--bg-end));
+      color:#0d1b16;
+      -webkit-font-smoothing:antialiased;
+      padding:28px;
     }
-    .header{display:flex;align-items:center;gap:14px;margin-bottom:8px}
-    .logoBox{width:56px;height:56px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#fff,rgba(255,255,255,0.85));padding:6px}
-    .logoBox svg{width:42px;height:42px}
-    .title{font-weight:700;color:#fff}
-    .subtitle{color:var(--muted);font-size:0.95rem;margin-top:4px}
 
-    /* Wizard */
-    .wizard{background:transparent;padding:12px;margin-top:8px}
-    .steps{display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap}
-    .step{
-      background:transparent;color:rgba(255,255,255,0.8);padding:8px 10px;border-radius:9px;border:1px solid rgba(255,255,255,0.04);
-      display:flex;align-items:center;gap:8px;font-weight:600;font-size:0.95rem
+    .container{
+      max-width:980px;margin:28px auto;background:linear-gradient(180deg,rgba(255,255,255,0.98),#fff);border-radius:12px;padding:20px;
+      box-shadow:0 12px 40px rgba(0,0,0,0.28);
     }
-    .step.active{background:linear-gradient(90deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));border:1px solid rgba(255,255,255,0.08)}
-    .progress-bar{height:8px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden;margin-bottom:18px}
-    .progress{height:100%;background:linear-gradient(90deg,#00ffd0,#00c6ff);width:0%}
 
-    /* step panel */
-    .panel{display:none;padding:8px 2px}
-    .panel.active{display:block}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
-    .row.single{grid-template-columns:1fr}
-    label{display:block;font-size:0.9rem;color:#dffbf0;margin-bottom:6px}
-    input[type="text"],input[type="email"],input[type="date"],input[type="number"],select,textarea{
-      width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);background:transparent;color:#fff;
-      outline:none;font-size:0.95rem
+    header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+    .logo{
+      width:56px;height:56px;border-radius:10px;background:#fff;display:flex;align-items:center;justify-content:center;
+      box-shadow:0 6px 18px rgba(0,0,0,0.12)
     }
-    textarea{min-height:110px}
-    .muted{color:var(--muted);font-size:0.9rem}
+    .logo i{color:var(--accent);font-size:22px}
+    header h1{font-size:1.25rem;margin:0;color:#0b3b2b}
+    header p{margin:0;color:var(--muted);font-size:0.9rem}
 
-    .actions{display:flex;justify-content:space-between;gap:8px;margin-top:12px}
-    .btn{background:linear-gradient(90deg,#0bbd94,#06a89a);border:none;color:#04342f;padding:10px 14px;border-radius:8px;font-weight:700;cursor:pointer}
-    .btn.ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.08)}
-    .btn.warn{background:#ffb857;color:#4b2b00}
-    .btn.secondary{background:transparent;border:1px solid rgba(255,255,255,0.08);color:#fff}
+    /* wizard */
+    .wizard{
+      margin-top:12px;
+    }
+    .steps{
+      display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;
+    }
+    .step {
+      flex:1;min-width:120px;padding:8px 10px;border-radius:8px;background:#f6fff6;border:1px solid rgba(0,0,0,0.04);
+      display:flex;flex-direction:column;align-items:flex-start;gap:6px;
+    }
+    .step.active{background:linear-gradient(90deg,#e6f8ec,#f7fff7);box-shadow:0 6px 20px rgba(6,50,20,0.04)}
+    .step strong{font-size:0.95rem;color:var(--accent)}
+    .progress{height:8px;background:#e9f7ef;border-radius:8px;width:100%;overflow:hidden}
+    .progress .bar{height:100%;background:linear-gradient(90deg,var(--accent),#0b8a46);width:0%}
 
+    /* form styles */
+    form{background:transparent;padding:8px 0}
+    .row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+    .col{flex:1;min-width:160px}
+    label{display:block;font-size:0.85rem;color:var(--muted);margin-bottom:6px}
+    input[type="text"], input[type="date"], input[type="number"], select, textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #e6efe6;font-size:0.95rem}
+    textarea{min-height:100px;resize:vertical}
+    .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+    .btn{background:var(--accent);color:#fff;padding:10px 14px;border:none;border-radius:8px;cursor:pointer;font-weight:700}
+    .btn.ghost{background:#fff;border:1px solid #e6efe6;color:var(--accent)}
+    .btn.secondary{background:#fff;color:var(--accent);border:1px solid #e6efe6}
     .small{font-size:0.85rem;color:var(--muted)}
-    .file-preview{margin-top:6px;font-size:0.85rem;color:#e6fffa}
 
-    /* guarantor/parent lists */
-    .list-item{background:rgba(255,255,255,0.02);padding:10px;border-radius:8px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.03)}
-    .flex-row{display:flex;gap:8px;align-items:center}
+    /* file previews */
+    .file-preview{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+    .file-preview img{width:96px;height:72px;object-fit:cover;border-radius:6px;border:1px solid #e6efe6}
 
-    @media (max-width:880px){
-      .row{grid-template-columns:1fr}
-      .header{gap:10px}
-      .logoBox{width:48px;height:48px}
+    /* guarantors list */
+    .guarantor-item{border:1px dashed #e6efe6;padding:10px;border-radius:8px;margin-bottom:8px;background:#fbfff9}
+
+    /* review box */
+    .review{background:#fbfff9;padding:12px;border-radius:8px;border:1px solid #e6efe6}
+    .review pre{white-space:pre-wrap;font-family:inherit;font-size:0.9rem;color:#123}
+
+    /* responsive */
+    @media (max-width:720px){
+      .row{flex-direction:column}
+      .steps{gap:6px}
     }
+
+    /* footer note */
+    .notes{margin-top:12px;font-size:0.85rem;color:var(--muted)}
   </style>
 </head>
 <body>
-  <div class="center-wrap">
-    <div class="card" role="main" aria-labelledby="pageTitle">
-      <div class="header">
-        <div class="logoBox" aria-hidden="true">
-          <!-- Embedded 'eye' SVG logo -->
-          <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-            <defs><linearGradient id="g1" x1="0" x2="1"><stop offset="0" stop-color="#00ffd0"/><stop offset="1" stop-color="#00c6ff"/></linearGradient></defs>
-            <path d="M2 32C10 12 30 4 32 4c2 0 22 8 30 28-8 20-28 28-30 28-2 0-22-8-30-28z" fill="url(#g1)"/>
-            <circle cx="32" cy="32" r="10" fill="#042a20"/>
-            <circle cx="32" cy="32" r="5" fill="#fff"/>
-          </svg>
-        </div>
-        <div>
-          <div class="title" id="pageTitle">Visionary Youth Group — Loan Application</div>
-          <div class="subtitle">Stylish HELB-style wizard • Your contact: Tel: 0741453336 • Email: visionaryyouthgroup32@gmail.com • Nairobi</div>
-        </div>
+
+  <div class="container" role="main">
+    <header>
+      <div class="logo" aria-hidden>
+        <!-- eye logo -->
+        <i class="fas fa-eye"></i>
+      </div>
+      <div>
+        <h1>Visionary Youth Group — Loan Application</h1>
+        <p>Integrity | Commitment | Entrepreneurial Nature — Tel: 0741453336 • visionaryyouthgroup32@gmail.com • Nairobi</p>
+      </div>
+    </header>
+
+    <section class="wizard" aria-label="Loan application wizard">
+      <div class="steps" id="stepsBar">
+        <div class="step active" data-step="1"><strong>1. Personal</strong><div class="small">Name, ID, DOB</div></div>
+        <div class="step" data-step="2"><strong>2. Permanent Residence</strong><div class="small">County / Constituency / Ward</div></div>
+        <div class="step" data-step="3"><strong>3. Residence</strong><div class="small">Nearest school, village</div></div>
+        <div class="step" data-step="4"><strong>4. Education</strong><div class="small">Studies & exam details</div></div>
+        <div class="step" data-step="5"><strong>5. Loan Details</strong><div class="small">Amount, purpose</div></div>
+        <div class="step" data-step="6"><strong>6. Guarantors</strong><div class="small">At least 2</div></div>
+        <div class="step" data-step="7"><strong>7. Parents & Review</strong><div class="small">Final review & submit</div></div>
       </div>
 
-      <div class="wizard" id="wizardRoot">
-        <div class="steps" id="stepsBar">
-          <div class="step active" data-step="0"><i class="fas fa-user"></i> Personal</div>
-          <div class="step" data-step="1"><i class="fas fa-house"></i> Residence</div>
-          <div class="step" data-step="2"><i class="fas fa-book"></i> Education</div>
-          <div class="step" data-step="3"><i class="fas fa-money-check"></i> Loan</div>
-          <div class="step" data-step="4"><i class="fas fa-user-friends"></i> Guarantors</div>
-          <div class="step" data-step="5"><i class="fas fa-users"></i> Parents</div>
-          <div class="step" data-step="6"><i class="fas fa-check-circle"></i> Review</div>
+      <div class="progress" aria-hidden>
+        <div class="bar" id="progressBar" style="width:14%"></div>
+      </div>
+
+      <!-- FORM: Step containers -->
+      <form id="loanWizard" autocomplete="off">
+        <!-- Step 1: Personal -->
+        <div data-step-content="1" class="step-content" style="margin-top:12px">
+          <h3>Personal Information</h3>
+          <div class="row">
+            <div class="col">
+              <label>First name <span class="small">*</span></label>
+              <input id="firstName" type="text" required>
+            </div>
+            <div class="col">
+              <label>Middle name</label>
+              <input id="middleName" type="text">
+            </div>
+            <div class="col">
+              <label>Last name <span class="small">*</span></label>
+              <input id="lastName" type="text" required>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col">
+              <label>ID / Passport number <span class="small">*</span></label>
+              <input id="idNumber" type="text" required>
+            </div>
+            <div class="col">
+              <label>Date of birth <span class="small">*</span></label>
+              <input id="dob" type="date" required>
+            </div>
+            <div class="col">
+              <label>Marital status</label>
+              <select id="maritalStatus">
+                <option>Single</option>
+                <option>Married</option>
+                <option>Divorced</option>
+                <option>Widowed</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col">
+              <label>Telephone <span class="small">*</span></label>
+              <input id="telephone" type="text" placeholder="07XXXXXXXX" required>
+            </div>
+            <div class="col">
+              <label>Gender</label>
+              <select id="gender"><option>Male</option><option>Female</option><option>Other</option></select>
+            </div>
+            <div class="col">
+              <label>Religion</label>
+              <input id="religion" type="text" placeholder="e.g. Christianity">
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col">
+              <label>Upload ID front (required)</label>
+              <input id="idFront" type="file" accept="image/*,application/pdf">
+            </div>
+            <div class="col">
+              <label>Upload ID back (required)</label>
+              <input id="idBack" type="file" accept="image/*,application/pdf">
+            </div>
+            <div class="col">
+              <label>Upload passport photo</label>
+              <input id="passportPhoto" type="file" accept="image/*">
+            </div>
+          </div>
+
+          <div class="file-preview" id="personalPreview"></div>
+
+          <div class="actions">
+            <button type="button" class="btn ghost" id="saveStep1">Save & Continue Later</button>
+            <button type="button" class="btn" data-next>Continue →</button>
+          </div>
         </div>
 
-        <div class="progress-bar"><div class="progress" id="progress"></div></div>
+        <!-- Step 2: Permanent Residence -->
+        <div data-step-content="2" class="step-content" style="display:none;margin-top:12px">
+          <h3>Permanent Residence</h3>
 
-        <!-- Panels -->
-        <form id="loanWizardForm" autocomplete="off">
-          <!-- STEP 0: Personal -->
-          <div class="panel active" data-panel="0">
-            <div class="row">
-              <div>
-                <label>First Name</label>
-                <input id="firstName" type="text" required>
-              </div>
-              <div>
-                <label>Middle Name</label>
-                <input id="middleName" type="text">
-              </div>
+          <div class="row">
+            <div class="col">
+              <label>P.O. Box</label>
+              <input id="poBox" type="text" placeholder="P.O. Box">
             </div>
-
-            <div class="row">
-              <div>
-                <label>Last Name</label>
-                <input id="lastName" type="text" required>
-              </div>
-              <div>
-                <label>ID / Passport No</label>
-                <input id="idNo" type="text" required>
-              </div>
+            <div class="col">
+              <label>Postal code</label>
+              <input id="postalCode" type="text">
             </div>
-
-            <div class="row">
-              <div>
-                <label>Date of Birth</label>
-                <input id="dob" type="date" required>
-              </div>
-              <div>
-                <label>Marital Status</label>
-                <select id="maritalStatus">
-                  <option>Single</option><option>Married</option><option>Divorced</option><option>Widowed</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="row">
-              <div>
-                <label>Telephone</label>
-                <input id="phone" type="text" placeholder="07XXXXXXXX" required>
-              </div>
-              <div>
-                <label>Gender</label>
-                <select id="gender"><option>Male</option><option>Female</option><option>Other</option></select>
-              </div>
-            </div>
-
-            <div class="row single">
-              <div>
-                <label>Religion</label>
-                <input id="religion" type="text" placeholder="e.g. Christianity">
-              </div>
-            </div>
-
-            <div class="row single">
-              <div>
-                <label>Upload ID (Front)</label>
-                <input id="idFront" type="file" accept="image/*,application/pdf">
-                <div id="idFrontPreview" class="file-preview"></div>
-              </div>
-            </div>
-
-            <div class="row single">
-              <div>
-                <label>Upload ID (Back)</label>
-                <input id="idBack" type="file" accept="image/*,application/pdf">
-                <div id="idBackPreview" class="file-preview"></div>
-              </div>
-            </div>
-
-            <div class="actions">
-              <button type="button" class="btn ghost" id="btnPrev" disabled><i class="fas fa-chevron-left"></i> Back</button>
-              <div style="margin-left:auto">
-                <button type="button" class="btn" id="btnNext0">Save & Continue <i class="fas fa-chevron-right"></i></button>
-              </div>
+            <div class="col">
+              <label>Town</label>
+              <input id="town" type="text">
             </div>
           </div>
 
-          <!-- STEP 1: Residence -->
-          <div class="panel" data-panel="1">
-            <div class="row">
-              <div>
-                <label>P.O. Box</label>
-                <input id="poBox" type="text">
-              </div>
-              <div>
-                <label>Postal Code</label>
-                <input id="postalCode" type="text">
-              </div>
+          <div class="row">
+            <div class="col">
+              <label>County <span class="small">*</span></label>
+              <select id="county" required></select>
             </div>
-
-            <div class="row">
-              <div>
-                <label>Town</label>
-                <input id="town" type="text">
-              </div>
-              <div>
-                <label>County</label>
-                <select id="county"></select>
-              </div>
+            <div class="col">
+              <label>Constituency <span class="small">*</span></label>
+              <select id="constituency" required></select>
             </div>
-
-            <div class="row">
-              <div>
-                <label>Constituency</label>
-                <select id="constituency"></select>
-              </div>
-              <div>
-                <label>Ward</label>
-                <select id="ward"></select>
-              </div>
-            </div>
-
-            <div class="row">
-              <div>
-                <label>Location</label>
-                <input id="location" type="text">
-              </div>
-              <div>
-                <label>Sub-location / Village</label>
-                <input id="sublocation" type="text">
-              </div>
-            </div>
-
-            <div class="row single">
-              <div>
-                <label>Nearest Primary School</label>
-                <input id="nearestSchool" type="text">
-              </div>
-            </div>
-
-            <div class="actions">
-              <button type="button" class="btn ghost" id="btnPrev1"><i class="fas fa-chevron-left"></i> Back</button>
-              <div style="margin-left:auto">
-                <button type="button" class="btn" id="btnNext1">Save & Continue <i class="fas fa-chevron-right"></i></button>
-              </div>
+            <div class="col">
+              <label>Ward <span class="small">*</span></label>
+              <select id="ward" required></select>
             </div>
           </div>
 
-          <!-- STEP 2: Education -->
-          <div class="panel" data-panel="2">
-            <div id="educationContainer">
-              <div class="edu-item" data-edu-index="0">
-                <div class="row">
-                  <div>
-                    <label>Level</label>
-                    <select class="edu-level">
-                      <option>KCPE</option><option>KCSE</option><option>Certificate</option><option>Diploma</option><option>Degree</option><option>Masters</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label>Exam Year</label>
-                    <input class="edu-year" type="number" min="1900" max="2099" placeholder="e.g. 2018">
-                  </div>
-                </div>
-                <div class="row">
-                  <div>
-                    <label>Index / Reg No</label>
-                    <input class="edu-index" type="text">
-                  </div>
-                  <div>
-                    <label>Exam Type</label>
-                    <select class="edu-examType"><option>National</option><option>Private</option></select>
-                  </div>
-                </div>
-                <div class="row single">
-                  <div>
-                    <label>Remarks / Subjects (optional)</label>
-                    <input class="edu-remarks" type="text">
-                  </div>
-                </div>
-                <hr style="border-color:rgba(255,255,255,0.04)">
-              </div>
+          <div class="row">
+            <div class="col">
+              <label>Location</label>
+              <input id="location" type="text">
             </div>
-
-            <div style="display:flex;gap:8px;margin-top:8px;margin-bottom:8px">
-              <button type="button" id="addEdu" class="btn secondary">+ Add another education level</button>
-              <button type="button" id="removeEdu" class="btn ghost">- Remove last</button>
+            <div class="col">
+              <label>Sub-location</label>
+              <input id="sublocation" type="text">
             </div>
-
-            <div class="actions">
-              <button type="button" class="btn ghost" id="btnPrev2"><i class="fas fa-chevron-left"></i> Back</button>
-              <div style="margin-left:auto">
-                <button type="button" class="btn" id="btnNext2">Save & Continue <i class="fas fa-chevron-right"></i></button>
-              </div>
+            <div class="col">
+              <label>Village</label>
+              <input id="village" type="text">
             </div>
           </div>
 
-          <!-- STEP 3: Loan Details -->
-          <div class="panel" data-panel="3">
-            <div class="row">
-              <div>
-                <label>Loan Amount (Ksh)</label>
-                <input id="loanAmount" type="number" min="0" step="100" required>
-              </div>
-              <div>
-                <label>Installment (Ksh)</label>
-                <input id="loanInstallment" type="number" min="0" step="50">
-              </div>
-            </div>
+          <div class="actions">
+            <button type="button" class="btn ghost" data-prev>← Back</button>
+            <button type="button" class="btn" data-next>Continue →</button>
+          </div>
+        </div>
 
-            <div class="row">
-              <div>
-                <label>Purpose</label>
-                <input id="loanPurpose" type="text" required>
-              </div>
-              <div>
-                <label>Installment Frequency</label>
-                <select id="installmentFreq"><option>Monthly</option><option>Quarterly</option><option>Weekly</option></select>
-              </div>
-            </div>
+        <!-- Step 3: Residence -->
+        <div data-step-content="3" class="step-content" style="display:none;margin-top:12px">
+          <h3>Residence Details</h3>
 
-            <div class="row">
-              <div>
-                <label>Date of First Installment</label>
-                <input id="firstInstallmentDate" type="date">
-              </div>
-              <div>
-                <label>Date of Last Installment</label>
-                <input id="lastInstallmentDate" type="date">
-              </div>
+          <div class="row">
+            <div class="col">
+              <label>Nearest primary school</label>
+              <input id="nearestSchool" type="text">
             </div>
-
-            <div class="row single">
-              <div>
-                <label>Upload Supporting Document (pdf/image)</label>
-                <input id="supportDoc" type="file" accept="application/pdf,image/*">
-                <div id="supportDocPreview" class="file-preview"></div>
-              </div>
+            <div class="col">
+              <label>Village</label>
+              <input id="resVillage" type="text">
             </div>
-
-            <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
-              <button type="button" id="btnApplyRedirect" class="btn ghost" title="Admin apply">Apply (redirect to admin.html)</button>
-              <div class="muted" style="margin-left:6px">Or continue to add guarantors & parents</div>
-            </div>
-
-            <div class="actions">
-              <button type="button" class="btn ghost" id="btnPrev3"><i class="fas fa-chevron-left"></i> Back</button>
-              <div style="margin-left:auto">
-                <button type="button" class="btn" id="btnNext3">Save & Continue <i class="fas fa-chevron-right"></i></button>
-              </div>
+            <div class="col">
+              <label>Street</label>
+              <input id="resStreet" type="text">
             </div>
           </div>
 
-          <!-- STEP 4: Guarantors -->
-          <div class="panel" data-panel="4">
-            <div id="guarantorsList"></div>
-            <div style="display:flex;gap:8px;margin-top:8px">
-              <button type="button" id="addGuarantorBtn" class="btn secondary"><i class="fas fa-user-plus"></i> Add Guarantor</button>
-              <button type="button" id="downloadGuarantorTemplate" class="btn ghost"><i class="fas fa-file-download"></i> Download Guarantor Form</button>
+          <div class="row">
+            <div class="col">
+              <label>Town</label>
+              <input id="resTown" type="text">
             </div>
-            <div class="small" style="margin-top:8px">Require at least 2 guarantors.</div>
-
-            <div class="actions">
-              <button type="button" class="btn ghost" id="btnPrev4"><i class="fas fa-chevron-left"></i> Back</button>
-              <div style="margin-left:auto">
-                <button type="button" class="btn" id="btnNext4">Save & Continue <i class="fas fa-chevron-right"></i></button>
-              </div>
+            <div class="col">
+              <label>County</label>
+              <input id="resCounty" type="text">
+            </div>
+            <div class="col">
+              <label>Constituency</label>
+              <input id="resConstituency" type="text">
             </div>
           </div>
 
-          <!-- STEP 5: Parents -->
-          <div class="panel" data-panel="5">
+          <div class="actions">
+            <button type="button" class="btn ghost" data-prev>← Back</button>
+            <button type="button" class="btn" data-next>Continue →</button>
+          </div>
+        </div>
+
+        <!-- Step 4: Education -->
+        <div data-step-content="4" class="step-content" style="display:none;margin-top:12px">
+          <h3>Education</h3>
+          <p class="small">Choose a level and provide at least two entries if applicable.</p>
+
+          <div id="educationList">
+            <!-- dynamic entries -->
+          </div>
+
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button type="button" class="btn ghost" id="addEducation">+ Add Education</button>
+          </div>
+
+          <div class="actions">
+            <button type="button" class="btn ghost" data-prev>← Back</button>
+            <button type="button" class="btn" data-next>Continue →</button>
+          </div>
+        </div>
+
+        <!-- Step 5: Loan Details -->
+        <div data-step-content="5" class="step-content" style="display:none;margin-top:12px">
+          <h3>Loan Details</h3>
+
+          <div class="row">
+            <div class="col">
+              <label>Amount requested (Ksh) <span class="small">*</span></label>
+              <input id="loanAmount" type="number" required>
+            </div>
+            <div class="col">
+              <label>Purpose of loan <span class="small">*</span></label>
+              <input id="loanPurpose" type="text" required>
+            </div>
+            <div class="col">
+              <label>Installment</label>
+              <input id="loanInstallment" type="number">
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col">
+              <label>Date of first installment</label>
+              <input id="firstInstallment" type="date">
+            </div>
+            <div class="col">
+              <label>Date of last installment</label>
+              <input id="lastInstallment" type="date">
+            </div>
+            <div class="col">
+              <label>Upload supporting document(s)</label>
+              <input id="loanSupportDocs" type="file" accept="image/*,application/pdf" multiple>
+            </div>
+          </div>
+
+          <div class="file-preview" id="loanSupportPreview"></div>
+
+          <div class="actions">
+            <button type="button" class="btn ghost" data-prev>← Back</button>
+            <button type="button" class="btn" data-next>Continue →</button>
+          </div>
+        </div>
+
+        <!-- Step 6: Guarantors -->
+        <div data-step-content="6" class="step-content" style="display:none;margin-top:12px">
+          <h3>Guarantors (Add at least 2)</h3>
+          <div id="guarantorsList"></div>
+
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button type="button" class="btn ghost" id="addGuarantor">+ Add Guarantor</button>
+            <button type="button" class="btn secondary" id="downloadGuarantorTemplate">Download Guarantor Template (PDF)</button>
+          </div>
+
+          <div class="actions">
+            <button type="button" class="btn ghost" data-prev>← Back</button>
+            <button type="button" class="btn" data-next>Continue →</button>
+          </div>
+        </div>
+
+        <!-- Step 7: Parents & Review -->
+        <div data-step-content="7" class="step-content" style="display:none;margin-top:12px">
+          <h3>Parents & Review</h3>
+
+          <div id="parentsArea">
+            <div style="display:flex;gap:8px;margin-bottom:8px">
+              <button type="button" class="btn ghost" id="addFather">+ Add Father</button>
+              <button type="button" class="btn ghost" id="addMother">+ Add Mother</button>
+            </div>
             <div id="parentsList"></div>
-            <div style="display:flex;gap:8px;margin-top:8px">
-              <button type="button" id="addFatherBtn" class="btn secondary">+ Add Father</button>
-              <button type="button" id="addMotherBtn" class="btn secondary">+ Add Mother</button>
-            </div>
-
-            <div class="actions">
-              <button type="button" class="btn ghost" id="btnPrev5"><i class="fas fa-chevron-left"></i> Back</button>
-              <div style="margin-left:auto">
-                <button type="button" class="btn" id="btnNext5">Save & Continue <i class="fas fa-chevron-right"></i></button>
-              </div>
-            </div>
           </div>
 
-          <!-- STEP 6: Review & Submit -->
-          <div class="panel" data-panel="6">
-            <h3 style="margin-top:0;color:#fff">Review Application</h3>
-            <div id="reviewArea" style="max-height:380px;overflow:auto;padding-right:6px"></div>
-
-            <div style="display:flex;gap:8px;margin-top:12px;align-items:center;">
-              <button type="button" id="btnDownloadPreviewPdf" class="btn secondary"><i class="fas fa-file-pdf"></i> Download Preview PDF</button>
-              <button type="button" id="btnClearDraft" class="btn ghost">Clear Draft</button>
-              <div style="flex:1"></div>
-              <button type="button" id="btnSubmitFinal" class="btn warn"><i class="fas fa-paper-plane"></i> Submit & Download Filled PDF</button>
-            </div>
+          <h4>Review Application</h4>
+          <div class="review" id="reviewBox">
+            <pre id="reviewText">Please review your application. Use previous buttons to correct any details.</pre>
           </div>
-        </form>
-      </div>
-    </div>
+
+          <div class="actions" style="margin-top:10px">
+            <button type="button" class="btn ghost" data-prev>← Back</button>
+            <button type="button" class="btn" id="submitApplication">Submit & Download PDF</button>
+          </div>
+
+          <p class="notes">After submission the full application will be saved to the RTDB & all uploaded documents stored in Storage. The generated PDF will embed images and supporting docs where possible.</p>
+        </div>
+      </form>
+    </section>
   </div>
 
-  <!-- Firebase + logic -->
   <script type="module">
-    // jsPDF
+    // Use jsPDF from global
     const { jsPDF } = window.jspdf;
 
+    // Firebase modular imports (v9)
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-    import { getDatabase, ref, push, set, update, get } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
-    import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
+    import {
+      getAuth
+    } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import {
+      getDatabase, ref, set, push, update, get, child
+    } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+    import {
+      getStorage, ref as sRef, uploadBytes, getDownloadURL
+    } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
 
-    // ===== YOUR FIREBASE CONFIG (keeps the RTDB URL you used earlier) =====
+    // ===== CONFIG - reuse your project config =====
     const firebaseConfig = {
       apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
       authDomain: "visionary-youth-grou-2024.firebaseapp.com",
@@ -430,570 +430,593 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+    const auth = getAuth ? getAuth(app) : null; // optional (if used)
     const db = getDatabase(app);
     const storage = getStorage(app);
 
-    // Wizard logic
-    const panels = Array.from(document.querySelectorAll('.panel'));
+    // wizard logic
     const steps = Array.from(document.querySelectorAll('.step'));
-    const progressEl = document.getElementById('progress');
+    const contents = Array.from(document.querySelectorAll('[data-step-content]'));
+    const progressBar = document.getElementById('progressBar');
+    let currentStep = 1;
+    const totalSteps = steps.length;
 
-    let current = 0;
-    function showStep(i){
-      current = i;
-      panels.forEach(p => p.classList.toggle('active', Number(p.dataset.panel) === i));
-      steps.forEach(s => s.classList.toggle('active', Number(s.dataset.step) === i));
-      const pct = Math.round((i)/(panels.length-1)*100);
-      progressEl.style.width = pct + '%';
-      // enable/disable prev
-      document.querySelectorAll('#btnPrev, #btnPrev1, #btnPrev2, #btnPrev3, #btnPrev4, #btnPrev5').forEach(b => b.disabled = (i===0));
-      window.scrollTo({top:0,behavior:'smooth'});
+    function showStep(n){
+      currentStep = n;
+      steps.forEach(s => s.classList.toggle('active', Number(s.dataset.step) === n));
+      contents.forEach(c => c.style.display = Number(c.dataset.stepContent) === n ? 'block' : 'none');
+      const pct = Math.round((n / totalSteps) * 100);
+      progressBar.style.width = pct + '%';
+      // update review when at final step
+      if(n === totalSteps) buildReview();
     }
 
-    // next/prev buttons
-    document.getElementById('btnNext0').addEventListener('click', ()=> { showStep(1); });
-    document.getElementById('btnNext1').addEventListener('click', ()=> { showStep(2); });
-    document.getElementById('btnNext2').addEventListener('click', ()=> { showStep(3); });
-    document.getElementById('btnNext3').addEventListener('click', ()=> { showStep(4); });
-    document.getElementById('btnNext4').addEventListener('click', ()=> { showStep(5); });
-    document.getElementById('btnNext5').addEventListener('click', ()=> { populateReview(); showStep(6); });
-
-    document.getElementById('btnPrev').addEventListener('click', ()=> showStep(0));
-    document.getElementById('btnPrev1').addEventListener('click', ()=> showStep(0));
-    document.getElementById('btnPrev2').addEventListener('click', ()=> showStep(1));
-    document.getElementById('btnPrev3').addEventListener('click', ()=> showStep(2));
-    document.getElementById('btnPrev4').addEventListener('click', ()=> showStep(3));
-    document.getElementById('btnPrev5').addEventListener('click', ()=> showStep(4));
-
-    // County list (47 counties). For detailed constituency/ward lists you can expand the mapping.
-    const counties = [
-      "Mombasa","Kwale","Kilifi","Tana River","Lamu","Taita-Taveta","Garissa","Wajir","Mandera",
-      "Marsabit","Isiolo","Meru","Tharaka-Nithi","Embu","Kitui","Machakos","Makueni","Nyandarua",
-      "Nyeri","Kirinyaga","Muranga","Kiambu","Turkana","West Pokot","Samburu","Trans Nzoia",
-      "Uasin Gishu","Elgeyo-Marakwet","Nandi","Baringo","Laikipia","Nakuru","Narok","Kajiado",
-      "Kericho","Bomet","Kakamega","Vihiga","Bungoma","Busia","Siaya","Kisumu","Homa Bay",
-      "Migori","Kisii","Nyamira","Nairobi"
-    ];
-    const countyEl = document.getElementById('county');
-    counties.forEach(c => { const o = document.createElement('option'); o.value=c; o.textContent=c; countyEl.appendChild(o); });
-
-    // Example minimal constituency mapping (expand as needed). If selected county has no mapping the constituency/ward becomes editable.
-    const constituencyMap = {
-      "Nairobi": ["Westlands","Roysambu","Dagoretti North","Embakasi South","Mathare","Starehe"],
-      "Kiambu": ["Githunguri","Kabete","Kiambaa","Kiambu","Thika Town"],
-      "Mombasa": ["Mvita","Nyali","Jomvu","Likoni"]
-      // ... expand as needed
-    };
-    const wardsMap = {
-      "Westlands": ["Parklands/Highridge","Kangemi","Kileleshwa"],
-      "Mvita": ["Mji wa Kale","Tudor","Tononoka"]
-      // ... expand as needed
-    };
-
-    function rebuildConstituencyOptions(county){
-      const constEl = document.getElementById('constituency');
-      constEl.innerHTML = '';
-      const list = constituencyMap[county];
-      if(Array.isArray(list)){
-        list.forEach(c => { const o = document.createElement('option'); o.value=c; o.textContent=c; constEl.appendChild(o); });
-        rebuildWardOptions(list[0]);
-      } else {
-        // no mapped constituency — provide a free text option
-        const o = document.createElement('option'); o.value = ''; o.textContent = 'Select / Type...'; constEl.appendChild(o);
-        constEl.insertAdjacentHTML('beforeend', '<option value="__other__">Other (type below)</option>');
-        rebuildWardOptions();
+    // wire next/prev
+    document.querySelectorAll('[data-next]').forEach(btn => btn.addEventListener('click', () => {
+      // basic validation before advancing
+      if(currentStep === 1){
+        if(!document.getElementById('firstName').value.trim() || !document.getElementById('idNumber').value.trim() || !document.getElementById('telephone').value.trim()){
+          return alert('Please fill required personal fields (First name, ID, Telephone).');
+        }
       }
-    }
-    function rebuildWardOptions(constituency){
-      const wEl = document.getElementById('ward');
-      wEl.innerHTML = '';
-      if(constituency && Array.isArray(wardsMap[constituency])){
-        wardsMap[constituency].forEach(w => { const o = document.createElement('option'); o.value=w; o.textContent=w; wEl.appendChild(o); });
-      } else {
-        const o = document.createElement('option'); o.value=''; o.textContent = 'Select / Type...'; wEl.appendChild(o);
+      if(currentStep === 2){
+        if(!document.getElementById('county').value || !document.getElementById('constituency').value || !document.getElementById('ward').value){
+          return alert('Please select County, Constituency and Ward.');
+        }
       }
-    }
-    countyEl.addEventListener('change', e => rebuildConstituencyOptions(e.target.value));
-    document.getElementById('constituency').addEventListener('change', e => rebuildWardOptions(e.target.value));
-    // init
-    rebuildConstituencyOptions(counties[0]);
+      if(currentStep < totalSteps) showStep(currentStep + 1);
+    }));
 
-    // Education add/remove
-    const eduContainer = document.getElementById('educationContainer');
-    document.getElementById('addEdu').addEventListener('click', () => {
-      const idx = eduContainer.querySelectorAll('.edu-item').length;
-      const item = document.createElement('div');
-      item.className = 'edu-item'; item.dataset.eduIndex = idx;
-      item.innerHTML = `
-        <div class="row">
-          <div><label>Level</label><select class="edu-level"><option>KCPE</option><option>KCSE</option><option>Certificate</option><option>Diploma</option><option>Degree</option><option>Masters</option></select></div>
-          <div><label>Exam Year</label><input class="edu-year" type="number" min="1900" max="2099" placeholder="e.g. 2018"></div>
-        </div>
-        <div class="row">
-          <div><label>Index / Reg No</label><input class="edu-index" type="text"></div>
-          <div><label>Exam Type</label><select class="edu-examType"><option>National</option><option>Private</option></select></div>
-        </div>
-        <div class="row single"><div><label>Remarks / Subjects (optional)</label><input class="edu-remarks" type="text"></div></div>
-        <hr style="border-color:rgba(255,255,255,0.04)">
-      `;
-      eduContainer.appendChild(item);
-    });
-    document.getElementById('removeEdu').addEventListener('click', ()=> {
-      const items = eduContainer.querySelectorAll('.edu-item');
-      if(items.length > 1) items[items.length-1].remove();
-    });
+    document.querySelectorAll('[data-prev]').forEach(btn => btn.addEventListener('click', ()=> {
+      if(currentStep > 1) showStep(currentStep - 1);
+    }));
 
-    // Guarantors & parents data containers
-    const guarantorsList = document.getElementById('guarantorsList');
-    const parentsList = document.getElementById('parentsList');
-
-    function renderGuarantorItem(obj){
-      const idx = (new Date()).getTime().toString(36);
-      const div = document.createElement('div'); div.className='list-item'; div.id = 'g_' + idx;
-      div.innerHTML = `
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div style="flex:1">
-            <div style="font-weight:700">${obj.name||'(No name)'}</div>
-            <div class="muted">Member No: ${obj.memberNo||'-'} • ID: ${obj.idNo||'-'} • Phone: ${obj.phone||'-'}</div>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
-            <button class="btn secondary btn-edit-guarantor" data-id="${idx}">Edit</button>
-            <button class="btn ghost btn-remove-guarantor" data-id="${idx}">Remove</button>
-          </div>
-        </div>
-      `;
-      guarantorsList.appendChild(div);
-      return idx;
-    }
-    function renderParentItem(obj, which){
-      const idx = (new Date()).getTime().toString(36);
-      const div = document.createElement('div'); div.className='list-item'; div.id = 'p_' + idx;
-      div.innerHTML = `
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div style="flex:1">
-            <div style="font-weight:700">${obj.name||which}</div>
-            <div class="muted">ID: ${obj.id||'-'} • Phone: ${obj.phone||'-'} • Email: ${obj.email||'-'}</div>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
-            <button class="btn secondary btn-edit-parent" data-id="${idx}">Edit</button>
-            <button class="btn ghost btn-remove-parent" data-id="${idx}">Remove</button>
-          </div>
-        </div>
-      `;
-      parentsList.appendChild(div);
-      return idx;
-    }
-
-    // Add guarantor modal-like inline prompt
-    async function promptGuarantor(existing){
-      const name = prompt('Guarantor name', existing?.name || '');
-      if(name === null) return null;
-      const memberNo = prompt('Member No (if any)', existing?.memberNo || '');
-      const idNo = prompt('ID / Passport No', existing?.idNo || '');
-      const phone = prompt('Phone', existing?.phone || '');
-      const email = prompt('Email', existing?.email || '');
-      return { name, memberNo, idNo, phone, email };
-    }
-    document.getElementById('addGuarantorBtn').addEventListener('click', async ()=>{
-      const g = await promptGuarantor();
-      if(!g) return;
-      renderGuarantorItem(g);
-    });
-    // remove/edit handlers (delegated)
-    guarantorsList.addEventListener('click', (e) => {
-      if(e.target.closest('.btn-remove-guarantor')){
-        const id = e.target.closest('.btn-remove-guarantor').dataset.id;
-        document.getElementById('g_' + id).remove();
-      } else if(e.target.closest('.btn-edit-guarantor')){
-        const id = e.target.closest('.btn-edit-guarantor').dataset.id;
-        const node = document.getElementById('g_' + id);
-        const currentName = node.querySelector('div > div').textContent;
-        promptGuarantor({ name: currentName }).then(updated => {
-          if(!updated) return;
-          node.querySelector('div > div').textContent = updated.name;
-          node.querySelector('.muted').textContent = `Member No: ${updated.memberNo||'-'} • ID: ${updated.idNo||'-'} • Phone: ${updated.phone||'-'}`;
-        });
-      }
-    });
-
-    document.getElementById('addFatherBtn').addEventListener('click', async ()=> {
-      const name = prompt('Father name'); if(!name) return;
-      const id = prompt('Father ID / Passport No') || '';
-      const phone = prompt('Father phone') || '';
-      const email = prompt('Father email') || '';
-      renderParentItem({ name, id, phone, email }, 'Father');
-    });
-    document.getElementById('addMotherBtn').addEventListener('click', async ()=> {
-      const name = prompt('Mother name'); if(!name) return;
-      const id = prompt('Mother ID / Passport No') || '';
-      const phone = prompt('Mother phone') || '';
-      const email = prompt('Mother email') || '';
-      renderParentItem({ name, id, phone, email }, 'Mother');
-    });
-
-    // file preview helpers + upload placeholders
-    function humanFileName(f){ return f ? (f.name || String(f)) : ''; }
-    document.getElementById('idFront').addEventListener('change', e => {
-      const f = e.target.files && e.target.files[0];
-      document.getElementById('idFrontPreview').textContent = f ? `Selected: ${humanFileName(f)}` : 'No file';
-    });
-    document.getElementById('idBack').addEventListener('change', e => {
-      const f = e.target.files && e.target.files[0];
-      document.getElementById('idBackPreview').textContent = f ? `Selected: ${humanFileName(f)}` : 'No file';
-    });
-    document.getElementById('supportDoc').addEventListener('change', e => {
-      const f = e.target.files && e.target.files[0];
-      document.getElementById('supportDocPreview').textContent = f ? `Selected: ${humanFileName(f)}` : 'No file';
-    });
-
-    // Apply redirect (as requested)
-    document.getElementById('btnApplyRedirect').addEventListener('click', ()=> {
-      // redirect to admin.html - since we're already admin, for compatibility we can open admin.html in a new tab
-      window.open('admin.html', '_blank');
-    });
-
-    // Build application object from form
-    function collectFormData(){
-      const personal = {
+    // Save step 1 (quick save)
+    document.getElementById('saveStep1').addEventListener('click', async () => {
+      const payload = {
         firstName: document.getElementById('firstName').value.trim(),
         middleName: document.getElementById('middleName').value.trim(),
         lastName: document.getElementById('lastName').value.trim(),
-        idNo: document.getElementById('idNo').value.trim(),
-        dob: document.getElementById('dob').value,
-        maritalStatus: document.getElementById('maritalStatus').value,
-        phone: document.getElementById('phone').value.trim(),
-        gender: document.getElementById('gender').value,
-        religion: document.getElementById('religion').value
+        idNumber: document.getElementById('idNumber').value.trim(),
+        telephone: document.getElementById('telephone').value.trim(),
+        savedAt: Date.now()
       };
-      const residence = {
-        poBox: document.getElementById('poBox').value,
-        postalCode: document.getElementById('postalCode').value,
-        town: document.getElementById('town').value,
-        county: document.getElementById('county').value,
-        constituency: document.getElementById('constituency').value,
-        ward: document.getElementById('ward').value,
-        location: document.getElementById('location').value,
-        sublocation: document.getElementById('sublocation').value,
-        nearestSchool: document.getElementById('nearestSchool').value
-      };
-      // education
-      const edus = [];
-      document.querySelectorAll('.edu-item').forEach(it => {
-        edus.push({
-          level: it.querySelector('.edu-level').value,
-          year: it.querySelector('.edu-year').value,
-          indexNo: it.querySelector('.edu-index').value,
-          examType: it.querySelector('.edu-examType').value,
-          remarks: it.querySelector('.edu-remarks').value
+      // push to RTDB under drafts (no auth assumption)
+      const draftsRef = ref(db, `loanDrafts/${payload.idNumber||payload.telephone||Date.now()}`);
+      await set(draftsRef, payload);
+      alert('Saved draft (you may continue later).');
+    });
+
+    // Populate counties (Kenya 47 counties)
+    const counties = [
+      "Mombasa","Kwale","Kilifi","Tana River","Lamu","Taita-Taveta","Garissa","Wajir","Mandera",
+      "Marsabit","Isiolo","Meru","Tharaka-Nithi","Embu","Kitui","Machakos","Makueni","Nyandarua",
+      "Nyeri","Kirinyaga","Murang'a","Kiambu","Turkana","West Pokot","Samburu","Trans-Nzoia","Uasin Gishu",
+      "Elgeyo-Marakwet","Nandi","Baringo","Laikipia","Nakuru","Narok","Kajiado","Kericho","Bomet",
+      "Kakamega","Vihiga","Bungoma","Busia","Siaya","Kisumu","Homa Bay","Migori","Kisii","Nyamira","Nairobi"
+    ];
+    const countyEl = document.getElementById('county');
+    counties.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = c; countyEl.appendChild(o); });
+
+    // Simple constituency mapping for demo (extendable)
+    const constituenciesByCounty = {
+      "Nairobi": ["Dagoretti North","Dagoretti South","Embakasi North","Embakasi South","Westlands","Starehe","Lang'ata"],
+      "Kiambu": ["Thika","Githunguri","Kiambu","Kabete","Ruiru"],
+      "Makueni": ["Makueni","Kibwezi East","Kibwezi West","Mbooni"],
+      "Nakuru": ["Nakuru Town East","Nakuru Town West","Naivasha","Gilgil"],
+      // add more mappings as needed...
+    };
+
+    // Wards placeholder mapping (extend)
+    const wardsByConstituency = {
+      "Dagoretti North": ["Kawangware","Riruta","Kabiro"],
+      "Westlands": ["Kangemi","Mountain View","Parklands"],
+      "Thika": ["Thika Town","Kamenu"],
+      "Makueni": ["Wote","Makueni Ward"]
+    };
+
+    function populateConstituenciesForCounty(county){
+      const sel = document.getElementById('constituency');
+      sel.innerHTML = '<option value="">Select</option>';
+      const list = constituenciesByCounty[county] || [];
+      list.forEach(c=> { const o=document.createElement('option'); o.value=c; o.textContent=c; sel.appendChild(o); });
+      // clear wards
+      document.getElementById('ward').innerHTML = '<option value="">Select</option>';
+    }
+
+    function populateWardsForConstituency(cons){
+      const sel = document.getElementById('ward');
+      sel.innerHTML = '<option value="">Select</option>';
+      const list = wardsByConstituency[cons] || [];
+      list.forEach(w=> { const o=document.createElement('option'); o.value=w; o.textContent=w; sel.appendChild(o); });
+    }
+
+    countyEl.addEventListener('change', () => {
+      const c = countyEl.value;
+      populateConstituenciesForCounty(c);
+      // ensure visible contrast: make dropdown dark text on light background
+      document.getElementById('constituency').style.color = '#123';
+      document.getElementById('ward').style.color = '#123';
+    });
+    document.getElementById('constituency').addEventListener('change', (e)=> populateWardsForConstituency(e.target.value));
+
+    // Education dynamic entries
+    const educationList = document.getElementById('educationList');
+    function addEducationEntry(data = {}) {
+      const id = 'edu_' + Date.now() + Math.floor(Math.random()*999);
+      const div = document.createElement('div');
+      div.className = 'guarantor-item';
+      div.dataset.id = id;
+      div.innerHTML = `
+        <div style="display:flex;gap:8px;align-items:center;justify-content:space-between">
+          <strong>Education entry</strong>
+          <button class="btn ghost removeEdu">Remove</button>
+        </div>
+        <div class="row" style="margin-top:8px">
+          <div class="col"><label>Level</label><select class="eduLevel"><option>KCPE</option><option>KCSE</option><option>Certificate</option><option>Diploma</option><option>Degree</option></select></div>
+          <div class="col"><label>Exam type / School</label><input class="eduExam" type="text"></div>
+          <div class="col"><label>Year / Index no</label><input class="eduYear" type="text"></div>
+        </div>
+      `;
+      educationList.appendChild(div);
+      if(data.level) div.querySelector('.eduLevel').value = data.level;
+      if(data.exam) div.querySelector('.eduExam').value = data.exam;
+      if(data.year) div.querySelector('.eduYear').value = data.year;
+      div.querySelector('.removeEdu').addEventListener('click', ()=> div.remove());
+    }
+    document.getElementById('addEducation').addEventListener('click', ()=> addEducationEntry());
+
+    // Guarantors dynamic
+    const guarantorsList = document.getElementById('guarantorsList');
+    function addGuarantor(data={}) {
+      const id = 'g_' + Date.now() + Math.floor(Math.random()*999);
+      const el = document.createElement('div');
+      el.className = 'guarantor-item';
+      el.dataset.id = id;
+      el.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <strong>Guarantor</strong>
+          <div style="display:flex;gap:8px">
+            <button class="btn ghost downloadG">Download Template</button>
+            <button class="btn ghost removeG">Remove</button>
+          </div>
+        </div>
+        <div class="row" style="margin-top:8px">
+          <div class="col"><label>Name</label><input class="g_name" type="text"></div>
+          <div class="col"><label>Member no</label><input class="g_member" type="text"></div>
+          <div class="col"><label>ID no</label><input class="g_id" type="text"></div>
+        </div>
+        <div class="row">
+          <div class="col"><label>Phone</label><input class="g_phone" type="text"></div>
+          <div class="col"><label>Email</label><input class="g_email" type="text"></div>
+        </div>
+      `;
+      guarantorsList.appendChild(el);
+      if(data.name) el.querySelector('.g_name').value = data.name;
+      if(data.member) el.querySelector('.g_member').value = data.member;
+      if(data.id) el.querySelector('.g_id').value = data.id;
+      if(data.phone) el.querySelector('.g_phone').value = data.phone;
+      if(data.email) el.querySelector('.g_email').value = data.email;
+
+      el.querySelector('.removeG').addEventListener('click', () => el.remove());
+      el.querySelector('.downloadG').addEventListener('click', async () => {
+        // build guarantor PDF for this guarantor (auto-fills applicant info)
+        await buildGuarantorPdf({
+          guarantor: {
+            name: el.querySelector('.g_name').value || '',
+            memberNo: el.querySelector('.g_member').value || '',
+            idNo: el.querySelector('.g_id').value || '',
+            phone: el.querySelector('.g_phone').value || '',
+            email: el.querySelector('.g_email').value || ''
+          },
+          applicant: getApplicantSummary()
         });
       });
-      // loan
-      const loan = {
-        amount: Number(document.getElementById('loanAmount').value || 0),
-        installment: Number(document.getElementById('loanInstallment').value || 0),
-        purpose: document.getElementById('loanPurpose').value,
-        frequency: document.getElementById('installmentFreq').value,
-        firstInstallmentDate: document.getElementById('firstInstallmentDate').value,
-        lastInstallmentDate: document.getElementById('lastInstallmentDate').value
+    }
+    document.getElementById('addGuarantor').addEventListener('click', ()=> addGuarantor());
+
+    // parents
+    const parentsList = document.getElementById('parentsList');
+    document.getElementById('addFather').addEventListener('click', ()=> addParent('Father'));
+    document.getElementById('addMother').addEventListener('click', ()=> addParent('Mother'));
+
+    function addParent(type, data={}) {
+      const id = 'p_' + Date.now() + Math.floor(Math.random()*999);
+      const el = document.createElement('div');
+      el.className = 'guarantor-item';
+      el.dataset.id = id;
+      el.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center"><strong>${type}</strong><button class="btn ghost removeP">Remove</button></div>
+        <div class="row" style="margin-top:8px">
+          <div class="col"><label>Name</label><input class="p_name" type="text"></div>
+          <div class="col"><label>Phone</label><input class="p_phone" type="text"></div>
+          <div class="col"><label>ID</label><input class="p_id" type="text"></div>
+        </div>
+        <div class="row"><div class="col"><label>Email</label><input class="p_email" type="text"></div></div>`;
+      parentsList.appendChild(el);
+      el.querySelector('.removeP').addEventListener('click', ()=> el.remove());
+    }
+
+    // file previews for personal & loan support
+    function previewFiles(inputEl, targetEl){
+      const files = inputEl.files;
+      const wrapper = document.getElementById(targetEl);
+      wrapper.innerHTML = '';
+      if(!files) return;
+      Array.from(files).forEach(file=>{
+        if(file.type.startsWith('image/')){
+          const img = document.createElement('img');
+          img.src = URL.createObjectURL(file);
+          wrapper.appendChild(img);
+        } else {
+          const div = document.createElement('div');
+          div.textContent = file.name;
+          div.className = 'small';
+          wrapper.appendChild(div);
+        }
+      });
+    }
+    document.getElementById('idFront').addEventListener('change', ()=> previewFiles(document.getElementById('idFront'),'personalPreview'));
+    document.getElementById('idBack').addEventListener('change', ()=> previewFiles(document.getElementById('idBack'),'personalPreview'));
+    document.getElementById('passportPhoto').addEventListener('change', ()=> previewFiles(document.getElementById('passportPhoto'),'personalPreview'));
+    document.getElementById('loanSupportDocs').addEventListener('change', ()=> previewFiles(document.getElementById('loanSupportDocs'),'loanSupportPreview'));
+
+    // small helper: applicant summary
+    function getApplicantSummary(){
+      return {
+        firstName: document.getElementById('firstName').value.trim(),
+        middleName: document.getElementById('middleName').value.trim(),
+        lastName: document.getElementById('lastName').value.trim(),
+        idNumber: document.getElementById('idNumber').value.trim(),
+        telephone: document.getElementById('telephone').value.trim(),
+        dob: document.getElementById('dob').value,
+        county: document.getElementById('county').value,
+        constituency: document.getElementById('constituency').value,
+        ward: document.getElementById('ward').value
       };
-      // guarantors
-      const guarantors = [];
-      guarantorsList.querySelectorAll('.list-item').forEach(node => {
-        const title = node.querySelector('div > div').textContent;
-        const meta = node.querySelector('.muted').textContent;
-        guarantors.push({ display: title, meta });
-      });
-      // parents
-      const parents = [];
-      parentsList.querySelectorAll('.list-item').forEach(node => {
-        const title = node.querySelector('div > div').textContent;
-        const meta = node.querySelector('.muted').textContent;
-        parents.push({ display: title, meta });
-      });
-
-      return { personal, residence, education: edus, loan, guarantors, parents };
     }
 
-    // Review population
-    function populateReview(){
-      const data = collectFormData();
-      const area = document.getElementById('reviewArea'); area.innerHTML = '';
-      const makeRow = (label, value) => `<div style="margin-bottom:6px"><strong style="color:#b8fff0">${label}:</strong> <span class="muted">${value||'-'}</span></div>`;
-      area.insertAdjacentHTML('beforeend', '<h4>Personal</h4>');
-      for(const k in data.personal) area.insertAdjacentHTML('beforeend', makeRow(k, data.personal[k]));
-      area.insertAdjacentHTML('beforeend','<hr>');
-      area.insertAdjacentHTML('beforeend','<h4>Residence</h4>');
-      for(const k in data.residence) area.insertAdjacentHTML('beforeend', makeRow(k, data.residence[k]));
-      area.insertAdjacentHTML('beforeend','<hr>');
-      area.insertAdjacentHTML('beforeend','<h4>Education</h4>');
-      data.education.forEach((e,i) => area.insertAdjacentHTML('beforeend', `<div class="muted">(${i+1}) ${e.level} • ${e.year} • ${e.indexNo} • ${e.examType}</div>`));
-      area.insertAdjacentHTML('beforeend','<hr>');
-      area.insertAdjacentHTML('beforeend','<h4>Loan</h4>');
-      for(const k in data.loan) area.insertAdjacentHTML('beforeend', makeRow(k, data.loan[k]));
-      area.insertAdjacentHTML('beforeend','<hr>');
-      area.insertAdjacentHTML('beforeend','<h4>Guarantors</h4>');
-      data.guarantors.forEach((g,i)=> area.insertAdjacentHTML('beforeend', `<div class="muted">(${i+1}) ${g.display} • ${g.meta}</div>`));
-      area.insertAdjacentHTML('beforeend','<hr>');
-      area.insertAdjacentHTML('beforeend','<h4>Parents / Guardians</h4>');
-      data.parents.forEach((p,i)=> area.insertAdjacentHTML('beforeend', `<div class="muted">(${i+1}) ${p.display} • ${p.meta}</div>`));
+    // build guarantor PDF
+    async function buildGuarantorPdf({guarantor, applicant}) {
+      const doc = new jsPDF({unit:'pt',format:'a4'});
+      const left = 36;
+      doc.setFontSize(14); doc.setFont('helvetica','bold'); doc.text('Visionary Youth Group', 220, 40);
+      doc.setFontSize(10); doc.setFont('helvetica','normal'); doc.text('Integrity | Commitment | Entrepreneurial Nature', 220, 56);
+      doc.setDrawColor(46,125,50); doc.setLineWidth(1.5); doc.line(left,72,559,left);
+      doc.setFontSize(12); doc.text('Guarantor Agreement', left, 96);
+      doc.setFontSize(10);
+      const applicantText = `Applicant: ${applicant.firstName || ''} ${applicant.middleName||''} ${applicant.lastName||''}\nID: ${applicant.idNumber || ''}\nPhone: ${applicant.telephone || ''}`;
+      doc.text(applicantText, left, 116);
+
+      let y = 170;
+      doc.text('Guarantor Details', left, y); y+=16;
+      doc.text(`Name: ${guarantor.name || ''}`, left, y); y+=14;
+      doc.text(`Member no: ${guarantor.memberNo || ''}`, left, y); y+=14;
+      doc.text(`ID No: ${guarantor.idNo || ''}`, left, y); y+=14;
+      doc.text(`Phone: ${guarantor.phone || ''}`, left, y); y+=14;
+      doc.text(`Email: ${guarantor.email || ''}`, left, y); y+=28;
+
+      const declaration = "I hereby declare that I guarantee repayment of the loan applied for by the applicant should they default, subject to the Visionary Youth Group loan policy. I understand the obligations and accept responsibility to meet repayments as necessary.";
+      const wrapped = doc.splitTextToSize(declaration, 520);
+      doc.text(wrapped, left, y); y += wrapped.length * 12 + 20;
+
+      doc.text('Guarantor signature: ____________________________    Date: __/__/____', left, y);
+      doc.text('Applicant signature: ____________________________    Date: __/__/____', left, y+28);
+
+      // footer
+      doc.setFontSize(9); doc.text('Visionary Youth Group — Tel: 0741453336 — Nairobi', left, 780);
+
+      const filename = `Guarantor_${(guarantor.name||'guarantor').replace(/\s+/g,'_')}.pdf`;
+      doc.save(filename);
     }
 
-    // Utility: serialize SVG to PNG dataURL for jsPDF header
-    async function svgToPngDataUrl(svgElement, width=200, height=200){
-      const serializer = new XMLSerializer();
-      const svgString = serializer.serializeToString(svgElement);
-      const svg64 = btoa(unescape(encodeURIComponent(svgString)));
-      const b64Start = 'data:image/svg+xml;base64,';
-      const img = new Image();
-      const src = b64Start + svg64;
-      return new Promise((resolve, reject) => {
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          // white background slight for better PDF appearance
-          ctx.fillStyle = '#ffffff';
-          ctx.fillRect(0,0,width,height);
-          ctx.drawImage(img,0,0,width,height);
-          resolve(canvas.toDataURL('image/png'));
-        };
-        img.onerror = reject;
-        img.src = src;
-      });
-    }
+    // build final two-page application PDF
+    async function buildFinalApplicationPdf(savedUrls = {}) {
+      const doc = new jsPDF({unit:'pt',format:'a4'});
+      const left = 36;
+      // PAGE 1 - Applicant & Residence & Education
+      doc.setFontSize(16); doc.setFont('helvetica','bold'); doc.text('Visionary Youth Group', 300, 36, {align:'center'});
+      doc.setFontSize(10); doc.setFont('helvetica','normal'); doc.text('Integrity | Commitment | Entrepreneurial Nature', 300, 52, {align:'center'});
+      doc.setDrawColor(46,125,50); doc.setLineWidth(1.5); doc.line(left,64,559,64);
+      doc.setFontSize(12); doc.text('Loan Application Form', left, 86);
 
-    // Generate Loan Application PDF (professional layout)
-    async function generateApplicationPdf(appData){
-      const doc = new jsPDF({unit:'pt', format:'a4'});
-      const svgEl = document.querySelector('.logoBox svg');
-      const imgData = await svgToPngDataUrl(svgEl, 80, 80).catch(()=>null);
+      // Applicant block
+      const applicant = getApplicantSummary();
+      let y = 108;
+      doc.setFontSize(10);
+      doc.text(`Name: ${applicant.firstName || ''} ${applicant.middleName || ''} ${applicant.lastName || ''}`, left, y); y+=14;
+      doc.text(`ID/Passport: ${applicant.idNumber || ''}    DOB: ${applicant.dob || ''}`, left, y); y+=14;
+      doc.text(`Telephone: ${applicant.telephone || ''}    Religion: ${document.getElementById('religion').value || ''}`, left, y); y+=18;
 
-      // Header
-      doc.setFillColor(6,40,50);
-      doc.rect(0,0,595,60,'F');
-      if(imgData) doc.addImage(imgData, 'PNG', 36, 16, 48, 48);
-      doc.setTextColor(255,255,255); doc.setFontSize(16); doc.setFont('helvetica','bold');
-      doc.text('Visionary Youth Group', 100, 30);
-      doc.setFontSize(10); doc.setFont('helvetica','normal');
-      doc.text('Loan Application Form', 100, 46);
-      doc.setTextColor(0,0,0);
-      let y = 90;
-      doc.setFontSize(11); doc.setFont('helvetica','bold');
-      doc.text('Applicant Details', 36, y); y += 14;
-      doc.setFont('helvetica','normal'); doc.setFontSize(10);
-      const p = appData.personal;
-      const r = appData.residence;
-      doc.text(`Name: ${p.firstName} ${p.middleName} ${p.lastName}`, 36, y); y+=12;
-      doc.text(`ID/Passport: ${p.idNo} • DOB: ${p.dob} • Gender: ${p.gender}`, 36, y); y+=12;
-      doc.text(`Phone: ${p.phone} • Religion: ${p.religion} • Marital: ${p.maritalStatus}`, 36, y); y+=16;
+      doc.text('Permanent Residence:', left, y); y+=12;
+      doc.setFontSize(9);
+      doc.text(`P.O. Box: ${document.getElementById('poBox').value || ''}  Postal: ${document.getElementById('postalCode').value || ''}`, left, y); y+=12;
+      doc.text(`Town: ${document.getElementById('town').value || ''}  County: ${document.getElementById('county').value || ''}`, left, y); y+=12;
+      doc.text(`Constituency: ${document.getElementById('constituency').value || ''}  Ward: ${document.getElementById('ward').value || ''}`, left, y); y+=18;
 
-      doc.setFont('helvetica','bold'); doc.text('Residence', 36, y); y+=14;
-      doc.setFont('helvetica','normal');
-      doc.text(`${r.poBox || '-'}, ${r.postalCode || '-'} • ${r.town || '-'} • ${r.county || '-'}`, 36, y); y+=12;
-      doc.text(`Constituency: ${r.constituency || '-'} • Ward: ${r.ward || '-'} • Location: ${r.location || '-'} • Sublocation: ${r.sublocation || '-'}`, 36, y); y+=16;
+      // Education list
+      doc.setFontSize(10); doc.text('Education:', left, y); y+=12;
+      const eduDivs = Array.from(document.querySelectorAll('#educationList .guarantor-item'));
+      if(eduDivs.length === 0){
+        doc.setFontSize(9); doc.text('No education entries provided.', left, y); y+=12;
+      } else {
+        eduDivs.slice(0,6).forEach(ed => {
+          const level = ed.querySelector('.eduLevel').value || '';
+          const exam = ed.querySelector('.eduExam').value || '';
+          const year = ed.querySelector('.eduYear').value || '';
+          const line = `${level} — ${exam} — ${year}`;
+          doc.setFontSize(9); doc.text(line, left, y); y+=12;
+          if(y > 720){ doc.addPage(); y = 40; }
+        });
+      }
 
-      doc.setFont('helvetica','bold'); doc.text('Education', 36, y); y+=12;
-      doc.setFont('helvetica','normal');
-      appData.education.forEach((ed, i) => {
-        doc.text(`${i+1}. ${ed.level} • ${ed.year || '-'} • ${ed.indexNo || '-'} • ${ed.examType || '-'}`, 36, y); y+=12;
-        if(y > 700){ doc.addPage(); y=40; }
-      });
-      y += 6;
-      doc.setFont('helvetica','bold'); doc.text('Loan Details', 36, y); y+=12;
-      doc.setFont('helvetica','normal');
-      doc.text(`Amount Requested: Ksh ${Number(appData.loan.amount||0).toLocaleString()}`, 36, y); y+=12;
-      doc.text(`Purpose: ${appData.loan.purpose || '-'}`, 36, y); y+=12;
-      doc.text(`Installment: Ksh ${Number(appData.loan.installment||0).toLocaleString()} • Frequency: ${appData.loan.frequency || '-'}`, 36, y); y+=12;
-      doc.text(`First Installment: ${appData.loan.firstInstallmentDate || '-'} • Last Installment: ${appData.loan.lastInstallmentDate || '-'}`, 36, y); y+=20;
-
-      doc.setFont('helvetica','bold'); doc.text('Guarantors', 36, y); y+=12;
-      doc.setFont('helvetica','normal');
-      appData.guarantors.forEach((g,i) => {
-        doc.text(`${i+1}. ${g.display || '-'} • ${g.meta || '-'}`, 36, y); y+=12;
-        if(y > 700){ doc.addPage(); y=40; }
-      });
-
+      // include uploaded personal images on page 1 after education
       y += 8;
-      doc.setFont('helvetica','bold'); doc.text('Parents / Guardians', 36, y); y+=12;
-      doc.setFont('helvetica','normal');
-      appData.parents.forEach((p,i) => {
-        doc.text(`${i+1}. ${p.display || '-'} • ${p.meta || '-'}`, 36, y); y+=12;
-        if(y > 700){ doc.addPage(); y=40; }
-      });
-
-      // Footer contact & signature placeholders
-      if(y > 640) { doc.addPage(); y = 80; }
-      doc.setDrawColor(200);
-      doc.line(36, y+20, 200, y+20);
-      doc.text('Applicant Signature', 36, y+34);
-      doc.line(300, y+20, 500, y+20);
-      doc.text('Date', 420, y+34);
-      doc.setFontSize(9); doc.setTextColor(120,120,120);
-      doc.text('Visionary Youth Group — Tel: 0741453336 • visionaryyouthgroup32@gmail.com • Nairobi', 36, 780);
-
-      return doc;
-    }
-
-    // Guarantor template PDF
-    async function generateGuarantorTemplate(){
-      const doc = new jsPDF({unit:'pt', format:'a4'});
-      doc.setFontSize(16); doc.setFont('helvetica','bold');
-      doc.text('Guarantor Declaration', 40, 50);
-      doc.setFontSize(10); doc.setFont('helvetica','normal');
-      const lines = [
-        'I, the undersigned guarantor, hereby declare that I guarantee the repayment of the loan applied by the applicant.',
-        'Guarantor details to fill below and sign.',
-        '',
-        'Full Name:',
-        'Member No:',
-        'ID / Passport No:',
-        'Phone:',
-        'Email:',
-        '',
-        'Signature: ________________________   Date: ________________',
-        '',
-        'Note: Submit a copy of the guarantor ID and sign in presence of office staff if required.'
+      const filesToEmbed = [];
+      // mapping input ids to savedUrls key if provided
+      const personalFiles = [
+        {id: 'idFront', label: 'ID Front'},
+        {id: 'idBack', label: 'ID Back'},
+        {id: 'passportPhoto', label: 'Passport'}
       ];
-      let y = 80;
-      lines.forEach(line => { doc.text(line, 40, y); y += 16; });
-      return doc;
-    }
-
-    // Upload file helper (returns storage URL)
-    async function uploadFile(file, path){
-      const sRef = storageRef(storage, path);
-      const snapshot = await uploadBytes(sRef, file);
-      const url = await getDownloadURL(snapshot.ref);
-      return url;
-    }
-
-    // Save application: upload files, push record to RTDB
-    async function saveApplicationToRTDB(appData, filesMap){
-      // require current user
-      const user = auth.currentUser;
-      if(!user) throw new Error('Not authenticated');
-
-      // push new application
-      const appRef = push(ref(db, `loanApplications/${user.uid}`));
-      const appId = appRef.key;
-
-      // if we have filesMap, upload them into storage under loanApplications/{uid}/{appId}/
-      const uploadedUrls = {};
-      for(const [k, f] of Object.entries(filesMap || {})){
-        if(!f) continue;
-        const ext = f.name.split('.').pop().slice(0,6);
-        const path = `loanApplications/${user.uid}/${appId}/${k}.${ext}`;
-        try{
-          uploadedUrls[k] = await uploadFile(f, path);
-        }catch(err){
-          console.error('Upload failed for', k, err);
+      for(const pf of personalFiles){
+        const inp = document.getElementById(pf.id);
+        if(inp && inp.files && inp.files[0]){
+          filesToEmbed.push({file: inp.files[0], label: pf.label});
+        } else if(savedUrls[pf.id]) {
+          filesToEmbed.push({url: savedUrls[pf.id], label: pf.label});
         }
       }
 
-      // assemble record
-      const record = {
+      // embed images (up to 3 small)
+      let imgX = left, imgY = y;
+      for(const f of filesToEmbed.slice(0,3)){
+        try {
+          let dataUrl = f.url;
+          if(!dataUrl && f.file){
+            // convert file to dataURL
+            dataUrl = await fileToDataUrl(f.file);
+          }
+          if(dataUrl){
+            doc.addImage(dataUrl, 'JPEG', imgX, imgY, 140, 100);
+            imgX += 146;
+            if(imgX > 420){ imgX = left; imgY += 108; }
+          }
+        } catch(e){ console.warn('embed failed', e); }
+      }
+
+      // PAGE 2 - Loan details, guarantors, parents, attachments
+      doc.addPage();
+      let y2 = 40;
+      doc.setFontSize(12); doc.setFont('helvetica','bold'); doc.text('Loan Details & Guarantors', left, y2); y2+=18;
+      doc.setFontSize(10);
+      doc.text(`Amount requested: Ksh ${document.getElementById('loanAmount').value || ''}`, left, y2); y2+=14;
+      doc.text(`Purpose: ${document.getElementById('loanPurpose').value || ''}`, left, y2); y2+=14;
+      doc.text(`Installment: Ksh ${document.getElementById('loanInstallment').value || ''}`, left, y2); y2+=14;
+      doc.text(`First installment: ${document.getElementById('firstInstallment').value || ''}   Last installment: ${document.getElementById('lastInstallment').value || ''}`, left, y2); y2+=18;
+
+      // Guarantors
+      doc.setFontSize(11); doc.text('Guarantors:', left, y2); y2+=12;
+      const gItems = Array.from(document.querySelectorAll('#guarantorsList .guarantor-item'));
+      if(gItems.length === 0){
+        doc.setFontSize(9); doc.text('No guarantors added.', left, y2); y2+=12;
+      } else {
+        gItems.forEach(g => {
+          const n = g.querySelector('.g_name').value || '';
+          const memb = g.querySelector('.g_member').value || '';
+          const id = g.querySelector('.g_id').value || '';
+          const phone = g.querySelector('.g_phone').value || '';
+          doc.setFontSize(9); doc.text(`${n} • Member: ${memb} • ID: ${id} • Phone: ${phone}`, left, y2);
+          y2 += 12;
+          if(y2 > 740){ doc.addPage(); y2 = 40; }
+        });
+      }
+
+      // Parents
+      y2 += 8;
+      doc.setFontSize(11); doc.text('Parents:', left, y2); y2+=12;
+      const pItems = Array.from(document.querySelectorAll('#parentsList .guarantor-item'));
+      if(pItems.length === 0){ doc.setFontSize(9); doc.text('No parent details provided.', left, y2); y2+=12; }
+      else {
+        pItems.forEach(p => {
+          const name = p.querySelector('.p_name').value || '';
+          const phone = p.querySelector('.p_phone').value || '';
+          const id = p.querySelector('.p_id').value || '';
+          doc.setFontSize(9); doc.text(`${name} • Tel: ${phone} • ID: ${id}`, left, y2);
+          y2 += 12;
+          if(y2 > 740){ doc.addPage(); y2 = 40; }
+        });
+      }
+
+      // Attach supporting docs (embed up to 3)
+      y2 += 14;
+      doc.setFontSize(11); doc.text('Attachments (Supporting Documents):', left, y2); y2 += 12;
+      const supportInput = document.getElementById('loanSupportDocs');
+      const supportFiles = supportInput && supportInput.files ? Array.from(supportInput.files) : [];
+      for(const sf of supportFiles.slice(0,4)){
+        try{
+          const dataUrl = await fileToDataUrl(sf);
+          doc.addImage(dataUrl, 'JPEG', left, y2, 200, 120);
+          y2 += 126;
+          if(y2 > 700){ doc.addPage(); y2 = 40; }
+        }catch(e){ console.warn('embed support failed', e); doc.setFontSize(9); doc.text(`Attached: ${sf.name}`, left, y2); y2 += 12; }
+      }
+
+      // final signatures
+      if(y2 > 700){ doc.addPage(); y2 = 40; }
+      y2 += 20;
+      doc.setFontSize(10); doc.text('Applicant signature: __________________________    Date: __/__/____', left, y2); y2 += 18;
+      doc.text('Loan Officer signature: _______________________    Date: __/__/____', left, y2); y2 += 18;
+
+      // footer
+      doc.setFontSize(9); doc.text('Visionary Youth Group — Tel: 0741453336 — Nairobi', left, 800);
+
+      return doc;
+    }
+
+    // helper to convert File to dataUrl
+    function fileToDataUrl(file){
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = e => resolve(e.target.result);
+        reader.onerror = e => reject(e);
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // submit application -> upload files, save RTDB, generate PDF with embedded images & downloads
+    document.getElementById('submitApplication').addEventListener('click', async () => {
+      // basic checks: at least 2 guarantors
+      const gCount = document.querySelectorAll('#guarantorsList .guarantor-item').length;
+      if(gCount < 2) return alert('Please add at least 2 guarantors.');
+      // collect a big payload
+      const appPayload = {
+        applicant: getApplicantSummary(),
+        residence: {
+          poBox: document.getElementById('poBox').value,
+          postalCode: document.getElementById('postalCode').value,
+          town: document.getElementById('town').value,
+          county: document.getElementById('county').value,
+          constituency: document.getElementById('constituency').value,
+          ward: document.getElementById('ward').value,
+          location: document.getElementById('location').value,
+          sublocation: document.getElementById('sublocation').value,
+          village: document.getElementById('village').value
+        },
+        residenceNearest: {
+          school: document.getElementById('nearestSchool').value,
+          village: document.getElementById('resVillage').value,
+          street: document.getElementById('resStreet').value,
+          town: document.getElementById('resTown').value,
+          county: document.getElementById('resCounty').value,
+          constituency: document.getElementById('resConstituency').value
+        },
+        education: Array.from(document.querySelectorAll('#educationList .guarantor-item')).map(ed => ({
+          level: ed.querySelector('.eduLevel').value,
+          exam: ed.querySelector('.eduExam').value,
+          year: ed.querySelector('.eduYear').value
+        })),
+        loan: {
+          amount: Number(document.getElementById('loanAmount').value || 0),
+          purpose: document.getElementById('loanPurpose').value,
+          installment: Number(document.getElementById('loanInstallment').value || 0),
+          firstInstallment: document.getElementById('firstInstallment').value,
+          lastInstallment: document.getElementById('lastInstallment').value
+        },
+        guarantors: Array.from(document.querySelectorAll('#guarantorsList .guarantor-item')).map(g => ({
+          name: g.querySelector('.g_name').value,
+          memberNo: g.querySelector('.g_member').value,
+          idNo: g.querySelector('.g_id').value,
+          phone: g.querySelector('.g_phone').value,
+          email: g.querySelector('.g_email').value
+        })),
+        parents: Array.from(document.querySelectorAll('#parentsList .guarantor-item')).map(p => ({
+          name: p.querySelector('.p_name').value,
+          phone: p.querySelector('.p_phone').value,
+          id: p.querySelector('.p_id').value,
+          email: p.querySelector('.p_email').value || ''
+        })),
         createdAt: Date.now(),
-        applicantUid: user.uid,
-        applicantEmail: user.email || null,
-        data: appData,
-        files: uploadedUrls,
         status: 'Submitted'
       };
 
-      await set(appRef, record);
-      return { appId, refPath: `loanApplications/${user.uid}/${appId}`, record };
+      // push to RTDB applications collection
+      const appsRef = push(ref(db, 'loanApplications'));
+      const appKey = appsRef.key;
+      await set(appsRef, appPayload);
+
+      // upload files to storage under uploads/{applicationId}/
+      const savedUrls = {};
+      const uploadList = [
+        {inputId:'idFront', key:'idFront'},
+        {inputId:'idBack', key:'idBack'},
+        {inputId:'passportPhoto', key:'passportPhoto'}
+      ];
+      for(const u of uploadList){
+        const inp = document.getElementById(u.inputId);
+        if(inp && inp.files && inp.files[0]){
+          try{
+            const path = `uploads/${appKey}/${u.key}_${Date.now()}`;
+            const sref = sRef(storage, path);
+            await uploadBytes(sref, inp.files[0]);
+            const url = await getDownloadURL(sref);
+            savedUrls[u.inputId] = url;
+            // add to DB under application attachments
+            await set(ref(db, `loanApplications/${appKey}/attachments/${u.key}`), url);
+          }catch(err){ console.error('upload fail', err); }
+        }
+      }
+
+      // upload supporting docs (multiple)
+      const supportInp = document.getElementById('loanSupportDocs');
+      if(supportInp && supportInp.files && supportInp.files.length){
+        const arr = [];
+        for(const f of Array.from(supportInp.files)){
+          try{
+            const path = `uploads/${appKey}/support_${Date.now()}_${f.name.replace(/[^\w.]/g,'')}`;
+            const sref = sRef(storage, path);
+            await uploadBytes(sref, f);
+            const url = await getDownloadURL(sref);
+            arr.push({name: f.name, url});
+          }catch(e){ console.warn('support upload fail', e); }
+        }
+        if(arr.length) await set(ref(db, `loanApplications/${appKey}/supportDocs`), arr);
+      }
+
+      // update application entry with attachment references
+      await update(ref(db, `loanApplications/${appKey}`), { storageSaved: true });
+
+      // now build the final PDF embedding (use savedUrls to include images if needed)
+      try{
+        const doc = await buildFinalApplicationPdf(savedUrls);
+        const applicantName = `${appPayload.applicant.firstName || 'Applicant'}`.replace(/\s+/g,'_');
+        const filename = `Loan_Application_${applicantName}.pdf`;
+        doc.save(filename);
+
+        // mark record with pdfDownloadAt
+        await update(ref(db, `loanApplications/${appKey}`), { pdfDownloadedAt: Date.now() });
+
+        alert('Application submitted successfully. PDF downloaded and application saved.');
+      }catch(e){
+        console.error('pdf build failed', e);
+        alert('Application saved, but failed to generate PDF on client. Check console.');
+      }
+    });
+
+    // download guarantor template (global button) - build blank template with applicant data
+    document.getElementById('downloadGuarantorTemplate').addEventListener('click', async ()=> {
+      const applicant = getApplicantSummary();
+      await buildGuarantorPdf({guarantor: {name:'[Guarantor name]', memberNo: '[Member no]', idNo:'', phone:'', email:''}, applicant});
+    });
+
+    // build review text
+    function buildReview(){
+      const payload = {
+        applicant: getApplicantSummary(),
+        residence: {
+          poBox: document.getElementById('poBox').value,
+          postalCode: document.getElementById('postalCode').value,
+          town: document.getElementById('town').value,
+          county: document.getElementById('county').value,
+          constituency: document.getElementById('constituency').value,
+          ward: document.getElementById('ward').value
+        },
+        loan: {
+          amount: document.getElementById('loanAmount').value,
+          purpose: document.getElementById('loanPurpose').value
+        },
+        guarantors: Array.from(document.querySelectorAll('#guarantorsList .guarantor-item')).map(g => ({
+          name: g.querySelector('.g_name').value,
+          memberNo: g.querySelector('.g_member').value
+        }))
+      };
+      document.getElementById('reviewText').textContent = JSON.stringify(payload, null, 2);
     }
 
-    // On final submit: gather files, upload, save, generate PDF, download
-    document.getElementById('btnSubmitFinal').addEventListener('click', async ()=>{
-      try{
-        const user = auth.currentUser;
-        if(!user){
-          alert('You must be logged in to submit. Please sign in.');
-          return;
-        }
-        // minimal validation: at least 2 guarantors
-        if(guarantorsList.querySelectorAll('.list-item').length < 2){
-          if(!confirm('Less than 2 guarantors added. Are you sure you want to continue?')) return;
-        }
+    // on load show first
+    showStep(1);
 
-        // collect data
-        const data = collectFormData();
-
-        // gather file inputs
-        const idFrontFile = document.getElementById('idFront').files[0];
-        const idBackFile = document.getElementById('idBack').files[0];
-        const supportFile = document.getElementById('supportDoc').files[0];
-
-        // save to RTDB & upload files
-        const savingToast = document.createElement('div'); savingToast.style.cssText='position:fixed;left:20px;bottom:20px;background:#006b4f;padding:8px 12px;border-radius:8px;color:#fff'; savingToast.textContent='Submitting...'; document.body.appendChild(savingToast);
-        const { appId } = await saveApplicationToRTDB(data, { idFront: idFrontFile, idBack: idBackFile, supportDoc: supportFile });
-        savingToast.textContent = 'Generating PDF...';
-
-        // generate pdf
-        const pdf = await generateApplicationPdf(data);
-        pdf.save(`Loan_Application_${appId}.pdf`);
-
-        savingToast.textContent = 'Done — application submitted';
-        setTimeout(()=> savingToast.remove(), 2200);
-        alert('Application submitted successfully. A PDF was downloaded. You can find your application in the dashboard under loan records.');
-      }catch(err){
-        console.error(err);
-        alert('Failed to submit application: ' + (err.message || err));
-      }
-    });
-
-    // Download preview PDF
-    document.getElementById('btnDownloadPreviewPdf').addEventListener('click', async ()=>{
-      const data = collectFormData();
-      const pdf = await generateApplicationPdf(data);
-      pdf.save(`Loan_Application_Preview.pdf`);
-    });
-
-    // Download guarantor template
-    document.getElementById('downloadGuarantorTemplate').addEventListener('click', async ()=>{
-      const doc = await generateGuarantorTemplate();
-      doc.save('Guarantor_Template.pdf');
-    });
-
-    // Clear draft
-    document.getElementById('btnClearDraft').addEventListener('click', () => {
-      if(!confirm('Clear all fields? This cannot be undone in this session.')) return;
-      document.getElementById('loanWizardForm').reset();
-      document.getElementById('guarantorsList').innerHTML = '';
-      document.getElementById('parentsList').innerHTML = '';
-      populateReview();
-      showStep(0);
-    });
-
-    // Authentication guard: ensure logged in and populate some user info if available
-    onAuthStateChanged(auth, user => {
-      if(!user){
-        // if not logged in redirect to index or prompt login
-        alert('You must be logged in as an admin/member to use the loan application portal. Redirecting to login.');
-        window.location.href = 'index.html';
-      } else {
-        // optionally prefill some fields if profile exists in RTDB
-        get(ref(db, `members/${user.uid}/profile`)).then(s => {
-          if(s.exists()){
-            const p = s.val();
-            if(p.name){
-              const parts = p.name.split(' ');
-              document.getElementById('firstName').value = parts[0] || '';
-              document.getElementById('lastName').value = parts.slice(1).join(' ') || '';
-            }
-            document.getElementById('phone').value = p.phone || '';
-            document.getElementById('idNo').value = p.id || '';
-            if(p.dob) document.getElementById('dob').value = p.dob;
-          }
-        });
-      }
-    });
-
-    // small UX niceties: clicking step toggles show step
-    steps.forEach(s => s.addEventListener('click', ()=> showStep(Number(s.dataset.step))));
+    // small UX: remove stray >> if present (some earlier paste had stray chars)
+    // (No-op but kept to ensure syntax)
   </script>
 </body>
 </html>
