@@ -11,8 +11,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
 
   <style>
-    *{box-sizing:border-box;scroll-behavior:smooth;margin:0;padding:0}
-    body{font-family:'Poppins',sans-serif;background:#f8f9fa;color:#222;line-height:1.5}
+    *{box-sizing:border-box;margin:0;padding:0;scroll-behavior:smooth;}
+    body{font-family:'Poppins',sans-serif;background:#f8f9fa;color:#222;line-height:1.6;}
     .topbar{background:#004d26;color:#fff;padding:6px 18px;font-size:14px;display:flex;justify-content:space-between;align-items:center}
     .topbar .left {display:flex;gap:14px;align-items:center}
     .topbar a{color:#fff;text-decoration:none;margin-left:10px}
@@ -38,7 +38,7 @@
     .hero .cta.secondary{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.25);margin-left:10px}
     .container{width:92%;max-width:1200px;margin:34px auto}
     section{background:#fff;border-radius:10px;padding:28px;box-shadow:0 6px 20px rgba(7,13,21,.04);margin-bottom:26px}
-    h2{color:#004d26;text-align:center;margin-bottom:14px;font-size:28px}
+    h2{color:#004d26;text-align:center;margin-bottom:18px;font-size:28px}
     .grid{display:grid;gap:18px}
     .grid-3{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
     .card{background:#fbfbfb;padding:18px;border-radius:10px;text-align:center;transition:transform .18s,box-shadow .18s}
@@ -46,44 +46,24 @@
     .card i{font-size:34px;color:#ffcc00;margin-bottom:12px}
     .muted{color:#666;font-size:15px}
     .banner{background:#004d26;color:#fff;padding:14px;border-radius:8px;text-align:center;font-weight:700;margin:12px auto}
-    #auth .intro{text-align:center;margin-bottom:18px}
-    .forms{display:grid;grid-template-columns:1fr 1fr;gap:22px}
-    .form-box{background:#fbfbfb;padding:18px;border-radius:10px}
-    .form-box h3{color:#004d26;margin-bottom:12px}
-    .form-box input{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border-radius:8px}
-    .btn{display:inline-block;background:#004d26;color:#fff;padding:10px 14px;border-radius:8px;text-decoration:none;font-weight:700;border:none;cursor:pointer}
-    .btn.ghost{background:transparent;border:1px solid #004d26;color:#004d26}
-    .member-preview{background:#f7fff7;border-left:4px solid #009a44;padding:14px;border-radius:8px;margin-top:10px}
-    .small-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:12px}
-    .small-row button{padding:8px 12px;border-radius:8px;border:1px solid #ccc;background:#fff;cursor:pointer}
-    .small-note{font-size:13px;color:#666}
-    .testimonial{background:#fbfbfb;padding:16px;border-radius:10px}
-    .gallery img{width:100%;height:180px;object-fit:cover;border-radius:10px}
     footer{background:#004d26;color:#fff;padding:24px;text-align:center}
     footer a{color:#ffcc00;text-decoration:none;margin:0 10px}
-
-    /* --- New toggle / centered auth styles --- */
-    .auth-controls { display:flex; gap:12px; justify-content:center; margin-top:18px; }
-    .auth-toggle-btn { padding:12px 20px; border-radius:10px; font-weight:700; cursor:pointer; border:2px solid transparent; }
-    .auth-toggle-btn.active { background:#004d26; color:#fff; border-color:#004d26; }
-    .auth-toggle-btn.inactive { background:transparent; color:#004d26; border-color:#004d26; }
-
-    .auth-forms-wrap { display:flex; justify-content:center; margin-top:26px; }
-    .auth-panel { width:100%; max-width:460px; transition: opacity .28s ease, transform .28s ease; }
-    .auth-panel.hidden { opacity:0; transform: translateY(-8px); height:0; overflow:hidden; pointer-events:none; }
-    .auth-panel.visible { opacity:1; transform: translateY(0); pointer-events:auto; }
+    .testimonial{background:#fbfbfb;padding:16px;border-radius:10px;text-align:center}
+    .testimonial p{font-style:italic}
+    .gallery img{width:100%;height:180px;object-fit:cover;border-radius:10px}
+    iframe{border-radius:8px}
 
     @media (max-width:880px){
-      .forms{grid-template-columns:1fr}
+      .grid-3{grid-template-columns:1fr}
       .hero h1{font-size:30px}
       .hero img{height:360px}
       .hero{height:360px}
-      .auth-forms-wrap { padding: 0 16px; }
     }
   </style>
 </head>
 <body>
 
+  <!-- Top Bar -->
   <div class="topbar">
     <div class="left"><i class="fas fa-phone"></i> +254 741 453336 <span style="opacity:.6">|</span> <i class="fas fa-envelope"></i> visionaryyouthgroup32@gmail.com</div>
     <div class="right">
@@ -93,18 +73,21 @@
     </div>
   </div>
 
+  <!-- Navigation -->
   <nav>
     <h1>Visionary Youth Group</h1>
     <ul>
       <li><a href="#about">About</a></li>
       <li><a href="#benefits">Membership</a></li>
+      <li><a href="#programs">Programs</a></li>
       <li><a href="#news">News</a></li>
       <li><a href="#faq">FAQ</a></li>
       <li><a href="#contact">Contact</a></li>
-      <li><a href="portal.html">New Online Portal</a></li>
+      <li><a href="index2.html">Join Us</a></li>
     </ul>
   </nav>
 
+  <!-- Hero Section -->
   <div class="hero">
     <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=1600&auto=format&fit=crop" alt="">
     <img src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=1600&auto=format&fit=crop" alt="">
@@ -113,7 +96,7 @@
       <h1>Empowering youth through savings, investments & skills</h1>
       <p>Join Visionary Youth Group — build financial independence with peers</p>
       <a class="cta" href="index2.html">Join Community</a>
-      <a class="cta secondary" href="portal.html">New Online Portal</a>
+      <a class="cta secondary" href="portal.html">Member Portal</a>
     </div>
   </div>
 
@@ -125,33 +108,23 @@
       <p class="muted">Visionary Youth Group is a youth-led financial empowerment movement focused on savings, affordable loans, mentorship, and community development. We support members to start and grow businesses, plan for education, and invest smartly.</p>
     </section>
 
-    <!-- Vision & Mission -->
-    <section id="vision" data-aos="fade-up">
-      <h2>Vision & Mission</h2>
-      <div class="grid grid-3">
-        <div class="card"><i class="fas fa-eye"></i><h3>Vision</h3><p>To be the leading youth financial group fostering literacy, growth and independence.</p></div>
-        <div class="card"><i class="fas fa-bullseye"></i><h3>Mission</h3><p>To empower youth through savings, affordable loans, mentorship, and investment opportunities.</p></div>
-        <div class="card"><i class="fas fa-hands-helping"></i><h3>Values</h3><p>Integrity · Unity · Transparency · Commitment</p></div>
-      </div>
-    </section>
-
     <!-- Programs -->
     <section id="programs" data-aos="fade-up">
-      <h2>Programs</h2>
+      <h2>Our Programs</h2>
       <div class="grid grid-3">
-        <div class="card"><i class="fas fa-wallet"></i><h3>Savings Plans</h3><p>Start from Ksh 500/month — emergency, education and investment plans.</p></div>
-        <div class="card"><i class="fas fa-hand-holding-usd"></i><h3>Loans</h3><p>Affordable micro and business loans with transparent repayment plans.</p></div>
-        <div class="card"><i class="fas fa-users"></i><h3>Mentorship</h3><p>Structured peer and professional mentorship, workshops, and networking.</p></div>
+        <div class="card"><i class="fas fa-wallet"></i><h3>Savings Plans</h3><p>Flexible monthly savings to build a strong financial foundation.</p></div>
+        <div class="card"><i class="fas fa-hand-holding-usd"></i><h3>Loans</h3><p>Affordable micro and business loans with easy repayment.</p></div>
+        <div class="card"><i class="fas fa-users"></i><h3>Mentorship</h3><p>Peer & professional mentorship for career & business growth.</p></div>
       </div>
     </section>
 
     <!-- Membership Benefits -->
     <section id="benefits" data-aos="fade-up">
-      <h2>Member Benefits</h2>
+      <h2>Membership Benefits</h2>
       <div class="grid grid-3">
-        <div class="card"><i class="fas fa-piggy-bank"></i><h3>Financial Security</h3><p>Access group investments and steady savings returns.</p></div>
-        <div class="card"><i class="fas fa-briefcase"></i><h3>Business Support</h3><p>Loans, advisory, and partner networks to scale ventures.</p></div>
-        <div class="card"><i class="fas fa-graduation-cap"></i><h3>Skill Building</h3><p>Workshops and trainings that enhance personal and business skills.</p></div>
+        <div class="card"><i class="fas fa-piggy-bank"></i><h3>Financial Security</h3><p>Secure investments & steady savings returns.</p></div>
+        <div class="card"><i class="fas fa-briefcase"></i><h3>Business Support</h3><p>Access to advisory services, loans, and partner networks.</p></div>
+        <div class="card"><i class="fas fa-graduation-cap"></i><h3>Skill Building</h3><p>Workshops & training to enhance business & personal skills.</p></div>
       </div>
     </section>
 
@@ -159,18 +132,18 @@
     <div class="banner" data-aos="fade-up">
       <i class="fas fa-university"></i> Paybill <strong>247247</strong> — Account: <strong>1290186343975</strong>
       <div style="margin-top:8px">
-        <button onclick="copyPaybill()" class="btn" style="background:#fff;color:#004d26;border:none;padding:8px 12px;border-radius:6px">Copy Paybill</button>
+        <button onclick="navigator.clipboard.writeText('247247 1290186343975')" class="btn" style="background:#fff;color:#004d26;border:none;padding:8px 12px;border-radius:6px">Copy Paybill</button>
         <span class="small-note" style="margin-left:10px;color:#fff;opacity:.9">Use this when making contributions via Equity</span>
       </div>
     </div>
 
-    <!-- News / Announcements -->
+    <!-- News -->
     <section id="news" data-aos="fade-up">
       <h2>Latest News & Events</h2>
       <div class="grid grid-3">
-        <div class="card"><i class="fas fa-newspaper"></i><h3>Annual Report 2024</h3><p>Read our impact and financial report for the year 2024.</p></div>
-        <div class="card"><i class="fas fa-calendar"></i><h3>Upcoming AGM</h3><p>Members meet to review strategies — attendance is encouraged. Date: 14 Dec 2025</p></div>
-        <div class="card"><i class="fas fa-bullhorn"></i><h3>Share Issue</h3><p>New share issuance for members — payout expected in March 2026.</p></div>
+        <div class="card"><i class="fas fa-newspaper"></i><h3>Annual Report 2024</h3><p>Read our impact & financial report for the year 2024.</p></div>
+        <div class="card"><i class="fas fa-calendar"></i><h3>Upcoming AGM</h3><p>Members meeting on 14 Dec 2025 — attendance is encouraged.</p></div>
+        <div class="card"><i class="fas fa-bullhorn"></i><h3>Share Issue</h3><p>New share issuance for members — payout expected March 2026.</p></div>
       </div>
     </section>
 
@@ -179,7 +152,7 @@
       <h2>FAQ</h2>
       <p><b>How do I join?</b> Click Join Community to fill the membership form on the next page.</p>
       <p><b>Minimum contribution?</b> Ksh 500 monthly.</p>
-      <p><b>How to track balance?</b> After login you can view balances or download statements under 'Member Preview'.</p>
+      <p><b>How to track balance?</b> Login to view balances or download statements under 'Member Preview'.</p>
       <p><b>Loans?</b> Yes — subject to approval and repayment terms.</p>
     </section>
 
@@ -211,8 +184,7 @@
         <div class="card"><i class="fas fa-envelope"></i><h3>Email</h3><p class="muted">visionaryyouthgroup32@gmail.com</p></div>
         <div class="card"><i class="fas fa-phone"></i><h3>Phone</h3><p class="muted">+254 741 453336</p></div>
       </div>
-
-      <iframe loading="lazy" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.858787143972!2d36.82194631475346!3d-1.292065035999988!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f173fd1f12345%3A0xabcdef1234567890!2sNairobi%2C%20Kenya!5e0!3m2!1sen!2ske!4v1694103256789!5m2!1sen!2ske" style="width:100%;height:300px;border:0;margin-top:14px;border-radius:8px"></iframe>
+      <iframe loading="lazy" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.858787143972!2d36.82194631475346!3d-1.292065035999988!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f173fd1f12345%3A0xabcdef1234567890!2sNairobi%2C%20Kenya!5e0!3m2!1sen!2ske!4v1694103256789!5m2!1sen!2ske" style="width:100%;height:300px;border:0;margin-top:14px"></iframe>
     </section>
 
   </main>
@@ -222,4 +194,11 @@
     <div style="margin-top:8px"><a href="#">Privacy</a> | <a href="#">Terms</a></div>
   </footer>
 
+  <!-- AOS JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+  <script>
+    AOS.init({duration:1000,easing:'ease-in-out',once:true});
+  </script>
+</body>
+</html>
 
