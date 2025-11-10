@@ -1,165 +1,272 @@
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Visionary Youth Group — Login / Sign Up</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Visionary Youth Group — Sign Up / Login</title>
 
-  <!-- Fonts & Icons -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<!-- Fonts & Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-  <style>
-    *{box-sizing:border-box;margin:0;padding:0;font-family:'Poppins',sans-serif;}
-    body{background:#f4f8f7;color:#222;height:100vh;display:flex;align-items:center;justify-content:center;}
-    .auth-container{background:#fff;padding:32px 28px;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.1);width:100%;max-width:420px;text-align:center;}
-    h1{color:#004d26;margin-bottom:20px;}
-    .tabs{display:flex;margin-bottom:20px;border-radius:10px;overflow:hidden;border:2px solid #004d26;}
-    .tab{flex:1;padding:12px;cursor:pointer;font-weight:700;transition:0.2s;}
-    .tab.active{background:#004d26;color:#fff;}
-    .tab.inactive{background:transparent;color:#004d26;}
-    .form-panel{display:none;text-align:left;}
-    .form-panel.active{display:block;}
-    .form-panel input, .form-panel select{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border-radius:8px;}
-    .btn{width:100%;padding:12px;background:#004d26;color:#fff;border:none;border-radius:8px;font-weight:700;margin-top:10px;cursor:pointer;transition:0.2s;}
-    .btn:hover{background:#006636;}
-    .small-note{font-size:13px;color:#666;margin-top:8px;text-align:center;}
-    .link-btn{background:transparent;color:#004d26;border:none;font-weight:600;cursor:pointer;margin-top:8px;text-decoration:underline;}
-  </style>
+<style>
+  body{
+    margin:0;
+    font-family:'Poppins',sans-serif;
+    background: linear-gradient(135deg, #004d26, #009a44);
+    height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#222;
+  }
+
+  .auth-container{
+    background:#fff;
+    border-radius:16px;
+    box-shadow:0 20px 40px rgba(0,0,0,0.2);
+    width:100%;
+    max-width:460px;
+    padding:40px 32px;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+    transition:0.4s;
+  }
+
+  .auth-container h1{
+    margin-bottom:24px;
+    color:#004d26;
+    font-size:28px;
+  }
+
+  .tabs{
+    display:flex;
+    border-radius:12px;
+    overflow:hidden;
+    margin-bottom:28px;
+    box-shadow:0 4px 12px rgba(0,0,0,.1);
+  }
+
+  .tab{
+    flex:1;
+    padding:14px 0;
+    cursor:pointer;
+    font-weight:600;
+    transition:0.3s;
+    background:#e6f2ec;
+    color:#004d26;
+    text-align:center;
+  }
+
+  .tab.active{
+    background:#004d26;
+    color:#fff;
+  }
+
+  .form-panel{
+    display:none;
+    text-align:left;
+    animation: fadeIn 0.4s ease forwards;
+  }
+
+  .form-panel.active{ display:block; }
+
+  input, select{
+    width:100%;
+    padding:14px 12px;
+    margin:10px 0;
+    border:1px solid #ccc;
+    border-radius:10px;
+    font-size:15px;
+    transition:0.3s;
+  }
+
+  input:focus, select:focus{
+    border-color:#004d26;
+    outline:none;
+    box-shadow:0 4px 12px rgba(0,77,38,0.2);
+  }
+
+  .btn{
+    width:100%;
+    padding:14px;
+    margin-top:14px;
+    border:none;
+    border-radius:12px;
+    background:#004d26;
+    color:#fff;
+    font-weight:700;
+    font-size:16px;
+    cursor:pointer;
+    transition:0.3s;
+  }
+
+  .btn:hover{
+    background:#006636;
+  }
+
+  .link-btn{
+    background:transparent;
+    border:none;
+    color:#004d26;
+    font-weight:600;
+    margin-top:12px;
+    text-decoration:underline;
+    cursor:pointer;
+    display:block;
+    text-align:center;
+  }
+
+  .small-note{
+    font-size:13px;
+    color:#555;
+    margin-top:12px;
+    text-align:center;
+  }
+
+  @keyframes fadeIn{
+    from{opacity:0; transform: translateY(12px);}
+    to{opacity:1; transform: translateY(0);}
+  }
+
+  /* Responsive */
+  @media(max-width:500px){
+    .auth-container{padding:28px 20px;}
+  }
+</style>
 </head>
 <body>
 
-  <div class="auth-container">
-    <h1>Visionary Youth Group</h1>
+<div class="auth-container">
+  <h1>Visionary Youth Group</h1>
 
-    <div class="tabs">
-      <div id="tabSignup" class="tab active">Sign Up</div>
-      <div id="tabLogin" class="tab inactive">Login</div>
-    </div>
-
-    <!-- Sign Up Form -->
-    <div id="signupPanel" class="form-panel active">
-      <input id="signupName" placeholder="Full Name">
-      <input id="signupPhone" placeholder="Phone (+254...)">
-      <input id="signupId" placeholder="ID / Passport">
-      <select id="signupClass">
-        <option value="" disabled selected>Select Class</option>
-        <option value="Ordinary">Ordinary</option>
-        <option value="Mean">Mean</option>
-      </select>
-      <input id="signupEmail" placeholder="Email">
-      <input id="signupPassword" type="password" placeholder="Password">
-      <button id="signupBtn" class="btn">Create Account</button>
-      <p class="small-note">By signing up you agree to our Terms.</p>
-    </div>
-
-    <!-- Login Form -->
-    <div id="loginPanel" class="form-panel">
-      <input id="loginEmail" placeholder="Email">
-      <input id="loginPassword" type="password" placeholder="Password">
-      <button id="loginBtn" class="btn">Login</button>
-      <button id="resetPasswordBtn" class="link-btn">Forgot Password?</button>
-      <p id="loginStatus" class="small-note"></p>
-    </div>
+  <div class="tabs">
+    <div id="tabSignup" class="tab active">Sign Up</div>
+    <div id="tabLogin" class="tab">Login</div>
   </div>
 
-  <!-- Firebase SDK -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-    import { getFirestore, setDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+  <!-- Sign Up Form -->
+  <div id="signupPanel" class="form-panel active">
+    <input id="signupName" placeholder="Full Name">
+    <input id="signupPhone" placeholder="Phone (+254...)">
+    <input id="signupId" placeholder="ID / Passport">
+    <select id="signupClass">
+      <option value="" disabled selected>Select Class</option>
+      <option value="Ordinary">Ordinary</option>
+      <option value="Mean">Mean</option>
+    </select>
+    <input id="signupEmail" placeholder="Email">
+    <input id="signupPassword" type="password" placeholder="Password">
+    <button id="signupBtn" class="btn">Create Account</button>
+    <p class="small-note">By signing up you agree to our Terms and Conditions.</p>
+  </div>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
-      authDomain: "visionary-youth-grou-2024.firebaseapp.com",
-      projectId: "visionary-youth-grou-2024",
-      storageBucket: "visionary-youth-grou-2024.appspot.com",
-      messagingSenderId: "372978592717",
-      appId: "1:372978592717:web:1c15aec728ee5f854f3284",
-      measurementId: "G-QP1RBT2ZCP"
-    };
+  <!-- Login Form -->
+  <div id="loginPanel" class="form-panel">
+    <input id="loginEmail" placeholder="Email">
+    <input id="loginPassword" type="password" placeholder="Password">
+    <button id="loginBtn" class="btn">Login</button>
+    <button id="resetPasswordBtn" class="link-btn">Forgot Password?</button>
+    <p id="loginStatus" class="small-note"></p>
+  </div>
+</div>
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+import { getFirestore, setDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-    const signupBtn = document.getElementById('signupBtn');
-    const loginBtn = document.getElementById('loginBtn');
-    const resetBtn = document.getElementById('resetPasswordBtn');
-    const loginStatus = document.getElementById('loginStatus');
+const firebaseConfig = {
+  apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
+  authDomain: "visionary-youth-grou-2024.firebaseapp.com",
+  projectId: "visionary-youth-grou-2024",
+  storageBucket: "visionary-youth-grou-2024.appspot.com",
+  messagingSenderId: "372978592717",
+  appId: "1:372978592717:web:1c15aec728ee5f854f3284",
+  measurementId: "G-QP1RBT2ZCP"
+};
 
-    // SIGN UP
-    signupBtn.addEventListener('click', async () => {
-      const name = document.getElementById('signupName').value.trim();
-      const phone = document.getElementById('signupPhone').value.trim();
-      const id = document.getElementById('signupId').value.trim();
-      const userClass = document.getElementById('signupClass').value;
-      const email = document.getElementById('signupEmail').value.trim();
-      const password = document.getElementById('signupPassword').value;
-      if(!name || !phone || !id || !userClass || !email || !password){ alert("Fill all fields"); return; }
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-      try{
-        const userCred = await createUserWithEmailAndPassword(auth, email, password);
-        await setDoc(doc(db, "members", userCred.user.uid), {
-          name, phone, id, class: userClass, email, balance: 0, createdAt: serverTimestamp()
-        });
-        alert("Signup successful!");
-        window.location.href = "dashboard.html";
-      }catch(err){
-        alert("Error: "+err.message);
-      }
+const signupBtn = document.getElementById('signupBtn');
+const loginBtn = document.getElementById('loginBtn');
+const resetBtn = document.getElementById('resetPasswordBtn');
+const loginStatus = document.getElementById('loginStatus');
+
+signupBtn.addEventListener('click', async()=>{
+  const name = document.getElementById('signupName').value.trim();
+  const phone = document.getElementById('signupPhone').value.trim();
+  const id = document.getElementById('signupId').value.trim();
+  const userClass = document.getElementById('signupClass').value;
+  const email = document.getElementById('signupEmail').value.trim();
+  const password = document.getElementById('signupPassword').value;
+
+  if(!name||!phone||!id||!userClass||!email||!password){ alert("Fill all fields"); return; }
+
+  try{
+    const userCred = await createUserWithEmailAndPassword(auth,email,password);
+    await setDoc(doc(db,"members",userCred.user.uid),{
+      name, phone, id, class:userClass, email, balance:0, createdAt:serverTimestamp()
     });
+    alert("Signup successful!");
+    window.location.href="dashboard.html";
+  }catch(err){
+    alert("Error: "+err.message);
+  }
+});
 
-    // LOGIN
-    loginBtn.addEventListener('click', async () => {
-      const email = document.getElementById('loginEmail').value.trim();
-      const password = document.getElementById('loginPassword').value;
-      if(!email || !password){ alert("Enter email & password"); return; }
+loginBtn.addEventListener('click', async()=>{
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  if(!email||!password){ alert("Enter email & password"); return; }
 
-      try{
-        await signInWithEmailAndPassword(auth, email, password);
-        loginStatus.textContent = "Login successful! Redirecting...";
-        setTimeout(()=>{ window.location.href = "dashboard.html"; }, 800);
-      }catch(err){
-        loginStatus.textContent = "Login failed: " + err.message;
-      }
-    });
+  try{
+    await signInWithEmailAndPassword(auth,email,password);
+    loginStatus.textContent = "Login successful! Redirecting...";
+    setTimeout(()=>window.location.href="dashboard.html",800);
+  }catch(err){
+    loginStatus.textContent = "Login failed: "+err.message;
+  }
+});
 
-    // RESET PASSWORD
-    resetBtn.addEventListener('click', async () => {
-      const email = document.getElementById('loginEmail').value.trim();
-      if(!email){ alert("Enter your email"); return; }
-      try{
-        await sendPasswordResetEmail(auth, email);
-        alert("Password reset email sent!");
-      }catch(err){
-        alert("Error: "+err.message);
-      }
-    });
+resetBtn.addEventListener('click', async()=>{
+  const email = document.getElementById('loginEmail').value.trim();
+  if(!email){ alert("Enter your email"); return; }
+  try{
+    await sendPasswordResetEmail(auth,email);
+    alert("Password reset email sent!");
+  }catch(err){
+    alert("Error: "+err.message);
+  }
+});
 
-    onAuthStateChanged(auth, user => {
-      if(user) window.location.href="dashboard.html";
-    });
-  </script>
+onAuthStateChanged(auth,user=>{
+  if(user) window.location.href="dashboard.html";
+});
+</script>
 
-  <!-- Tab Toggle -->
-  <script>
-    const tabSignup = document.getElementById('tabSignup');
-    const tabLogin = document.getElementById('tabLogin');
-    const signupPanel = document.getElementById('signupPanel');
-    const loginPanel = document.getElementById('loginPanel');
+<!-- Tab Toggle -->
+<script>
+const tabSignup=document.getElementById('tabSignup');
+const tabLogin=document.getElementById('tabLogin');
+const signupPanel=document.getElementById('signupPanel');
+const loginPanel=document.getElementById('loginPanel');
 
-    tabSignup.addEventListener('click', ()=>{
-      tabSignup.classList.add('active'); tabSignup.classList.remove('inactive');
-      tabLogin.classList.add('inactive'); tabLogin.classList.remove('active');
-      signupPanel.classList.add('active'); loginPanel.classList.remove('active');
-    });
+tabSignup.addEventListener('click',()=>{
+  tabSignup.classList.add('active'); tabSignup.classList.remove('inactive');
+  tabLogin.classList.remove('active'); tabLogin.classList.add('inactive');
+  signupPanel.classList.add('active'); loginPanel.classList.remove('active');
+});
 
-    tabLogin.addEventListener('click', ()=>{
-      tabLogin.classList.add('active'); tabLogin.classList.remove('inactive');
-      tabSignup.classList.add('inactive'); tabSignup.classList.remove('active');
-      loginPanel.classList.add('active'); signupPanel.classList.remove('active');
-    });
-  </script>
+tabLogin.addEventListener('click',()=>{
+  tabLogin.classList.add('active'); tabLogin.classList.remove('inactive');
+  tabSignup.classList.remove('active'); tabSignup.classList.add('inactive');
+  loginPanel.classList.add('active'); signupPanel.classList.remove('active');
+});
+</script>
 
 </body>
 </html>
