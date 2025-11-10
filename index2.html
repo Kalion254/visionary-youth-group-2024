@@ -1,298 +1,272 @@
-<!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VISIONARY YOUTH GROUP 2024</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, sans-serif;
-            margin: 0;
-            padding: 0;
-            background: #f4f7fb;
-            color: #333;
-            scroll-behavior: smooth;
-        }
-        /* Header */
-        
-        header {
-            background: linear-gradient(90deg, #003366, #0055a5);
-            color: #fff;
-            padding: 1rem 2rem;
-            position: sticky;
-            top: 0;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
-        }
-        
-        header h1 {
-            margin: 0;
-            font-size: 1.5rem;
-            letter-spacing: 1px;
-        }
-        
-        nav ul {
-            list-style: none;
-            display: flex;
-            gap: 1rem;
-            margin: 0;
-            padding: 0;
-        }
-        
-        nav a {
-            color: #fff;
-            text-decoration: none;
-            font-weight: 500;
-        }
-        
-        nav a:hover {
-            text-decoration: underline;
-        }
-        /* Hero */
-        
-        .hero {
-            background: linear-gradient(rgba(0, 0, 50, 0.6), rgba(0, 0, 50, 0.6)), url('https://source.unsplash.com/1600x600/?youth,teamwork,finance') center/cover;
-            color: #fff;
-            text-align: center;
-            padding: 6rem 2rem;
-        }
-        
-        .hero h2 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-        }
-        
-        .hero p {
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
-        }
-        
-        .hero button {
-            background: #ffcc00;
-            color: #003366;
-            border: none;
-            padding: 0.8rem 1.5rem;
-            border-radius: 30px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        
-        .hero button:hover {
-            background: #e6b800;
-            transform: scale(1.05);
-        }
-        /* Sections */
-        
-        .section {
-            padding: 3rem 2rem;
-            max-width: 1100px;
-            margin: auto;
-        }
-        
-        .section h2 {
-            color: #003366;
-            margin-bottom: 1rem;
-            text-align: center;
-        }
-        /* Cards */
-        
-        .cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-        }
-        
-        .card {
-            background: #fff;
-            padding: 2rem;
-            border-radius: 1rem;
-            text-align: center;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            transition: 0.3s;
-        }
-        
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        .card h3 {
-            color: #003366;
-        }
-        /* Buttons */
-        
-        button {
-            background: #0055a5;
-            color: #fff;
-            padding: .75rem 1.25rem;
-            border: none;
-            border-radius: 30px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        
-        button:hover {
-            background: #003366;
-            transform: scale(1.05);
-        }
-        /* Forms */
-        
-        form {
-            display: grid;
-            gap: 1rem;
-            max-width: 600px;
-            margin: auto;
-        }
-        
-        input,
-        textarea {
-            padding: .75rem;
-            border: 1px solid #ccc;
-            border-radius: .5rem;
-            width: 100%;
-        }
-        /* Login */
-        
-        .login-box {
-            max-width: 400px;
-            margin: auto;
-            background: #fff;
-            padding: 2rem;
-            border-radius: 1rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-        /* Footer */
-        
-        footer {
-            background: #003366;
-            color: #fff;
-            text-align: center;
-            padding: 1rem;
-            margin-top: 2rem;
-        }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Visionary Youth Group — Sign Up / Login</title>
+
+<!-- Fonts & Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+  body{
+    margin:0;
+    font-family:'Poppins',sans-serif;
+    background: linear-gradient(135deg, #004d26, #009a44);
+    height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#222;
+  }
+
+  .auth-container{
+    background:#fff;
+    border-radius:16px;
+    box-shadow:0 20px 40px rgba(0,0,0,0.2);
+    width:100%;
+    max-width:460px;
+    padding:40px 32px;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+    transition:0.4s;
+  }
+
+  .auth-container h1{
+    margin-bottom:24px;
+    color:#004d26;
+    font-size:28px;
+  }
+
+  .tabs{
+    display:flex;
+    border-radius:12px;
+    overflow:hidden;
+    margin-bottom:28px;
+    box-shadow:0 4px 12px rgba(0,0,0,.1);
+  }
+
+  .tab{
+    flex:1;
+    padding:14px 0;
+    cursor:pointer;
+    font-weight:600;
+    transition:0.3s;
+    background:#e6f2ec;
+    color:#004d26;
+    text-align:center;
+  }
+
+  .tab.active{
+    background:#004d26;
+    color:#fff;
+  }
+
+  .form-panel{
+    display:none;
+    text-align:left;
+    animation: fadeIn 0.4s ease forwards;
+  }
+
+  .form-panel.active{ display:block; }
+
+  input, select{
+    width:100%;
+    padding:14px 12px;
+    margin:10px 0;
+    border:1px solid #ccc;
+    border-radius:10px;
+    font-size:15px;
+    transition:0.3s;
+  }
+
+  input:focus, select:focus{
+    border-color:#004d26;
+    outline:none;
+    box-shadow:0 4px 12px rgba(0,77,38,0.2);
+  }
+
+  .btn{
+    width:100%;
+    padding:14px;
+    margin-top:14px;
+    border:none;
+    border-radius:12px;
+    background:#004d26;
+    color:#fff;
+    font-weight:700;
+    font-size:16px;
+    cursor:pointer;
+    transition:0.3s;
+  }
+
+  .btn:hover{
+    background:#006636;
+  }
+
+  .link-btn{
+    background:transparent;
+    border:none;
+    color:#004d26;
+    font-weight:600;
+    margin-top:12px;
+    text-decoration:underline;
+    cursor:pointer;
+    display:block;
+    text-align:center;
+  }
+
+  .small-note{
+    font-size:13px;
+    color:#555;
+    margin-top:12px;
+    text-align:center;
+  }
+
+  @keyframes fadeIn{
+    from{opacity:0; transform: translateY(12px);}
+    to{opacity:1; transform: translateY(0);}
+  }
+
+  /* Responsive */
+  @media(max-width:500px){
+    .auth-container{padding:28px 20px;}
+  }
+</style>
 </head>
-
 <body>
-    <header>
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-            <h1>VISIONARY YOUTH GROUP 2024</h1>
-            <nav>
-                <ul>
-                    <li><a href="#home">Home</a></li>
-                    <li><a href="#about">About</a></li>
-                    <li><a href="#services">Services</a></li>
-                    <li><a href="#join">Join</a></li>
-                    <li><a href="#login">Login</a></li>
-                    <li><a href="#contact">Contact</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
 
-    <section id="home" class="hero">
-        <h2>Empowering Youth Through Financial Growth</h2>
-        <p>Together we save, invest, and build a stronger future.</p>
-        <button onclick="document.getElementById('join').scrollIntoView({behavior:'smooth'})">Join Us</button>
-    </section>
+<div class="auth-container">
+  <h1>Visionary Youth Group</h1>
 
-    <section id="about" class="section">
-        <h2>About Us</h2>
-        <p style="text-align:center;max-width:800px;margin:auto;">We are a youth-led financial group dedicated to promoting savings culture, providing affordable loans, and empowering young people through financial literacy and investment opportunities.</p>
-    </section>
+  <div class="tabs">
+    <div id="tabSignup" class="tab active">Sign Up</div>
+    <div id="tabLogin" class="tab">Login</div>
+  </div>
 
-    <section id="services" class="section">
-        <h2>Our Services</h2>
-        <div class="cards">
-            <div class="card">
-                <h3>💰 Savings</h3>
-                <p>Members contribute regularly to build collective savings that benefit everyone.</p>
-            </div>
-            <div class="card">
-                <h3>📑 Loans</h3>
-                <p>We provide low-interest loans to members for personal and business growth.</p>
-            </div>
-            <div class="card">
-                <h3>📚 Financial Training</h3>
-                <p>Workshops and seminars to improve financial literacy and management skills.</p>
-            </div>
-            <div class="card">
-                <h3>📈 Investments</h3>
-                <p>Pooling resources to invest in projects that generate income for the group.</p>
-            </div>
-        </div>
-    </section>
+  <!-- Sign Up Form -->
+  <div id="signupPanel" class="form-panel active">
+    <input id="signupName" placeholder="Full Name">
+    <input id="signupPhone" placeholder="Phone (+254...)">
+    <input id="signupId" placeholder="ID / Passport">
+    <select id="signupClass">
+      <option value="" disabled selected>Select Class</option>
+      <option value="Ordinary">Ordinary</option>
+      <option value="Mean">Mean</option>
+    </select>
+    <input id="signupEmail" placeholder="Email">
+    <input id="signupPassword" type="password" placeholder="Password">
+    <button id="signupBtn" class="btn">Create Account</button>
+    <p class="small-note">By signing up you agree to our Terms and Conditions.</p>
+  </div>
 
-    <section id="join" class="section">
-        <h2>Become a Member</h2>
-        <p style="text-align:center;max-width:800px;margin:auto;">Join us today and take control of your financial future. Membership is open to all youth passionate about growth, savings, and investment.</p>
-        <div style="text-align:center;margin-top:1rem;">
-            <button onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Apply Now</button>
-        </div>
-    </section>
+  <!-- Login Form -->
+  <div id="loginPanel" class="form-panel">
+    <input id="loginEmail" placeholder="Email">
+    <input id="loginPassword" type="password" placeholder="Password">
+    <button id="loginBtn" class="btn">Login</button>
+    <button id="resetPasswordBtn" class="link-btn">Forgot Password?</button>
+    <p id="loginStatus" class="small-note"></p>
+  </div>
+</div>
 
-    <!-- Login Section -->
-    <section id="login" class="section">
-        <h2>Member Login</h2>
-        <div class="login-box">
-            <form id="loginForm">
-                <input type="text" id="username" placeholder="Username" required>
-                <input type="password" id="password" placeholder="Password" required>
-                <button type="submit">Login</button>
-                <p id="loginMsg"></p>
-            </form>
-        </div>
-    </section>
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+import { getFirestore, setDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-    <section id="contact" class="section">
-        <h2>Contact Us</h2>
-        <p style="text-align:center;">Email: <a href="mailto:visionaryyouthgroup32@gmail.com">visionaryyouthgroup32@gmail.com</a></p>
-        <p style="text-align:center;">Phone: <a href="tel:+254741453336">+254 741 453336</a></p>
+const firebaseConfig = {
+  apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
+  authDomain: "visionary-youth-grou-2024.firebaseapp.com",
+  projectId: "visionary-youth-grou-2024",
+  storageBucket: "visionary-youth-grou-2024.appspot.com",
+  messagingSenderId: "372978592717",
+  appId: "1:372978592717:web:1c15aec728ee5f854f3284",
+  measurementId: "G-QP1RBT2ZCP"
+};
 
-        <form id="contactForm">
-            <input type="text" name="name" placeholder="Your Name" required>
-            <input type="email" name="email" placeholder="Your Email" required>
-            <textarea name="message" rows="5" placeholder="Your Message" required></textarea>
-            <button type="submit">Send Message</button>
-            <p id="formMsg"></p>
-        </form>
-    </section>
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-    <footer>
-        <p>© <span id="year"></span> VISIONARY YOUTH GROUP 2024. All rights reserved.</p>
-    </footer>
+const signupBtn = document.getElementById('signupBtn');
+const loginBtn = document.getElementById('loginBtn');
+const resetBtn = document.getElementById('resetPasswordBtn');
+const loginStatus = document.getElementById('loginStatus');
 
-    <script>
-        document.getElementById('year').textContent = new Date().getFullYear();
+signupBtn.addEventListener('click', async()=>{
+  const name = document.getElementById('signupName').value.trim();
+  const phone = document.getElementById('signupPhone').value.trim();
+  const id = document.getElementById('signupId').value.trim();
+  const userClass = document.getElementById('signupClass').value;
+  const email = document.getElementById('signupEmail').value.trim();
+  const password = document.getElementById('signupPassword').value;
 
-        // Contact form simulation
-        document.getElementById('contactForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            document.getElementById('formMsg').textContent = "Thank you! Your message has been received.";
-            this.reset();
-        });
+  if(!name||!phone||!id||!userClass||!email||!password){ alert("Fill all fields"); return; }
 
-        // Simple login demo (replace with backend in real system)
-        const users = {
-            "member1": "pass123",
-            "admin": "admin123"
-        };
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const u = document.getElementById('username').value;
-            const p = document.getElementById('password').value;
-            if (users[u] && users[u] === p) {
-                document.getElementById('loginMsg').style.color = "green";
-                document.getElementById('loginMsg').textContent = "Welcome, " + u + "!";
-            } else {
-                document.getElementById('loginMsg').style.color = "red";
-                document.getElementById('loginMsg').textContent = "Invalid credentials.";
-            }
-            this.reset();
-        });
-    </script>
+  try{
+    const userCred = await createUserWithEmailAndPassword(auth,email,password);
+    await setDoc(doc(db,"members",userCred.user.uid),{
+      name, phone, id, class:userClass, email, balance:0, createdAt:serverTimestamp()
+    });
+    alert("Signup successful!");
+    window.location.href="dashboard.html";
+  }catch(err){
+    alert("Error: "+err.message);
+  }
+});
+
+loginBtn.addEventListener('click', async()=>{
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  if(!email||!password){ alert("Enter email & password"); return; }
+
+  try{
+    await signInWithEmailAndPassword(auth,email,password);
+    loginStatus.textContent = "Login successful! Redirecting...";
+    setTimeout(()=>window.location.href="dashboard.html",800);
+  }catch(err){
+    loginStatus.textContent = "Login failed: "+err.message;
+  }
+});
+
+resetBtn.addEventListener('click', async()=>{
+  const email = document.getElementById('loginEmail').value.trim();
+  if(!email){ alert("Enter your email"); return; }
+  try{
+    await sendPasswordResetEmail(auth,email);
+    alert("Password reset email sent!");
+  }catch(err){
+    alert("Error: "+err.message);
+  }
+});
+
+onAuthStateChanged(auth,user=>{
+  if(user) window.location.href="dashboard.html";
+});
+</script>
+
+<!-- Tab Toggle -->
+<script>
+const tabSignup=document.getElementById('tabSignup');
+const tabLogin=document.getElementById('tabLogin');
+const signupPanel=document.getElementById('signupPanel');
+const loginPanel=document.getElementById('loginPanel');
+
+tabSignup.addEventListener('click',()=>{
+  tabSignup.classList.add('active'); tabSignup.classList.remove('inactive');
+  tabLogin.classList.remove('active'); tabLogin.classList.add('inactive');
+  signupPanel.classList.add('active'); loginPanel.classList.remove('active');
+});
+
+tabLogin.addEventListener('click',()=>{
+  tabLogin.classList.add('active'); tabLogin.classList.remove('inactive');
+  tabSignup.classList.remove('active'); tabSignup.classList.add('inactive');
+  loginPanel.classList.add('active'); signupPanel.classList.remove('active');
+});
+</script>
+
 </body>
-
 </html>

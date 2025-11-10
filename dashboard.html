@@ -1,20 +1,1137 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Visionary Youth Group</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
-    <script src="script.js" defer></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Visionary Youth Group — Member Dashboard</title>
+
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <style>
+    :root{
+      --dark:#164e2a;
+      --accent:#2e7d32;
+      --gold:#ffcc00;
+      --bg1:#e9ffec;
+      --card:#ffffff;
+      --muted:#6b7280;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;font-family:'Poppins',sans-serif;background:linear-gradient(120deg,var(--bg1),#f6fff6);color:#123;
+      -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+    }
+
+    /* Top bar */
+    .topbar{
+      position:fixed;left:0;right:0;top:0;height:64px;background:linear-gradient(90deg,var(--dark),#26734d);color:#fff;
+      display:flex;align-items:center;justify-content:space-between;padding:0 18px;z-index:1200;
+      box-shadow:0 6px 20px rgba(6,50,20,0.12);
+    }
+    .brand{display:flex;align-items:center;gap:12px}
+    .brand h1{font-size:1.05rem;margin:0;font-weight:700}
+    .hamburger{font-size:1.6rem;cursor:pointer}
+    .user-area{display:flex;align-items:center;gap:12px}
+    .avatar-wrap{width:44px;height:44px;border-radius:8px;overflow:hidden;background:#fff;display:flex;align-items:center;justify-content:center}
+    .avatar-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+    .user-info{text-align:right;font-size:0.95rem}
+    .user-info small{display:block;color:rgba(255,255,255,0.85)}
+
+    /* Menu overlay */
+    .menu{
+      position:fixed;top:64px;left:12px;background:rgba(255,255,255,0.98);max-width:320px;border-radius:8px;padding:8px;
+      box-shadow:0 8px 30px rgba(0,0,0,0.12);display:none;z-index:1199;
+    }
+    .menu a{display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;color:#123;text-decoration:none}
+    .menu a:hover{background:#f1fff1}
+
+    /* Layout */
+    .page{
+      max-width:1200px;margin:92px auto 48px;padding:0 18px;
+      display:grid;grid-template-columns:repeat(12,1fr);gap:18px;
+    }
+
+    /* Hero / summary */
+    .hero{grid-column:span 12;background:var(--card);border-radius:12px;padding:16px;display:flex;justify-content:space-between;align-items:center;gap:16px;box-shadow:0 8px 20px rgba(6,50,20,0.03)}
+    .welcome{display:flex;flex-direction:column}
+    .welcome h2{margin:0;color:var(--dark)}
+    .quick-actions{display:flex;gap:10px}
+
+    /* cards */
+    .card{background:var(--card);border-radius:12px;padding:14px;box-shadow:0 8px 20px rgba(6,50,20,0.05);overflow:hidden}
+    .balances-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+    .balance{background:linear-gradient(180deg,#f3fff3,#ffffff);padding:12px;border-radius:10px;text-align:center}
+    .balance .label{color:var(--muted);font-size:0.95rem}
+    .balance .value{font-weight:700;font-size:1.25rem;color:var(--accent);margin-top:8px}
+
+    /* action bar (loan table) */
+    .action-bar{grid-column:span 12;background:transparent;margin-top:6px}
+    .loan-table{width:100%;border-collapse:collapse;background:var(--card);border-radius:10px;overflow:hidden;box-shadow:0 8px 20px rgba(6,50,20,0.03)}
+    .loan-table th, .loan-table td{padding:12px;border-bottom:1px solid #eef6ee;text-align:left;font-size:0.95rem}
+    .loan-table thead th{background:linear-gradient(90deg,#f7fff7,#ffffff);font-weight:700}
+    .loan-stage {padding:6px 8px;border-radius:6px;font-weight:700;font-size:0.85rem}
+    .stage-pending{background:#fffbe6;color:#8a6d00}
+    .stage-active{background:#e6f8ec;color:#145c2e}
+    .stage-closed{background:#e8f0ff;color:#254188}
+
+    /* transactions */
+    .transactions-card{grid-column:span 12;margin-top:8px}
+    .tx-table{width:100%;border-collapse:collapse}
+    .tx-table th, .tx-table td{padding:10px;border-bottom:1px solid #eef6ee;text-align:left;font-size:0.9rem}
+    .tx-table thead th{background:#fbfff9}
+
+    /* split grid */
+    .big{grid-column:span 8}
+    .side{grid-column:span 4}
+
+    /* form */
+    .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+    .form-grid .full{grid-column:1/-1}
+    input, select, textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #d1d5db;font-size:0.95rem}
+    textarea{min-height:100px;resize:vertical}
+    .btn{background:var(--accent);color:white;padding:10px 14px;border:none;border-radius:8px;cursor:pointer;font-weight:700}
+    .btn.secondary{background:#fff;color:var(--accent);border:1px solid #e3f1e3}
+    .muted{color:var(--muted)}
+
+    /* small screens adjustments */
+    @media (max-width:1000px){
+      .big{grid-column:span 12}
+      .side{grid-column:span 12}
+      .form-grid{grid-template-columns:1fr}
+      .menu{left:8px;right:8px;max-width:unset}
+    }
+
+    /* toast */
+    #toast{position:fixed;right:18px;bottom:18px;background:#28a745;color:#fff;padding:10px 14px;border-radius:8px;display:none;z-index:2000}
+
+    /* hidden sections toggle */
+    .hidden-section{display:none}
+    .visible-section{display:block}
+    .section-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
+    .small-note{font-size:12px;color:var(--muted)}
+
+    /* responsive loan item */
+    .loan-item{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:12px;border-radius:8px;background:#fbfff9;margin-bottom:10px}
+    .loan-item .left{flex:1}
+    .loan-item .right{min-width:180px;text-align:right}
+  </style>
 </head>
-
 <body>
-    <h2>Welcome to Your Dashboard</h2>
-    <p>Here you will see your savings, loans, and contributions (coming soon).</p>
-    <button onclick="logout()">Logout</button>
-</body>
 
+  <div class="topbar">
+    <div class="brand">
+      <!-- small "eye" logo to indicate vision -->
+      <div style="font-size:22px">👁️</div>
+      <h1>Visionary Youth Group</h1>
+    </div>
+
+    <div class="user-area">
+      <div class="avatar-wrap" id="topAvatar" title="Profile photo"></div>
+      <div class="user-info">
+        <div id="topEmail">—</div>
+        <small id="topStatus">Status: <strong style="color:#9ff2b8">Active</strong></small>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:10px">
+        <button id="downloadStatementTop" title="Download Account Statement" class="btn secondary"><i class="fas fa-file-pdf"></i>&nbsp;Statement</button>
+        <i class="fas fa-bars hamburger hamburgerAction" role="button" aria-label="Menu" style="font-size:20px;color:#fff;margin-left:6px"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="menu" id="menu" aria-hidden="true">
+    <a href="#" data-target="overview" class="menu-item"><i class="fas fa-home"></i> Overview</a>
+    <a href="#" data-target="balancesCard" class="menu-item"><i class="fas fa-wallet"></i> Balances</a>
+    <a href="#" id="menuMyLoans" class="menu-item"><i class="fas fa-money-bill-wave"></i> My Loans</a>
+    <a href="#" id="menuSelfServe" class="menu-item"><i class="fas fa-tools"></i> Self Serve</a>
+    <a href="#" id="menuProfile" class="menu-item"><i class="fas fa-user-edit"></i> Update Profile</a>
+    <a href="#" data-target="withdraw-section" class="menu-item"><i class="fas fa-hand-holding-usd"></i> Withdrawals</a>
+    <a href="#" id="menuLogout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+  </div>
+
+  <main class="page" id="pageRoot">
+    <!-- hero -->
+    <div class="hero card" id="overview">
+      <div class="welcome">
+        <h2 id="welcomeName">Welcome, Member</h2>
+        <div style="color:var(--muted);margin-top:6px">Quick snapshot — all amounts shown in <strong>Ksh</strong></div>
+        <div style="margin-top:6px;font-size:0.9rem">Points: <strong id="pointsDisplay">0</strong></div>
+      </div>
+      <div class="quick-actions">
+        <button id="applyLoanBtnTop" class="btn"><i class="fas fa-file-signature"></i>&nbsp;Apply Loan</button>
+        <button id="quickStatement" class="btn secondary"><i class="fas fa-file-download"></i>&nbsp;Statement</button>
+      </div>
+    </div>
+
+    <!-- balances summary -->
+    <div class="card big" id="balancesCard">
+      <h2>Balances</h2>
+      <div class="balances-grid">
+        <div class="balance"><div class="label">Monthly Savings</div><div class="value" id="monthlyVal">Ksh 0</div></div>
+        <div class="balance"><div class="label">Weekly Savings</div><div class="value" id="weeklyVal">Ksh 0</div></div>
+        <div class="balance"><div class="label">Shares</div><div class="value" id="sharesVal">Ksh 0</div></div>
+        <div class="balance"><div class="label">Dividends</div><div class="value" id="dividendsVal">Ksh 0</div></div>
+        <div class="balance"><div class="label">Total Loans</div><div class="value" id="totalLoansVal">Ksh 0</div></div>
+        <div class="balance"><div class="label">Unpaid Balances</div><div class="value" id="unpaidVal">Ksh 0</div></div>
+        <div class="balance"><div class="label">Outstanding Loans</div><div class="value" id="outstandingLoansVal">Ksh 0</div></div>
+      </div>
+    </div>
+
+    <!-- loan action bar (table) -->
+    <div class="action-bar card">
+      <h3 style="margin-top:0">Loan Action Bar</h3>
+      <table class="loan-table">
+        <thead>
+          <tr>
+            <th>Loan Date</th>
+            <th>Amount</th>
+            <th>Interest</th>
+            <th>Installment</th>
+            <th>Due Date</th>
+            <th>Stage</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="loanActionBody">
+          <tr><td colspan="7" style="padding:14px">Loading loan summary...</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:10px; font-size:13px" class="muted">Note: To apply for a new loan use the Apply Loan button (redirects to admin.html).</div>
+    </div>
+
+    <!-- Transactions (history) -->
+    <div class="transactions-card card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <h3 style="margin:0">Transaction History</h3>
+        <div style="display:flex;gap:8px;align-items:center">
+          <select id="txFilterType" class="muted" style="padding:6px;border-radius:6px;border:1px solid #e6f0ea">
+            <option value="all">All</option>
+            <option value="credit">Credit</option>
+            <option value="debit">Debit</option>
+          </select>
+          <button id="downloadTxBtn" class="btn secondary"><i class="fas fa-file-download"></i> Download</button>
+        </div>
+      </div>
+      <div style="overflow:auto;max-height:420px">
+        <table class="tx-table" id="txTable">
+          <thead>
+            <tr>
+              <th>Date</th><th>Description</th><th>Debit</th><th>Credit</th><th>Balance</th>
+            </tr>
+          </thead>
+          <tbody id="txBody">
+            <tr><td colspan="5" style="padding:12px">Loading transactions...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- right side: payments, notifications, profile -->
+    <aside class="card side">
+      <h3>Pay / Quick Actions</h3>
+
+      <!-- M-Pesa general payment -->
+      <div style="margin-top:8px">
+        <label class="muted">Pay via M-Pesa (General)</label>
+        <input id="mpesaPhone" placeholder="07XXXXXXXX" />
+        <input id="mpesaAmount" placeholder="Amount (Ksh)" type="number" />
+        <input id="mpesaAccount" placeholder="Account / Remarks (optional)" />
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button id="mpesaPayBtn" class="btn">Pay (M-Pesa)</button>
+          <button id="mpesaLogBtn" class="btn secondary">Log Payment</button>
+        </div>
+      </div>
+
+      <!-- notifications -->
+      <div style="margin-top:14px">
+        <h4 style="margin:0 0 8px 0">🔔 Notifications</h4>
+        <div id="notifWrapper" style="max-height:220px;overflow:auto;border-radius:8px;padding:6px;background:#fbfff9">
+          <ul id="notifList" style="list-style:none;margin:0;padding:0">
+            <li>Loading notifications...</li>
+          </ul>
+        </div>
+        <div style="margin-top:8px;display:flex;gap:8px">
+          <button id="markAllRead" class="btn secondary">Mark all read</button>
+        </div>
+      </div>
+
+      <!-- points -->
+      <div style="margin-top:14px">
+        <h4 style="margin:0 0 6px 0">🎯 Points</h4>
+        <div id="pointsBox" style="padding:10px;background:#fff;border-radius:8px">
+          <div style="font-size:1.5rem;font-weight:700" id="pointsBoxValue">0</div>
+          <div class="muted" style="font-size:0.9rem">Member activity score</div>
+        </div>
+      </div>
+
+      <!-- small profile quick -->
+      <div style="margin-top:14px">
+        <h4 style="margin:0 0 6px 0">Profile</h4>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div class="avatar-wrap" id="miniAvatar"></div>
+          <div>
+            <div id="miniName">—</div>
+            <small id="miniEmail" class="muted">—</small>
+          </div>
+        </div>
+        <div style="margin-top:8px;display:flex;gap:8px">
+          <button id="saveProfile" class="btn">Save profile</button>
+          <button id="choosePhotoBtn" class="btn secondary">Upload photo</button>
+          <input id="photoUploadInput" type="file" accept="image/*" style="display:none" />
+        </div>
+      </div>
+    </aside>
+
+    <!-- loans manage + profile expanded -->
+    <section class="card side" id="loansListFull">
+      <h2>Loans — Manage Applications</h2>
+      <div id="loansListArea">Loading loans…</div>
+      <div id="loansListFullInner" style="margin-top:12px"></div>
+
+      <hr style="margin:12px 0">
+      <div style="display:flex;gap:8px">
+        <button id="downloadStatement" class="btn secondary"><i class="fas fa-file-pdf"></i>&nbsp;Download Statement</button>
+        <button id="downloadApplications" class="btn" title="Download all my applications"><i class="fas fa-download"></i>&nbsp;My Applications</button>
+      </div>
+    </section>
+
+    <!-- My Loans (toggle) -->
+    <section class="card big hidden-section" id="myLoansSection">
+      <div class="section-head">
+        <h2>My Loans</h2>
+        <div>
+          <button id="applyLoanBtn" class="btn"><i class="fas fa-file-signature"></i> Apply Loan</button>
+          <button id="refreshLoansBtn" class="btn secondary"><i class="fas fa-sync"></i> Refresh</button>
+        </div>
+      </div>
+      <div id="myLoansList" style="margin-top:12px">Loading loans...</div>
+    </section>
+
+    <!-- Self Serve (toggle) -->
+    <section class="card big hidden-section" id="selfServeSection">
+      <div class="section-head">
+        <h2>Self Serve</h2>
+        <div class="small-note">Download loan statements and quick tools</div>
+      </div>
+
+      <div style="margin-top:12px" id="selfServeContent">
+        <div style="margin-bottom:12px">
+          <button id="selfDownloadAllLoanStatements" class="btn secondary"><i class="fas fa-file-pdf"></i> Download All Loan Statements (PDF)</button>
+          <button id="selfRecentActivity" class="btn"><i class="fas fa-list"></i> Recent Activity</button>
+        </div>
+        <div id="selfServeList">Loading…</div>
+      </div>
+    </section>
+
+    <!-- Update Profile (toggle) -->
+    <section class="card side hidden-section" id="profileSection" style="padding-bottom:18px">
+      <div class="section-head">
+        <h2>Update Profile</h2>
+        <div class="small-note">Click Save to persist changes</div>
+      </div>
+
+      <form id="updateProfileForm" style="margin-top:12px">
+        <div class="form-grid">
+          <div>
+            <label class="small-note">Full Name</label>
+            <input id="profile_fullName" placeholder="Full name" />
+          </div>
+          <div>
+            <label class="small-note">Member No.</label>
+            <input id="profile_memberNo" placeholder="Member number" />
+          </div>
+          <div>
+            <label class="small-note">ID / Passport</label>
+            <input id="profile_id" placeholder="ID number" />
+          </div>
+          <div>
+            <label class="small-note">Email</label>
+            <input id="profile_email" placeholder="Email address" />
+          </div>
+          <div>
+            <label class="small-note">Phone</label>
+            <input id="profile_phone" placeholder="07XXXXXXXX" />
+          </div>
+          <div>
+            <label class="small-note">Date of Birth</label>
+            <input id="profile_dob" type="date" />
+          </div>
+          <div class="full">
+            <label class="small-note">Date Joined</label>
+            <input id="profile_yearJoined" type="date" />
+          </div>
+        </div>
+
+        <div style="margin-top:12px;display:flex;gap:8px">
+          <button id="saveProfileFormBtn" type="button" class="btn">Save</button>
+          <button id="cancelProfileBtn" type="button" class="btn secondary">Cancel</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Withdraw section placeholder (kept for your original flow) -->
+    <section id="withdraw-section" class="hidden-section card side">
+      <h3>Withdraw</h3>
+      <div class="muted">Withdraw interface (use your existing withdraw form here)</div>
+    </section>
+
+  </main>
+
+  <div id="toast">Toast</div>
+
+  <!-- Firebase + app logic -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import { getDatabase, ref, onValue, get, push, set, update } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+    import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
+
+    const { jsPDF } = window.jspdf;
+
+    // ====== CONFIG (replace if needed) ======
+    const firebaseConfig = {
+      apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
+      authDomain: "visionary-youth-grou-2024.firebaseapp.com",
+      databaseURL: "https://visionary-youth-grou-2024-default-rtdb.firebaseio.com",
+      projectId: "visionary-youth-grou-2024",
+      storageBucket: "visionary-youth-grou-2024.appspot.com",
+      messagingSenderId: "372978592717",
+      appId: "1:372978592717:web:1c15aec728ee5f854f3284"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+    const storage = getStorage(app);
+
+    // UI refs
+    const menu = document.getElementById('menu');
+    const toast = document.getElementById('toast');
+    const topEmail = document.getElementById('topEmail');
+    const welcomeName = document.getElementById('welcomeName');
+    const pointsDisplay = document.getElementById('pointsDisplay');
+    const topAvatar = document.getElementById('topAvatar');
+    const miniAvatar = document.getElementById('miniAvatar');
+    const miniName = document.getElementById('miniName');
+    const miniEmail = document.getElementById('miniEmail');
+
+    const loanActionBody = document.getElementById('loanActionBody');
+    const txBody = document.getElementById('txBody');
+    const txFilterType = document.getElementById('txFilterType');
+    const downloadTxBtn = document.getElementById('downloadTxBtn');
+
+    const notifList = document.getElementById('notifList');
+    const markAllReadBtn = document.getElementById('markAllRead');
+
+    const mpesaPhone = document.getElementById('mpesaPhone');
+    const mpesaAmount = document.getElementById('mpesaAmount');
+    const mpesaAccount = document.getElementById('mpesaAccount');
+    const mpesaPayBtn = document.getElementById('mpesaPayBtn');
+    const mpesaLogBtn = document.getElementById('mpesaLogBtn');
+
+    const choosePhotoBtn = document.getElementById('choosePhotoBtn');
+    const photoInput = document.getElementById('photoUploadInput');
+    const saveProfileBtn = document.getElementById('saveProfile');
+
+    // New UI refs
+    const myLoansSection = document.getElementById('myLoansSection');
+    const myLoansList = document.getElementById('myLoansList');
+    const selfServeSection = document.getElementById('selfServeSection');
+    const selfServeList = document.getElementById('selfServeList');
+    const profileSection = document.getElementById('profileSection');
+
+    const applyLoanBtn = document.getElementById('applyLoanBtn');
+    const refreshLoansBtn = document.getElementById('refreshLoansBtn');
+
+    const selfDownloadAllLoanStatements = document.getElementById('selfDownloadAllLoanStatements');
+
+    const saveProfileFormBtn = document.getElementById('saveProfileFormBtn');
+    const cancelProfileBtn = document.getElementById('cancelProfileBtn');
+
+    // helpers
+    function showToast(msg, t=3000){ toast.textContent = msg; toast.style.display='block'; setTimeout(()=> toast.style.display='none', t); }
+    function formatKsh(n){ const num = Number(n||0); return 'Ksh ' + num.toLocaleString('en-KE'); }
+    function safeText(s){ return String(s || ''); }
+
+    // menu toggle
+    document.querySelectorAll('.hamburgerAction').forEach(h=> h.addEventListener('click', ()=> menu.style.display = menu.style.display === 'block'? 'none':'block'));
+
+    // toggle sections (open on click only)
+    document.getElementById('menuMyLoans').addEventListener('click', (e)=>{
+      e.preventDefault();
+      [myLoansSection, selfServeSection, profileSection].forEach(s => s.classList.add('hidden-section'));
+      myLoansSection.classList.toggle('hidden-section');
+      myLoansSection.classList.toggle('visible-section');
+      menu.style.display='none';
+      loadMemberLoans();
+    });
+    document.getElementById('menuSelfServe').addEventListener('click', (e)=>{
+      e.preventDefault();
+      [myLoansSection, selfServeSection, profileSection].forEach(s => s.classList.add('hidden-section'));
+      selfServeSection.classList.toggle('hidden-section');
+      selfServeSection.classList.toggle('visible-section');
+      menu.style.display='none';
+    });
+    document.getElementById('menuProfile').addEventListener('click', (e)=>{
+      e.preventDefault();
+      [myLoansSection, selfServeSection, profileSection].forEach(s => s.classList.add('hidden-section'));
+      profileSection.classList.toggle('hidden-section');
+      profileSection.classList.toggle('visible-section');
+      menu.style.display='none';
+    });
+
+    // data state
+    let currentUid = null;
+
+    // points/activity helpers (minimal)
+    async function logActivity(msg){
+      if(!currentUid) return;
+      const r = push(ref(db, `members/${currentUid}/activityLog`));
+      await set(r, {text: msg, ts: Date.now()});
+    }
+    async function awardPoints(n, reason){
+      if(!currentUid || !n) return;
+      const s = await get(ref(db, `points/${currentUid}`));
+      const cur = s.exists()? Number(s.val()||0) : 0;
+      await set(ref(db, `points/${currentUid}`), cur + Number(n));
+      document.getElementById('pointsBoxValue').textContent = String(cur + Number(n));
+      pointsDisplay.textContent = String(cur + Number(n));
+      await logActivity(`Points +${n} (${reason})`);
+    }
+
+    // ===== Auth state
+    onAuthStateChanged(auth, async user => {
+      if(!user){ location.href='index.html'; return; }
+      currentUid = user.uid;
+      topEmail.textContent = user.email || '—';
+      welcomeName.textContent = (user.displayName || user.email || 'Member').split('@')[0];
+      miniEmail.textContent = user.email || '—';
+      await logActivity('Logged in');
+      await awardPoints(1, 'Login');
+
+      // profile
+      onValue(ref(db, `members/${currentUid}/profile`), snap => {
+        if(!snap.exists()) return;
+        const p = snap.val();
+        if(p.name) { welcomeName.textContent = p.name; miniName.textContent = p.name; document.getElementById('profile_fullName') && (document.getElementById('profile_fullName').value = p.name); }
+        if(p.phone) document.getElementById('profile_phone') && (document.getElementById('profile_phone').value = p.phone);
+        if(p.id) document.getElementById('profile_id') && (document.getElementById('profile_id').value = p.id);
+        if(p.yearJoined) document.getElementById('profile_yearJoined') && (document.getElementById('profile_yearJoined').value = p.yearJoined);
+        if(p.dob) document.getElementById('profile_dob') && (document.getElementById('profile_dob').value = p.dob);
+        if(p.status) document.getElementById('topStatus') && (document.getElementById('topStatus').innerHTML = `Status: <strong style="color:#9ff2b8">${p.status}</strong>`);
+        if(p.memberNo) document.getElementById('profile_memberNo') && (document.getElementById('profile_memberNo').value = p.memberNo);
+        if(p.email) document.getElementById('profile_email') && (document.getElementById('profile_email').value = p.email);
+      });
+
+      // profile photo
+      onValue(ref(db, `members/${currentUid}/photoURL`), snap => {
+        const url = snap.exists()? snap.val() : null;
+        if(url){ topAvatar.innerHTML = `<img src="${url}" alt="avatar">`; miniAvatar.innerHTML = `<img src="${url}" alt="avatar">`; }
+        else { topAvatar.innerHTML = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--dark)"><i class="fas fa-user"></i></div>`; miniAvatar.innerHTML = topAvatar.innerHTML; }
+      });
+
+      // balances listeners
+      onValue(ref(db, `members/${currentUid}/savings/monthly`), s => { document.getElementById('monthlyVal').textContent = formatKsh(s.exists()? s.val() : 0); });
+      onValue(ref(db, `members/${currentUid}/savings/weekly`), s => { document.getElementById('weeklyVal').textContent = formatKsh(s.exists()? s.val() : 0); });
+      onValue(ref(db, `members/${currentUid}/shares/total`), s => { document.getElementById('sharesVal').textContent = formatKsh(s.exists()? s.val() : 0); });
+      onValue(ref(db, `members/${currentUid}/shares/dividends`), s => { document.getElementById('dividendsVal').textContent = formatKsh(s.exists()? s.val() : 0); });
+      onValue(ref(db, `members/${currentUid}/unpaidBalances`), s => { document.getElementById('unpaidVal').textContent = formatKsh(s.exists()? s.val() : 0); });
+      onValue(ref(db, `members/${currentUid}/loans/total`), s => { const val = s.exists()? s.val() : {}; document.getElementById('totalLoansVal').textContent = formatKsh(val.total || 0); });
+      onValue(ref(db, `members/${currentUid}/outstandingLoans`), s => { document.getElementById('outstandingLoansVal').textContent = formatKsh(s.exists()? s.val() : 0); });
+
+      // ===== Loan action bar (read-only)
+      onValue(ref(db, `loans/${currentUid}`), snap => {
+        const body = loanActionBody;
+        body.innerHTML = '';
+        if(!snap.exists()){ body.innerHTML = '<tr><td colspan="7" style="padding:12px">No loan records</td></tr>'; return; }
+        const loansObj = snap.val();
+
+        let loansArray = [];
+        if(typeof loansObj === 'object' && !Array.isArray(loansObj)) {
+          loansArray = Object.entries(loansObj).map(([id, l]) => ({ id, ...l }));
+        } else if(Array.isArray(loansObj)) {
+          loansArray = loansObj;
+        } else {
+          loansArray = [{ id: 'current', ...loansObj }];
+        }
+
+        // latest first
+        loansArray.sort((a,b)=> (new Date(b.loanDate||0).getTime()) - (new Date(a.loanDate||0).getTime()));
+
+        loansArray.forEach(loan => {
+          const tr = document.createElement('tr');
+          const stageLower = (loan.stage || loan.status || '').toLowerCase();
+          const stageClass = stageLower.includes('paid') || stageLower.includes('closed') ? 'stage-closed' : (stageLower.includes('active') ? 'stage-active' : 'stage-pending');
+          tr.innerHTML = `
+            <td>${safeText(loan.loanDate ? new Date(loan.loanDate).toLocaleDateString() : loan.loanDate || '-') }</td>
+            <td>${formatKsh(loan.amount || loan.amountFigures || 0)}</td>
+            <td>${safeText(loan.interest || loan.interestRate || loan.rate || '-')}</td>
+            <td>${formatKsh(loan.installment || loan.monthlyInstallment || 0)}</td>
+            <td>${safeText(loan.dueDate ? new Date(loan.dueDate).toLocaleDateString() : loan.dueDate || '-') }</td>
+            <td><span class="loan-stage ${stageClass}">${safeText(loan.stage || loan.status || 'Pending')}</span></td>
+            <td>
+              <button class="btn secondary btn-view-loan" data-loan-id="${loan.id}"><i class="fas fa-eye"></i> View</button>
+              <button class="btn btn-download-loan" data-loan-id="${loan.id}"><i class="fas fa-file-pdf"></i> Statement</button>
+              <button class="btn btn-clear-cert" data-loan-id="${loan.id}"><i class="fas fa-certificate"></i> Clearance</button>
+            </td>
+          `;
+          body.appendChild(tr);
+        });
+      });
+
+      // handle clicks on dynamically created buttons
+      document.body.addEventListener('click', async (e)=>{
+        const viewBtn = e.target.closest('.btn-view-loan');
+        const dlBtn = e.target.closest('.btn-download-loan');
+        const certBtn = e.target.closest('.btn-clear-cert');
+
+        if(viewBtn){
+          const loanId = viewBtn.dataset.loanId;
+          myLoansSection.classList.remove('hidden-section'); myLoansSection.classList.add('visible-section');
+          menu.style.display='none';
+          await loadMemberLoans();
+          const el = document.querySelector(`[data-loan-row="${loanId}"]`);
+          if(el) el.scrollIntoView({behavior:'smooth', block:'center'});
+        }
+
+        if(dlBtn){
+          const loanId = dlBtn.dataset.loanId;
+          const d = await buildLoanStatementPdfForLoan(loanId);
+          if(d) d.save(`Loan_Statement_${loanId || 'loan'}.pdf`);
+          awardPoints(1,'Downloaded loan statement');
+        }
+
+        if(certBtn){
+          const loanId = certBtn.dataset.loanId;
+          const snap = await get(ref(db, `loans/${currentUid}/${loanId}`));
+          const loan = snap.exists()? snap.val() : null;
+          if(!loan) return alert('Loan not found');
+          const outstanding = Number(loan.outstanding || loan.remaining || loan.balance || 0);
+          if(outstanding > 0) return alert('Clearance certificate available only when loan is fully paid');
+          const d = await buildClearanceCertificatePdf(loanId, loan);
+          if(d) d.save(`Clearance_${loanId}.pdf`);
+          awardPoints(3,'Downloaded clearance certificate');
+        }
+      });
+
+      // ===== Transactions rendering
+      function renderTransactions(snap) {
+        const tbody = txBody;
+        tbody.innerHTML = '';
+        if(!snap.exists()){ tbody.innerHTML = '<tr><td colspan="5" style="padding:12px">No transactions</td></tr>'; return; }
+        const txsObj = snap.val();
+        const txs = Object.entries(txsObj).map(([id, t]) => ({ id, ...t }));
+        txs.sort((a,b)=> (new Date(b.date||b.ts||b.timestamp).getTime()) - (new Date(a.date||a.ts||a.timestamp).getTime()));
+        const filter = txFilterType.value;
+
+        txs.forEach(t=>{
+          const isDebit = (t.debit && Number(t.debit)>0) || (t.type && t.type.toLowerCase()==='debit');
+          const isCredit = (t.credit && Number(t.credit)>0) || (t.type && t.type.toLowerCase()==='credit');
+          if(filter === 'debit' && !isDebit) return;
+          if(filter === 'credit' && !isCredit) return;
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${new Date(t.date || t.ts || t.timestamp || Date.now()).toLocaleString()}</td>
+            <td>${safeText(t.description || t.details || t.note || '')}</td>
+            <td>${t.debit ? formatKsh(t.debit) : '-'}</td>
+            <td>${t.credit ? formatKsh(t.credit) : '-'}</td>
+            <td>${t.balance ? formatKsh(t.balance) : '-'}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      onValue(ref(db, `transactions/${currentUid}`), snap => renderTransactions(snap));
+      txFilterType.addEventListener('change', ()=> get(ref(db, `transactions/${currentUid}`)).then(snap => renderTransactions(snap)));
+
+      // download tx as PDF
+      downloadTxBtn.addEventListener('click', async ()=>{
+        const snap = await get(ref(db, `transactions/${currentUid}`));
+        if(!snap.exists()) return alert('No transactions to download');
+        const txs = snap.val();
+        const doc = new jsPDF();
+        doc.setFontSize(12);
+        doc.text('Transactions', 20, 20);
+        let y=40;
+        Object.values(txs).sort((a,b)=> (new Date(b.date||b.ts||0) - new Date(a.date||a.ts||0))).forEach(t=>{
+          const line = `${new Date(t.date||t.ts||Date.now()).toLocaleString()} - ${t.description||''} - D:${t.debit||'-'} C:${t.credit||'-'} Bal:${t.balance||'-'}`;
+          const wrap = doc.splitTextToSize(line, 520);
+          doc.text(wrap, 20, y); y += wrap.length*8;
+          if(y>750){ doc.addPage(); y=40; }
+        });
+        doc.save(`transactions_${currentUid}.pdf`);
+        awardPoints(1, 'Downloaded transactions');
+      });
+
+      // ===== Notifications
+      function renderNotifSnapshot(snap) {
+        notifList.innerHTML = '';
+        if(!snap.exists()){ notifList.innerHTML = '<li class="muted">No notifications</li>'; return; }
+        const obj = snap.val();
+        const items = Object.entries(obj).map(([id, n]) => ({ id, ...n })).sort((a,b)=> (b.timestamp || b.ts || 0) - (a.timestamp || a.ts || 0));
+        items.forEach(item => {
+          const li = document.createElement('li');
+          li.style.padding = '8px';
+          li.style.borderBottom = '1px solid #eef6ee';
+          li.innerHTML = `
+            <div style="display:flex;justify-content:space-between;gap:8px">
+              <div>
+                <strong style="color:${item.read ? '#6b7280' : '#146c2b'}">${safeText(item.title)}</strong><br>
+                <small class="muted">${new Date(item.timestamp || item.ts || Date.now()).toLocaleString()}</small>
+                <div style="margin-top:6px">${safeText(item.message || item.body || '')}</div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+                <button class="btn secondary mark-read" data-id="${item.id}">${item.read ? 'Read' : 'Mark read'}</button>
+              </div>
+            </div>
+          `;
+          notifList.appendChild(li);
+        });
+
+        document.querySelectorAll('.mark-read').forEach(btn => {
+          btn.addEventListener('click', async (e) => {
+            const id = btn.dataset.id;
+            if(!id) return;
+            await update(ref(db, `members/${currentUid}/notifications/${id}`), { read: true });
+            showToast('Marked read');
+            awardPoints(1, 'Read notification');
+          });
+        });
+      }
+
+      onValue(ref(db, `members/${currentUid}/notifications`), snap => renderNotifSnapshot(snap));
+      markAllReadBtn.addEventListener('click', async ()=>{
+        const s = await get(ref(db, `members/${currentUid}/notifications`));
+        if(!s.exists()) return showToast('No notifications');
+        const updates = {};
+        Object.keys(s.val()).forEach(id => updates[`members/${currentUid}/notifications/${id}/read`] = true);
+        await update(ref(db), updates);
+        showToast('All marked read');
+      });
+
+      // ===== M-Pesa STK (example) =====
+      mpesaPayBtn.addEventListener('click', async () => {
+        if(!currentUid) return alert('Not signed in');
+        const phone = mpesaPhone.value.trim();
+        const amount = Number(mpesaAmount.value || 0);
+        const account = mpesaAccount.value.trim();
+        if(!phone || !/^\d{9,12}$/.test(phone.replace(/^0/,'').replace(/\D/g,''))) return alert('Enter valid phone (e.g. 07XXXXXXXX)');
+        if(!amount || amount <= 0) return alert('Enter valid amount');
+
+        showToast('Initiating STK Push…');
+        try{
+          const payload = { phone, amount, account, memberId: currentUid, description: account || 'General payment' };
+          const resp = await fetch('https://mpesa-stk-y093.onrender.com/stkpush', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          const json = await resp.json();
+          const pRef = push(ref(db, `payments/${currentUid}`));
+          await set(pRef, { phone, amount, account, ts: Date.now(), status: json.status || 'requested', response: json });
+          showToast('STK Push requested. Check phone to confirm.');
+          await logActivity(`STK Push requested: Ksh ${amount}`);
+        }catch(err){
+          console.error(err);
+          alert('Failed to send STK Push. See console.');
+        }
+      });
+
+      // manual log
+      mpesaLogBtn.addEventListener('click', async ()=>{
+        if(!currentUid) return alert('Not signed in');
+        const phone = mpesaPhone.value.trim();
+        const amount = Number(mpesaAmount.value || 0);
+        const account = mpesaAccount.value.trim();
+        if(!amount || amount <= 0) return alert('Enter amount to log');
+        const pRef = push(ref(db, `payments/${currentUid}`));
+        await set(pRef, { phone, amount, account, ts: Date.now(), status: 'logged' });
+        showToast('Payment logged');
+        logActivity(`Payment logged: Ksh ${amount}`);
+        awardPoints(4, 'Logged payment');
+      });
+
+      // ===== Photo upload
+      choosePhotoBtn.addEventListener('click', ()=> photoInput.click());
+      photoInput.addEventListener('change', async (e) => {
+        const file = e.target.files && e.target.files[0];
+        if(!file) return;
+        if(!currentUid) return alert('Not signed in');
+        const path = `members/${currentUid}/photo_${Date.now()}`;
+        const sRef = storageRef(storage, path);
+        try{
+          await uploadBytes(sRef, file);
+          const url = await getDownloadURL(sRef);
+          await set(ref(db, `members/${currentUid}/photoURL`), url);
+          showToast('Photo uploaded');
+          awardPoints(2, 'Uploaded profile photo');
+        }catch(err){ console.error(err); alert('Photo upload failed'); }
+      });
+
+      // ===== Save profile quick (right side)
+      saveProfileBtn.addEventListener('click', async ()=>{
+        if(!currentUid) return alert('Not signed in');
+        const payload = {
+          name: document.getElementById('profile_fullName')?.value || miniName.textContent || '',
+          phone: document.getElementById('profile_phone')?.value || '',
+          id: document.getElementById('profile_id')?.value || '',
+          yearJoined: document.getElementById('profile_yearJoined')?.value || '',
+          dob: document.getElementById('profile_dob')?.value || '',
+          status: 'Active'
+        };
+        await update(ref(db, `members/${currentUid}/profile`), payload);
+        showToast('Profile saved');
+        awardPoints(3, 'Updated profile');
+      });
+
+      // ===== Save profile from menu (Update Profile)
+      saveProfileFormBtn.addEventListener('click', async ()=>{
+        if(!currentUid) return alert('Not signed in');
+        const payload = {
+          name: document.getElementById('profile_fullName')?.value || '',
+          phone: document.getElementById('profile_phone')?.value || '',
+          id: document.getElementById('profile_id')?.value || '',
+          yearJoined: document.getElementById('profile_yearJoined')?.value || '',
+          dob: document.getElementById('profile_dob')?.value || '',
+          memberNo: document.getElementById('profile_memberNo')?.value || '',
+          email: document.getElementById('profile_email')?.value || '',
+          status: 'Active'
+        };
+        // use update to avoid overwriting unexpected children
+        await update(ref(db, `members/${currentUid}/profile`), payload);
+        showToast('Profile updated');
+        awardPoints(3, 'Updated profile (form)');
+      });
+      cancelProfileBtn.addEventListener('click', ()=>{ profileSection.classList.add('hidden-section'); profileSection.classList.remove('visible-section'); });
+
+      // ===== Loans applications list and status update (members/{uid}/loans/applications)
+      onValue(ref(db, `members/${currentUid}/loans/applications`), snap => {
+        const area = document.getElementById('loansListArea');
+        const areaFull = document.getElementById('loansListFullInner');
+        area.innerHTML = ''; areaFull.innerHTML = '';
+        if(!snap.exists()){ area.innerHTML = '<div class="muted">No applications found</div>'; return; }
+        const apps = snap.val();
+        Object.entries(apps).forEach(([id, app])=>{
+          const short = document.createElement('div');
+          short.style.padding='8px'; short.style.borderBottom='1px solid #eef6ee';
+          short.innerHTML = `<div style="display:flex;justify-content:space-between"><div><strong>${app.memberName || app.name || '(Applicant)'}</strong><div class="muted">Amount: ${formatKsh(app.amountFigures || app.amount || 0)} • Status: ${app.status||'Pending'}</div></div><div><small>${new Date(app.appliedAt || app.appliedAt || 0).toLocaleString()}</small></div></div>`;
+          area.appendChild(short);
+
+          const fullEntry = document.createElement('div');
+          fullEntry.style.padding='8px'; fullEntry.style.borderBottom='1px solid #eef6ee';
+          fullEntry.innerHTML = `
+            <div style="display:flex;justify-content:space-between;gap:12px;align-items:center">
+              <div style="flex:1">
+                <div style="font-weight:700">${app.memberName || app.name || '(Applicant)'}</div>
+                <div class="muted" style="font-size:0.9rem">Amount: ${formatKsh(app.amountFigures || app.amount || 0)} • Applied: ${new Date(app.appliedAt || 0).toLocaleString()}</div>
+                <div style="margin-top:6px">${safeText(app.purpose||'')}</div>
+              </div>
+              <div style="min-width:220px;display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+                <select class="status-select" data-app-id="${id}">
+                  <option ${app.status==='Pending'?'selected':''}>Pending</option>
+                  <option ${app.status==='Approved'?'selected':''}>Approved</option>
+                  <option ${app.status==='Disbursed'?'selected':''}>Disbursed</option>
+                  <option ${app.status==='Paid'?'selected':''}>Paid</option>
+                  <option ${app.status==='Rejected'?'selected':''}>Rejected</option>
+                </select>
+                <small class="muted">Change status (updates RTDB)</small>
+              </div>
+            </div>
+          `;
+          areaFull.appendChild(fullEntry);
+        });
+
+        // attach change listeners (use update to only change status field)
+        document.querySelectorAll('.status-select').forEach(sel=>{
+          sel.addEventListener('change', async (e)=>{
+            const appId = sel.dataset.appId;
+            const newStatus = sel.value;
+            try{
+              await update(ref(db, `members/${currentUid}/loans/applications/${appId}`), { status: newStatus });
+              showToast('Status updated');
+              logActivity(`Application ${appId} status -> ${newStatus}`);
+              awardPoints(3, 'Updated application status');
+            }catch(err){ console.error(err); alert('Failed to update status'); }
+          });
+        });
+      });
+
+      // ===== Account statement PDF builder (includes eye logo + contact)
+      async function buildAccountStatementPdf(){
+        if(!currentUid) return alert('Not signed in');
+        const snapMember = await get(ref(db, `members/${currentUid}`));
+        const snapshotMonthly = await get(ref(db, `members/${currentUid}/savings/monthly`));
+        const snapshotWeekly = await get(ref(db, `members/${currentUid}/savings/weekly`));
+        const loansSnap = await get(ref(db, `loans/${currentUid}`));
+        const sharesSnap = await get(ref(db, `members/${currentUid}/shares`));
+
+        const doc = new jsPDF({unit:'pt', format:'a4'});
+        let left = 36, y = 40;
+        // header
+        doc.setFillColor(46,125,50); doc.rect(0,0,595,56,'F');
+        doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(16);
+        doc.setFontSize(20); doc.text('👁️', left, 38);
+        doc.setFontSize(14); doc.text('Visionary Youth Group', 80, 32);
+        doc.setFontSize(9); doc.text('Tel: 0741453336 | email: visionaryyouthgroup32@gmail.com | Nairobi', 80, 46);
+
+        doc.setTextColor(0,0,0);
+        y = 90;
+        const profile = snapMember.exists() && snapMember.val().profile ? snapMember.val().profile : (snapMember.exists()? snapMember.val().profile || snapMember.val() : {});
+        doc.setFontSize(10); doc.setFont('helvetica','normal');
+        doc.text(`Member: ${profile.name || profile.fullName || topEmail.textContent}`, left, y); y+=12;
+        doc.text(`Email: ${topEmail.textContent}`, left, y); y+=12;
+        doc.text(`Date: ${new Date().toLocaleDateString()}`, left, y); y+=18;
+
+        function calcSnap(snap){ if(!snap.exists()) return 0; const val = snap.val(); if(typeof val === 'number' || typeof val === 'string') return Number(val)||0; let total = 0; Object.values(val).forEach(child=>{ if(child && typeof child === 'object' && ('amount' in child)) total += Number(child.amount||0); else if(typeof child === 'number') total += child; }); return total; }
+        const monthly = calcSnap(snapshotMonthly);
+        const weekly = calcSnap(snapshotWeekly);
+        const shares = sharesSnap.exists()? (sharesSnap.val().total || sharesSnap.val() || 0) : 0;
+        const dividends = sharesSnap.exists()? (sharesSnap.val().dividends || 0) : 0;
+
+        let totalLoans = 0, unpaid = 0, appsList = [];
+        if(loansSnap.exists()){
+          const loansObj = loansSnap.val();
+          if(loansObj.summary){
+            totalLoans = loansObj.summary.total || 0; unpaid = loansObj.summary.unpaid || 0;
+          } else {
+            Object.values(loansObj).forEach(v=>{
+              if(v && typeof v === 'object' && (v.amountFigures || v.amount)) { totalLoans += Number(v.amountFigures||v.amount||0); if((v.status||'').toLowerCase() !== 'paid') unpaid += Number(v.amountFigures||v.amount||0); appsList.push(v); }
+            });
+          }
+        }
+
+        doc.setFont('helvetica','bold'); doc.text('Financial Summary', left, y); y+=14;
+        doc.setFont('helvetica','normal');
+        doc.text(`Weekly Savings: ${formatKsh(weekly)}`, left, y); y+=12;
+        doc.text(`Monthly Savings: ${formatKsh(monthly)}`, left, y); y+=12;
+        doc.text(`Shares: ${formatKsh(shares)}`, left, y); y+=12;
+        doc.text(`Dividends: ${formatKsh(dividends)}`, left, y); y+=12;
+        doc.text(`Total Loans: ${formatKsh(totalLoans)}`, left, y); y+=12;
+        doc.text(`Unpaid Balances: ${formatKsh(unpaid)}`, left, y); y+=18;
+
+        if(appsList.length){
+          doc.setFont('helvetica','bold'); doc.text('Loan Applications (recent)', left, y); y += 14;
+          doc.setFont('helvetica','normal');
+          appsList.slice(-10).forEach(app=>{
+            const line = `${app.memberName || app.name || ''} — ${formatKsh(app.amountFigures || app.amount || 0)} — ${app.status || 'Pending'}`;
+            const wr = doc.splitTextToSize(line, 500); doc.text(wr,left,y); y += wr.length*12;
+            if(y > 720){ doc.addPage(); y=40; }
+          });
+          y+=8;
+        }
+        if(y > 700){ doc.addPage(); y=40; }
+        doc.line(left, y+20, left+240, y+20); doc.text('Prepared by / Signature', left, y+34);
+        return doc;
+      }
+
+      document.getElementById('downloadStatementTop')?.addEventListener('click', async ()=>{ const d = await buildAccountStatementPdf(); if(d) d.save(`Account_Statement_${(topEmail.textContent||'member').replace(/[^\w@.-]/g,'')}.pdf`); awardPoints(1, 'Downloaded account statement'); });
+      document.getElementById('downloadStatement')?.addEventListener('click', async ()=>{ const d = await buildAccountStatementPdf(); if(d) d.save(`Account_Statement_${(topEmail.textContent||'member').replace(/[^\w@.-]/g,'')}.pdf`); awardPoints(2, 'Downloaded account statement'); });
+
+      // ===== Load Member Loans (My Loans, Self Serve)
+      async function loadMemberLoans(){
+        if(!currentUid) { myLoansList.innerHTML = '<div class="muted">Not signed in</div>'; return; }
+        const snap = await get(ref(db, `loans/${currentUid}`));
+        myLoansList.innerHTML = '';
+        selfServeList.innerHTML = '';
+        if(!snap.exists()){ myLoansList.innerHTML = '<div class="muted">No loans available</div>'; selfServeList.innerHTML = '<div class="muted">No loans available</div>'; return; }
+        const loansObj = snap.val();
+        let loansArray = [];
+        if(typeof loansObj === 'object' && !Array.isArray(loansObj)) loansArray = Object.entries(loansObj).map(([id,l])=>({id, ...l}));
+        else if(Array.isArray(loansObj)) loansArray = loansObj;
+        else loansArray = [{id:'current', ...loansObj}];
+        loansArray.sort((a,b)=> (new Date(b.loanDate||0) - new Date(a.loanDate||0)));
+
+        loansArray.forEach(loan=>{
+          const div = document.createElement('div');
+          div.className = 'loan-item';
+          div.dataset.loanId = loan.id;
+          div.dataset.loanRow = loan.id;
+          const outstanding = Number(loan.outstanding || loan.remaining || loan.balance || 0);
+          div.innerHTML = `
+            <div class="left">
+              <div style="font-weight:700">${safeText(loan.product || loan.title || 'Loan')}</div>
+              <div class="muted">${safeText(loan.loanDate ? new Date(loan.loanDate).toLocaleDateString() : '-') } • Amount: ${formatKsh(loan.amount||loan.amountFigures||0)}</div>
+              <div style="margin-top:6px">${safeText(loan.purpose||'')}</div>
+            </div>
+            <div class="right">
+              <div style="font-weight:700">${outstanding>0? formatKsh(outstanding) : 'PAID'}</div>
+              <div style="margin-top:8px">
+                <button class="btn secondary btn-download-loan" data-loan-id="${loan.id}"><i class="fas fa-file-pdf"></i> Statement</button>
+                <button class="btn btn-clear-cert" data-loan-id="${loan.id}"><i class="fas fa-certificate"></i> Clearance</button>
+              </div>
+            </div>
+          `;
+          myLoansList.appendChild(div);
+
+          // self serve entry cloned
+          const sdiv = div.cloneNode(true);
+          selfServeList.appendChild(sdiv);
+        });
+
+        // hide or disable clearance buttons when outstanding > 0
+        document.querySelectorAll('.btn-clear-cert').forEach(async (btn) => {
+          const id = btn.dataset.loanId;
+          const snapLoan = await get(ref(db, `loans/${currentUid}/${id}`));
+          const loan = snapLoan.exists()? snapLoan.val() : null;
+          const outstanding = Number(loan?.outstanding || loan?.remaining || loan?.balance || 0);
+          if(outstanding > 0){ btn.style.opacity = '0.6'; btn.title = 'Clearance available after full repayment'; }
+        });
+      }
+
+      // hook refresh and apply
+      refreshLoansBtn.addEventListener('click', ()=> loadMemberLoans());
+      document.getElementById('applyLoanBtn')?.addEventListener('click', ()=> { window.location.href = 'admin.html'; });
+      document.getElementById('applyLoanBtnTop')?.addEventListener('click', ()=> { window.location.href = 'admin.html'; });
+
+      selfDownloadAllLoanStatements?.addEventListener('click', async ()=>{
+        if(!currentUid) return alert('Not signed in');
+        const snap = await get(ref(db, `loans/${currentUid}`));
+        if(!snap.exists()) return alert('No loans found');
+        const loansObj = snap.val();
+        const loansArray = Object.entries(loansObj).map(([id,l])=>({id, ...l}));
+        for(const loan of loansArray){
+          const d = await buildLoanStatementPdfForLoan(loan.id);
+          if(d) d.save(`LoanStatement_${loan.id}.pdf`);
+        }
+        awardPoints(5, 'Downloaded all loan statements');
+      });
+
+      // ===== Build Loan Statement PDF for loanId =====
+      async function buildLoanStatementPdfForLoan(loanId){
+        if(!currentUid) return alert('Not signed in');
+        const snapLoan = await get(ref(db, `loans/${currentUid}/${loanId}`));
+        if(!snapLoan.exists()) return alert('Loan not found');
+        const loan = snapLoan.val();
+
+        // attempt to fetch payments under loans/{uid}/{loanId}/payments or transactions/{uid}
+        let payments = {};
+        const paymentsSnap = await get(ref(db, `loans/${currentUid}/${loanId}/payments`));
+        if(paymentsSnap.exists()) payments = paymentsSnap.val();
+        else {
+          // fallback: look for transactions with description containing loanId (best-effort)
+          const txSnap = await get(ref(db, `transactions/${currentUid}`));
+          if(txSnap.exists()){
+            Object.entries(txSnap.val()).forEach(([k,v])=>{
+              const desc = (v.description||'').toString();
+              if(desc.includes(loanId)) payments[k] = v;
+            });
+          }
+        }
+
+        const doc = new jsPDF({unit:'pt', format:'a4'});
+        let left = 36, y = 40;
+        // header
+        doc.setFillColor(46,125,50); doc.rect(0,0,595,56,'F');
+        doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(16);
+        doc.setFontSize(20); doc.text('👁️', left, 38);
+        doc.setFontSize(14); doc.text('Visionary Youth Group', 80, 32);
+        doc.setFontSize(9); doc.text('Tel: 0741453336 | email: visionaryyouthgroup32@gmail.com | Nairobi', 80, 46);
+
+        doc.setTextColor(0,0,0);
+        y = 90;
+        doc.setFontSize(12); doc.setFont('helvetica','bold');
+        doc.text('Loan Statement', left, y); y += 18;
+        doc.setFont('helvetica','normal'); doc.setFontSize(10);
+        doc.text(`Loan ID: ${loanId}`, left, y); y+=12;
+        doc.text(`Member: ${loan.memberName || loan.name || topEmail.textContent}`, left, y); y+=12;
+        doc.text(`Amount: ${formatKsh(loan.amount || loan.amountFigures || 0)}   Interest: ${safeText(loan.interest || loan.interestRate || '-')}`, left, y); y+=12;
+        doc.text(`Installment: ${formatKsh(loan.installment || loan.monthlyInstallment || 0)}   Due Date: ${safeText(loan.dueDate || '-')}`, left, y); y+=14;
+
+        doc.setFont('helvetica','bold'); doc.text('Payment History', left, y); y+=12;
+        doc.setFont('helvetica','normal');
+
+        let rows = [];
+        if(payments && typeof payments === 'object') rows = Object.entries(payments).map(([id,p]) => ({ id, ...(p||{}) })).sort((a,b) => (b.ts||0) - (a.ts||0));
+
+        if(!rows.length){
+          doc.text('No recorded payments for this loan.', left, y); y+=14;
+        } else {
+          for(const p of rows){
+            const line = `${new Date(p.ts || p.date || Date.now()).toLocaleDateString()} - ${safeText(p.note||p.description||'Payment')} - ${formatKsh(p.amount||p.credit||p.paid||0)} - Bal: ${formatKsh(p.balance||p.remaining||p.outstanding||0)}`;
+            const wrap = doc.splitTextToSize(line, 520);
+            doc.text(wrap, left, y); y += wrap.length * 12;
+            if(y > 740){ doc.addPage(); y = 40; }
+          }
+        }
+
+        if(y > 700){ doc.addPage(); y=40; }
+        doc.setFont('helvetica','bold'); doc.text('Summary', left, y+8); doc.setFont('helvetica','normal');
+        doc.text(`Outstanding: ${formatKsh(loan.outstanding || loan.remaining || loan.balance || 0)}`, left, y+26);
+        doc.text(`Status: ${loan.status || loan.stage || 'Pending'}`, left+220, y+26);
+
+        // attach uploaded docs list (if any) - include URLs
+        const docsSnap = await get(ref(db, `loans/${currentUid}/${loanId}/documents`));
+        if(docsSnap.exists()){
+          y += 48;
+          doc.setFont('helvetica','bold'); doc.text('Attached Documents', left, y); y+=14;
+          doc.setFont('helvetica','normal'); 
+          Object.values(docsSnap.val()).forEach(d=>{
+            const line = `${safeText(d.name || d.filename || 'document')} — ${safeText(d.url || d.downloadUrl || '')}`;
+            const wrap = doc.splitTextToSize(line, 520);
+            doc.text(wrap, left, y); y += wrap.length * 10;
+            if(y > 740){ doc.addPage(); y = 40; }
+          });
+        }
+
+        doc.line(left, y+20, left+240, y+20); doc.text('Prepared by / Signature', left, y+34);
+        return doc;
+      }
+
+      // ===== Build Clearance Certificate PDF =====
+      async function buildClearanceCertificatePdf(loanId, loanData){
+        if(!currentUid) return alert('Not signed in');
+        const snapLoan = await get(ref(db, `loans/${currentUid}/${loanId}`));
+        const loan = loanData || (snapLoan.exists()? snapLoan.val() : null);
+        if(!loan) return alert('Loan not found');
+
+        const doc = new jsPDF({unit:'pt', format:'a4'});
+        doc.setFillColor(46,125,50); doc.rect(0,0,595,80,'F');
+        doc.setTextColor(255,255,255); doc.setFont('helvetica','bold');
+        doc.setFontSize(22); doc.text('👁️', 36, 48);
+        doc.setFontSize(16); doc.text('Visionary Youth Group', 88, 40);
+        doc.setFontSize(10); doc.text('Tel: 0741453336 | visionaryyouthgroup32@gmail.com | Nairobi', 88, 56);
+
+        doc.setTextColor(0,0,0);
+        doc.setFontSize(18); doc.setFont('helvetica','bold');
+        doc.text('LOAN CLEARANCE CERTIFICATE', 300, 120, { align: 'center' });
+
+        doc.setFontSize(11); doc.setFont('helvetica','normal');
+        let y = 160;
+        doc.text(`Certificate No: CLE-${loanId}`, 36, y); y+=18;
+        doc.text(`This is to certify that ${loan.memberName || loan.name || ''} (ID: ${loan.idNumber || loan.identity || loan.memberId || '—'}) has fully repaid the loan with Loan ID ${loanId}.`, 36, y, {maxWidth:520}); y+=30;
+        doc.text(`Loan Amount: ${formatKsh(loan.amount || loan.amountFigures || 0)}`, 36, y); y+=18;
+        doc.text(`Date of Clearance: ${new Date().toLocaleDateString()}`, 36, y); y+=32;
+
+        doc.setTextColor(200,200,200);
+        doc.setFontSize(60);
+        doc.text('PAID IN FULL', 300, 330, { align: 'center', angle: -20 });
+        doc.setTextColor(0,0,0);
+
+        doc.setFontSize(12);
+        doc.text('Authorized Signatory:', 36, 430);
+        doc.line(36, 442, 260, 442);
+        doc.text('Name', 36, 458);
+        doc.text('Title: Chairperson', 36, 474);
+
+        return doc;
+      }
+
+      // initial activity
+      await logActivity('Dashboard loaded');
+    }); // end onAuthStateChanged
+
+    // Logout
+    document.getElementById('menuLogout')?.addEventListener('click', ()=> { try{ signOut(auth); }catch(e){} window.location.href='index.html'; });
+
+    // quick nav
+    document.getElementById('quickStatement')?.addEventListener('click', async ()=> { const d = await (typeof buildAccountStatementPdf === 'function' ? buildAccountStatementPdf() : null); if(d) { d.save(`Account_Statement_${(topEmail.textContent||'member').replace(/[^\w@.-]/g,'')}.pdf`); } });
+    document.getElementById('applyLoanBtnTop')?.addEventListener('click', ()=> { window.location.href = 'admin.html'; });
+  </script>
+</body>
 </html>

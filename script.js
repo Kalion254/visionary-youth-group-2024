@@ -1,55 +1,57 @@
-// Replace these dummy values with your actual Firebase config
-const firebaseConfig = {
-    apiKey: "DUMMY-API-KEY",
-    authDomain: "dummy-project.firebaseapp.com",
-    projectId: "dummy-project",
-    storageBucket: "dummy-project.appspot.com",
-    messagingSenderId: "1234567890",
-    appId: "1:1234567890:web:abcdef123456"
-};
+<!-- Firebase App (the core Firebase SDK) -->
+<script type="module">
+  // Import the functions you need from the SDKs
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+  import { getFirestore, setDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-// Initialize Firebase
-const app = firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
+  // Your Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
+    authDomain: "visionary-youth-grou-2024.firebaseapp.com",
+    projectId: "visionary-youth-grou-2024",
+    storageBucket: "visionary-youth-grou-2024.firebasestorage.app",
+    messagingSenderId: "372978592717",
+    appId: "1:372978592717:web:1c15aec728ee5f854f3284",
+    measurementId: "G-QP1RBT2ZCP"
+  };
 
-// Signup
-const signupForm = document.getElementById("signup-form");
-if (signupForm) {
-    signupForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const email = document.getElementById("signup-email").value;
-        const password = document.getElementById("signup-password").value;
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth();
+  const db = getFirestore(app);
 
-        auth.createUserWithEmailAndPassword(email, password)
-            .then(() => {
-                alert("Account created successfully!");
-                window.location.href = "dashboard.html";
-            })
-            .catch(err => alert(err.message));
-    });
-}
+  // Signup function after successful M-Pesa payment
+  window.registerFirebaseUser = async (signupInfo) => {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, signupInfo.email, signupInfo.password);
+      const user = userCredential.user;
 
-// Login
-const loginForm = document.getElementById("login-form");
-if (loginForm) {
-    loginForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const email = document.getElementById("login-email").value;
-        const password = document.getElementById("login-password").value;
+      // Store additional info in Firestore
+      await setDoc(doc(db, "members", user.uid), {
+        name: signupInfo.name,
+        phone: signupInfo.phone,
+        idNumber: signupInfo.id,
+        origin: signupInfo.origin,
+        email: signupInfo.email,
+        createdAt: serverTimestamp()
+      });
 
-        auth.signInWithEmailAndPassword(email, password)
-            .then(() => {
-                alert("Login successful!");
-                window.location.href = "dashboard.html";
-            })
-            .catch(err => alert(err.message));
-    });
-}
+      alert(`Welcome ${signupInfo.name}, your account has been created!`);
+    } catch (err) {
+      console.error(err);
+      alert("Firebase signup error: " + err.message);
+    }
+  };
 
-// Logout
-function logout() {
-    auth.signOut().then(() => {
-        alert("Logged out!");
-        window.location.href = "login.html";
-    });
-}
+  // Login function
+  window.loginFirebaseUser = async (email, password) => {
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      alert(`Welcome back, ${userCredential.user.email}`);
+    } catch (err) {
+      console.error(err);
+      alert("Login error: " + err.message);
+    }
+  };
+</script>

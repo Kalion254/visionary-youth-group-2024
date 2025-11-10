@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Visionary Youth Group – Member Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: #f1f3f6;
+      color: #333;
+    }
+    header {
+      background: #005826;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    header h1 {
+      margin: 0;
+      font-size: 26px;
+      font-weight: 600;
+    }
+    header p {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .portal-container {
+      max-width: 420px;
+      margin: 50px auto;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    .tabs {
+      display: flex;
+      background: #e6e6e6;
+    }
+    .tabs button {
+      flex: 1;
+      padding: 12px;
+      background: transparent;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 15px;
+      color: #333;
+      transition: 0.3s;
+    }
+    .tabs button.active {
+      background: #005826;
+      color: #fff;
+    }
+    form {
+      display: none;
+      padding: 25px;
+    }
+    form.active {
+      display: block;
+    }
+    label {
+      display: block;
+      margin-top: 12px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    input[type="checkbox"] {
+      width: auto;
+      margin-right: 8px;
+    }
+    button.submit-btn {
+      width: 100%;
+      margin-top: 20px;
+      padding: 12px;
+      background: #005826;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button.submit-btn:hover {
+      background: #00793a;
+    }
+    .extra {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 13px;
+    }
+    .extra a {
+      color: #005826;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .info {
+      background: #fff;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+    .info h3 {
+      color: #005826;
+      margin-bottom: 10px;
+    }
+    .images {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 15px;
+      width: 90%;
+      margin: 30px auto;
+    }
+    .images img {
+      width: 100%;
+      border-radius: 8px;
+      height: 180px;
+      object-fit: cover;
+    }
+    footer {
+      text-align: center;
+      background: #005826;
+      color: #fff;
+      padding: 16px;
+      margin-top: 40px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Visionary Youth Group Portal</h1>
+    <p>Empowering Youth Through Investment & Inclusivity</p>
+  </header>
+
+  <div class="portal-container">
+    <div class="tabs">
+      <button id="tabSignUp" class="active">Sign Up</button>
+      <button id="tabLogin">Login</button>
+    </div>
+
+    <!-- Sign Up -->
+    <form id="signupForm" class="active">
+      <label>Full Name</label>
+      <input type="text" id="fullName" required>
+
+      <label>ID Number</label>
+      <input type="text" id="idNumber" required>
+
+      <label>Member Number</label>
+      <input type="text" id="memberNumber" required>
+
+      <label>Type of Member</label>
+      <select id="memberType" required>
+        <option value="">Select...</option>
+        <option value="Mean">Mean Member</option>
+        <option value="Ordinary">Ordinary Member</option>
+      </select>
+
+      <label>Origin</label>
+      <input type="text" id="origin" required>
+
+      <label>Ethnicity</label>
+      <input type="text" id="ethnicity" required>
+
+      <label>Email</label>
+      <input type="email" id="email" required>
+
+      <label>Phone Number</label>
+      <input type="tel" id="phone" required>
+
+      <label>Create Password</label>
+      <input type="password" id="password" required>
+
+      <label>Confirm Password</label>
+      <input type="password" id="confirmPassword" required>
+
+      <label><input type="checkbox" id="terms" required> I agree to the Terms & Conditions</label>
+
+      <button type="submit" class="submit-btn">Create Account</button>
+    </form>
+
+    <!-- Login -->
+    <form id="loginForm">
+      <label>Email</label>
+      <input type="email" id="loginEmail" required>
+
+      <label>Password</label>
+      <input type="password" id="loginPassword" required>
+
+      <button type="submit" class="submit-btn">Login</button>
+
+      <div class="extra">
+        <a href="#" id="resetLink">Forgot Password?</a>
+      </div>
+    </form>
+  </div>
+
+  <div class="info">
+    <h3>About Our Membership</h3>
+    <p><strong>Mean Members</strong> are the core investors responsible for governance, funding initiatives, and decision-making. They enjoy full privileges and voting rights.</p>
+    <p><strong>Ordinary Members</strong> are active contributors in savings, capacity building, and projects. They access benefits and financial education opportunities.</p>
+  </div>
+
+  <div class="images">
+    <img src="https://images.unsplash.com/photo-1522205408450-add114ad53fe?q=80&w=1200" alt="Investment meeting">
+    <img src="https://images.unsplash.com/photo-1605902711622-cfb43c4437b5?q=80&w=1200" alt="Youth investments">
+    <img src="https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?q=80&w=1200" alt="Green projects">
+  </div>
+
+  <footer>
+    &copy; 2025 Visionary Youth Group | Inspired by SEKU Design | All Rights Reserved
+  </footer>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+    // ✅ Correct Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
+      authDomain: "visionary-youth-grou-2024.firebaseapp.com",
+      projectId: "visionary-youth-grou-2024",
+      storageBucket: "visionary-youth-grou-2024.appspot.com",
+      messagingSenderId: "372978592717",
+      appId: "1:372978592717:web:1c15aec728ee5f854f3284",
+      measurementId: "G-QP1RBT2ZCP"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    // --- Tabs logic ---
+    const tabSignUp = document.getElementById('tabSignUp');
+    const tabLogin = document.getElementById('tabLogin');
+    const signupForm = document.getElementById('signupForm');
+    const loginForm = document.getElementById('loginForm');
+
+    tabSignUp.onclick = () => {
+      tabSignUp.classList.add('active');
+      tabLogin.classList.remove('active');
+      signupForm.classList.add('active');
+      loginForm.classList.remove('active');
+    };
+    tabLogin.onclick = () => {
+      tabLogin.classList.add('active');
+      tabSignUp.classList.remove('active');
+      loginForm.classList.add('active');
+      signupForm.classList.remove('active');
+    };
+
+    // --- Sign Up ---
+    signupForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const fullName = signupForm["fullName"].value.trim();
+      const idNo = signupForm["idNumber"].value.trim();
+      const memberNo = signupForm["memberNumber"].value.trim();
+      const memberType = signupForm["memberType"].value;
+      const origin = signupForm["origin"].value.trim();
+      const ethnicity = signupForm["ethnicity"].value.trim();
+      const email = signupForm["email"].value.trim();
+      const phone = signupForm["phone"].value.trim();
+      const password = signupForm["password"].value.trim();
+      const confirm = signupForm["confirmPassword"].value.trim();
+      const terms = signupForm["terms"].checked;
+
+      if (!terms) return alert("Please agree to the terms and conditions.");
+      if (password !== confirm) return alert("Passwords do not match.");
+
+      try {
+        const cred = await createUserWithEmailAndPassword(auth, email, password);
+        const uid = cred.user.uid;
+        await set(ref(db, "members/" + uid), {
+          fullName, idNo, memberNo, memberType, origin, ethnicity, email, phone,
+          createdAt: new Date().toISOString()
+        });
+        alert("Sign-up successful! Redirecting to dashboard...");
+        window.location.href = "dashboard space.html";
+      } catch (err) {
+        alert("Error: " + err.message);
+      }
+    });
+
+    // --- Login ---
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = loginForm["loginEmail"].value.trim();
+      const password = loginForm["loginPassword"].value.trim();
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        alert("Login successful!");
+        window.location.href = "dashboard space.html";
+      } catch (err) {
+        alert("Login failed: " + err.message);
+      }
+    });
+
+    // --- Reset Password ---
+    document.getElementById("resetLink").addEventListener("click", async () => {
+      const email = prompt("Enter your email for password reset:");
+      if (!email) return;
+      try {
+        await sendPasswordResetEmail(auth, email);
+        alert("Password reset link sent to " + email);
+      } catch (err) {
+        alert("Error: " + err.message);
+      }
+    });
+  </script>
+</body>
+</html>
