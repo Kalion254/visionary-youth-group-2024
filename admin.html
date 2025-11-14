@@ -1,614 +1,1023 @@
+
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Admin Loan Application — Visionary Youth Group</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <title>Visionary Youth Group — Loan Application (Admin)</title>
+
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
   <style>
-    :root{--bg:#0f172a;--card:#0b1220;--accent:#06b6d4;--muted:#94a3b8}
-    *{box-sizing:border-box;font-family:'Poppins',system-ui,Segoe UI,Roboto,Arial}
-    body{margin:0;background:linear-gradient(135deg,#071033 0%,#052230 60%), url('') no-repeat center/cover;min-height:100vh;color:#e6eef6}
-    .container{max-width:1100px;margin:40px auto;padding:28px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:16px;box-shadow:0 10px 30px rgba(2,6,23,0.7)}
-    header{display:flex;align-items:center;gap:16px;margin-bottom:18px}
-    header h1{font-size:20px;margin:0}
-    .wizard{display:flex;gap:12px;margin-bottom:18px;flex-wrap:wrap}
-    .step{padding:10px 12px;border-radius:10px;background:rgba(255,255,255,0.03);cursor:pointer}
-    .step.active{background:linear-gradient(90deg,var(--accent),#0ea5a9);color:#04202a;font-weight:700}
-    form{background:transparent;padding:8px}
-    .card{background:var(--card);padding:18px;border-radius:12px;margin-bottom:14px}
-    label{display:block;font-size:13px;margin-bottom:6px;color:var(--muted)}
-    input[type=text],input[type=date],input[type=number],select,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit}
-    .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .actions{display:flex;justify-content:space-between;gap:12px}
-    button{background:var(--accent);border:none;padding:10px 14px;border-radius:10px;color:#04202a;font-weight:700;cursor:pointer}
-    button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
-    .small{font-size:13px;color:var(--muted)}
-    .file-list{margin-top:8px;font-size:13px}
-    .guarantors-list, .parents-list{margin-top:8px}
-    .add-btn{background:transparent;border:1px dashed rgba(255,255,255,0.06);padding:8px;border-radius:8px;color:var(--muted);cursor:pointer}
-    .review{white-space:pre-wrap;font-family:monospace;background:rgba(0,0,0,0.15);padding:12px;border-radius:8px}
-    footer{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
-    .note{font-size:13px;color:var(--muted)}
-    @media (max-width:720px){.two{grid-template-columns:1fr}}
+    :root{
+      --bg-start:#062a2a;
+      --bg-end:#0a5a39;
+      --card:#ffffff;
+      --accent:#2e7d32;
+      --muted:#6b7280;
+      --gold:#ffcc00;
+      --glass: rgba(255,255,255,0.06);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:'Poppins',sans-serif}
+    body{
+      background: linear-gradient(135deg,var(--bg-start),var(--bg-end));
+      color:#0d1b16;
+      -webkit-font-smoothing:antialiased;
+      padding:28px;
+    }
+
+    .container{
+      max-width:980px;margin:28px auto;background:linear-gradient(180deg,rgba(255,255,255,0.98),#fff);border-radius:12px;padding:20px;
+      box-shadow:0 12px 40px rgba(0,0,0,0.28);
+    }
+
+    header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+    .logo{
+      width:56px;height:56px;border-radius:10px;background:#fff;display:flex;align-items:center;justify-content:center;
+      box-shadow:0 6px 18px rgba(0,0,0,0.12)
+    }
+    .logo i{color:var(--accent);font-size:22px}
+    header h1{font-size:1.25rem;margin:0;color:#0b3b2b}
+    header p{margin:0;color:var(--muted);font-size:0.9rem}
+
+    /* wizard */
+    .wizard{
+      margin-top:12px;
+    }
+    .steps{
+      display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;
+    }
+    .step {
+      flex:1;min-width:120px;padding:8px 10px;border-radius:8px;background:#f6fff6;border:1px solid rgba(0,0,0,0.04);
+      display:flex;flex-direction:column;align-items:flex-start;gap:6px;
+    }
+    .step.active{background:linear-gradient(90deg,#e6f8ec,#f7fff7);box-shadow:0 6px 20px rgba(6,50,20,0.04)}
+    .step strong{font-size:0.95rem;color:var(--accent)}
+    .progress{height:8px;background:#e9f7ef;border-radius:8px;width:100%;overflow:hidden}
+    .progress .bar{height:100%;background:linear-gradient(90deg,var(--accent),#0b8a46);width:0%}
+
+    /* form styles */
+    form{background:transparent;padding:8px 0}
+    .row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+    .col{flex:1;min-width:160px}
+    label{display:block;font-size:0.85rem;color:var(--muted);margin-bottom:6px}
+    input[type="text"], input[type="date"], input[type="number"], select, textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #e6efe6;font-size:0.95rem}
+    textarea{min-height:100px;resize:vertical}
+    .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+    .btn{background:var(--accent);color:#fff;padding:10px 14px;border:none;border-radius:8px;cursor:pointer;font-weight:700}
+    .btn.ghost{background:#fff;border:1px solid #e6efe6;color:var(--accent)}
+    .btn.secondary{background:#fff;color:var(--accent);border:1px solid #e6efe6}
+    .small{font-size:0.85rem;color:var(--muted)}
+
+    /* file previews */
+    .file-preview{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+    .file-preview img{width:96px;height:72px;object-fit:cover;border-radius:6px;border:1px solid #e6efe6}
+
+    /* guarantors list */
+    .guarantor-item{border:1px dashed #e6efe6;padding:10px;border-radius:8px;margin-bottom:8px;background:#fbfff9}
+
+    /* review box */
+    .review{background:#fbfff9;padding:12px;border-radius:8px;border:1px solid #e6efe6}
+    .review pre{white-space:pre-wrap;font-family:inherit;font-size:0.9rem;color:#123}
+
+    /* responsive */
+    @media (max-width:720px){
+      .row{flex-direction:column}
+      .steps{gap:6px}
+    }
+
+    /* footer note */
+    .notes{margin-top:12px;font-size:0.85rem;color:var(--muted)}
   </style>
 </head>
 <body>
-  <div class="container">
+
+  <div class="container" role="main">
     <header>
-      <div style="width:56px;height:56px;border-radius:12px;background:linear-gradient(90deg,#06b6d4,#0ea5a9);display:flex;align-items:center;justify-content:center;font-weight:700;color:#021018">VYG</div>
+      <div class="logo" aria-hidden>
+        <!-- eye logo -->
+        <i class="fas fa-eye"></i>
+      </div>
       <div>
-        <h1>Loan application (Admin) — Wizard</h1>
-        <div class="small">Fill the tabs, verify IDs against members and generate a downloadable PDF on submit.</div>
+        <h1>Visionary Youth Group — Loan Application</h1>
+        <p>Integrity | Commitment | Entrepreneurial Nature — Tel: 0741453336 • visionaryyouthgroup32@gmail.com • Nairobi</p>
       </div>
     </header>
 
-    <nav class="wizard" id="wizardNav"></nav>
-
-    <form id="loanForm" class="card">
-      <!-- STEP PANES -->
-      <div id="stepContainer"></div>
-
-      <div class="actions">
-        <button type="button" id="prevBtn" class="ghost">← Back</button>
-        <div style="display:flex;gap:8px">
-          <button type="button" id="saveDraft">Save draft</button>
-          <button type="button" id="nextBtn">Next →</button>
-        </div>
+    <section class="wizard" aria-label="Loan application wizard">
+      <div class="steps" id="stepsBar">
+        <div class="step active" data-step="1"><strong>1. Personal</strong><div class="small">Name, ID, DOB</div></div>
+        <div class="step" data-step="2"><strong>2. Permanent Residence</strong><div class="small">County / Constituency / Ward</div></div>
+        <div class="step" data-step="3"><strong>3. Residence</strong><div class="small">Nearest school, village</div></div>
+        <div class="step" data-step="4"><strong>4. Education</strong><div class="small">Studies & exam details</div></div>
+        <div class="step" data-step="5"><strong>5. Loan Details</strong><div class="small">Amount, purpose</div></div>
+        <div class="step" data-step="6"><strong>6. Guarantors</strong><div class="small">At least 2</div></div>
+        <div class="step" data-step="7"><strong>7. Parents & Review</strong><div class="small">Final review & submit</div></div>
       </div>
-    </form>
 
-    <footer>
-      <div class="note">Files are uploaded to Firebase Storage and application saved to RTDB. Replace the Firebase config inside the script.</div>
-      <div class="small">Designed for Visionary Youth Group • Admin</div>
-    </footer>
+      <div class="progress" aria-hidden>
+        <div class="bar" id="progressBar" style="width:14%"></div>
+      </div>
+
+      <!-- FORM: Step containers -->
+      <form id="loanWizard" autocomplete="off">
+        <!-- Step 1: Personal -->
+        <div data-step-content="1" class="step-content" style="margin-top:12px">
+          <h3>Personal Information</h3>
+          <div class="row">
+            <div class="col">
+              <label>First name <span class="small">*</span></label>
+              <input id="firstName" type="text" required>
+            </div>
+            <div class="col">
+              <label>Middle name</label>
+              <input id="middleName" type="text">
+            </div>
+            <div class="col">
+              <label>Last name <span class="small">*</span></label>
+              <input id="lastName" type="text" required>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col">
+              <label>ID / Passport number <span class="small">*</span></label>
+              <input id="idNumber" type="text" required>
+            </div>
+            <div class="col">
+              <label>Date of birth <span class="small">*</span></label>
+              <input id="dob" type="date" required>
+            </div>
+            <div class="col">
+              <label>Marital status</label>
+              <select id="maritalStatus">
+                <option>Single</option>
+                <option>Married</option>
+                <option>Divorced</option>
+                <option>Widowed</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col">
+              <label>Telephone <span class="small">*</span></label>
+              <input id="telephone" type="text" placeholder="07XXXXXXXX" required>
+            </div>
+            <div class="col">
+              <label>Gender</label>
+              <select id="gender"><option>Male</option><option>Female</option><option>Other</option></select>
+            </div>
+            <div class="col">
+              <label>Religion</label>
+              <input id="religion" type="text" placeholder="e.g. Christianity">
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col">
+              <label>Upload ID front (required)</label>
+              <input id="idFront" type="file" accept="image/*,application/pdf">
+            </div>
+            <div class="col">
+              <label>Upload ID back (required)</label>
+              <input id="idBack" type="file" accept="image/*,application/pdf">
+            </div>
+            <div class="col">
+              <label>Upload passport photo</label>
+              <input id="passportPhoto" type="file" accept="image/*">
+            </div>
+          </div>
+
+          <div class="file-preview" id="personalPreview"></div>
+
+          <div class="actions">
+            <button type="button" class="btn ghost" id="saveStep1">Save & Continue Later</button>
+            <button type="button" class="btn" data-next>Continue →</button>
+          </div>
+        </div>
+
+        <!-- Step 2: Permanent Residence -->
+        <div data-step-content="2" class="step-content" style="display:none;margin-top:12px">
+          <h3>Permanent Residence</h3>
+
+          <div class="row">
+            <div class="col">
+              <label>P.O. Box</label>
+              <input id="poBox" type="text" placeholder="P.O. Box">
+            </div>
+            <div class="col">
+              <label>Postal code</label>
+              <input id="postalCode" type="text">
+            </div>
+            <div class="col">
+              <label>Town</label>
+              <input id="town" type="text">
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col">
+              <label>County <span class="small">*</span></label>
+              <select id="county" required></select>
+            </div>
+            <div class="col">
+              <label>Constituency <span class="small">*</span></label>
+              <select id="constituency" required></select>
+            </div>
+            <div class="col">
+              <label>Ward <span class="small">*</span></label>
+              <select id="ward" required></select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col">
+              <label>Location</label>
+              <input id="location" type="text">
+            </div>
+            <div class="col">
+              <label>Sub-location</label>
+              <input id="sublocation" type="text">
+            </div>
+            <div class="col">
+              <label>Village</label>
+              <input id="village" type="text">
+            </div>
+          </div>
+
+          <div class="actions">
+            <button type="button" class="btn ghost" data-prev>← Back</button>
+            <button type="button" class="btn" data-next>Continue →</button>
+          </div>
+        </div>
+
+        <!-- Step 3: Residence -->
+        <div data-step-content="3" class="step-content" style="display:none;margin-top:12px">
+          <h3>Residence Details</h3>
+
+          <div class="row">
+            <div class="col">
+              <label>Nearest primary school</label>
+              <input id="nearestSchool" type="text">
+            </div>
+            <div class="col">
+              <label>Village</label>
+              <input id="resVillage" type="text">
+            </div>
+            <div class="col">
+              <label>Street</label>
+              <input id="resStreet" type="text">
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col">
+              <label>Town</label>
+              <input id="resTown" type="text">
+            </div>
+            <div class="col">
+              <label>County</label>
+              <input id="resCounty" type="text">
+            </div>
+            <div class="col">
+              <label>Constituency</label>
+              <input id="resConstituency" type="text">
+            </div>
+          </div>
+
+          <div class="actions">
+            <button type="button" class="btn ghost" data-prev>← Back</button>
+            <button type="button" class="btn" data-next>Continue →</button>
+          </div>
+        </div>
+
+        <!-- Step 4: Education -->
+        <div data-step-content="4" class="step-content" style="display:none;margin-top:12px">
+          <h3>Education</h3>
+          <p class="small">Choose a level and provide at least two entries if applicable.</p>
+
+          <div id="educationList">
+            <!-- dynamic entries -->
+          </div>
+
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button type="button" class="btn ghost" id="addEducation">+ Add Education</button>
+          </div>
+
+          <div class="actions">
+            <button type="button" class="btn ghost" data-prev>← Back</button>
+            <button type="button" class="btn" data-next>Continue →</button>
+          </div>
+        </div>
+
+        <!-- Step 5: Loan Details -->
+        <div data-step-content="5" class="step-content" style="display:none;margin-top:12px">
+          <h3>Loan Details</h3>
+
+          <div class="row">
+            <div class="col">
+              <label>Amount requested (Ksh) <span class="small">*</span></label>
+              <input id="loanAmount" type="number" required>
+            </div>
+            <div class="col">
+              <label>Purpose of loan <span class="small">*</span></label>
+              <input id="loanPurpose" type="text" required>
+            </div>
+            <div class="col">
+              <label>Installment</label>
+              <input id="loanInstallment" type="number">
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col">
+              <label>Date of first installment</label>
+              <input id="firstInstallment" type="date">
+            </div>
+            <div class="col">
+              <label>Date of last installment</label>
+              <input id="lastInstallment" type="date">
+            </div>
+            <div class="col">
+              <label>Upload supporting document(s)</label>
+              <input id="loanSupportDocs" type="file" accept="image/*,application/pdf" multiple>
+            </div>
+          </div>
+
+          <div class="file-preview" id="loanSupportPreview"></div>
+
+          <div class="actions">
+            <button type="button" class="btn ghost" data-prev>← Back</button>
+            <button type="button" class="btn" data-next>Continue →</button>
+          </div>
+        </div>
+
+        <!-- Step 6: Guarantors -->
+        <div data-step-content="6" class="step-content" style="display:none;margin-top:12px">
+          <h3>Guarantors (Add at least 2)</h3>
+          <div id="guarantorsList"></div>
+
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button type="button" class="btn ghost" id="addGuarantor">+ Add Guarantor</button>
+            <button type="button" class="btn secondary" id="downloadGuarantorTemplate">Download Guarantor Template (PDF)</button>
+          </div>
+
+          <div class="actions">
+            <button type="button" class="btn ghost" data-prev>← Back</button>
+            <button type="button" class="btn" data-next>Continue →</button>
+          </div>
+        </div>
+
+        <!-- Step 7: Parents & Review -->
+        <div data-step-content="7" class="step-content" style="display:none;margin-top:12px">
+          <h3>Parents & Review</h3>
+
+          <div id="parentsArea">
+            <div style="display:flex;gap:8px;margin-bottom:8px">
+              <button type="button" class="btn ghost" id="addFather">+ Add Father</button>
+              <button type="button" class="btn ghost" id="addMother">+ Add Mother</button>
+            </div>
+            <div id="parentsList"></div>
+          </div>
+
+          <h4>Review Application</h4>
+          <div class="review" id="reviewBox">
+            <pre id="reviewText">Please review your application. Use previous buttons to correct any details.</pre>
+          </div>
+
+          <div class="actions" style="margin-top:10px">
+            <button type="button" class="btn ghost" data-prev>← Back</button>
+            <button type="button" class="btn" id="submitApplication">Submit & Download PDF</button>
+          </div>
+
+          <p class="notes">After submission the full application will be saved to the RTDB & all uploaded documents stored in Storage. The generated PDF will embed images and supporting docs where possible.</p>
+        </div>
+      </form>
+    </section>
   </div>
 
-  <!-- Libraries -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script type="module">
+    // Use jsPDF from global
+    const { jsPDF } = window.jspdf;
 
-  <script>
-    // ---------- CONFIGURE FIREBASE ----------
-    // Replace with your Firebase config
+    // Firebase modular imports (v9)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import {
+      getAuth
+    } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import {
+      getDatabase, ref, set, push, update, get, child
+    } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+    import {
+      getStorage, ref as sRef, uploadBytes, getDownloadURL
+    } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
+
+    // ===== CONFIG - reuse your project config =====
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_AUTH_DOMAIN",
-      databaseURL: "YOUR_DATABASE_URL",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_STORAGE_BUCKET",
-      messagingSenderId: "...",
-      appId: "..."
+      apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
+      authDomain: "visionary-youth-grou-2024.firebaseapp.com",
+      databaseURL: "https://visionary-youth-grou-2024-default-rtdb.firebaseio.com",
+      projectId: "visionary-youth-grou-2024",
+      storageBucket: "visionary-youth-grou-2024.appspot.com",
+      messagingSenderId: "372978592717",
+      appId: "1:372978592717:web:1c15aec728ee5f854f3284"
     };
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-    const storage = firebase.storage();
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth ? getAuth(app) : null; // optional (if used)
+    const db = getDatabase(app);
+    const storage = getStorage(app);
 
-    // ---------- UI / Steps ----------
-    const steps = [
-      { id:'personal', title:'Personal Info' },
-      { id:'permanent', title:'Permanent Residence' },
-      { id:'residence', title:'Residence' },
-      { id:'education', title:'Education' },
-      { id:'loan', title:'Loan Details' },
-      { id:'guarantors', title:'Guarantors' },
-      { id:'parents', title:'Parents' },
-      { id:'review', title:'Review & Submit' }
-    ];
+    // wizard logic
+    const steps = Array.from(document.querySelectorAll('.step'));
+    const contents = Array.from(document.querySelectorAll('[data-step-content]'));
+    const progressBar = document.getElementById('progressBar');
+    let currentStep = 1;
+    const totalSteps = steps.length;
 
-    const wizardNav = document.getElementById('wizardNav');
-    const stepContainer = document.getElementById('stepContainer');
-    let currentStep = 0;
-    const formData = { guarantors: [], parents: [] };
-
-    function renderWizard(){
-      wizardNav.innerHTML = '';
-      steps.forEach((s,i)=>{
-        const el = document.createElement('div');
-        el.className = 'step' + (i===currentStep? ' active':'');
-        el.textContent = (i+1)+'. '+s.title;
-        el.onclick = ()=>{ goToStep(i); };
-        wizardNav.appendChild(el);
-      });
-      renderStep();
+    function showStep(n){
+      currentStep = n;
+      steps.forEach(s => s.classList.toggle('active', Number(s.dataset.step) === n));
+      contents.forEach(c => c.style.display = Number(c.dataset.stepContent) === n ? 'block' : 'none');
+      const pct = Math.round((n / totalSteps) * 100);
+      progressBar.style.width = pct + '%';
+      // update review when at final step
+      if(n === totalSteps) buildReview();
     }
 
-    // ---------- DATA SOURCES (counties sample) ----------
-    const counties = [
-      'Mombasa','Kwale','Kilifi','Tana River','Lamu','Taita-Taveta','Garissa','Wajir','Mandera','Marsabit','Isiolo','Meru','Tharaka-Nithi','Embu','Kitui','Machakos','Makueni','Nyandarua','Nyeri','Kirinyaga','Murang'a','Kiambu','Turkana','West Pokot','Samburu','Trans Nzoia','Uasin Gishu','Elgeyo-Marakwet','Nandi','Baringo','Laikipia','Nakuru','Narok','Kajiado','Kericho','Bomet','Kakamega','Vihiga','Bungoma','Busia','Siaya','Kisumu','Homa Bay','Migori','Kisii','Nyamira','Nairobi'
-    ];
-
-    // NOTE: Constituencies and wards are MANY. For correctness, load them from your database or an API.
-    // Example structure for dynamic population (replace with full mapping or fetch from RTDB):
-    const exampleConstituencies = {
-      'Nairobi': ['Westlands','Langata','Starehe','Kasarani'],
-      'Kiambu': ['Kiambu','Githunguri','Kabete']
-    };
-    const exampleWards = {
-      'Westlands':['Kangemi','Karura','Parklands'],
-      'Langata':['Karen','Langata East']
-    };
-
-    // ---------- RENDER STEPS ----------
-    function renderStep(){
-      const step = steps[currentStep];
-      stepContainer.innerHTML = '';
-      if(step.id==='personal') stepContainer.appendChild(personalPane());
-      if(step.id==='permanent') stepContainer.appendChild(permanentPane());
-      if(step.id==='residence') stepContainer.appendChild(residencePane());
-      if(step.id==='education') stepContainer.appendChild(educationPane());
-      if(step.id==='loan') stepContainer.appendChild(loanPane());
-      if(step.id==='guarantors') stepContainer.appendChild(guarantorsPane());
-      if(step.id==='parents') stepContainer.appendChild(parentsPane());
-      if(step.id==='review') stepContainer.appendChild(reviewPane());
-      renderWizard();
-    }
-
-    function personalPane(){
-      const wrap = document.createElement('div');
-      wrap.innerHTML = `
-        <h3>Personal information</h3>
-        <div class="two">
-          <div>
-            <label>First name</label><input id="first" type="text">
-          </div>
-          <div>
-            <label>Middle name</label><input id="middle" type="text">
-          </div>
-        </div>
-        <div class="two">
-          <div>
-            <label>Last name</label><input id="last" type="text">
-          </div>
-          <div>
-            <label>ID number</label><input id="idno" type="text">
-          </div>
-        </div>
-        <div class="two">
-          <div><label>Date of birth</label><input id="dob" type="date"></div>
-          <div><label>Marital status</label><select id="marital"><option>Single</option><option>Married</option><option>Divorced</option><option>Widowed</option></select></div>
-        </div>
-        <div class="two">
-          <div><label>Telephone</label><input id="phone" type="text"></div>
-          <div><label>Gender</label><select id="gender"><option>Male</option><option>Female</option><option>Other</option></select></div>
-        </div>
-        <div class="two">
-          <div><label>Religion</label><input id="religion" type="text"></div>
-          <div>
-            <label>Upload ID (both sides) + Passport</label>
-            <input id="idFront" type="file" accept="image/*,application/pdf"><br>
-            <input id="idBack" type="file" accept="image/*,application/pdf"><br>
-            <input id="passport" type="file" accept="image/*,application/pdf">
-            <div class="file-list" id="fileListPersonal"></div>
-          </div>
-        </div>
-      `;
-      return wrap;
-    }
-
-    function permanentPane(){
-      const wrap = document.createElement('div');
-      wrap.innerHTML = `
-        <h3>Permanent residence</h3>
-        <div class="two">
-          <div><label>Box No</label><input id="boxno" type="text"></div>
-          <div><label>Postal Code</label><input id="postal" type="text"></div>
-        </div>
-        <div class="two">
-          <div><label>Town</label><input id="town" type="text"></div>
-          <div>
-            <label>County</label>
-            <select id="county"></select>
-          </div>
-        </div>
-        <div class="two">
-          <div><label>Constituency</label><select id="constituency"></select></div>
-          <div><label>Ward</label><select id="ward"></select></div>
-        </div>
-        <div class="two">
-          <div><label>Location</label><input id="location" type="text"></div>
-          <div><label>Sub-location / Village</label><input id="sublocation" type="text"></div>
-        </div>
-      `;
-
-      // populate counties
-      setTimeout(()=>{
-        const sel = wrap.querySelector('#county');
-        counties.forEach(c=>{ const opt=document.createElement('option');opt.value=c;opt.textContent=c;sel.appendChild(opt);});
-        // when county changes, load constituencies from exampleConstituencies or fetch from RTDB
-        sel.onchange = (e)=>{
-          const val=e.target.value;
-          const cons = exampleConstituencies[val]||[];
-          const csel = wrap.querySelector('#constituency'); csel.innerHTML='';
-          cons.forEach(x=>{const o=document.createElement('option');o.value=x;o.textContent=x;csel.appendChild(o)});
-          csel.onchange();
-        };
-        wrap.querySelector('#county').dispatchEvent(new Event('change'));
-        wrap.querySelector('#constituency').onchange = (ev)=>{
-          const vv = ev.target.value;
-          const wards = exampleWards[vv]||[];
-          const wsel = wrap.querySelector('#ward'); wsel.innerHTML='';
-          wards.forEach(x=>{const o=document.createElement('option');o.value=x;o.textContent=x;wsel.appendChild(o)});
-        };
-      },100);
-
-      return wrap;
-    }
-
-    function residencePane(){
-      const wrap = document.createElement('div');
-      wrap.innerHTML = `
-        <h3>Residence</h3>
-        <div class="two">
-          <div><label>Nearest primary school</label><input id="nearestSchool" type="text"></div>
-          <div><label>Village</label><input id="village" type="text"></div>
-        </div>
-        <div class="two">
-          <div><label>Street</label><input id="street" type="text"></div>
-          <div><label>Town</label><input id="resTown" type="text"></div>
-        </div>
-        <div class="two">
-          <div><label>County</label><select id="resCounty"></select></div>
-          <div><label>Constituency</label><select id="resCons"></select></div>
-        </div>
-      `;
-      setTimeout(()=>{ const sel = wrap.querySelector('#resCounty'); counties.forEach(c=>{ const opt=document.createElement('option');opt.value=c;opt.textContent=c;sel.appendChild(opt);}); },50);
-      return wrap;
-    }
-
-    function educationPane(){
-      const wrap = document.createElement('div');
-      wrap.innerHTML = `
-        <h3>Education</h3>
-        <div>
-          <label>Level</label>
-          <select id="edLevel"><option>KCPE</option><option>KCSE</option><option>Certificate</option><option>Diploma</option><option>Degree</option></select>
-        </div>
-        <div style="margin-top:12px">
-          <label>Provide up to two records for the selected level</label>
-          <div class="two">
-            <div><label>Exam type</label><select id="examType1"><option>KCSE</option><option>KCPE</option><option>Certificate</option><option>Diploma</option><option>Degree</option></select>
-                <label>Exam year</label><input id="examYear1" type="number"></div>
-            <div><label>Index / Reg No</label><input id="index1" type="text"><label>Details/School</label><input id="school1" type="text"></div>
-          </div>
-          <div style="height:8px"></div>
-          <div class="two">
-            <div><label>Exam type</label><select id="examType2"><option>KCSE</option><option>KCPE</option><option>Certificate</option><option>Diploma</option><option>Degree</option></select>
-                <label>Exam year</label><input id="examYear2" type="number"></div>
-            <div><label>Index / Reg No</label><input id="index2" type="text"><label>Details/School</label><input id="school2" type="text"></div>
-          </div>
-        </div>
-      `;
-      return wrap;
-    }
-
-    function loanPane(){
-      const wrap = document.createElement('div');
-      wrap.innerHTML = `
-        <h3>Loan details</h3>
-        <div class="two">
-          <div><label>Amount (KES)</label><input id="loanAmount" type="number"></div>
-          <div><label>Purpose</label><input id="loanPurpose" type="text"></div>
-        </div>
-        <div class="two">
-          <div><label>Installment (KES)</label><input id="installment" type="number"></div>
-          <div><label>Date of first installment</label><input id="firstInst" type="date"></div>
-        </div>
-        <div class="two">
-          <div><label>Date of last installment</label><input id="lastInst" type="date"></div>
-          <div>
-            <label>Upload support document</label>
-            <input id="supportDoc" type="file" accept="image/*,application/pdf">
-            <div class="file-list" id="fileListLoan"></div>
-          </div>
-        </div>
-      `;
-      return wrap;
-    }
-
-    function guarantorsPane(){
-      const wrap = document.createElement('div');
-      wrap.innerHTML = `
-        <h3>Guarantors</h3>
-        <div class="small">Add at least two guarantors. Guarantors must be registered members in the members DB.</div>
-        <div style="margin-top:12px"><button id="addGuarantor" type="button" class="add-btn">+ Add guarantor</button></div>
-        <div class="guarantors-list" id="guarantorsList"></div>
-        <div style="margin-top:12px">
-          <button id="downloadGuarantorPdf" type="button">Download guarantor agreement PDF (template)</button>
-        </div>
-      `;
-
-      setTimeout(()=>{
-        wrap.querySelector('#addGuarantor').onclick = addGuarantorForm;
-        wrap.querySelector('#downloadGuarantorPdf').onclick = ()=>{ generateGuarantorPDF(); };
-      },50);
-
-      return wrap;
-    }
-
-    function parentsPane(){
-      const wrap = document.createElement('div');
-      wrap.innerHTML = `
-        <h3>Parents / Next of kin</h3>
-        <div style="display:flex;gap:12px;flex-wrap:wrap">
-          <button id="addFather" type="button" class="add-btn">+ Add Father</button>
-          <button id="addMother" type="button" class="add-btn">+ Add Mother</button>
-        </div>
-        <div class="parents-list" id="parentsList"></div>
-      `;
-      setTimeout(()=>{
-        wrap.querySelector('#addFather').onclick = ()=> addParent('father');
-        wrap.querySelector('#addMother').onclick = ()=> addParent('mother');
-      },50);
-      return wrap;
-    }
-
-    function reviewPane(){
-      const wrap = document.createElement('div');
-      wrap.innerHTML = `
-        <h3>Review & Submit</h3>
-        <div class="small">Check all the details then submit. A filled application PDF will download automatically and the record will be saved to RTDB.</div>
-        <div style="margin-top:12px">
-          <div id="reviewBox" class="review"></div>
-        </div>
-        <div style="margin-top:12px;display:flex;gap:10px">
-          <button id="submitBtn">Submit application & Download PDF</button>
-        </div>
-      `;
-      setTimeout(()=>{ wrap.querySelector('#submitBtn').onclick = submitApplication; updateReview(); },50);
-      return wrap;
-    }
-
-    // ---------- Helpers to add guarantors / parents ----------
-    function addGuarantorForm(){
-      const id = Date.now();
-      const container = document.getElementById('guarantorsList');
-      const div = document.createElement('div');
-      div.className='card';
-      div.innerHTML = `
-        <div class="two">
-          <div><label>Name</label><input data-name id="g_name_${id}" type="text"></div>
-          <div><label>Member No</label><input id="g_member_${id}" type="text"></div>
-        </div>
-        <div class="two">
-          <div><label>ID no</label><input id="g_id_${id}" type="text"></div>
-          <div><label>Phone</label><input id="g_phone_${id}" type="text"></div>
-        </div>
-        <div class="two">
-          <div><label>Email</label><input id="g_email_${id}" type="email"></div>
-          <div style="display:flex;align-items:center;gap:8px"><button id="verifyG_${id}" type="button">Verify member</button><button id="removeG_${id}" type="button" class="ghost">Remove</button></div>
-        </div>
-      `;
-      container.appendChild(div);
-      document.getElementById(`removeG_${id}`).onclick = ()=>{ div.remove(); }
-      document.getElementById(`verifyG_${id}`).onclick = async ()=>{
-        const memberNo = document.getElementById(`g_member_${id}`).value.trim();
-        if(!memberNo) return alert('Enter member number');
-        const ok = await verifyMemberByNumber(memberNo);
-        if(ok){ alert('Guarantor is a registered member. Verified.'); } else alert('Member not found or not active');
+    // wire next/prev
+    document.querySelectorAll('[data-next]').forEach(btn => btn.addEventListener('click', () => {
+      // basic validation before advancing
+      if(currentStep === 1){
+        if(!document.getElementById('firstName').value.trim() || !document.getElementById('idNumber').value.trim() || !document.getElementById('telephone').value.trim()){
+          return alert('Please fill required personal fields (First name, ID, Telephone).');
+        }
       }
+      if(currentStep === 2){
+        if(!document.getElementById('county').value || !document.getElementById('constituency').value || !document.getElementById('ward').value){
+          return alert('Please select County, Constituency and Ward.');
+        }
+      }
+      if(currentStep < totalSteps) showStep(currentStep + 1);
+    }));
+
+    document.querySelectorAll('[data-prev]').forEach(btn => btn.addEventListener('click', ()=> {
+      if(currentStep > 1) showStep(currentStep - 1);
+    }));
+
+    // Save step 1 (quick save)
+    document.getElementById('saveStep1').addEventListener('click', async () => {
+      const payload = {
+        firstName: document.getElementById('firstName').value.trim(),
+        middleName: document.getElementById('middleName').value.trim(),
+        lastName: document.getElementById('lastName').value.trim(),
+        idNumber: document.getElementById('idNumber').value.trim(),
+        telephone: document.getElementById('telephone').value.trim(),
+        savedAt: Date.now()
+      };
+      // push to RTDB under drafts (no auth assumption)
+      const draftsRef = ref(db, `loanDrafts/${payload.idNumber||payload.telephone||Date.now()}`);
+      await set(draftsRef, payload);
+      alert('Saved draft (you may continue later).');
+    });
+
+    // Populate counties (Kenya 47 counties)
+    const counties = [
+      "Mombasa","Kwale","Kilifi","Tana River","Lamu","Taita-Taveta","Garissa","Wajir","Mandera",
+      "Marsabit","Isiolo","Meru","Tharaka-Nithi","Embu","Kitui","Machakos","Makueni","Nyandarua",
+      "Nyeri","Kirinyaga","Murang'a","Kiambu","Turkana","West Pokot","Samburu","Trans-Nzoia","Uasin Gishu",
+      "Elgeyo-Marakwet","Nandi","Baringo","Laikipia","Nakuru","Narok","Kajiado","Kericho","Bomet",
+      "Kakamega","Vihiga","Bungoma","Busia","Siaya","Kisumu","Homa Bay","Migori","Kisii","Nyamira","Nairobi"
+    ];
+    const countyEl = document.getElementById('county');
+    counties.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = c; countyEl.appendChild(o); });
+
+    // Simple constituency mapping for demo (extendable)
+    const constituenciesByCounty = {
+      "Nairobi": ["Dagoretti North","Dagoretti South","Embakasi North","Embakasi South","Westlands","Starehe","Lang'ata"],
+      "Kiambu": ["Thika","Githunguri","Kiambu","Kabete","Ruiru"],
+      "Makueni": ["Makueni","Kibwezi East","Kibwezi West","Mbooni"],
+      "Nakuru": ["Nakuru Town East","Nakuru Town West","Naivasha","Gilgil"],
+      // add more mappings as needed...
+    };
+
+    // Wards placeholder mapping (extend)
+    const wardsByConstituency = {
+      "Dagoretti North": ["Kawangware","Riruta","Kabiro"],
+      "Westlands": ["Kangemi","Mountain View","Parklands"],
+      "Thika": ["Thika Town","Kamenu"],
+      "Makueni": ["Wote","Makueni Ward"]
+    };
+
+    function populateConstituenciesForCounty(county){
+      const sel = document.getElementById('constituency');
+      sel.innerHTML = '<option value="">Select</option>';
+      const list = constituenciesByCounty[county] || [];
+      list.forEach(c=> { const o=document.createElement('option'); o.value=c; o.textContent=c; sel.appendChild(o); });
+      // clear wards
+      document.getElementById('ward').innerHTML = '<option value="">Select</option>';
     }
 
-    function addParent(kind){
-      const id = Date.now();
-      const container = document.getElementById('parentsList');
+    function populateWardsForConstituency(cons){
+      const sel = document.getElementById('ward');
+      sel.innerHTML = '<option value="">Select</option>';
+      const list = wardsByConstituency[cons] || [];
+      list.forEach(w=> { const o=document.createElement('option'); o.value=w; o.textContent=w; sel.appendChild(o); });
+    }
+
+    countyEl.addEventListener('change', () => {
+      const c = countyEl.value;
+      populateConstituenciesForCounty(c);
+      // ensure visible contrast: make dropdown dark text on light background
+      document.getElementById('constituency').style.color = '#123';
+      document.getElementById('ward').style.color = '#123';
+    });
+    document.getElementById('constituency').addEventListener('change', (e)=> populateWardsForConstituency(e.target.value));
+
+    // Education dynamic entries
+    const educationList = document.getElementById('educationList');
+    function addEducationEntry(data = {}) {
+      const id = 'edu_' + Date.now() + Math.floor(Math.random()*999);
       const div = document.createElement('div');
-      div.className='card';
+      div.className = 'guarantor-item';
+      div.dataset.id = id;
       div.innerHTML = `
-        <div class="two">
-          <div><label>Name (${kind})</label><input id="p_name_${id}" type="text"></div>
-          <div><label>Phone</label><input id="p_phone_${id}" type="text"></div>
+        <div style="display:flex;gap:8px;align-items:center;justify-content:space-between">
+          <strong>Education entry</strong>
+          <button class="btn ghost removeEdu">Remove</button>
         </div>
-        <div class="two">
-          <div><label>ID</label><input id="p_id_${id}" type="text"></div>
-          <div><label>Email</label><input id="p_email_${id}" type="email"></div>
+        <div class="row" style="margin-top:8px">
+          <div class="col"><label>Level</label><select class="eduLevel"><option>KCPE</option><option>KCSE</option><option>Certificate</option><option>Diploma</option><option>Degree</option></select></div>
+          <div class="col"><label>Exam type / School</label><input class="eduExam" type="text"></div>
+          <div class="col"><label>Year / Index no</label><input class="eduYear" type="text"></div>
         </div>
       `;
-      container.appendChild(div);
+      educationList.appendChild(div);
+      if(data.level) div.querySelector('.eduLevel').value = data.level;
+      if(data.exam) div.querySelector('.eduExam').value = data.exam;
+      if(data.year) div.querySelector('.eduYear').value = data.year;
+      div.querySelector('.removeEdu').addEventListener('click', ()=> div.remove());
+    }
+    document.getElementById('addEducation').addEventListener('click', ()=> addEducationEntry());
+
+    // Guarantors dynamic
+    const guarantorsList = document.getElementById('guarantorsList');
+    function addGuarantor(data={}) {
+      const id = 'g_' + Date.now() + Math.floor(Math.random()*999);
+      const el = document.createElement('div');
+      el.className = 'guarantor-item';
+      el.dataset.id = id;
+      el.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <strong>Guarantor</strong>
+          <div style="display:flex;gap:8px">
+            <button class="btn ghost downloadG">Download Template</button>
+            <button class="btn ghost removeG">Remove</button>
+          </div>
+        </div>
+        <div class="row" style="margin-top:8px">
+          <div class="col"><label>Name</label><input class="g_name" type="text"></div>
+          <div class="col"><label>Member no</label><input class="g_member" type="text"></div>
+          <div class="col"><label>ID no</label><input class="g_id" type="text"></div>
+        </div>
+        <div class="row">
+          <div class="col"><label>Phone</label><input class="g_phone" type="text"></div>
+          <div class="col"><label>Email</label><input class="g_email" type="text"></div>
+        </div>
+      `;
+      guarantorsList.appendChild(el);
+      if(data.name) el.querySelector('.g_name').value = data.name;
+      if(data.member) el.querySelector('.g_member').value = data.member;
+      if(data.id) el.querySelector('.g_id').value = data.id;
+      if(data.phone) el.querySelector('.g_phone').value = data.phone;
+      if(data.email) el.querySelector('.g_email').value = data.email;
+
+      el.querySelector('.removeG').addEventListener('click', () => el.remove());
+      el.querySelector('.downloadG').addEventListener('click', async () => {
+        // build guarantor PDF for this guarantor (auto-fills applicant info)
+        await buildGuarantorPdf({
+          guarantor: {
+            name: el.querySelector('.g_name').value || '',
+            memberNo: el.querySelector('.g_member').value || '',
+            idNo: el.querySelector('.g_id').value || '',
+            phone: el.querySelector('.g_phone').value || '',
+            email: el.querySelector('.g_email').value || ''
+          },
+          applicant: getApplicantSummary()
+        });
+      });
+    }
+    document.getElementById('addGuarantor').addEventListener('click', ()=> addGuarantor());
+
+    // parents
+    const parentsList = document.getElementById('parentsList');
+    document.getElementById('addFather').addEventListener('click', ()=> addParent('Father'));
+    document.getElementById('addMother').addEventListener('click', ()=> addParent('Mother'));
+
+    function addParent(type, data={}) {
+      const id = 'p_' + Date.now() + Math.floor(Math.random()*999);
+      const el = document.createElement('div');
+      el.className = 'guarantor-item';
+      el.dataset.id = id;
+      el.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center"><strong>${type}</strong><button class="btn ghost removeP">Remove</button></div>
+        <div class="row" style="margin-top:8px">
+          <div class="col"><label>Name</label><input class="p_name" type="text"></div>
+          <div class="col"><label>Phone</label><input class="p_phone" type="text"></div>
+          <div class="col"><label>ID</label><input class="p_id" type="text"></div>
+        </div>
+        <div class="row"><div class="col"><label>Email</label><input class="p_email" type="text"></div></div>`;
+      parentsList.appendChild(el);
+      el.querySelector('.removeP').addEventListener('click', ()=> el.remove());
     }
 
-    // ---------- NAV CONTROLS ----------
-    document.getElementById('prevBtn').onclick = ()=>{ if(currentStep>0){ currentStep--; renderStep(); } };
-    document.getElementById('nextBtn').onclick = ()=>{ if(currentStep<steps.length-1){ currentStep++; renderStep(); } }
-    document.getElementById('saveDraft').onclick = saveDraft;
+    // file previews for personal & loan support
+    function previewFiles(inputEl, targetEl){
+      const files = inputEl.files;
+      const wrapper = document.getElementById(targetEl);
+      wrapper.innerHTML = '';
+      if(!files) return;
+      Array.from(files).forEach(file=>{
+        if(file.type.startsWith('image/')){
+          const img = document.createElement('img');
+          img.src = URL.createObjectURL(file);
+          wrapper.appendChild(img);
+        } else {
+          const div = document.createElement('div');
+          div.textContent = file.name;
+          div.className = 'small';
+          wrapper.appendChild(div);
+        }
+      });
+    }
+    document.getElementById('idFront').addEventListener('change', ()=> previewFiles(document.getElementById('idFront'),'personalPreview'));
+    document.getElementById('idBack').addEventListener('change', ()=> previewFiles(document.getElementById('idBack'),'personalPreview'));
+    document.getElementById('passportPhoto').addEventListener('change', ()=> previewFiles(document.getElementById('passportPhoto'),'personalPreview'));
+    document.getElementById('loanSupportDocs').addEventListener('change', ()=> previewFiles(document.getElementById('loanSupportDocs'),'loanSupportPreview'));
 
-    function goToStep(i){ currentStep=i; renderStep(); }
-
-    // ---------- SAVE/UPLOAD/VERIFY ----------
-    async function saveDraft(){
-      collectFormToObject();
-      const id = 'draft_'+Date.now();
-      await db.ref('loan_applications/'+id).set(formData);
-      alert('Draft saved with id: '+id);
+    // small helper: applicant summary
+    function getApplicantSummary(){
+      return {
+        firstName: document.getElementById('firstName').value.trim(),
+        middleName: document.getElementById('middleName').value.trim(),
+        lastName: document.getElementById('lastName').value.trim(),
+        idNumber: document.getElementById('idNumber').value.trim(),
+        telephone: document.getElementById('telephone').value.trim(),
+        dob: document.getElementById('dob').value,
+        county: document.getElementById('county').value,
+        constituency: document.getElementById('constituency').value,
+        ward: document.getElementById('ward').value
+      };
     }
 
-    function collectFormToObject(){
-      // Personal
-      formData.first = document.getElementById('first')?.value||'';
-      formData.middle = document.getElementById('middle')?.value||'';
-      formData.last = document.getElementById('last')?.value||'';
-      formData.idno = document.getElementById('idno')?.value||'';
-      formData.dob = document.getElementById('dob')?.value||'';
-      formData.marital = document.getElementById('marital')?.value||'';
-      formData.phone = document.getElementById('phone')?.value||'';
-      formData.gender = document.getElementById('gender')?.value||'';
-      formData.religion = document.getElementById('religion')?.value||'';
+    // build guarantor PDF
+    async function buildGuarantorPdf({guarantor, applicant}) {
+      const doc = new jsPDF({unit:'pt',format:'a4'});
+      const left = 36;
+      doc.setFontSize(14); doc.setFont('helvetica','bold'); doc.text('Visionary Youth Group', 220, 40);
+      doc.setFontSize(10); doc.setFont('helvetica','normal'); doc.text('Integrity | Commitment | Entrepreneurial Nature', 220, 56);
+      doc.setDrawColor(46,125,50); doc.setLineWidth(1.5); doc.line(left,72,559,left);
+      doc.setFontSize(12); doc.text('Guarantor Agreement', left, 96);
+      doc.setFontSize(10);
+      const applicantText = `Applicant: ${applicant.firstName || ''} ${applicant.middleName||''} ${applicant.lastName||''}\nID: ${applicant.idNumber || ''}\nPhone: ${applicant.telephone || ''}`;
+      doc.text(applicantText, left, 116);
 
-      // Permanent
-      formData.boxno = document.getElementById('boxno')?.value||'';
-      formData.postal = document.getElementById('postal')?.value||'';
-      formData.town = document.getElementById('town')?.value||'';
-      formData.county = document.getElementById('county')?.value||'';
-      formData.constituency = document.getElementById('constituency')?.value||'';
-      formData.ward = document.getElementById('ward')?.value||'';
-      formData.location = document.getElementById('location')?.value||'';
-      formData.sublocation = document.getElementById('sublocation')?.value||'';
+      let y = 170;
+      doc.text('Guarantor Details', left, y); y+=16;
+      doc.text(`Name: ${guarantor.name || ''}`, left, y); y+=14;
+      doc.text(`Member no: ${guarantor.memberNo || ''}`, left, y); y+=14;
+      doc.text(`ID No: ${guarantor.idNo || ''}`, left, y); y+=14;
+      doc.text(`Phone: ${guarantor.phone || ''}`, left, y); y+=14;
+      doc.text(`Email: ${guarantor.email || ''}`, left, y); y+=28;
 
-      // Residence
-      formData.nearestSchool = document.getElementById('nearestSchool')?.value||'';
-      formData.village = document.getElementById('village')?.value||'';
-      formData.street = document.getElementById('street')?.value||'';
-      formData.resTown = document.getElementById('resTown')?.value||'';
-      formData.resCounty = document.getElementById('resCounty')?.value||'';
+      const declaration = "I hereby declare that I guarantee repayment of the loan applied for by the applicant should they default, subject to the Visionary Youth Group loan policy. I understand the obligations and accept responsibility to meet repayments as necessary.";
+      const wrapped = doc.splitTextToSize(declaration, 520);
+      doc.text(wrapped, left, y); y += wrapped.length * 12 + 20;
 
-      // Education
-      formData.level = document.getElementById('edLevel')?.value||'';
-      formData.education = [
-        {examType:document.getElementById('examType1')?.value, year:document.getElementById('examYear1')?.value, index:document.getElementById('index1')?.value, school:document.getElementById('school1')?.value},
-        {examType:document.getElementById('examType2')?.value, year:document.getElementById('examYear2')?.value, index:document.getElementById('index2')?.value, school:document.getElementById('school2')?.value}
+      doc.text('Guarantor signature: ____________________________    Date: __/__/____', left, y);
+      doc.text('Applicant signature: ____________________________    Date: __/__/____', left, y+28);
+
+      // footer
+      doc.setFontSize(9); doc.text('Visionary Youth Group — Tel: 0741453336 — Nairobi', left, 780);
+
+      const filename = `Guarantor_${(guarantor.name||'guarantor').replace(/\s+/g,'_')}.pdf`;
+      doc.save(filename);
+    }
+
+    // build final two-page application PDF
+    async function buildFinalApplicationPdf(savedUrls = {}) {
+      const doc = new jsPDF({unit:'pt',format:'a4'});
+      const left = 36;
+      // PAGE 1 - Applicant & Residence & Education
+      doc.setFontSize(16); doc.setFont('helvetica','bold'); doc.text('Visionary Youth Group', 300, 36, {align:'center'});
+      doc.setFontSize(10); doc.setFont('helvetica','normal'); doc.text('Integrity | Commitment | Entrepreneurial Nature', 300, 52, {align:'center'});
+      doc.setDrawColor(46,125,50); doc.setLineWidth(1.5); doc.line(left,64,559,64);
+      doc.setFontSize(12); doc.text('Loan Application Form', left, 86);
+
+      // Applicant block
+      const applicant = getApplicantSummary();
+      let y = 108;
+      doc.setFontSize(10);
+      doc.text(`Name: ${applicant.firstName || ''} ${applicant.middleName || ''} ${applicant.lastName || ''}`, left, y); y+=14;
+      doc.text(`ID/Passport: ${applicant.idNumber || ''}    DOB: ${applicant.dob || ''}`, left, y); y+=14;
+      doc.text(`Telephone: ${applicant.telephone || ''}    Religion: ${document.getElementById('religion').value || ''}`, left, y); y+=18;
+
+      doc.text('Permanent Residence:', left, y); y+=12;
+      doc.setFontSize(9);
+      doc.text(`P.O. Box: ${document.getElementById('poBox').value || ''}  Postal: ${document.getElementById('postalCode').value || ''}`, left, y); y+=12;
+      doc.text(`Town: ${document.getElementById('town').value || ''}  County: ${document.getElementById('county').value || ''}`, left, y); y+=12;
+      doc.text(`Constituency: ${document.getElementById('constituency').value || ''}  Ward: ${document.getElementById('ward').value || ''}`, left, y); y+=18;
+
+      // Education list
+      doc.setFontSize(10); doc.text('Education:', left, y); y+=12;
+      const eduDivs = Array.from(document.querySelectorAll('#educationList .guarantor-item'));
+      if(eduDivs.length === 0){
+        doc.setFontSize(9); doc.text('No education entries provided.', left, y); y+=12;
+      } else {
+        eduDivs.slice(0,6).forEach(ed => {
+          const level = ed.querySelector('.eduLevel').value || '';
+          const exam = ed.querySelector('.eduExam').value || '';
+          const year = ed.querySelector('.eduYear').value || '';
+          const line = `${level} — ${exam} — ${year}`;
+          doc.setFontSize(9); doc.text(line, left, y); y+=12;
+          if(y > 720){ doc.addPage(); y = 40; }
+        });
+      }
+
+      // include uploaded personal images on page 1 after education
+      y += 8;
+      const filesToEmbed = [];
+      // mapping input ids to savedUrls key if provided
+      const personalFiles = [
+        {id: 'idFront', label: 'ID Front'},
+        {id: 'idBack', label: 'ID Back'},
+        {id: 'passportPhoto', label: 'Passport'}
       ];
+      for(const pf of personalFiles){
+        const inp = document.getElementById(pf.id);
+        if(inp && inp.files && inp.files[0]){
+          filesToEmbed.push({file: inp.files[0], label: pf.label});
+        } else if(savedUrls[pf.id]) {
+          filesToEmbed.push({url: savedUrls[pf.id], label: pf.label});
+        }
+      }
 
-      // Loan
-      formData.loan = { amount:document.getElementById('loanAmount')?.value, purpose:document.getElementById('loanPurpose')?.value, installment:document.getElementById('installment')?.value, firstInst:document.getElementById('firstInst')?.value, lastInst:document.getElementById('lastInst')?.value };
+      // embed images (up to 3 small)
+      let imgX = left, imgY = y;
+      for(const f of filesToEmbed.slice(0,3)){
+        try {
+          let dataUrl = f.url;
+          if(!dataUrl && f.file){
+            // convert file to dataURL
+            dataUrl = await fileToDataUrl(f.file);
+          }
+          if(dataUrl){
+            doc.addImage(dataUrl, 'JPEG', imgX, imgY, 140, 100);
+            imgX += 146;
+            if(imgX > 420){ imgX = left; imgY += 108; }
+          }
+        } catch(e){ console.warn('embed failed', e); }
+      }
+
+      // PAGE 2 - Loan details, guarantors, parents, attachments
+      doc.addPage();
+      let y2 = 40;
+      doc.setFontSize(12); doc.setFont('helvetica','bold'); doc.text('Loan Details & Guarantors', left, y2); y2+=18;
+      doc.setFontSize(10);
+      doc.text(`Amount requested: Ksh ${document.getElementById('loanAmount').value || ''}`, left, y2); y2+=14;
+      doc.text(`Purpose: ${document.getElementById('loanPurpose').value || ''}`, left, y2); y2+=14;
+      doc.text(`Installment: Ksh ${document.getElementById('loanInstallment').value || ''}`, left, y2); y2+=14;
+      doc.text(`First installment: ${document.getElementById('firstInstallment').value || ''}   Last installment: ${document.getElementById('lastInstallment').value || ''}`, left, y2); y2+=18;
 
       // Guarantors
-      const gcont = document.getElementById('guarantorsList');
-      formData.guarantors = [];
-      if(gcont){
-        Array.from(gcont.querySelectorAll('input')).forEach(inp=>{
-          const id = inp.id;
-          const match = id.match(/g_(name|member|id|phone|email)_(\d+)/);
-          if(match){
-            const key = match[1]; const idx = match[2];
-            let obj = formData.guarantors.find(x=>x.__id==idx);
-            if(!obj){ obj={__id:idx}; formData.guarantors.push(obj); }
-            obj[key] = inp.value;
-          }
+      doc.setFontSize(11); doc.text('Guarantors:', left, y2); y2+=12;
+      const gItems = Array.from(document.querySelectorAll('#guarantorsList .guarantor-item'));
+      if(gItems.length === 0){
+        doc.setFontSize(9); doc.text('No guarantors added.', left, y2); y2+=12;
+      } else {
+        gItems.forEach(g => {
+          const n = g.querySelector('.g_name').value || '';
+          const memb = g.querySelector('.g_member').value || '';
+          const id = g.querySelector('.g_id').value || '';
+          const phone = g.querySelector('.g_phone').value || '';
+          doc.setFontSize(9); doc.text(`${n} • Member: ${memb} • ID: ${id} • Phone: ${phone}`, left, y2);
+          y2 += 12;
+          if(y2 > 740){ doc.addPage(); y2 = 40; }
         });
       }
 
       // Parents
-      const pcont = document.getElementById('parentsList'); formData.parents=[];
-      if(pcont){
-        Array.from(pcont.querySelectorAll('input')).forEach(inp=>{
-          const id = inp.id; const match = id.match(/p_(name|phone|id|email)_(\d+)/);
-          if(match){ const key=match[1]; const idx=match[2]; let obj=formData.parents.find(x=>x.__id==idx); if(!obj){obj={__id:idx};formData.parents.push(obj);} obj[key]=inp.value; }
+      y2 += 8;
+      doc.setFontSize(11); doc.text('Parents:', left, y2); y2+=12;
+      const pItems = Array.from(document.querySelectorAll('#parentsList .guarantor-item'));
+      if(pItems.length === 0){ doc.setFontSize(9); doc.text('No parent details provided.', left, y2); y2+=12; }
+      else {
+        pItems.forEach(p => {
+          const name = p.querySelector('.p_name').value || '';
+          const phone = p.querySelector('.p_phone').value || '';
+          const id = p.querySelector('.p_id').value || '';
+          doc.setFontSize(9); doc.text(`${name} • Tel: ${phone} • ID: ${id}`, left, y2);
+          y2 += 12;
+          if(y2 > 740){ doc.addPage(); y2 = 40; }
         });
       }
 
-      // Files: we don't embed them here; we will upload and save links on submit
+      // Attach supporting docs (embed up to 3)
+      y2 += 14;
+      doc.setFontSize(11); doc.text('Attachments (Supporting Documents):', left, y2); y2 += 12;
+      const supportInput = document.getElementById('loanSupportDocs');
+      const supportFiles = supportInput && supportInput.files ? Array.from(supportInput.files) : [];
+      for(const sf of supportFiles.slice(0,4)){
+        try{
+          const dataUrl = await fileToDataUrl(sf);
+          doc.addImage(dataUrl, 'JPEG', left, y2, 200, 120);
+          y2 += 126;
+          if(y2 > 700){ doc.addPage(); y2 = 40; }
+        }catch(e){ console.warn('embed support failed', e); doc.setFontSize(9); doc.text(`Attached: ${sf.name}`, left, y2); y2 += 12; }
+      }
+
+      // final signatures
+      if(y2 > 700){ doc.addPage(); y2 = 40; }
+      y2 += 20;
+      doc.setFontSize(10); doc.text('Applicant signature: __________________________    Date: __/__/____', left, y2); y2 += 18;
+      doc.text('Loan Officer signature: _______________________    Date: __/__/____', left, y2); y2 += 18;
+
+      // footer
+      doc.setFontSize(9); doc.text('Visionary Youth Group — Tel: 0741453336 — Nairobi', left, 800);
+
+      return doc;
     }
 
-    async function submitApplication(){
-      collectFormToObject();
+    // helper to convert File to dataUrl
+    function fileToDataUrl(file){
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = e => resolve(e.target.result);
+        reader.onerror = e => reject(e);
+        reader.readAsDataURL(file);
+      });
+    }
 
-      // confirm minimum guarantors
-      if(!formData.guarantors || formData.guarantors.length<2){ return alert('Please add at least two guarantors'); }
+    // submit application -> upload files, save RTDB, generate PDF with embedded images & downloads
+    document.getElementById('submitApplication').addEventListener('click', async () => {
+      // basic checks: at least 2 guarantors
+      const gCount = document.querySelectorAll('#guarantorsList .guarantor-item').length;
+      if(gCount < 2) return alert('Please add at least 2 guarantors.');
+      // collect a big payload
+      const appPayload = {
+        applicant: getApplicantSummary(),
+        residence: {
+          poBox: document.getElementById('poBox').value,
+          postalCode: document.getElementById('postalCode').value,
+          town: document.getElementById('town').value,
+          county: document.getElementById('county').value,
+          constituency: document.getElementById('constituency').value,
+          ward: document.getElementById('ward').value,
+          location: document.getElementById('location').value,
+          sublocation: document.getElementById('sublocation').value,
+          village: document.getElementById('village').value
+        },
+        residenceNearest: {
+          school: document.getElementById('nearestSchool').value,
+          village: document.getElementById('resVillage').value,
+          street: document.getElementById('resStreet').value,
+          town: document.getElementById('resTown').value,
+          county: document.getElementById('resCounty').value,
+          constituency: document.getElementById('resConstituency').value
+        },
+        education: Array.from(document.querySelectorAll('#educationList .guarantor-item')).map(ed => ({
+          level: ed.querySelector('.eduLevel').value,
+          exam: ed.querySelector('.eduExam').value,
+          year: ed.querySelector('.eduYear').value
+        })),
+        loan: {
+          amount: Number(document.getElementById('loanAmount').value || 0),
+          purpose: document.getElementById('loanPurpose').value,
+          installment: Number(document.getElementById('loanInstallment').value || 0),
+          firstInstallment: document.getElementById('firstInstallment').value,
+          lastInstallment: document.getElementById('lastInstallment').value
+        },
+        guarantors: Array.from(document.querySelectorAll('#guarantorsList .guarantor-item')).map(g => ({
+          name: g.querySelector('.g_name').value,
+          memberNo: g.querySelector('.g_member').value,
+          idNo: g.querySelector('.g_id').value,
+          phone: g.querySelector('.g_phone').value,
+          email: g.querySelector('.g_email').value
+        })),
+        parents: Array.from(document.querySelectorAll('#parentsList .guarantor-item')).map(p => ({
+          name: p.querySelector('.p_name').value,
+          phone: p.querySelector('.p_phone').value,
+          id: p.querySelector('.p_id').value,
+          email: p.querySelector('.p_email').value || ''
+        })),
+        createdAt: Date.now(),
+        status: 'Submitted'
+      };
 
-      // Verify guarantors are members
-      for(const g of formData.guarantors){
-        if(!g.member){
-          // try to use member number field
+      // push to RTDB applications collection
+      const appsRef = push(ref(db, 'loanApplications'));
+      const appKey = appsRef.key;
+      await set(appsRef, appPayload);
+
+      // upload files to storage under uploads/{applicationId}/
+      const savedUrls = {};
+      const uploadList = [
+        {inputId:'idFront', key:'idFront'},
+        {inputId:'idBack', key:'idBack'},
+        {inputId:'passportPhoto', key:'passportPhoto'}
+      ];
+      for(const u of uploadList){
+        const inp = document.getElementById(u.inputId);
+        if(inp && inp.files && inp.files[0]){
+          try{
+            const path = `uploads/${appKey}/${u.key}_${Date.now()}`;
+            const sref = sRef(storage, path);
+            await uploadBytes(sref, inp.files[0]);
+            const url = await getDownloadURL(sref);
+            savedUrls[u.inputId] = url;
+            // add to DB under application attachments
+            await set(ref(db, `loanApplications/${appKey}/attachments/${u.key}`), url);
+          }catch(err){ console.error('upload fail', err); }
         }
       }
 
-      const appId = 'loan_'+Date.now();
-      // upload files then save
-      const fileUploads = await uploadAllFiles(appId);
-      formData.uploads = fileUploads;
-      formData.appliedAt = new Date().toISOString();
-
-      await db.ref('loan_applications/'+appId).set(formData);
-
-      // generate PDF and download
-      await generateLoanPDF(formData, appId);
-      alert('Application submitted and saved with id: '+appId);
-    }
-
-    // ---------- File uploads ----------
-    async function uploadAllFiles(appId){
-      const storageRoot = storage.ref('loan_applications/'+appId);
-      const uploads = {};
-      const fids = ['idFront','idBack','passport','supportDoc'];
-      for(const fid of fids){
-        const el = document.getElementById(fid);
-        if(el && el.files && el.files[0]){
-          const file = el.files[0];
-          const ref = storageRoot.child(fid+'_'+file.name);
-          await ref.put(file);
-          const url = await ref.getDownloadURL();
-          uploads[fid]=url;
+      // upload supporting docs (multiple)
+      const supportInp = document.getElementById('loanSupportDocs');
+      if(supportInp && supportInp.files && supportInp.files.length){
+        const arr = [];
+        for(const f of Array.from(supportInp.files)){
+          try{
+            const path = `uploads/${appKey}/support_${Date.now()}_${f.name.replace(/[^\w.]/g,'')}`;
+            const sref = sRef(storage, path);
+            await uploadBytes(sref, f);
+            const url = await getDownloadURL(sref);
+            arr.push({name: f.name, url});
+          }catch(e){ console.warn('support upload fail', e); }
         }
+        if(arr.length) await set(ref(db, `loanApplications/${appKey}/supportDocs`), arr);
       }
-      return uploads;
-    }
 
-    // ---------- Verification helpers ----------
-    async function verifyMemberByNumber(memberNo){
+      // update application entry with attachment references
+      await update(ref(db, `loanApplications/${appKey}`), { storageSaved: true });
+
+      // now build the final PDF embedding (use savedUrls to include images if needed)
       try{
-        const snap = await db.ref('members').orderByChild('memberNo').equalTo(memberNo).once('value');
-        return snap.exists();
-      }catch(e){ console.error(e); return false; }
+        const doc = await buildFinalApplicationPdf(savedUrls);
+        const applicantName = `${appPayload.applicant.firstName || 'Applicant'}`.replace(/\s+/g,'_');
+        const filename = `Loan_Application_${applicantName}.pdf`;
+        doc.save(filename);
+
+        // mark record with pdfDownloadAt
+        await update(ref(db, `loanApplications/${appKey}`), { pdfDownloadedAt: Date.now() });
+
+        alert('Application submitted successfully. PDF downloaded and application saved.');
+      }catch(e){
+        console.error('pdf build failed', e);
+        alert('Application saved, but failed to generate PDF on client. Check console.');
+      }
+    });
+
+    // download guarantor template (global button) - build blank template with applicant data
+    document.getElementById('downloadGuarantorTemplate').addEventListener('click', async ()=> {
+      const applicant = getApplicantSummary();
+      await buildGuarantorPdf({guarantor: {name:'[Guarantor name]', memberNo: '[Member no]', idNo:'', phone:'', email:''}, applicant});
+    });
+
+    // build review text
+    function buildReview(){
+      const payload = {
+        applicant: getApplicantSummary(),
+        residence: {
+          poBox: document.getElementById('poBox').value,
+          postalCode: document.getElementById('postalCode').value,
+          town: document.getElementById('town').value,
+          county: document.getElementById('county').value,
+          constituency: document.getElementById('constituency').value,
+          ward: document.getElementById('ward').value
+        },
+        loan: {
+          amount: document.getElementById('loanAmount').value,
+          purpose: document.getElementById('loanPurpose').value
+        },
+        guarantors: Array.from(document.querySelectorAll('#guarantorsList .guarantor-item')).map(g => ({
+          name: g.querySelector('.g_name').value,
+          memberNo: g.querySelector('.g_member').value
+        }))
+      };
+      document.getElementById('reviewText').textContent = JSON.stringify(payload, null, 2);
     }
 
-    async function verifyKenyaID(idno){
-      // Simple check for numeric and length; for authoritative verification you must compare to your members DB
-      if(!/^[0-9]{5,12}$/.test(idno)) return false;
-      const snap = await db.ref('members').orderByChild('idno').equalTo(idno).once('value');
-      return snap.exists();
-    }
+    // on load show first
+    showStep(1);
 
-    // ---------- PDF generation ----------
-    async function generateLoanPDF(data, appId){
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({unit:'pt', format:'a4'});
-      const left=40; let y=40;
-      doc.setFontSize(16); doc.text('Visionary Youth Group', left, y); y+=22;
-      doc.setFontSize(12); doc.text('Loan Application ('+appId+')', left, y); y+=20;
-      doc.setFontSize(10);
-      doc.text(`Name: ${data.first||''} ${data.middle||''} ${data.last||''}`, left, y); y+=14;
-      doc.text(`ID No: ${data.idno||''}`, left, y); y+=14;
-      doc.text(`Phone: ${data.phone||''} | Email: ${data.email||''}`, left, y); y+=18;
-      doc.text('---Permanent Residence---', left, y); y+=14;
-      doc.text(`County: ${data.county||''} | Constituency: ${data.constituency||''} | Ward: ${data.ward||''}`, left, y); y+=18;
-      doc.text('---Education---', left, y); y+=14;
-      (data.education||[]).forEach(ed=>{ doc.text(`${ed.examType||''} - ${ed.index||''} (${ed.year||''}) - ${ed.school||''}`, left, y); y+=12; if(y>740){ doc.addPage(); y=40; } });
-      y+=8; doc.text('---Loan---', left, y); y+=14;
-      doc.text(`Amount: KES ${data.loan?.amount||''} | Purpose: ${data.loan?.purpose||''}`, left, y); y+=14;
-      doc.text(`Installment: ${data.loan?.installment||''} | From: ${data.loan?.firstInst||''} To: ${data.loan?.lastInst||''}`, left, y); y+=24;
-      doc.text('Guarantors:', left, y); y+=14;
-      (data.guarantors||[]).forEach(g=>{ doc.text(`${g.name||g.member||''} | ID: ${g.id||''} | MemberNo: ${g.member||''}`, left, y); y+=12; if(y>740){ doc.addPage(); y=40; } });
-      doc.setFontSize(9); doc.text('Generated on: '+new Date().toLocaleString(), left, y+30);
-
-      // Add links to uploaded docs (note: PDFs cannot embed remote files easily; include URLs)
-      y+=40; doc.setFontSize(10); doc.text('Attachments (links):', left, y); y+=12;
-      const uploads = data.uploads||{}; Object.keys(uploads).forEach(k=>{ doc.text(`${k}: ${uploads[k]}`, left, y); y+=10; if(y>740){ doc.addPage(); y=40; } });
-
-      // trigger download
-      doc.save('loan_application_'+appId+'.pdf');
-    }
-
-    function generateGuarantorPDF(){
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({unit:'pt', format:'a4'});
-      doc.setFontSize(16); doc.text('Guarantor Agreement — Visionary Youth Group',40,40);
-      doc.setFontSize(11);
-      doc.text('I, the undersigned, agree to act as guarantor for the loan applied by the applicant. I confirm that the information I provide is true and I am a registered member of the society.\n\n',40,70);
-      doc.text('Guarantor details:',40,120);
-      doc.text('Name: ________________________',40,150);
-      doc.text('Member No: ____________________',40,175);
-      doc.text('ID No: ________________________',40,200);
-      doc.text('Phone: ________________________',40,225);
-      doc.text('Email: ________________________',40,250);
-      doc.text('\nSignature: ______________________    Date: ____________',40,290);
-      doc.save('guarantor_agreement_template.pdf');
-    }
-
-    // ---------- REVIEW UI ----------
-    function updateReview(){ collectFormToObject(); document.getElementById('reviewBox').textContent = JSON.stringify(formData, null, 2); }
-
-    // Update review when fields change (basic)
-    document.addEventListener('input', ()=>{ if(steps[currentStep] && steps[currentStep].id==='review') updateReview(); });
-
-    // Initialize
-    renderWizard();
-
+    // small UX: remove stray >> if present (some earlier paste had stray chars)
+    // (No-op but kept to ensure syntax)
   </script>
 </body>
 </html>
-
-## Wards
-- Add full ward list here…
