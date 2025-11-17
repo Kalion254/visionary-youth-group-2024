@@ -70,21 +70,6 @@
     .balance .label{color:var(--muted);font-size:0.95rem}
     .balance .value{font-weight:700;font-size:1.25rem;color:var(--accent);margin-top:8px}
 
-    /* action bar (loan table) */
-    .action-bar{grid-column:span 12;background:transparent;margin-top:6px}
-    .loan-table{width:100%;border-collapse:collapse;background:var(--card);border-radius:10px;overflow:hidden;box-shadow:0 8px 20px rgba(6,50,20,0.03)}
-    .loan-table th, .loan-table td{padding:12px;border-bottom:1px solid #eef6ee;text-align:left;font-size:0.95rem}
-    .loan-table thead th{background:linear-gradient(90deg,#f7fff7,#ffffff);font-weight:700}
-    .loan-stage {padding:6px 8px;border-radius:6px;font-weight:700;font-size:0.85rem}
-    .stage-pending{background:#fffbe6;color:#8a6d00}
-    .stage-active{background:#e6f8ec;color:#145c2e}
-    .stage-closed{background:#e8f0ff;color:#254188}
-
-    /* transactions */
-    .transactions-card{grid-column:span 12;margin-top:8px}
-    .tx-table{width:100%;border-collapse:collapse}
-    .tx-table th, .tx-table td{padding:10px;border-bottom:1px solid #eef6ee;text-align:left;font-size:0.9rem}
-    .tx-table thead th{background:#fbfff9}
 
     /* split grid */
     .big{grid-column:span 8}
@@ -183,54 +168,6 @@
       </div>
     </div>
 
-    <!-- loan action bar (table) -->
-    <div class="action-bar card">
-      <h3 style="margin-top:0">Loan Action Bar</h3>
-      <table class="loan-table">
-        <thead>
-          <tr>
-            <th>Loan Date</th>
-            <th>Amount</th>
-            <th>Interest</th>
-            <th>Installment</th>
-            <th>Due Date</th>
-            <th>Stage</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody id="loanActionBody">
-          <tr><td colspan="7" style="padding:14px">Loading loan summary...</td></tr>
-        </tbody>
-      </table>
-      <div style="margin-top:10px; font-size:13px" class="muted">Note: To apply for a new loan use the Apply Loan button (redirects to admin.html).</div>
-    </div>
-
-    <!-- Transactions (history) -->
-    <div class="transactions-card card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <h3 style="margin:0">Transaction History</h3>
-        <div style="display:flex;gap:8px;align-items:center">
-          <select id="txFilterType" class="muted" style="padding:6px;border-radius:6px;border:1px solid #e6f0ea">
-            <option value="all">All</option>
-            <option value="credit">Credit</option>
-            <option value="debit">Debit</option>
-          </select>
-          <button id="downloadTxBtn" class="btn secondary"><i class="fas fa-file-download"></i> Download</button>
-        </div>
-      </div>
-      <div style="overflow:auto;max-height:420px">
-        <table class="tx-table" id="txTable">
-          <thead>
-            <tr>
-              <th>Date</th><th>Description</th><th>Debit</th><th>Credit</th><th>Balance</th>
-            </tr>
-          </thead>
-          <tbody id="txBody">
-            <tr><td colspan="5" style="padding:12px">Loading transactions...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
 
     <!-- right side: payments, notifications, profile -->
     <aside class="card side">
@@ -288,30 +225,6 @@
       </div>
     </aside>
 
-    <!-- loans manage + profile expanded -->
-    <section class="card side" id="loansListFull">
-      <h2>Loans — Manage Applications</h2>
-      <div id="loansListArea">Loading loans…</div>
-      <div id="loansListFullInner" style="margin-top:12px"></div>
-
-      <hr style="margin:12px 0">
-      <div style="display:flex;gap:8px">
-        <button id="downloadStatement" class="btn secondary"><i class="fas fa-file-pdf"></i>&nbsp;Download Statement</button>
-        <button id="downloadApplications" class="btn" title="Download all my applications"><i class="fas fa-download"></i>&nbsp;My Applications</button>
-      </div>
-    </section>
-
-    <!-- My Loans (toggle) -->
-    <section class="card big hidden-section" id="myLoansSection">
-      <div class="section-head">
-        <h2>My Loans</h2>
-        <div>
-          <button id="applyLoanBtn" class="btn"><i class="fas fa-file-signature"></i> Apply Loan</button>
-          <button id="refreshLoansBtn" class="btn secondary"><i class="fas fa-sync"></i> Refresh</button>
-        </div>
-      </div>
-      <div id="myLoansList" style="margin-top:12px">Loading loans...</div>
-    </section>
 
     <!-- Self Serve (toggle) -->
     <section class="card big hidden-section" id="selfServeSection">
@@ -545,129 +458,6 @@
       onValue(ref(db, `members/${currentUid}/loans/total`), s => { const val = s.exists()? s.val() : {}; document.getElementById('totalLoansVal').textContent = formatKsh(val.total || 0); });
       onValue(ref(db, `members/${currentUid}/outstandingLoans`), s => { document.getElementById('outstandingLoansVal').textContent = formatKsh(s.exists()? s.val() : 0); });
 
-      // ===== Loan action bar (read-only)
-      onValue(ref(db, `loans/${currentUid}`), snap => {
-        const body = loanActionBody;
-        body.innerHTML = '';
-        if(!snap.exists()){ body.innerHTML = '<tr><td colspan="7" style="padding:12px">No loan records</td></tr>'; return; }
-        const loansObj = snap.val();
-
-        let loansArray = [];
-        if(typeof loansObj === 'object' && !Array.isArray(loansObj)) {
-          loansArray = Object.entries(loansObj).map(([id, l]) => ({ id, ...l }));
-        } else if(Array.isArray(loansObj)) {
-          loansArray = loansObj;
-        } else {
-          loansArray = [{ id: 'current', ...loansObj }];
-        }
-
-        // latest first
-        loansArray.sort((a,b)=> (new Date(b.loanDate||0).getTime()) - (new Date(a.loanDate||0).getTime()));
-
-        loansArray.forEach(loan => {
-          const tr = document.createElement('tr');
-          const stageLower = (loan.stage || loan.status || '').toLowerCase();
-          const stageClass = stageLower.includes('paid') || stageLower.includes('closed') ? 'stage-closed' : (stageLower.includes('active') ? 'stage-active' : 'stage-pending');
-          tr.innerHTML = `
-            <td>${safeText(loan.loanDate ? new Date(loan.loanDate).toLocaleDateString() : loan.loanDate || '-') }</td>
-            <td>${formatKsh(loan.amount || loan.amountFigures || 0)}</td>
-            <td>${safeText(loan.interest || loan.interestRate || loan.rate || '-')}</td>
-            <td>${formatKsh(loan.installment || loan.monthlyInstallment || 0)}</td>
-            <td>${safeText(loan.dueDate ? new Date(loan.dueDate).toLocaleDateString() : loan.dueDate || '-') }</td>
-            <td><span class="loan-stage ${stageClass}">${safeText(loan.stage || loan.status || 'Pending')}</span></td>
-            <td>
-              <button class="btn secondary btn-view-loan" data-loan-id="${loan.id}"><i class="fas fa-eye"></i> View</button>
-              <button class="btn btn-download-loan" data-loan-id="${loan.id}"><i class="fas fa-file-pdf"></i> Statement</button>
-              <button class="btn btn-clear-cert" data-loan-id="${loan.id}"><i class="fas fa-certificate"></i> Clearance</button>
-            </td>
-          `;
-          body.appendChild(tr);
-        });
-      });
-
-      // handle clicks on dynamically created buttons
-      document.body.addEventListener('click', async (e)=>{
-        const viewBtn = e.target.closest('.btn-view-loan');
-        const dlBtn = e.target.closest('.btn-download-loan');
-        const certBtn = e.target.closest('.btn-clear-cert');
-
-        if(viewBtn){
-          const loanId = viewBtn.dataset.loanId;
-          myLoansSection.classList.remove('hidden-section'); myLoansSection.classList.add('visible-section');
-          menu.style.display='none';
-          await loadMemberLoans();
-          const el = document.querySelector(`[data-loan-row="${loanId}"]`);
-          if(el) el.scrollIntoView({behavior:'smooth', block:'center'});
-        }
-
-        if(dlBtn){
-          const loanId = dlBtn.dataset.loanId;
-          const d = await buildLoanStatementPdfForLoan(loanId);
-          if(d) d.save(`Loan_Statement_${loanId || 'loan'}.pdf`);
-          awardPoints(1,'Downloaded loan statement');
-        }
-
-        if(certBtn){
-          const loanId = certBtn.dataset.loanId;
-          const snap = await get(ref(db, `loans/${currentUid}/${loanId}`));
-          const loan = snap.exists()? snap.val() : null;
-          if(!loan) return alert('Loan not found');
-          const outstanding = Number(loan.outstanding || loan.remaining || loan.balance || 0);
-          if(outstanding > 0) return alert('Clearance certificate available only when loan is fully paid');
-          const d = await buildClearanceCertificatePdf(loanId, loan);
-          if(d) d.save(`Clearance_${loanId}.pdf`);
-          awardPoints(3,'Downloaded clearance certificate');
-        }
-      });
-
-      // ===== Transactions rendering
-      function renderTransactions(snap) {
-        const tbody = txBody;
-        tbody.innerHTML = '';
-        if(!snap.exists()){ tbody.innerHTML = '<tr><td colspan="5" style="padding:12px">No transactions</td></tr>'; return; }
-        const txsObj = snap.val();
-        const txs = Object.entries(txsObj).map(([id, t]) => ({ id, ...t }));
-        txs.sort((a,b)=> (new Date(b.date||b.ts||b.timestamp).getTime()) - (new Date(a.date||a.ts||a.timestamp).getTime()));
-        const filter = txFilterType.value;
-
-        txs.forEach(t=>{
-          const isDebit = (t.debit && Number(t.debit)>0) || (t.type && t.type.toLowerCase()==='debit');
-          const isCredit = (t.credit && Number(t.credit)>0) || (t.type && t.type.toLowerCase()==='credit');
-          if(filter === 'debit' && !isDebit) return;
-          if(filter === 'credit' && !isCredit) return;
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td>${new Date(t.date || t.ts || t.timestamp || Date.now()).toLocaleString()}</td>
-            <td>${safeText(t.description || t.details || t.note || '')}</td>
-            <td>${t.debit ? formatKsh(t.debit) : '-'}</td>
-            <td>${t.credit ? formatKsh(t.credit) : '-'}</td>
-            <td>${t.balance ? formatKsh(t.balance) : '-'}</td>
-          `;
-          tbody.appendChild(tr);
-        });
-      }
-
-      onValue(ref(db, `transactions/${currentUid}`), snap => renderTransactions(snap));
-      txFilterType.addEventListener('change', ()=> get(ref(db, `transactions/${currentUid}`)).then(snap => renderTransactions(snap)));
-
-      // download tx as PDF
-      downloadTxBtn.addEventListener('click', async ()=>{
-        const snap = await get(ref(db, `transactions/${currentUid}`));
-        if(!snap.exists()) return alert('No transactions to download');
-        const txs = snap.val();
-        const doc = new jsPDF();
-        doc.setFontSize(12);
-        doc.text('Transactions', 20, 20);
-        let y=40;
-        Object.values(txs).sort((a,b)=> (new Date(b.date||b.ts||0) - new Date(a.date||a.ts||0))).forEach(t=>{
-          const line = `${new Date(t.date||t.ts||Date.now()).toLocaleString()} - ${t.description||''} - D:${t.debit||'-'} C:${t.credit||'-'} Bal:${t.balance||'-'}`;
-          const wrap = doc.splitTextToSize(line, 520);
-          doc.text(wrap, 20, y); y += wrap.length*8;
-          if(y>750){ doc.addPage(); y=40; }
-        });
-        doc.save(`transactions_${currentUid}.pdf`);
-        awardPoints(1, 'Downloaded transactions');
-      });
 
       // ===== Notifications
       function renderNotifSnapshot(snap) {
@@ -810,41 +600,7 @@
       });
       cancelProfileBtn.addEventListener('click', ()=>{ profileSection.classList.add('hidden-section'); profileSection.classList.remove('visible-section'); });
 
-      // ===== Loans applications list and status update (members/{uid}/loans/applications)
-      onValue(ref(db, `members/${currentUid}/loans/applications`), snap => {
-        const area = document.getElementById('loansListArea');
-        const areaFull = document.getElementById('loansListFullInner');
-        area.innerHTML = ''; areaFull.innerHTML = '';
-        if(!snap.exists()){ area.innerHTML = '<div class="muted">No applications found</div>'; return; }
-        const apps = snap.val();
-        Object.entries(apps).forEach(([id, app])=>{
-          const short = document.createElement('div');
-          short.style.padding='8px'; short.style.borderBottom='1px solid #eef6ee';
-          short.innerHTML = `<div style="display:flex;justify-content:space-between"><div><strong>${app.memberName || app.name || '(Applicant)'}</strong><div class="muted">Amount: ${formatKsh(app.amountFigures || app.amount || 0)} • Status: ${app.status||'Pending'}</div></div><div><small>${new Date(app.appliedAt || app.appliedAt || 0).toLocaleString()}</small></div></div>`;
-          area.appendChild(short);
-
-          const fullEntry = document.createElement('div');
-          fullEntry.style.padding='8px'; fullEntry.style.borderBottom='1px solid #eef6ee';
-          fullEntry.innerHTML = `
-            <div style="display:flex;justify-content:space-between;gap:12px;align-items:center">
-              <div style="flex:1">
-                <div style="font-weight:700">${app.memberName || app.name || '(Applicant)'}</div>
-                <div class="muted" style="font-size:0.9rem">Amount: ${formatKsh(app.amountFigures || app.amount || 0)} • Applied: ${new Date(app.appliedAt || 0).toLocaleString()}</div>
-                <div style="margin-top:6px">${safeText(app.purpose||'')}</div>
-              </div>
-              <div style="min-width:220px;display:flex;flex-direction:column;gap:6px;align-items:flex-end">
-                <select class="status-select" data-app-id="${id}">
-                  <option ${app.status==='Pending'?'selected':''}>Pending</option>
-                  <option ${app.status==='Approved'?'selected':''}>Approved</option>
-                  <option ${app.status==='Disbursed'?'selected':''}>Disbursed</option>
-                  <option ${app.status==='Paid'?'selected':''}>Paid</option>
-                  <option ${app.status==='Rejected'?'selected':''}>Rejected</option>
-                </select>
-                <small class="muted">Change status (updates RTDB)</small>
-              </div>
-            </div>
-          `;
-          areaFull.appendChild(fullEntry);
+     );
         });
 
         // attach change listeners (use update to only change status field)
