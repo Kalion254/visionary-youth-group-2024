@@ -3,49 +3,147 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Visionary Youth Group — Admin Portal</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<title>VYG — Admin Portal</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  body{font-family:'Poppins',sans-serif;background:#f8f9fa;margin:0;padding:0;display:flex;justify-content:center;align-items:center;height:100vh;}
-  .container{background:#fff;padding:32px 28px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.12);max-width:400px;width:90%;}
-  h2{text-align:center;color:#004d26;margin-bottom:24px;}
-  label{display:block;margin-top:14px;font-weight:500;color:#333;}
-  input, select{width:100%;padding:10px 14px;margin-top:6px;border-radius:6px;border:1px solid #ccc;font-size:15px;}
-  input:focus, select:focus{outline:none;border-color:#004d26;}
-  button{width:100%;padding:12px;margin-top:20px;background:#004d26;color:#fff;border:none;border-radius:6px;font-weight:600;font-size:16px;cursor:pointer;transition:0.3s;}
-  button:hover{background:#006633;}
-  .toggle-link{text-align:center;margin-top:12px;font-size:14px;}
-  .toggle-link a{color:#004d26;text-decoration:none;font-weight:500;}
-  .toggle-link a:hover{text-decoration:underline;}
+  body{
+    margin:0;
+    font-family:'Poppins',sans-serif;
+    background:url('https://images.unsplash.com/photo-1573497019309-1c29c88b4a4a?auto=format&fit=crop&w=1350&q=80') center/cover no-repeat;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    position:relative;
+  }
+  /* Dark overlay */
+  body::before{
+    content:"";
+    position:absolute;
+    top:0;left:0;
+    width:100%;height:100%;
+    background:rgba(0,0,0,0.55);
+    backdrop-filter:blur(3px);
+  }
+
+  .container{
+    position:relative;
+    width:90%;
+    max-width:430px;
+    background:white;
+    padding:35px 28px;
+    border-radius:14px;
+    box-shadow:0 8px 32px rgba(0,0,0,0.25);
+    animation:fadeIn 0.4s ease-in-out;
+  }
+
+  @keyframes fadeIn{
+    from{opacity:0;transform:translateY(20px);}
+    to{opacity:1;transform:translateY(0);}
+  }
+
+  h2{
+    text-align:center;
+    color:#004d26;
+    margin-bottom:20px;
+    font-weight:600;
+  }
+
+  label{
+    font-weight:500;
+    margin-top:12px;
+    display:block;
+    color:#222;
+  }
+
+  input,select{
+    width:100%;
+    padding:12px;
+    border-radius:8px;
+    border:1px solid #ccc;
+    margin-top:5px;
+    font-size:15px;
+  }
+
+  input:focus,select:focus{
+    border-color:#007a3d;
+    outline:none;
+  }
+
+  button{
+    width:100%;
+    padding:12px;
+    margin-top:22px;
+    background:#007a3d;
+    color:white;
+    border:none;
+    border-radius:8px;
+    font-weight:600;
+    cursor:pointer;
+    font-size:16px;
+    transition:0.25s;
+  }
+
+  button:hover{
+    background:#005e2e;
+  }
+
+  .toggle-link{
+    text-align:center;
+    margin-top:14px;
+  }
+
+  .toggle-link a{
+    text-decoration:none;
+    color:#007a3d;
+    font-weight:500;
+  }
+
+  .toggle-link a:hover{
+    text-decoration:underline;
+  }
+
   .error{color:red;font-size:14px;margin-top:6px;}
   .success{color:green;font-size:14px;margin-top:6px;}
 </style>
 </head>
+
 <body>
 
 <div class="container" id="authContainer">
+
   <h2 id="formTitle">Admin Login</h2>
 
+  <!-- LOGIN FORM -->
   <form id="loginForm">
     <label>Email</label>
     <input type="email" id="loginEmail" required>
+
     <label>Password</label>
     <input type="password" id="loginPassword" required>
+
     <button type="submit">Login</button>
+
     <div class="error" id="loginError"></div>
-    <div class="toggle-link">Don't have an account? <a href="#" id="showSignup">Sign Up</a></div>
+
+    <div class="toggle-link">No account? <a href="#" id="showSignup">Sign Up</a></div>
   </form>
 
+  <!-- SIGNUP FORM -->
   <form id="signupForm" style="display:none;">
     <label>Full Name</label>
     <input type="text" id="signupName" required>
+
     <label>Email</label>
     <input type="email" id="signupEmail" required>
+
     <label>Phone Number</label>
     <input type="text" id="signupPhone" required>
+
     <label>ID Number</label>
     <input type="text" id="signupID" required>
+
     <label>Role</label>
     <select id="signupRole" required>
       <option value="">Select Role</option>
@@ -53,13 +151,18 @@
       <option value="Secretary">Secretary</option>
       <option value="Treasurer">Treasurer</option>
     </select>
+
     <label>Password</label>
     <input type="password" id="signupPassword" required>
+
     <button type="submit">Sign Up</button>
+
     <div class="error" id="signupError"></div>
     <div class="success" id="signupSuccess"></div>
-    <div class="toggle-link">Already have an account? <a href="#" id="showLogin">Login</a></div>
+
+    <div class="toggle-link">Have an account? <a href="#" id="showLogin">Login</a></div>
   </form>
+
 </div>
 
 <!-- Firebase SDK -->
@@ -68,106 +171,113 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
 <script>
-  // Firebase config
-   const firebaseConfig = {
-      apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
-      authDomain: "visionary-youth-grou-2024.firebaseapp.com",
-      databaseURL: "https://visionary-youth-grou-2024-default-rtdb.firebaseio.com",
-      projectId: "visionary-youth-grou-2024",
-      storageBucket: "visionary-youth-grou-2024.appspot.com",
-      messagingSenderId: "372978592717",
-      appId: "1:372978592717:web:1c15aec728ee5f854f3284"
-    
+  // YOUR FIREBASE CONFIG HERE
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_APP.firebaseapp.com",
+    databaseURL: "https://YOUR_APP.firebaseio.com",
+    projectId: "YOUR_APP",
+    storageBucket: "YOUR_APP.appspot.com",
+    messagingSenderId: "YOUR_ID",
+    appId: "YOUR_APP_ID",
   };
   firebase.initializeApp(firebaseConfig);
+
   const db = firebase.database();
   const auth = firebase.auth();
 
-  // Toggle forms
+  // ---- FORM TOGGLING ----
   const loginForm = document.getElementById('loginForm');
   const signupForm = document.getElementById('signupForm');
   const showSignup = document.getElementById('showSignup');
   const showLogin = document.getElementById('showLogin');
 
-  showSignup.addEventListener('click', e => {
+  showSignup.onclick = e => {
     e.preventDefault();
-    loginForm.style.display = 'none';
-    signupForm.style.display = 'block';
-    document.getElementById('formTitle').innerText = 'Admin Sign Up';
-  });
+    loginForm.style.display = "none";
+    signupForm.style.display = "block";
+    document.getElementById('formTitle').innerText = "Admin Sign Up";
+  };
 
-  showLogin.addEventListener('click', e => {
+  showLogin.onclick = e => {
     e.preventDefault();
-    signupForm.style.display = 'none';
-    loginForm.style.display = 'block';
-    document.getElementById('formTitle').innerText = 'Admin Login';
-  });
+    signupForm.style.display = "none";
+    loginForm.style.display = "block";
+    document.getElementById('formTitle').innerText = "Admin Login";
+  };
 
-  // Signup
-  signupForm.addEventListener('submit', async (e) => {
+  // ---- SIGNUP ----
+  signupForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const name = document.getElementById('signupName').value.trim();
-    const email = document.getElementById('signupEmail').value.trim();
-    const phone = document.getElementById('signupPhone').value.trim();
-    const id = document.getElementById('signupID').value.trim();
-    const role = document.getElementById('signupRole').value;
-    const password = document.getElementById('signupPassword').value;
 
-    const signupError = document.getElementById('signupError');
-    const signupSuccess = document.getElementById('signupSuccess');
-    signupError.innerText = '';
-    signupSuccess.innerText = '';
+    const name = signupName.value;
+    const email = signupEmail.value;
+    const phone = signupPhone.value;
+    const id = signupID.value;
+    const role = signupRole.value;
+    const password = signupPassword.value;
+
+    signupError.textContent = "";
+    signupSuccess.textContent = "";
 
     try {
-      // Check if admin is pre-registered in RTDB
-      const snapshot = await db.ref('admins').orderByChild('id').equalTo(id).get();
-      if(snapshot.exists()){
-        const admins = snapshot.val();
-        let match = false;
-        for(let key in admins){
-          if(admins[key].role === role && admins[key].email === email){
-            match = true;
-            break;
-          }
-        }
-        if(!match){
-          signupError.innerText = "Role or email doesn't match our records.";
-          return;
-        }
-      } else {
-        signupError.innerText = "Admin not found in database.";
+      // Check pre-registered admins
+      const snap = await db.ref("admins").orderByChild("id").equalTo(id).get();
+
+      if (!snap.exists()) {
+        signupError.textContent = "This admin is NOT in the official records.";
         return;
       }
 
-      // Create Firebase Auth user
+      let match = false;
+      const data = snap.val();
+
+      for (let key in data) {
+        if (data[key].role === role && data[key].email === email)
+          match = true;
+      }
+
+      if (!match) {
+        signupError.textContent = "Email or role does NOT match official admin list.";
+        return;
+      }
+
+      // Create auth user
       await auth.createUserWithEmailAndPassword(email, password);
 
-      // Save admin details
-      const newAdminRef = db.ref('admins').push();
-      await newAdminRef.set({name,email,phone,id,role});
+      // Save full details
+      await db.ref("adminsList/" + auth.currentUser.uid).set({
+        name, email, phone, id, role, createdAt: Date.now()
+      });
 
-      signupSuccess.innerText = "Signup successful! You can now login.";
+      signupSuccess.textContent = "Signup successful! You may now login.";
       signupForm.reset();
-    } catch(err) {
-      signupError.innerText = err.message;
+
+    } catch (err) {
+      signupError.textContent = err.message;
     }
   });
 
-  // Login
-  loginForm.addEventListener('submit', async (e) => {
+  // ---- LOGIN ----
+  loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const email = document.getElementById('loginEmail').value.trim();
-    const password = document.getElementById('loginPassword').value;
-    const loginError = document.getElementById('loginError');
-    loginError.innerText = '';
+
+    loginError.textContent = "";
+
     try {
-      await auth.signInWithEmailAndPassword(email, password);
+      await auth.signInWithEmailAndPassword(
+        loginEmail.value,
+        loginPassword.value
+      );
+
       // Redirect to admin dashboard
-      window.location.href = 'admin-dashboard.html';
-    } catch(err) {
-      loginError.innerText = err.message;
+      window.location.href = "admin-dashboard.html";
+
+    } catch (err) {
+      loginError.textContent = err.message;
     }
   });
 </script>
+
 </body>
 </html>
