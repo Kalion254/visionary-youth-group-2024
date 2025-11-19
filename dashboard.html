@@ -727,7 +727,7 @@
         showToast('Initiating STK Push…');
         try{
           const payload = { phone, amount, account, memberId: currentUid, description: account || 'General payment' };
-          const resp = await fetch('https://mpesa-stk-y093.onrender.com/stkpush', {
+          const resp = await fetch('https://mpesa-production.onrender.com', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
