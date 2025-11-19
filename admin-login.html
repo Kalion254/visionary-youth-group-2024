@@ -122,6 +122,29 @@ const auth = firebase.auth();
 showSignup.onclick = e => { e.preventDefault(); loginForm.style.display="none"; signupForm.style.display="block"; formTitle.innerText="Admin Sign Up"; };
 showLogin.onclick = e => { e.preventDefault(); signupForm.style.display="none"; loginForm.style.display="block"; formTitle.innerText="Admin Login"; };
 
+// Function to check if all roles are signed up
+async function checkAllRolesSignedUp() {
+  const roles = ["Chairperson","Secretary","Treasurer"];
+  const signedSnap = await db.ref("adminsList").get();
+  if(signedSnap.exists()){
+    const admins = signedSnap.val();
+    let count=0;
+    roles.forEach(r=>{
+      for(let uid in admins){
+        if(admins[uid].role===r) { count++; break; }
+      }
+    });
+    if(count===roles.length){
+      signupForm.style.display="none";
+      return true;
+    }
+  }
+  return false;
+}
+
+// Initial check
+checkAllRolesSignedUp();
+
 // SIGNUP
 signupForm.addEventListener("submit", async e => {
   e.preventDefault();
@@ -159,6 +182,9 @@ signupForm.addEventListener("submit", async e => {
     signupSuccess.textContent="Signup successful! You may now login.";
     signupForm.reset();
 
+    // Check if all roles are signed up to hide form
+    checkAllRolesSignedUp();
+
   } catch(err){ signupError.textContent=err.message; }
 });
 
@@ -172,9 +198,8 @@ loginForm.addEventListener("submit", async e => {
     const password = loginPassword.value;
 
     const userCred = await auth.signInWithEmailAndPassword(email,password);
-    const uid = userCred.user.uid;
 
-    // Check admin by email instead of UID
+    // Check admin by email in adminsList
     const adminSnap = await db.ref("adminsList").orderByChild("email").equalTo(email).get();
     if(!adminSnap.exists()){
       await auth.signOut();
