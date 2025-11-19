@@ -18,7 +18,6 @@
     align-items:center;
     position:relative;
   }
-
   body::before{
     content:"";
     position:absolute;
@@ -26,7 +25,6 @@
     background:rgba(0,0,0,0.58);
     backdrop-filter:blur(3px);
   }
-
   .container{
     position:relative;
     width:90%;
@@ -37,73 +35,24 @@
     box-shadow:0 8px 32px rgba(0,0,0,0.25);
     animation:fadeIn 0.4s ease-in-out;
   }
-
   @keyframes fadeIn{
     from{opacity:0;transform:translateY(20px);}
     to{opacity:1;transform:translateY(0);}
   }
-
   h2{
     text-align:center;
     color:#004d26;
     margin-bottom:20px;
     font-weight:600;
   }
-
-  label{
-    font-weight:500;
-    margin-top:12px;
-    display:block;
-    color:#222;
-  }
-
-  input,select{
-    width:100%;
-    padding:12px;
-    border-radius:8px;
-    border:1px solid #ccc;
-    margin-top:5px;
-    font-size:15px;
-  }
-
-  input:focus,select:focus{
-    border-color:#007a3d;
-    outline:none;
-  }
-
-  button{
-    width:100%;
-    padding:12px;
-    margin-top:22px;
-    background:#007a3d;
-    color:white;
-    border:none;
-    border-radius:8px;
-    font-weight:600;
-    cursor:pointer;
-    font-size:16px;
-    transition:0.25s;
-  }
-
-  button:hover{
-    background:#005e2e;
-  }
-
-  .toggle-link{
-    text-align:center;
-    margin-top:14px;
-  }
-
-  .toggle-link a{
-    text-decoration:none;
-    color:#007a3d;
-    font-weight:500;
-  }
-
-  .toggle-link a:hover{
-    text-decoration:underline;
-  }
-
+  label{font-weight:500;margin-top:12px;display:block;color:#222;}
+  input,select{width:100%;padding:12px;border-radius:8px;border:1px solid #ccc;margin-top:5px;font-size:15px;}
+  input:focus,select:focus{border-color:#007a3d;outline:none;}
+  button{width:100%;padding:12px;margin-top:22px;background:#007a3d;color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:16px;transition:0.25s;}
+  button:hover{background:#005e2e;}
+  .toggle-link{text-align:center;margin-top:14px;}
+  .toggle-link a{text-decoration:none;color:#007a3d;font-weight:500;}
+  .toggle-link a:hover{text-decoration:underline;}
   .error{color:red;font-size:14px;margin-top:6px;}
   .success{color:green;font-size:14px;margin-top:6px;}
 </style>
@@ -171,115 +120,106 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
 <script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
-    authDomain: "visionary-youth-grou-2024.firebaseapp.com",
-    databaseURL: "https://visionary-youth-grou-2024-default-rtdb.firebaseio.com",
-    projectId: "visionary-youth-grou-2024",
-    storageBucket: "visionary-youth-grou-2024.appspot.com",
-    messagingSenderId: "372978592717",
-    appId: "1:372978592717:web:1c15aec728ee5f854f3284"
-  };
-  firebase.initializeApp(firebaseConfig);
+const firebaseConfig = {
+  apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
+  authDomain: "visionary-youth-grou-2024.firebaseapp.com",
+  databaseURL: "https://visionary-youth-grou-2024-default-rtdb.firebaseio.com",
+  projectId: "visionary-youth-grou-2024",
+  storageBucket: "visionary-youth-grou-2024.appspot.com",
+  messagingSenderId: "372978592717",
+  appId: "1:372978592717:web:1c15aec728ee5f854f3284"
+};
+firebase.initializeApp(firebaseConfig);
 
-  const db = firebase.database();
-  const auth = firebase.auth();
+const db = firebase.database();
+const auth = firebase.auth();
 
-  // TOGGLE LOGIN/SIGNUP
-  showSignup.onclick = e => {
-    e.preventDefault();
-    loginForm.style.display = "none";
-    signupForm.style.display = "block";
-    formTitle.innerText = "Admin Sign Up";
-  };
+// Toggle forms
+showSignup.onclick = e => { e.preventDefault(); loginForm.style.display="none"; signupForm.style.display="block"; formTitle.innerText="Admin Sign Up"; };
+showLogin.onclick = e => { e.preventDefault(); signupForm.style.display="none"; loginForm.style.display="block"; formTitle.innerText="Admin Login"; };
 
-  showLogin.onclick = e => {
-    e.preventDefault();
-    signupForm.style.display = "none";
-    loginForm.style.display = "block";
-    formTitle.innerText = "Admin Login";
-  };
+// SIGNUP — only allow official admins
+signupForm.addEventListener("submit", async e => {
+  e.preventDefault();
+  signupError.textContent = "";
+  signupSuccess.textContent = "";
 
-  // SIGNUP — CHECK AGAINST OFFICIAL LIST
-  signupForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
+  const name = signupName.value.trim();
+  const email = signupEmail.value.trim();
+  const phone = signupPhone.value.trim();
+  const id = signupID.value.trim();
+  const role = signupRole.value;
+  const password = signupPassword.value;
 
-    signupError.textContent = "";
-    signupSuccess.textContent = "";
-
-    const name = signupName.value;
-    const email = signupEmail.value;
-    const phone = signupPhone.value;
-    const id = signupID.value;
-    const role = signupRole.value;
-    const password = signupPassword.value;
-
-    try {
-      const snap = await db.ref("admins").orderByChild("id").equalTo(id).get();
-
-      if (!snap.exists()) {
-        signupError.textContent = "Admin not found in official records.";
-        return;
-      }
-
-      let match = false;
-      const admins = snap.val();
-
-      for (let k in admins) {
-        if (admins[k].email === email && admins[k].role === role) {
-          match = true;
-        }
-      }
-
-      if (!match) {
-        signupError.textContent = "Role or Email does NOT match official admin records.";
-        return;
-      }
-
-      await auth.createUserWithEmailAndPassword(email, password);
-
-      const uid = auth.currentUser.uid;
-
-      await db.ref("adminsList/" + uid).set({
-        name, email, phone, id, role, createdAt: Date.now()
-      });
-
-      signupSuccess.textContent = "Signup successful. You may now login.";
-      signupForm.reset();
-
-    } catch (err) {
-      signupError.textContent = err.message;
+  try {
+    // Check official admins
+    const snap = await db.ref("admins").orderByChild("id").equalTo(id).get();
+    if (!snap.exists()) {
+      signupError.textContent = "You are NOT registered as an official admin.";
+      return;
     }
-  });
 
-  // SECURE LOGIN — BLOCK NON-ADMINS
-  loginForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    loginError.textContent = "";
-
-    try {
-      const userCred = await auth.signInWithEmailAndPassword(
-        loginEmail.value,
-        loginPassword.value
-      );
-
-      const uid = userCred.user.uid;
-
-      const adminSnap = await db.ref("adminsList/" + uid).get();
-
-      if (!adminSnap.exists()) {
-        await auth.signOut();
-        loginError.textContent = "Access Denied. You are NOT an admin.";
-        return;
+    let match = false;
+    let currentKey = null;
+    const admins = snap.val();
+    for (let key in admins) {
+      if (admins[key].email === email && admins[key].role === role) {
+        match = true;
+        currentKey = key;
       }
-
-      window.location.href = "admin-dashboard.html";
-
-    } catch (err) {
-      loginError.textContent = err.message;
     }
-  });
+    if (!match) {
+      signupError.textContent = "Email or role does not match official admin records.";
+      return;
+    }
+
+    // Prevent duplicate signup if role already taken
+    const roleSnap = await db.ref("adminsList").orderByChild("role").equalTo(role).get();
+    if (roleSnap.exists()) {
+      signupError.textContent = `Signup for ${role} is already completed.`;
+      return;
+    }
+
+    // Create auth user
+    await auth.createUserWithEmailAndPassword(email, password);
+    const uid = auth.currentUser.uid;
+
+    // Save admin data
+    await db.ref("adminsList/" + uid).set({
+      name, email, phone, id, role, createdAt: Date.now()
+    });
+
+    signupSuccess.textContent = "Signup successful! You may now login.";
+    signupForm.reset();
+
+  } catch(err) {
+    signupError.textContent = err.message;
+  }
+});
+
+// LOGIN — only existing admin
+loginForm.addEventListener("submit", async e => {
+  e.preventDefault();
+  loginError.textContent = "";
+
+  try {
+    const userCred = await auth.signInWithEmailAndPassword(loginEmail.value.trim(), loginPassword.value);
+    const uid = userCred.user.uid;
+
+    const adminSnap = await db.ref("adminsList/" + uid).get();
+    if (!adminSnap.exists()) {
+      await auth.signOut();
+      loginError.textContent = "Access Denied. You are NOT an admin.";
+      return;
+    }
+
+    // Redirect to admin dashboard
+    window.location.href = "admin-dashboard.html";
+
+  } catch(err) {
+    loginError.textContent = err.message;
+  }
+});
 </script>
 
 </body>
