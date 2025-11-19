@@ -8,52 +8,52 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
-  body{
-    margin:0;
-    font-family:'Poppins',sans-serif;
-    background:url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1350&q=80') center/cover no-repeat;
-    height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    position:relative;
-  }
-  body::before{
-    content:"";
-    position:absolute;
-    inset:0;
-    background:rgba(0,0,0,0.58);
-    backdrop-filter:blur(3px);
-  }
-  .container{
-    position:relative;
-    width:90%;
-    max-width:430px;
-    background:white;
-    padding:35px 28px;
-    border-radius:14px;
-    box-shadow:0 8px 32px rgba(0,0,0,0.25);
-    animation:fadeIn 0.4s ease-in-out;
-  }
-  @keyframes fadeIn{
-    from{opacity:0;transform:translateY(20px);}
-    to{opacity:1;transform:translateY(0);}
-  }
-  h2{text-align:center;color:#004d26;margin-bottom:20px;font-weight:600;}
-  label{font-weight:500;margin-top:12px;display:block;color:#222;}
-  input,select{width:100%;padding:12px;border-radius:8px;border:1px solid #ccc;margin-top:5px;font-size:15px;}
-  input:focus,select:focus{border-color:#007a3d;outline:none;}
-  button{width:100%;padding:12px;margin-top:22px;background:#007a3d;color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:16px;transition:0.25s;}
-  button:hover{background:#005e2e;}
-  .toggle-link{text-align:center;margin-top:14px;}
-  .toggle-link a{text-decoration:none;color:#007a3d;font-weight:500;}
-  .toggle-link a:hover{text-decoration:underline;}
-  .error{color:red;font-size:14px;margin-top:6px;}
-  .success{color:green;font-size:14px;margin-top:6px;}
-  @media(max-width:480px){
-    .container{padding:25px 18px;}
-    h2{font-size:20px;}
-  }
+body{
+  margin:0;
+  font-family:'Poppins',sans-serif;
+  background:url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1350&q=80') center/cover no-repeat;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  position:relative;
+}
+body::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,0.58);
+  backdrop-filter:blur(3px);
+}
+.container{
+  position:relative;
+  width:90%;
+  max-width:430px;
+  background:white;
+  padding:35px 28px;
+  border-radius:14px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.25);
+  animation:fadeIn 0.4s ease-in-out;
+}
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(20px);}
+  to{opacity:1;transform:translateY(0);}
+}
+h2{text-align:center;color:#004d26;margin-bottom:20px;font-weight:600;}
+label{font-weight:500;margin-top:12px;display:block;color:#222;}
+input,select{width:100%;padding:12px;border-radius:8px;border:1px solid #ccc;margin-top:5px;font-size:15px;}
+input:focus,select:focus{border-color:#007a3d;outline:none;}
+button{width:100%;padding:12px;margin-top:22px;background:#007a3d;color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:16px;transition:0.25s;}
+button:hover{background:#005e2e;}
+.toggle-link{text-align:center;margin-top:14px;}
+.toggle-link a{text-decoration:none;color:#007a3d;font-weight:500;}
+.toggle-link a:hover{text-decoration:underline;}
+.error{color:red;font-size:14px;margin-top:6px;}
+.success{color:green;font-size:14px;margin-top:6px;}
+@media(max-width:480px){
+  .container{padding:25px 18px;}
+  h2{font-size:20px;}
+}
 </style>
 </head>
 
@@ -110,7 +110,6 @@
 
 </div>
 
-<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -126,7 +125,6 @@ const firebaseConfig = {
   appId: "1:130045074518:web:0cea4a53d34194f89f2ff7",
   measurementId: "G-94M788XBYX"
 };
- 
 firebase.initializeApp(firebaseConfig);
 
 const db = firebase.database();
@@ -168,15 +166,7 @@ signupForm.addEventListener("submit", async e => {
   const password = signupPassword.value;
 
   try {
-    // Double-check role availability
-    const snap = await db.ref("adminsList").orderByChild("role").equalTo(role).get();
-    if (snap.exists()) {
-      signupError.textContent = `Signup for ${role} is already completed.`;
-      updateRoleOptions();
-      return;
-    }
-
-    // Create auth
+    // Create Firebase Auth user
     const userCred = await auth.createUserWithEmailAndPassword(email, password);
     const uid = userCred.user.uid;
 
@@ -192,7 +182,7 @@ signupForm.addEventListener("submit", async e => {
   }
 });
 
-// LOGIN
+// LOGIN — verify from adminsList
 loginForm.addEventListener("submit", async e => {
   e.preventDefault();
   loginError.textContent = "";
@@ -208,7 +198,6 @@ loginForm.addEventListener("submit", async e => {
       return;
     }
 
-    // Redirect to admin dashboard
     window.location.href = "admin-dashboard.html";
 
   } catch(err) {
@@ -216,6 +205,5 @@ loginForm.addEventListener("submit", async e => {
   }
 });
 </script>
-
 </body>
 </html>
