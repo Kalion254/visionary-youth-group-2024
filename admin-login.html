@@ -163,7 +163,7 @@
     try {
       await auth.signInWithEmailAndPassword(email, password);
       // Redirect to admin dashboard
-      window.location.href = 'admin.html';
+      window.location.href = 'admin-dashboard.html';
     } catch(err) {
       loginError.innerText = err.message;
     }
