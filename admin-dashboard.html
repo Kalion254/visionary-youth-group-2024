@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VYG Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f4f7fd;
+            margin: 0;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: #3b82f6;
+            color: #fff;
+        }
+        
+        header h1 {
+            font-size: 1.5rem;
+        }
+        
+        header .profile {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 220px;
+            height: 100%;
+            background: #1e40af;
+            padding-top: 5rem;
+            display: flex;
+            flex-direction: column;
+            transition: 0.3s;
+        }
+        
+        .sidebar a {
+            color: #fff;
+            text-decoration: none;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        main {
+            margin-left: 220px;
+            padding: 2rem;
+        }
+        
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .card {
+            background: linear-gradient(135deg, #60a5fa, #3b82f6);
+            color: #fff;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+        
+        th,
+        td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+        }
+        
+        th {
+            background: #3b82f6;
+            color: #fff;
+        }
+        
+        tr:nth-child(even) {
+            background: #f3f4f6;
+        }
+        
+        @media(max-width:768px) {
+            .sidebar {
+                width: 60px;
+            }
+            .cards {
+                grid-template-columns: 1fr;
+            }
+            main {
+                margin-left: 60px;
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>VYG Admin</h1>
+        <div class="profile"><span>Admin Name</span><img src="https://via.placeholder.com/32" style="border-radius:50%;"></div>
+    </header>
+    <aside class="sidebar">
+        <a href="#"><i data-feather="home"></i><span>Dashboard</span></a>
+        <a href="#"><i data-feather="users"></i><span>Members</span></a>
+        <a href="#"><i data-feather="file-text"></i><span>Loans</span></a>
+        <a href="#"><i data-feather="bar-chart-2"></i><span>Transactions</span></a>
+    </aside>
+    <main>
+        <div class="cards">
+            <div class="card">
+                <h2>Total Members</h2>
+                <p id="totalMembers">0</p>
+            </div>
+            <div class="card">
+                <h2>Total Weekly Savings</h2>
+                <p id="totalWeekly">0</p>
+            </div>
+            <div class="card">
+                <h2>Total Monthly Savings</h2>
+                <p id="totalMonthly">0</p>
+            </div>
+            <div class="card">
+                <h2>Pending Loans</h2>
+                <p id="pendingLoans">0</p>
+            </div>
+            <div class="card">
+                <h2>Outstanding Loans</h2>
+                <p id="outstandingLoans">0</p>
+            </div>
+        </div>
+        <h2>Recent Members</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>ID</th>
+                    <th>Phone</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="memberTable"></tbody>
+        </table>
+    </main>
+    <script>
+        feather.replace();
+
+        async function loadAdminDashboard() {
+            // Members
+            const resMembers = await fetch('http://localhost:5000/api/members');
+            const members = await resMembers.json();
+            document.getElementById('totalMembers').textContent = members.length;
+            const tbody = document.getElementById('memberTable');
+            members.forEach(m => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${m.name}</td><td>${m.idNumber}</td><td>${m.phone}</td><td>${m.status}</td>`;
+                tbody.appendChild(tr);
+            });
+
+            // Savings
+            const resSavings = await fetch('http://localhost:5000/api/totalSavings');
+            const savings = await resSavings.json();
+            document.getElementById('totalWeekly').textContent = savings.totalWeekly || 0;
+            document.getElementById('totalMonthly').textContent = savings.totalMonthly || 0;
+
+            // Loans
+            const resLoans = await fetch('http://localhost:5000/api/loanSummary');
+            const loans = await resLoans.json();
+            document.getElementById('pendingLoans').textContent = loans.pending || 0;
+            document.getElementById('outstandingLoans').textContent = loans.outstanding || 0;
+        }
+
+        loadAdminDashboard();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Visionary Youth Group — Admin Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+  body{font-family:'Poppins',sans-serif;background:#f8f9fa;margin:0;padding:0;display:flex;justify-content:center;align-items:center;height:100vh;}
+  .container{background:#fff;padding:32px 28px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.12);max-width:400px;width:90%;}
+  h2{text-align:center;color:#004d26;margin-bottom:24px;}
+  label{display:block;margin-top:14px;font-weight:500;color:#333;}
+  input, select{width:100%;padding:10px 14px;margin-top:6px;border-radius:6px;border:1px solid #ccc;font-size:15px;}
+  input:focus, select:focus{outline:none;border-color:#004d26;}
+  button{width:100%;padding:12px;margin-top:20px;background:#004d26;color:#fff;border:none;border-radius:6px;font-weight:600;font-size:16px;cursor:pointer;transition:0.3s;}
+  button:hover{background:#006633;}
+  .toggle-link{text-align:center;margin-top:12px;font-size:14px;}
+  .toggle-link a{color:#004d26;text-decoration:none;font-weight:500;}
+  .toggle-link a:hover{text-decoration:underline;}
+  .error{color:red;font-size:14px;margin-top:6px;}
+  .success{color:green;font-size:14px;margin-top:6px;}
+</style>
+</head>
+<body>
+
+<div class="container" id="authContainer">
+  <h2 id="formTitle">Admin Login</h2>
+
+  <form id="loginForm">
+    <label>Email</label>
+    <input type="email" id="loginEmail" required>
+    <label>Password</label>
+    <input type="password" id="loginPassword" required>
+    <button type="submit">Login</button>
+    <div class="error" id="loginError"></div>
+    <div class="toggle-link">Don't have an account? <a href="#" id="showSignup">Sign Up</a></div>
+  </form>
+
+  <form id="signupForm" style="display:none;">
+    <label>Full Name</label>
+    <input type="text" id="signupName" required>
+    <label>Email</label>
+    <input type="email" id="signupEmail" required>
+    <label>Phone Number</label>
+    <input type="text" id="signupPhone" required>
+    <label>ID Number</label>
+    <input type="text" id="signupID" required>
+    <label>Role</label>
+    <select id="signupRole" required>
+      <option value="">Select Role</option>
+      <option value="Chairperson">Chairperson</option>
+      <option value="Secretary">Secretary</option>
+      <option value="Treasurer">Treasurer</option>
+    </select>
+    <label>Password</label>
+    <input type="password" id="signupPassword" required>
+    <button type="submit">Sign Up</button>
+    <div class="error" id="signupError"></div>
+    <div class="success" id="signupSuccess"></div>
+    <div class="toggle-link">Already have an account? <a href="#" id="showLogin">Login</a></div>
+  </form>
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+<script>
+  // Firebase config
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    databaseURL: "https://YOUR_PROJECT.firebaseio.com",
+    projectId: "YOUR_PROJECT",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_MESSAGING_ID",
+    appId: "YOUR_APP_ID"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+  const auth = firebase.auth();
+
+  // Toggle forms
+  const loginForm = document.getElementById('loginForm');
+  const signupForm = document.getElementById('signupForm');
+  const showSignup = document.getElementById('showSignup');
+  const showLogin = document.getElementById('showLogin');
+
+  showSignup.addEventListener('click', e => {
+    e.preventDefault();
+    loginForm.style.display = 'none';
+    signupForm.style.display = 'block';
+    document.getElementById('formTitle').innerText = 'Admin Sign Up';
+  });
+
+  showLogin.addEventListener('click', e => {
+    e.preventDefault();
+    signupForm.style.display = 'none';
+    loginForm.style.display = 'block';
+    document.getElementById('formTitle').innerText = 'Admin Login';
+  });
+
+  // Signup
+  signupForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = document.getElementById('signupName').value.trim();
+    const email = document.getElementById('signupEmail').value.trim();
+    const phone = document.getElementById('signupPhone').value.trim();
+    const id = document.getElementById('signupID').value.trim();
+    const role = document.getElementById('signupRole').value;
+    const password = document.getElementById('signupPassword').value;
+
+    const signupError = document.getElementById('signupError');
+    const signupSuccess = document.getElementById('signupSuccess');
+    signupError.innerText = '';
+    signupSuccess.innerText = '';
+
+    try {
+      // Check if admin is pre-registered in RTDB
+      const snapshot = await db.ref('admins').orderByChild('id').equalTo(id).get();
+      if(snapshot.exists()){
+        const admins = snapshot.val();
+        let match = false;
+        for(let key in admins){
+          if(admins[key].role === role && admins[key].email === email){
+            match = true;
+            break;
+          }
+        }
+        if(!match){
+          signupError.innerText = "Role or email doesn't match our records.";
+          return;
+        }
+      } else {
+        signupError.innerText = "Admin not found in database.";
+        return;
+      }
+
+      // Create Firebase Auth user
+      await auth.createUserWithEmailAndPassword(email, password);
+
+      // Save admin details
+      const newAdminRef = db.ref('admins').push();
+      await newAdminRef.set({name,email,phone,id,role});
+
+      signupSuccess.innerText = "Signup successful! You can now login.";
+      signupForm.reset();
+    } catch(err) {
+      signupError.innerText = err.message;
+    }
+  });
+
+  // Login
+  loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const loginError = document.getElementById('loginError');
+    loginError.innerText = '';
+    try {
+      await auth.signInWithEmailAndPassword(email, password);
+      // Redirect to admin dashboard
+      window.location.href = 'admin.html';
+    } catch(err) {
+      loginError.innerText = err.message;
+    }
+  });
+</script>
+</body>
+</html>
