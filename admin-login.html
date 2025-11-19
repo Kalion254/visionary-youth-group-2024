@@ -2,63 +2,73 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VYG — Admin Portal</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
 <style>
-body{
-  margin:0;
-  font-family:'Poppins',sans-serif;
-  background:url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1350&q=80') center/cover no-repeat;
-  height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  position:relative;
-}
-body::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:rgba(0,0,0,0.58);
-  backdrop-filter:blur(3px);
-}
-.container{
-  position:relative;
-  width:90%;
-  max-width:430px;
-  background:white;
-  padding:30px 25px;
-  border-radius:14px;
-  box-shadow:0 8px 32px rgba(0,0,0,0.25);
-  animation:fadeIn 0.4s ease-in-out;
-}
-@keyframes fadeIn{
-  from{opacity:0;transform:translateY(20px);}
-  to{opacity:1;transform:translateY(0);}
-}
-h2{text-align:center;color:#004d26;margin-bottom:20px;font-weight:600;}
-label{font-weight:500;margin-top:12px;display:block;color:#222;}
-input,select{width:100%;padding:12px;border-radius:8px;border:1px solid #ccc;margin-top:5px;font-size:15px;}
-input:focus,select:focus{border-color:#007a3d;outline:none;}
-button{width:100%;padding:12px;margin-top:22px;background:#007a3d;color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:16px;transition:0.25s;}
-button:hover{background:#005e2e;}
-button:disabled{background:#ccc;cursor:not-allowed;}
-.toggle-link{text-align:center;margin-top:14px;}
-.toggle-link a{text-decoration:none;color:#007a3d;font-weight:500;}
-.toggle-link a:hover{text-decoration:underline;}
-.error{color:red;font-size:14px;margin-top:6px;}
-.success{color:green;font-size:14px;margin-top:6px;}
-@media(max-width:500px){
-  .container{padding:25px 15px;}
-  h2{font-size:20px;}
-  input,select,button{font-size:14px;padding:10px;}
-}
+  body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1350&q=80') center/cover no-repeat;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+  body::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(3px);
+  }
+  .container {
+    position: relative;
+    width: 90%;
+    max-width: 430px;
+    background: white;
+    padding: 35px 28px;
+    border-radius: 14px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    z-index: 1;
+  }
+  h2 { text-align:center; color:#004d26; margin-bottom:20px; font-weight:600; }
+  label { display:block; margin-top:12px; font-weight:500; color:#222; }
+  input, select {
+    width:100%;
+    padding:12px;
+    margin-top:5px;
+    border-radius:8px;
+    border:1px solid #ccc;
+    font-size:15px;
+  }
+  input:focus, select:focus { border-color:#007a3d; outline:none; }
+  button {
+    width:100%;
+    padding:12px;
+    margin-top:22px;
+    background:#007a3d;
+    color:white;
+    border:none;
+    border-radius:8px;
+    font-weight:600;
+    cursor:pointer;
+    font-size:16px;
+    transition:0.25s;
+  }
+  button:hover { background:#005e2e; }
+  .toggle-link { text-align:center; margin-top:14px; }
+  .toggle-link a { text-decoration:none; color:#007a3d; font-weight:500; }
+  .toggle-link a:hover { text-decoration:underline; }
+  .error { color:red; font-size:14px; margin-top:6px; }
+  .success { color:green; font-size:14px; margin-top:6px; }
+  @media(max-width:480px) {
+    .container { padding: 25px 20px; }
+    h2 { font-size:20px; }
+  }
 </style>
 </head>
-
 <body>
 
 <div class="container" id="authContainer">
@@ -95,7 +105,7 @@ button:disabled{background:#ccc;cursor:not-allowed;}
     </select>
     <label>Password</label>
     <input type="password" id="signupPassword" required>
-    <button type="submit" id="signupBtn">Sign Up</button>
+    <button type="submit">Sign Up</button>
     <div class="error" id="signupError"></div>
     <div class="success" id="signupSuccess"></div>
     <div class="toggle-link">Have an account? <a href="#" id="showLogin">Login</a></div>
@@ -109,97 +119,111 @@ button:disabled{background:#ccc;cursor:not-allowed;}
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyDi-CrxIRZWNyrQLWgpLP-S20TlDwPKyd0",
-  authDomain: "vyg-admin.firebaseapp.com",
-  databaseURL: "https://vyg-admin-default-rtdb.firebaseio.com",
-  projectId: "vyg-admin",
-  storageBucket: "vyg-admin.firebasestorage.app",
-  messagingSenderId: "130045074518",
-  appId: "1:130045074518:web:0cea4a53d34194f89f2ff7"
-};
-firebase.initializeApp(firebaseConfig);
+  // Initialize Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyDi-CrxIRZWNyrQLWgpLP-S20TlDwPKyd0",
+    authDomain: "vyg-admin.firebaseapp.com",
+    databaseURL: "https://vyg-admin-default-rtdb.firebaseio.com",
+    projectId: "vyg-admin",
+    storageBucket: "vyg-admin.firebasestorage.app",
+    messagingSenderId: "130045074518",
+    appId: "1:130045074518:web:0cea4a53d34194f89f2ff7"
+  };
+  firebase.initializeApp(firebaseConfig);
 
-const db = firebase.database();
-const auth = firebase.auth();
+  const db = firebase.database();
+  const auth = firebase.auth();
 
-// Toggle forms
-showSignup.onclick = e => { e.preventDefault(); loginForm.style.display="none"; signupForm.style.display="block"; formTitle.innerText="Admin Sign Up"; };
-showLogin.onclick = e => { e.preventDefault(); signupForm.style.display="none"; loginForm.style.display="block"; formTitle.innerText="Admin Login"; };
+  // Toggle forms
+  const loginForm = document.getElementById("loginForm");
+  const signupForm = document.getElementById("signupForm");
+  const showSignup = document.getElementById("showSignup");
+  const showLogin = document.getElementById("showLogin");
+  const formTitle = document.getElementById("formTitle");
 
-// Function to check roles
-async function checkRoles() {
-  const roles = ["Chairperson","Secretary","Treasurer"];
-  const snap = await db.ref("adminsList").get();
-  const admins = snap.exists() ? snap.val() : {};
-  let filledRoles = roles.filter(r=>Object.values(admins).some(a=>a.role===r));
-  if(filledRoles.length===roles.length){
-    signupBtn.disabled = true;
-    signupBtn.textContent = "All roles filled";
-  } else { signupBtn.disabled = false; signupBtn.textContent = "Sign Up"; }
-}
-checkRoles();
+  showSignup.onclick = e => { e.preventDefault(); loginForm.style.display="none"; signupForm.style.display="block"; formTitle.innerText="Admin Sign Up"; };
+  showLogin.onclick = e => { e.preventDefault(); signupForm.style.display="none"; loginForm.style.display="block"; formTitle.innerText="Admin Login"; };
 
-// SIGNUP
-signupForm.addEventListener("submit", async e => {
-  e.preventDefault();
-  signupError.textContent = "";
-  signupSuccess.textContent = "";
+  // SIGNUP
+  signupForm.addEventListener("submit", async e => {
+    e.preventDefault();
+    document.getElementById("signupError").textContent="";
+    document.getElementById("signupSuccess").textContent="";
 
-  const name = signupName.value.trim();
-  const email = signupEmail.value.trim();
-  const phone = signupPhone.value.trim();
-  const id = signupID.value.trim();
-  const role = signupRole.value;
-  const password = signupPassword.value;
+    const name = signupName.value.trim();
+    const email = signupEmail.value.trim();
+    const phone = signupPhone.value.trim();
+    const id = signupID.value.trim();
+    const role = signupRole.value;
+    const password = signupPassword.value;
 
-  try {
-    // Check official admins
-    const snap = await db.ref("admins").orderByChild("id").equalTo(id).get();
-    if(!snap.exists()){ signupError.textContent="You are NOT registered as an official admin."; return; }
+    try {
+      // Check if admin is pre-registered
+      const snap = await db.ref("admins").get();
+      const admins = snap.val();
+      let isOfficial = false;
+      for(let key in admins) {
+        if(admins[key].id === id && admins[key].email === email && admins[key].role === role){
+          isOfficial = true;
+          break;
+        }
+      }
+      if(!isOfficial) {
+        document.getElementById("signupError").textContent="You are NOT registered as an official admin.";
+        return;
+      }
 
-    let match=false;
-    const admins = snap.val();
-    for(let k in admins){ if(admins[k].email===email && admins[k].role===role){ match=true; break; } }
-    if(!match){ signupError.textContent="Email or role does not match official admin records."; return; }
+      // Check if this role is already signed up
+      const roleSnap = await db.ref("adminsList").orderByChild("role").equalTo(role).get();
+      if(roleSnap.exists()) {
+        document.getElementById("signupError").textContent=`Signup for ${role} is already completed.`;
+        return;
+      }
 
-    // Prevent duplicate role signup
-    const roleSnap = await db.ref("adminsList").orderByChild("role").equalTo(role).get();
-    if(roleSnap.exists()){ signupError.textContent=`Signup for ${role} already done.`; return; }
+      // Create Firebase Auth
+      const userCred = await auth.createUserWithEmailAndPassword(email, password);
+      const uid = userCred.user.uid;
 
-    // Create user in Auth
-    await auth.createUserWithEmailAndPassword(email,password);
-    const uid = auth.currentUser.uid;
+      // Save to adminsList
+      await db.ref("adminsList/" + uid).set({
+        name, email, phone, id, role, createdAt: Date.now()
+      });
 
-    // Save in RTDB
-    await db.ref("adminsList/"+uid).set({ name,email,phone,id,role,createdAt:Date.now() });
+      document.getElementById("signupSuccess").textContent="Signup successful! You may now login.";
+      signupForm.reset();
 
-    signupSuccess.textContent="Signup successful! You may now login.";
-    signupForm.reset();
-    checkRoles();
+    } catch(err){
+      document.getElementById("signupError").textContent = err.message;
+    }
+  });
 
-  } catch(err){ signupError.textContent=err.message; }
-});
+  // LOGIN
+  loginForm.addEventListener("submit", async e => {
+    e.preventDefault();
+    document.getElementById("loginError").textContent="";
 
-// LOGIN
-loginForm.addEventListener("submit", async e => {
-  e.preventDefault();
-  loginError.textContent = "";
+    try {
+      const email = loginEmail.value.trim();
+      const password = loginPassword.value;
 
-  try {
-    const email = loginEmail.value.trim();
-    const password = loginPassword.value;
+      const userCred = await auth.signInWithEmailAndPassword(email, password);
+      const uid = userCred.user.uid;
 
-    const userCred = await auth.signInWithEmailAndPassword(email,password);
+      // Verify admin
+      const snap = await db.ref("adminsList/" + uid).get();
+      if(!snap.exists()){
+        await auth.signOut();
+        document.getElementById("loginError").textContent="Access Denied. You are NOT an admin.";
+        return;
+      }
 
-    // Verify admin exists in adminsList
-    const adminSnap = await db.ref("adminsList").orderByChild("email").equalTo(email).get();
-    if(!adminSnap.exists()){ await auth.signOut(); loginError.textContent="Access Denied. You are NOT an admin."; return; }
+      // Redirect to dashboard
+      window.location.href = "admin-dashboard.html";
 
-    window.location.href="admin-dashboard.html";
-
-  } catch(err){ loginError.textContent=err.message; }
-});
+    } catch(err){
+      document.getElementById("loginError").textContent = err.message;
+    }
+  });
 </script>
 
 </body>
