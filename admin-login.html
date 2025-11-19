@@ -6,24 +6,24 @@
 <title>VYG — Admin Portal</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
 <style>
   body{
     margin:0;
     font-family:'Poppins',sans-serif;
-    background:url('https://images.unsplash.com/photo-1573497019309-1c29c88b4a4a?auto=format&fit=crop&w=1350&q=80') center/cover no-repeat;
+    background:url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1350&q=80') center/cover no-repeat;
     height:100vh;
     display:flex;
     justify-content:center;
     align-items:center;
     position:relative;
   }
-  /* Dark overlay */
+
   body::before{
     content:"";
     position:absolute;
-    top:0;left:0;
-    width:100%;height:100%;
-    background:rgba(0,0,0,0.55);
+    inset:0;
+    background:rgba(0,0,0,0.58);
     backdrop-filter:blur(3px);
   }
 
@@ -171,44 +171,41 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
 <script>
-  // YOUR FIREBASE CONFIG HERE
-    const firebaseConfig = {
-      apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
-      authDomain: "visionary-youth-grou-2024.firebaseapp.com",
-      databaseURL: "https://visionary-youth-grou-2024-default-rtdb.firebaseio.com",
-      projectId: "visionary-youth-grou-2024",
-      storageBucket: "visionary-youth-grou-2024.appspot.com",
-      messagingSenderId: "372978592717",
-      appId: "1:372978592717:web:1c15aec728ee5f854f3284"
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyA_OCu7HQ5HCH2OYx5dQ2Z1r7YPwQJave4",
+    authDomain: "visionary-youth-grou-2024.firebaseapp.com",
+    databaseURL: "https://visionary-youth-grou-2024-default-rtdb.firebaseio.com",
+    projectId: "visionary-youth-grou-2024",
+    storageBucket: "visionary-youth-grou-2024.appspot.com",
+    messagingSenderId: "372978592717",
+    appId: "1:372978592717:web:1c15aec728ee5f854f3284"
+  };
   firebase.initializeApp(firebaseConfig);
 
   const db = firebase.database();
   const auth = firebase.auth();
 
-  // ---- FORM TOGGLING ----
-  const loginForm = document.getElementById('loginForm');
-  const signupForm = document.getElementById('signupForm');
-  const showSignup = document.getElementById('showSignup');
-  const showLogin = document.getElementById('showLogin');
-
+  // TOGGLE LOGIN/SIGNUP
   showSignup.onclick = e => {
     e.preventDefault();
     loginForm.style.display = "none";
     signupForm.style.display = "block";
-    document.getElementById('formTitle').innerText = "Admin Sign Up";
+    formTitle.innerText = "Admin Sign Up";
   };
 
   showLogin.onclick = e => {
     e.preventDefault();
     signupForm.style.display = "none";
     loginForm.style.display = "block";
-    document.getElementById('formTitle').innerText = "Admin Login";
+    formTitle.innerText = "Admin Login";
   };
 
-  // ---- SIGNUP ----
+  // SIGNUP — CHECK AGAINST OFFICIAL LIST
   signupForm.addEventListener("submit", async (e) => {
     e.preventDefault();
+
+    signupError.textContent = "";
+    signupSuccess.textContent = "";
 
     const name = signupName.value;
     const email = signupEmail.value;
@@ -217,40 +214,37 @@
     const role = signupRole.value;
     const password = signupPassword.value;
 
-    signupError.textContent = "";
-    signupSuccess.textContent = "";
-
     try {
-      // Check pre-registered admins
       const snap = await db.ref("admins").orderByChild("id").equalTo(id).get();
 
       if (!snap.exists()) {
-        signupError.textContent = "This admin is NOT in the official records.";
+        signupError.textContent = "Admin not found in official records.";
         return;
       }
 
       let match = false;
-      const data = snap.val();
+      const admins = snap.val();
 
-      for (let key in data) {
-        if (data[key].role === role && data[key].email === email)
+      for (let k in admins) {
+        if (admins[k].email === email && admins[k].role === role) {
           match = true;
+        }
       }
 
       if (!match) {
-        signupError.textContent = "Email or role does NOT match official admin list.";
+        signupError.textContent = "Role or Email does NOT match official admin records.";
         return;
       }
 
-      // Create auth user
       await auth.createUserWithEmailAndPassword(email, password);
 
-      // Save full details
-      await db.ref("adminsList/" + auth.currentUser.uid).set({
+      const uid = auth.currentUser.uid;
+
+      await db.ref("adminsList/" + uid).set({
         name, email, phone, id, role, createdAt: Date.now()
       });
 
-      signupSuccess.textContent = "Signup successful! You may now login.";
+      signupSuccess.textContent = "Signup successful. You may now login.";
       signupForm.reset();
 
     } catch (err) {
@@ -258,19 +252,28 @@
     }
   });
 
-  // ---- LOGIN ----
+  // SECURE LOGIN — BLOCK NON-ADMINS
   loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     loginError.textContent = "";
 
     try {
-      await auth.signInWithEmailAndPassword(
+      const userCred = await auth.signInWithEmailAndPassword(
         loginEmail.value,
         loginPassword.value
       );
 
-      // Redirect to admin dashboard
+      const uid = userCred.user.uid;
+
+      const adminSnap = await db.ref("adminsList/" + uid).get();
+
+      if (!adminSnap.exists()) {
+        await auth.signOut();
+        loginError.textContent = "Access Denied. You are NOT an admin.";
+        return;
+      }
+
       window.location.href = "admin-dashboard.html";
 
     } catch (err) {
