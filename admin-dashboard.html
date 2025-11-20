@@ -1,195 +1,238 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VYG Admin Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: #f4f7fd;
-            margin: 0;
-        }
-        
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem;
-            background: #3b82f6;
-            color: #fff;
-        }
-        
-        header h1 {
-            font-size: 1.5rem;
-        }
-        
-        header .profile {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 220px;
-            height: 100%;
-            background: #1e40af;
-            padding-top: 5rem;
-            display: flex;
-            flex-direction: column;
-            transition: 0.3s;
-        }
-        
-        .sidebar a {
-            color: #fff;
-            text-decoration: none;
-            padding: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        main {
-            margin-left: 220px;
-            padding: 2rem;
-        }
-        
-        .cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-        
-        .card {
-            background: linear-gradient(135deg, #60a5fa, #3b82f6);
-            color: #fff;
-            padding: 1.5rem;
-            border-radius: 1rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: #fff;
-            border-radius: 0.5rem;
-            overflow: hidden;
-        }
-        
-        th,
-        td {
-            padding: 0.75rem 1rem;
-            text-align: left;
-        }
-        
-        th {
-            background: #3b82f6;
-            color: #fff;
-        }
-        
-        tr:nth-child(even) {
-            background: #f3f4f6;
-        }
-        
-        @media(max-width:768px) {
-            .sidebar {
-                width: 60px;
-            }
-            .cards {
-                grid-template-columns: 1fr;
-            }
-            main {
-                margin-left: 60px;
-                padding: 1rem;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VYG Admin Dashboard</title>
+
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+
+    body{background:#f4f7fa;color:#222;}
+    header{background:#004d26;color:#fff;padding:18px;font-size:20px;font-weight:600;display:flex;justify-content:space-between;align-items:center;}
+    header button{background:#fff;color:#004d26;border:none;padding:8px 14px;border-radius:6px;font-weight:600;}
+
+    /* Layout */
+    .container{width:95%;max-width:1150px;margin:20px auto;}
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:14px;
+    }
+
+    .card{
+      background:#fff;padding:18px;border-radius:12px;
+      box-shadow:0 4px 12px rgba(0,0,0,.08);
+      text-align:center;
+    }
+
+    .card h3{font-size:20px;margin-bottom:6px;}
+    .card p{font-size:14px;color:#444;}
+
+    /* Tables */
+    table{width:100%;border-collapse:collapse;margin-top:18px;background:#fff;border-radius:12px;overflow:hidden;}
+    th,td{padding:12px;font-size:14px;border-bottom:1px solid #eee;text-align:left;}
+    th{background:#004d26;color:#fff;}
+    tr:hover{background:#f2f7f3;}
+
+    /* Form popup */
+    #addAdminForm{
+      display:none;
+      position:fixed;top:50%;left:50%;
+      transform:translate(-50%,-50%);
+      width:90%;max-width:420px;
+      background:#fff;padding:22px;border-radius:12px;
+      box-shadow:0 8px 24px rgba(0,0,0,.2);
+      z-index:999;
+    }
+    #addAdminForm input,select{
+      width:100%;padding:10px;margin:8px 0;
+      border:1px solid #ccc;border-radius:6px;
+    }
+    #addAdminForm button{
+      margin-top:10px;width:100%;
+      background:#004d26;color:#fff;
+      border:none;padding:10px;border-radius:6px;
+      font-weight:600;
+    }
+
+    #overlay{
+      display:none;position:fixed;top:0;left:0;
+      width:100%;height:100%;
+      background:rgba(0,0,0,.4);
+      z-index:900;
+    }
+
+    @media(max-width:650px){
+      header{flex-direction:column;gap:10px;text-align:center;}
+      th,td{font-size:12px;padding:8px;}
+    }
+  </style>
 </head>
 
 <body>
-    <header>
-        <h1>VYG Admin</h1>
-        <div class="profile"><span>Admin Name</span><img src="https://via.placeholder.com/32" style="border-radius:50%;"></div>
-    </header>
-    <aside class="sidebar">
-        <a href="#"><i data-feather="home"></i><span>Dashboard</span></a>
-        <a href="#"><i data-feather="users"></i><span>Members</span></a>
-        <a href="#"><i data-feather="file-text"></i><span>Loans</span></a>
-        <a href="#"><i data-feather="bar-chart-2"></i><span>Transactions</span></a>
-    </aside>
-    <main>
-        <div class="cards">
-            <div class="card">
-                <h2>Total Members</h2>
-                <p id="totalMembers">0</p>
-            </div>
-            <div class="card">
-                <h2>Total Weekly Savings</h2>
-                <p id="totalWeekly">0</p>
-            </div>
-            <div class="card">
-                <h2>Total Monthly Savings</h2>
-                <p id="totalMonthly">0</p>
-            </div>
-            <div class="card">
-                <h2>Pending Loans</h2>
-                <p id="pendingLoans">0</p>
-            </div>
-            <div class="card">
-                <h2>Outstanding Loans</h2>
-                <p id="outstandingLoans">0</p>
-            </div>
-        </div>
-        <h2>Recent Members</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>ID</th>
-                    <th>Phone</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody id="memberTable"></tbody>
-        </table>
-    </main>
-    <script>
-        feather.replace();
 
-        async function loadAdminDashboard() {
-            // Members
-            const resMembers = await fetch('http://localhost:5000/api/members');
-            const members = await resMembers.json();
-            document.getElementById('totalMembers').textContent = members.length;
-            const tbody = document.getElementById('memberTable');
-            members.forEach(m => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `<td>${m.name}</td><td>${m.idNumber}</td><td>${m.phone}</td><td>${m.status}</td>`;
-                tbody.appendChild(tr);
-            });
+<header>
+  Visionary Youth Group — Admin Dashboard
+  <button onclick="logout()">Logout</button>
+</header>
 
-            // Savings
-            const resSavings = await fetch('http://localhost:5000/api/totalSavings');
-            const savings = await resSavings.json();
-            document.getElementById('totalWeekly').textContent = savings.totalWeekly || 0;
-            document.getElementById('totalMonthly').textContent = savings.totalMonthly || 0;
+<div class="container">
 
-            // Loans
-            const resLoans = await fetch('http://localhost:5000/api/loanSummary');
-            const loans = await resLoans.json();
-            document.getElementById('pendingLoans').textContent = loans.pending || 0;
-            document.getElementById('outstandingLoans').textContent = loans.outstanding || 0;
-        }
+  <!-- CARDS -->
+  <div class="grid">
+    <div class="card"><h3 id="membersCount">0</h3><p>Members Registered</p></div>
+    <div class="card"><h3 id="loanCount">0</h3><p>Total Loans</p></div>
+    <div class="card"><h3 id="transactionCount">0</h3><p>Transactions</p></div>
+    <div class="card">
+      <button onclick="openAdminForm()" style="padding:10px 14px;background:#FFCC00;color:#00371a;border:none;border-radius:6px;font-weight:700;">+ Add Admin</button>
+    </div>
+  </div>
 
-        loadAdminDashboard();
-    </script>
+  <!-- MEMBERS TABLE -->
+  <h2 style="margin-top:25px;color:#004d26;">Members</h2>
+  <table id="membersTable">
+    <thead><tr><th>Name</th><th>ID</th><th>Phone</th><th>Balance</th></tr></thead>
+    <tbody></tbody>
+  </table>
+
+  <!-- LOANS TABLE -->
+  <h2 style="margin-top:25px;color:#004d26;">Loans</h2>
+  <table id="loansTable">
+    <thead><tr><th>Member</th><th>Amount</th><th>Status</th><th>Due Date</th></tr></thead>
+    <tbody></tbody>
+  </table>
+
+  <!-- TRANSACTIONS TABLE -->
+  <h2 style="margin-top:25px;color:#004d26;">Transactions</h2>
+  <table id="transactionsTable">
+    <thead><tr><th>Date</th><th>Description</th><th>Type</th><th>Amount</th></tr></thead>
+    <tbody></tbody>
+  </table>
+
+</div>
+
+<!-- ADD ADMIN POPUP -->
+<div id="overlay"></div>
+
+<div id="addAdminForm">
+  <h3 style="margin-bottom:10px;color:#004d26;">Add New Admin</h3>
+
+  <input type="text" id="adminName" placeholder="Full Name">
+  <input type="text" id="adminId" placeholder="ID Number">
+  <input type="email" id="adminEmail" placeholder="Email">
+
+  <select id="adminRole">
+    <option value="">Select Role</option>
+    <option value="chairperson">Chairperson</option>
+    <option value="secretary">Secretary</option>
+    <option value="treasurer">Treasurer</option>
+  </select>
+
+  <button onclick="saveAdmin()">Save Admin</button>
+</div>
+
+<script>
+  const API = "http://localhost:5000/api";  // CHANGE IF ONLINE
+
+  document.addEventListener("DOMContentLoaded", loadDashboard);
+
+  async function loadDashboard(){
+    loadCounts();
+    loadMembers();
+    loadLoans();
+    loadTransactions();
+  }
+
+  async function loadCounts(){
+    let m = await fetch(API + "/members/count").then(r=>r.json());
+    let l = await fetch(API + "/loans/count").then(r=>r.json());
+    let t = await fetch(API + "/transactions/count").then(r=>r.json());
+
+    document.getElementById("membersCount").innerText = m.count;
+    document.getElementById("loanCount").innerText = l.count;
+    document.getElementById("transactionCount").innerText = t.count;
+  }
+
+  async function loadMembers(){
+    let res = await fetch(API + "/members");
+    let data = await res.json();
+
+    let tbody = document.querySelector("#membersTable tbody");
+    tbody.innerHTML = "";
+
+    data.forEach(m=>{
+      tbody.innerHTML += `<tr>
+        <td>${m.name}</td>
+        <td>${m.id}</td>
+        <td>${m.phone}</td>
+        <td>KES ${m.balance}</td>
+      </tr>`;
+    });
+  }
+
+  async function loadLoans(){
+    let res = await fetch(API + "/loans");
+    let loans = await res.json();
+    let tbody = document.querySelector("#loansTable tbody");
+    tbody.innerHTML = "";
+
+    loans.forEach(l=>{
+      tbody.innerHTML += `<tr>
+        <td>${l.memberName}</td>
+        <td>KES ${l.amount}</td>
+        <td>${l.status}</td>
+        <td>${l.dueDate}</td>
+      </tr>`;
+    });
+  }
+
+  async function loadTransactions(){
+    let res = await fetch(API + "/transactions");
+    let data = await res.json();
+
+    let tbody = document.querySelector("#transactionsTable tbody");
+    tbody.innerHTML = "";
+
+    data.forEach(t=>{
+      tbody.innerHTML += `<tr>
+        <td>${t.date}</td>
+        <td>${t.description}</td>
+        <td>${t.type}</td>
+        <td>KES ${t.amount}</td>
+      </tr>`;
+    });
+  }
+
+  function openAdminForm(){
+    document.getElementById("addAdminForm").style.display = "block";
+    document.getElementById("overlay").style.display = "block";
+  }
+
+  function logout(){
+    alert("Logged out");
+    window.location.href = "admin-login.html";
+  }
+
+  async function saveAdmin(){
+    let payload = {
+      name: adminName.value,
+      id: adminId.value,
+      email: adminEmail.value,
+      role: adminRole.value
+    };
+
+    await fetch(API + "/admins", {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    alert("Admin saved successfully!");
+    location.reload();
+  }
+</script>
+
 </body>
-
 </html>
