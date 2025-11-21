@@ -1,4 +1,4 @@
-
+rewrite maintaining this
 <!doctype html>
 <html lang="en">
 <head>
@@ -310,28 +310,265 @@
   Note: adapt endpoints and payloads to your backend.
 */
 
-/* Actions */
-async function createAdmin(){ const payload={name:$('ad_name').value,email:$('ad_email').value,phone:$('ad_phone').value,role:$('ad_role').value}; await api('/admins',{method:'POST',body:JSON.stringify(payload)}); closeModal(); fetchAndRender(); }
-async function saveMember(){ const payload={name:$('m_name').value,memberId:$('m_id').value,phone:$('m_phone').value}; await api('/members',{method:'POST',body:JSON.stringify(payload)}); closeModal(); fetchAndRender(); }
-async function saveSaving(){ const payload={memberId:$('s_mid').value,type:$('s_type').value,amount:Number($('s_amount').value)}; await api('/savings',{method:'POST',body:JSON.stringify(payload)}); closeModal(); fetchAndRender(); }
-async function saveLoan(){ const payload={memberId:$('l_mid').value,principal:Number($('l_amount').value),interestRate:Number($('l_rate').value),dueDate:$('l_due').value}; await api('/loans',{method:'POST',body:JSON.stringify(payload)}); closeModal(); fetchAndRender(); }
-async function markSavingPaid(id,type){ if(!confirm('Mark as paid?')) return; await api(`/savings/${id}/mark-paid`,{method:'POST'}); fetchAndRender(); }
-async function applyPenaltySingle(id,type){ await api('/savings/apply-penalty',{method:'POST',body:JSON.stringify({ids:[id],type})}); fetchAndRender(); }
-async function applySelectedPenalties(){ const ids=[...Array.from(document.querySelectorAll('.wkchk:checked')).map(n=>n.dataset.id), ...Array.from(document.querySelectorAll('.mnchk:checked')).map(n=>n.dataset.id)]; if(!ids.length){alert('Select items first');return;} await api('/savings/apply-penalty',{method:'POST',body:JSON.stringify({ids})}); fetchAndRender(); }
+const API_BASE = 'http://localhost:5000/api'; // <-- change to your backend
+let SETTINGS = { weeklyPenalty: 10, monthlyPenalty: 50, loanDailyRate: 0.02 };
 
-async function applyLoanPenalty(loanId){ if(!confirm('Apply loan penalty now?')) return; await api(`/loans/${loanId}/apply-penalty`,{method:'POST'}); fetchAndRender(); }
-async function runPenaltyNow(){ await api('/cron/savings-penalties',{method:'POST'}); fetchAndRender(); }
-async function applyLoanAccrualNow(){ await api('/cron/loan-accrual',{method:'POST'}); fetchAndRender(); }
-$('runAccrualBtn').addEventListener('click', async ()=>{ await applyLoanAccrualNow(); alert('Loan accrual triggered'); });
+// simple helpers
+const $ = id => document.getElementById(id);
+const show = (sec)=>{ document.querySelectorAll('.section').forEach(s=>s.style.display='none'); $(sec).style.display='block'; }
+document.querySelectorAll('.menu-link').forEach(a=>{
+  a.addEventListener('click', e=>{
+    e.preventDefault();
+    document.querySelectorAll('.menu-link').forEach(x=>x.classList.remove('active'));
+    a.classList.add('active');
+    show(a.dataset.section);
+  });
+});
 
-async function openMember(memberId){ const m=await api('/members/'+memberId); $('modalPanel').innerHTML=`<h3>${m.name}</h3><div class="row"><div class="col"><label>Member ID</label><div>${m.memberId}</div></div><div class="col"><label>Phone</label><div>${m.phone||''}</div></div></div><div class="row"><div class="col"><label>Balance</label><div>KES ${numberWithCommas(m.balance||0)}</div></div><div class="col"><label>Status</label><div>${m.status||'active'}</div></div></div><div class="flex-end"><button class="btn" onclick="downloadFullStatement('${memberId}')">Download Statement</button><button class="btn ghost" onclick="closeModal()">Close</button></div>`; $('modal').style.display='flex'; }
+// modal
+function openModal(panel){
+  const modal = $('modal'); const mp = $('modalPanel'); modal.style.display='flex';
+  if(panel==='createAdmin'){
+    mp.innerHTML = `<h3>Create Admin</h3>
+      <label>Name</label><input id="ad_name">
+      <label>Email</label><input id="ad_email">
+      <label>Phone</label><input id="ad_phone">
+      <label>Role</label><select id="ad_role"><option>superadmin</option><option>treasurer</option><option>secretary</option></select>
+      <div class="flex-end"><button class="btn" onclick="createAdmin()">Save</button><button class="btn ghost" onclick="closeModal()">Close</button></div>`;
+  }
+  if(panel==='addMember'){
+    mp.innerHTML = `<h3>Add Member</h3>
+      <label>Name</label><input id="m_name">
+      <label>Member ID</label><input id="m_id">
+      <label>Phone</label><input id="m_phone">
+      <div class="flex-end"><button class="btn" onclick="saveMember()">Save</button><button class="btn ghost" onclick="closeModal()">Close</button></div>`;
+  }
+  if(panel==='addSaving'){
+    mp.innerHTML = `<h3>Add Saving</h3>
+      <label>Member ID</label><input id="s_mid">
+      <label>Type</label><select id="s_type"><option value="weekly">weekly</option><option value="monthly">monthly</option></select>
+      <label>Amount</label><input id="s_amount" type="number">
+      <div class="flex-end"><button class="btn" onclick="saveSaving()">Save</button><button class="btn ghost" onclick="closeModal()">Close</button></div>`;
+  }
+  if(panel==='addLoan'){
+    mp.innerHTML = `<h3>Create Loan</h3>
+      <label>Member ID</label><input id="l_mid">
+      <label>Principal</label><input id="l_amount" type="number">
+      <label>Interest (%)</label><input id="l_rate" type="number" value="10">
+      <label>Due Date</label><input id="l_due" type="date">
+      <div class="flex-end"><button class="btn" onclick="saveLoan()">Create</button><button class="btn ghost" onclick="closeModal()">Close</button></div>`;
+  }
+}
+function closeModal(){ $('modal').style.display='none'; $('modalPanel').innerHTML=''; }
 
-function logout(){ localStorage.removeItem('vyg_token'); window.location.href='/admin-login.html'; }
-function numberWithCommas(x){ return (x||0).toString().replace(/\B(?=(\d{3})+(?!\d))/g,","); }
+// persistence helpers
+async function api(path, opts = {}) {
+  try {
+    const res = await fetch(API_BASE + path, Object.assign({
+      headers: { 'Content-Type': 'application/json' }
+    }, opts));
+    if(!res.ok){ const txt = await res.text(); throw new Error(txt || 'API error'); }
+    return res.json();
+  } catch(err){ console.error('API',path,err); throw err; }
+}
 
-async function saveSettings(){ SETTINGS.weeklyPenalty=Number($('cfgWeekly').value); SETTINGS.monthlyPenalty=Number($('cfgMonthly').value); SETTINGS.loanDailyRate=Number($('cfgLoanRate').value); await api('/settings',{method:'POST',body:JSON.stringify(SETTINGS)}); alert('Saved'); }
+/* -------------------- FETCH & RENDER -------------------- */
+async function fetchAndRender(){
+  try {
+    // stats
+    const [members, weekly, monthly, loans, transactions, penalties] = await Promise.all([
+      api('/members'),
+      api('/savings/weekly'),
+      api('/savings/monthly'),
+      api('/loans'),
+      api('/transactions'),
+      api('/penalties/summary').catch(()=>({ total:0 }))
+    ]);
+    // compute stats
+    $('statMembers').innerText = members.length;
+    const totalSavings = (weekly.reduce((s,r)=>s + (r.paidAmount||0) + (r.penaltyAmount||0),0) + monthly.reduce((s,r)=>s + (r.paidAmount||0) + (r.penaltyAmount||0),0));
+    $('statSavings').innerText = 'KES ' + numberWithCommas(totalSavings);
+    const outstandingLoans = loans.reduce((s,l)=>s + (l.balance||0),0);
+    $('statLoans').innerText = 'KES ' + numberWithCommas(outstandingLoans);
+    $('statPenalties').innerText = 'KES ' + numberWithCommas((penalties.total||0));
 
+    // overdue lists
+    const overdueLoans = loans.filter(l=>l.status==='overdue' || (new Date(l.dueDate) < new Date() && l.status==='active'));
+    $('overdueLoansList').innerText = overdueLoans.slice(0,4).map(l=>`${l.memberName || l.memberId} KES ${l.balance}`).join(', ') || 'None';
+    const overdueSavings = [...weekly.filter(w=>w.status!=='paid' && w.penaltyApplied), ...monthly.filter(m=>m.status!=='paid' && m.penaltyApplied)];
+    $('overdueSavingsList').innerText = overdueSavings.length ? `${overdueSavings.length} overdue items` : 'None';
 
+    // render tables
+    renderMembersTable(members);
+    renderSavingsTables(weekly, monthly);
+    renderLoansTable(loans);
+    renderTransactionsTable(transactions);
+  } catch(err){
+    alert('Failed to load data: '+err.message);
+  }
+}
+
+/* MEMBERS */
+function renderMembersTable(members){
+  const tbody = document.querySelector('#membersTable tbody'); tbody.innerHTML='';
+  members.forEach(m=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${m.name}</td><td>${m.memberId || m._id}</td><td>${m.phone||''}</td><td>KES ${numberWithCommas(m.balance||0)}</td>
+      <td>
+        <button class="btn small" onclick="openMember('${m.memberId||m._id}')">View</button>
+        <button class="btn ghost small" onclick="downloadFullStatement('${m.memberId||m._id}')">Statement</button>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+/* SAVINGS */
+function renderSavingsTables(weekly, monthly){
+  const wtbody = document.querySelector('#weeklyTable tbody'); wtbody.innerHTML='';
+  weekly.forEach(w=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td><input type="checkbox" data-id="${w._id}" class="wkchk"></td>
+      <td>${w.memberName || w.memberId}</td><td>${w.week}</td><td>KES ${w.requiredAmount}</td>
+      <td>KES ${w.paidAmount||0}</td><td>${w.penaltyApplied ? 'KES '+w.penaltyAmount : '-'}</td><td><span class="pill">${w.status}</span></td>
+      <td>
+        <button class="btn small" onclick="markSavingPaid('${w._id}','weekly')">Mark Paid</button>
+        <button class="btn ghost small" onclick="applyPenaltySingle('${w._id}','weekly')">Apply Penalty</button>
+        <button class="btn small" onclick="downloadSavingReceiptById('${w._id}')">Receipt</button>
+      </td>`;
+    wtbody.appendChild(tr);
+  });
+
+  const mtbody = document.querySelector('#monthlyTable tbody'); mtbody.innerHTML='';
+  monthly.forEach(m=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td><input type="checkbox" data-id="${m._id}" class="mnchk"></td>
+      <td>${m.memberName || m.memberId}</td><td>${m.month}</td><td>KES ${m.requiredAmount}</td>
+      <td>KES ${m.paidAmount||0}</td><td>${m.penaltyApplied ? 'KES '+m.penaltyAmount : '-'}</td><td><span class="pill">${m.status}</span></td>
+      <td>
+        <button class="btn small" onclick="markSavingPaid('${m._id}','monthly')">Mark Paid</button>
+        <button class="btn ghost small" onclick="applyPenaltySingle('${m._id}','monthly')">Apply Penalty</button>
+        <button class="btn small" onclick="downloadSavingReceiptById('${m._id}')">Receipt</button>
+      </td>`;
+    mtbody.appendChild(tr);
+  });
+
+  // select all
+  $('wkSelectAll').onclick = e => document.querySelectorAll('.wkchk').forEach(cb=>cb.checked = e.target.checked);
+  $('mnSelectAll').onclick = e => document.querySelectorAll('.mnchk').forEach(cb=>cb.checked = e.target.checked);
+}
+
+/* LOANS */
+function renderLoansTable(loans){
+  const tbody = document.querySelector('#loansTable tbody'); tbody.innerHTML='';
+  loans.forEach(l=>{
+    // calculate current penalty display (if server didn't accrue yet)
+    const due = new Date(l.dueDate); let overdueDays = 0;
+    if(new Date() > due) overdueDays = Math.floor((new Date() - due)/(1000*60*60*24));
+    const penalty = (l.penaltiesTotal || 0) + ( (l.penaltyRate || SETTINGS.loanDailyRate) * (l.balance || 0) * overdueDays );
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${l.memberName || l.memberId}</td>
+      <td>KES ${numberWithCommas(l.principal||0)}</td>
+      <td>KES ${numberWithCommas(l.balance||0)}</td>
+      <td>${l.interestRate || l.interest}%</td>
+      <td>${(new Date(l.dueDate)).toLocaleDateString()}</td>
+      <td>${overdueDays}</td>
+      <td>KES ${numberWithCommas(Math.round(penalty))}</td>
+      <td><span class="pill">${l.status}</span></td>
+      <td>
+        <button class="btn small" onclick="applyLoanPenalty('${l._id}')">Apply Penalty</button>
+        <button class="btn ghost small" onclick="downloadLoanReceiptById('${l._id}')">Receipt</button>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+/* TRANSACTIONS */
+function renderTransactionsTable(tx){
+  const tbody = document.querySelector('#transactionsTable tbody'); tbody.innerHTML='';
+  tx.forEach(t=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${(new Date(t.createdAt)).toLocaleString()}</td>
+      <td>${t.memberName || t.memberId}</td><td>${t.type}</td><td>${t.description||''}</td><td>KES ${numberWithCommas(t.amount)}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+/* -------------------- ACTIONS -------------------- */
+async function createAdmin(){
+  const payload = { name: $('ad_name').value, email: $('ad_email').value, phone: $('ad_phone').value, role: $('ad_role').value };
+  await api('/admins',{ method:'POST', body: JSON.stringify(payload) });
+  closeModal(); fetchAndRender();
+}
+async function saveMember(){
+  const payload = { name: $('m_name').value, memberId: $('m_id').value, phone: $('m_phone').value };
+  await api('/members',{ method:'POST', body: JSON.stringify(payload) });
+  closeModal(); fetchAndRender();
+}
+async function saveSaving(){
+  const payload = { memberId: $('s_mid').value, type: $('s_type').value, amount: Number($('s_amount').value) };
+  await api('/savings',{ method:'POST', body: JSON.stringify(payload) });
+  closeModal(); fetchAndRender();
+}
+async function saveLoan(){
+  const payload = { memberId: $('l_mid').value, principal: Number($('l_amount').value), interestRate: Number($('l_rate').value), dueDate: $('l_due').value };
+  await api('/loans',{ method:'POST', body: JSON.stringify(payload) });
+  closeModal(); fetchAndRender();
+}
+async function saveLoan(){ // duplicate safe
+  const payload = { memberId: $('l_mid').value, principal: Number($('l_amount').value), interestRate: Number($('l_rate').value), dueDate: $('l_due').value };
+  await api('/loans',{ method:'POST', body: JSON.stringify(payload) });
+  closeModal(); fetchAndRender();
+}
+async function markSavingPaid(id,type){
+  if(!confirm('Mark as paid?')) return;
+  await api(`/savings/${id}/mark-paid`, { method:'POST' });
+  fetchAndRender();
+}
+async function applyPenaltySingle(id,type){
+  const body = { ids: [id], type };
+  await api('/savings/apply-penalty', { method:'POST', body: JSON.stringify(body) });
+  fetchAndRender();
+}
+async function applySelectedPenalties(){
+  const wIds = Array.from(document.querySelectorAll('.wkchk:checked')).map(n=>n.dataset.id);
+  const mIds = Array.from(document.querySelectorAll('.mnchk:checked')).map(n=>n.dataset.id);
+  const ids = [...wIds, ...mIds];
+  if(!ids.length){ alert('Select items first'); return; }
+  await api('/savings/apply-penalty',{ method:'POST', body: JSON.stringify({ ids }) });
+  fetchAndRender();
+}
+
+/* LOAN penalty actions */
+async function applyLoanPenalty(loanId){
+  if(!confirm('Apply loan penalty now?')) return;
+  await api(`/loans/${loanId}/apply-penalty`, { method:'POST' });
+  fetchAndRender();
+}
+async function runPenaltyNow(){
+  // runs savings penalty job on server
+  await api('/cron/run-savings-penalties', { method:'POST' });
+  fetchAndRender();
+}
+async function applyLoanAccrualNow(){
+  await api('/cron/run-loan-accrual', { method:'POST' });
+  fetchAndRender();
+}
+async function runAccrualBtn(){
+  // manual button handler
+  await api('/cron/run-loan-accrual', { method:'POST' });
+  alert('Loan accrual job triggered on server (if endpoint implemented).');
+}
+
+/* open member */
+async function openMember(memberId){
+  // show modal with member details & quick actions
+  const m = await api('/members/'+memberId);
+  const content = `<h3>${m.name}</h3>
+    <div class="row"><div class="col"><label>Member ID</label><div>${m.memberId}</div></div><div class="col"><label>Phone</label><div>${m.phone||''}</div></div></div>
+    <div class="row"><div class="col"><label>Balance</label><div>KES ${numberWithCommas(m.balance||0)}</div></div><div class="col"><label>Status</label><div>${m.status||'active'}</div></div></div>
+    <div class="flex-end"><button class="btn" onclick="downloadFullStatement('${memberId}')">Download Statement</button><button class="btn ghost" onclick="closeModal()">Close</button></div>`;
+  $('modalPanel').innerHTML = content; $('modal').style.display='flex';
+}
 
 /* EXPORTS & CSV */
 function exportMembersCSV(){ alert('Implement server CSV export endpoint or build client CSV'); }
