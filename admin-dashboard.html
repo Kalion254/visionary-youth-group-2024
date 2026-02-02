@@ -264,7 +264,19 @@
     </table>
   </div>
 </section>
+<!-- ORGANIZATION DOCUMENTS -->
+<section id="documents" class="section" style="display:none">
+  <h3>Organization Documents</h3>
+  <input type="file" id="docFile">
+  <button class="btn small" onclick="uploadDoc()">Upload</button>
 
+  <div class="table-wrap" style="margin-top:10px">
+    <table id="docsTable">
+      <thead><tr><th>Name</th><th>Uploaded</th><th>Actions</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</section>
 
 
     <!-- RECEIPTS / PDFs -->
@@ -724,6 +736,25 @@ async function applyLoanAccrualNow(){
     alert('Loan accrual job triggered on server (if endpoint implemented).');
   } catch(e){ alert('Loan accrual failed: '+shortErr(e)); }
 }
+/* staff render */
+function renderStaff(staff){
+  const tbody=$('staffTable').querySelector('tbody');
+  tbody.innerHTML='';
+  staff.forEach(s=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td>${s.name}</td>
+      <td>${s.role}</td>
+      <td>${s.phone||''}</td>
+      <td><span class="pill">${s.status||'active'}</span></td>
+      <td>
+        <button class="btn small">Edit</button>
+        <button class="btn danger small">Deactivate</button>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+}
+
 
 /* open member */
 async function openMember(memberId){
@@ -735,6 +766,16 @@ async function openMember(memberId){
       <div class="flex-end"><button class="btn" onclick="downloadFullStatement('${memberId}')">Download Statement</button><button class="btn ghost" onclick="closeModal()">Close</button></div>`;
     $('modalPanel').innerHTML = content; $('modal').style.display='flex';
   } catch(e){ alert('Open member failed: '+shortErr(e)); }
+}
+
+
+async function uploadDoc(){
+  const f=$('docFile').files[0];
+  if(!f) return alert('select file');
+  const fd=new FormData();
+  fd.append('file',f);
+  await fetch(API_BASE+'/documents',{method:'POST',body:fd});
+  fetchAndRender();
 }
 
 /* EXPORTS & CSV */
@@ -893,3 +934,4 @@ window.applyLoanPenalty = applyLoanPenalty;
 </script>
 </body>
 </html>
+
