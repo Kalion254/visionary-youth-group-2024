@@ -86,6 +86,11 @@
         <li><a href="#" class="menu-link" data-section="transactions">🔁 Transactions</a></li>
         <li><a href="#" class="menu-link" data-section="receipts">📄 Receipts / PDFs</a></li>
         <li><a href="#" class="menu-link" data-section="settings">⚙️ Settings</a></li>
+        <li><a href="#" class="menu-link" data-section="investments">📈 Investments</a></li>
+<li><a href="#" class="menu-link" data-section="staff">🧑‍💼 Staff</a></li>
+<li><a href="#" class="menu-link" data-section="analytics">📊 Analytics</a></li>
+<li><a href="#" class="menu-link" data-section="documents">🗂 Org Documents</a></li>
+
       </ul>
     </nav>
 
@@ -217,6 +222,50 @@
         <table id="transactionsTable"><thead><tr><th>Date</th><th>Member</th><th>Type</th><th>Description</th><th>Amount</th></tr></thead><tbody></tbody></table>
       </div>
     </section>
+
+    <section id="investments" class="section" style="display:none">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+    <h3>Investments</h3>
+    <button class="btn ghost" onclick="openModal('addInvestment')">Add Investment</button>
+  </div>
+<!-- INVESTMENTS -->
+  <div class="table-wrap">
+    <table id="investmentsTable">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Amount</th>
+          <th>Start Date</th>
+          <th>Expected Return</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</section>
+<!-- STAFF -->
+<section id="staff" class="section" style="display:none">
+  <h3>Staff & Officials</h3>
+  <div class="table-wrap">
+    <table id="staffTable">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Role</th>
+          <th>Phone</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</section>
+
+
 
     <!-- RECEIPTS / PDFs -->
     <section id="receipts" class="section" style="display:none">
@@ -364,6 +413,21 @@ function openModal(panel){
 }
 function closeModal(){ $('modal').style.display='none'; $('modalPanel').innerHTML=''; }
 
+if(panel==='addInvestment'){
+  mp.innerHTML = `
+    <h3>Add Investment</h3>
+    <label>Name</label><input id="inv_name">
+    <label>Type</label><select id="inv_type"><option>SACCO</option><option>Fixed Deposit</option><option>Project</option></select>
+    <label>Amount (KES)</label><input id="inv_amount" type="number">
+    <label>Expected Return (KES)</label><input id="inv_return" type="number">
+    <label>Start Date</label><input id="inv_date" type="date">
+    <div class="flex-end">
+      <button class="btn" onclick="saveInvestment()">Save</button>
+      <button class="btn ghost" onclick="closeModal()">Close</button>
+    </div>`;
+}
+
+
 // persistence helpers
 async function api(path, opts = {}) {
   try {
@@ -510,6 +574,57 @@ function renderTransactionsTable(tx){
     tbody.appendChild(tr);
   });
 }
+/* INVESTMENTS */
+async function saveInvestment(){
+  const payload = {
+    name: $('inv_name').value,
+    type: $('inv_type').value,
+    amount: Number($('inv_amount').value),
+    expectedReturn: Number($('inv_return').value),
+    startDate: $('inv_date').value
+  };
+  await api('/investments',{method:'POST',body:JSON.stringify(payload)});
+  closeModal(); fetchAndRender();
+}
+
+function renderInvestments(inv){
+  const tbody = $('investmentsTable').querySelector('tbody');
+  tbody.innerHTML='';
+  inv.forEach(i=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td>${i.name}</td>
+      <td>${i.type}</td>
+      <td>KES ${numberWithCommas(i.amount)}</td>
+      <td>${new Date(i.startDate).toLocaleDateString()}</td>
+      <td>KES ${numberWithCommas(i.expectedReturn||0)}</td>
+      <td><span class="pill">${i.status||'active'}</span></td>
+      <td>
+        <button class="btn small">View</button>
+        <button class="btn ghost small">Edit</button>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+}
+/* STAFF */
+function renderStaff(staff){
+  const tbody=$('staffTable').querySelector('tbody');
+  tbody.innerHTML='';
+  staff.forEach(s=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td>${s.name}</td>
+      <td>${s.role}</td>
+      <td>${s.phone||''}</td>
+      <td><span class="pill">${s.status||'active'}</span></td>
+      <td>
+        <button class="btn small">Edit</button>
+        <button class="btn danger small">Deactivate</button>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+}
+
 
 /* -------------------- ACTIONS -------------------- */
 async function createAdmin(){
