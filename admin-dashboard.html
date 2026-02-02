@@ -850,22 +850,39 @@ function generateLoanReceiptPDF(data){
 }
 
 /* Full statement (combines savings, loans, penalties) */
-async function downloadFullStatement(memberId){
-  if(!memberId) memberId = $('statementMemberId').value.trim();
-  if(!memberId) return alert('enter member id');
+async function downloadFullStatement(memberId) {
+  if (!memberId) {
+    const input = $('statementMemberId').value.trim();
+    if (!input) return alert('Enter member ID');
+    memberId = input; // use value from input if not passed
+  }
+
   try {
-    const report = await api(`/reports/member-statement/${memberId}`);
-    generateFullStatementPDF(report);
-  } catch(e){ alert('Download statement failed: '+shortErr(e)); }
+    // fetch the PDF from backend
+    const res = await fetch(`${API_BASE}/reports/member-statement/${memberId}`, {
+      method: 'GET'
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(()=>({ error: 'Unknown error' }));
+      return alert('Download statement failed: ' + (err.error || 'Unknown'));
+    }
+
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `member_statement_${memberId}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  } catch (e) {
+    console.error(e);
+    alert('Download statement failed: ' + shortErr(e));
+  }
 }
-function generateFullStatementPDF(report){
-  const doc = new jsPDF({unit:'pt',format:'a4'});
-  doc.setFontSize(18); doc.text('Visionary Youth Group', 40, 50);
-  doc.setFontSize(12); doc.text('Member Full Statement', 40, 80);
-  doc.setFontSize(10);
-  doc.text(`Name: ${report.member.name || report.member.memberId}`, 40, 110);
-  doc.text(`Member ID: ${report.member.memberId}`, 40, 125);
-  doc.text(`Date: ${new Date().toLocaleString()}`, 40, 140);
+
 
   // savings table
   doc.autoTable({
